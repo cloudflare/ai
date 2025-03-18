@@ -1,0 +1,12 @@
+{
+  "main": "oauth-provider.ts",
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20250303.0"
+  },
+  "devDependencies": {
+    "vitest": "^1.2.2"
+  },
+  "scripts": {
+    "test": "vitest"
+  }
+}
