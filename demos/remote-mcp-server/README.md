@@ -33,7 +33,7 @@ To explore your new MCP api, you can use the [MCP Inspector](https://modelcontex
 
 ![MCP Inspector with after a tool call](img/mcp-inspector-successful-tool-call.png)
 
-## Connect Claude Desktop to your local server
+## Connect Claude Desktop to your local MCP server
 
 The MCP inspector is great, but we really want to connect this to Claude! Follow [Anthropic's Quickstart](<https://modelcontextprotocol.io/quickstart/user) and within Claude Desktop go to Settings > Developer > Edit Config to find your configuration file.
 
@@ -76,8 +76,35 @@ Then enter the `workers.dev` URL (ex: `worker-name.account-name.workers.dev/sse`
 
 You've now connected to your MCP server from a remote MCP client.
 
+## Connect Claude Desktop to your remote MCP server
+
+Update the Claude configuration file to point to your `workers.dev` URL (ex: `worker-name.account-name.workers.dev/sse`) and restart Claude 
+
+```json
+{
+  "mcpServers": {
+    "math": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://worker-name.account-name.workers.dev/sse"
+      ]
+    }
+  }
+}
+```
+
 ## Debugging
+
+Should anything go wrong it can be helpful to restart Claude, or to try connecting directly to your
+MCP server on the command line with the following command.
 
 ```bash
 npx mcp-remote http://localhost:8787/sse
+```
+
+In some rare cases it may help to clear the files added to `~/.mcp-auth`
+
+```bash
+rm -rf ~/.mcp-auth
 ```
