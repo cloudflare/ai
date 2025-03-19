@@ -1,15 +1,15 @@
-import { Hono } from 'hono'
-import { OAuthHelpers } from '../lib/OAuthProvider'
+import { Hono } from "hono";
+import { OAuthHelpers } from "../../lib/workers-oauth-provider";
 
 export type Bindings = Env & {
-  OAUTH_PROVIDER: OAuthHelpers
-}
+	OAUTH_PROVIDER: OAuthHelpers;
+};
 
 type Variables = {
-  isLoggedIn: boolean
-}
+	isLoggedIn: boolean;
+};
 const app = new Hono<{
-  Bindings: Bindings
-  Variables: Variables
-}>()
-export default app
+	Bindings: Bindings;
+	Variables: Variables;
+}>();
+export default app;

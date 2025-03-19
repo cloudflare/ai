@@ -7,5 +7,16 @@
     "dev": "wrangler dev",
     "start": "wrangler dev",
     "cf-typegen": "wrangler types"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250310.0",
+    "@modelcontextprotocol/sdk": "^1.7.0",
+    "hono": "^4.7.4",
+    "husky": "^9.1.7",
+    "marked": "^15.0.7",
+    "prettier": "^3.5.3",
+    "typescript": "^5.5.2",
+    "wrangler": "^3.112.0",
+    "zod": "^3.24.2"
   }
 }
