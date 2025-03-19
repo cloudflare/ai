@@ -1,5 +1,5 @@
 {
-	"name": "ai-mono",
+	"name": "mcp-slack-oauth",
 	"author": "Andy Jessop",
 	"scripts": {
 		"generate-app": "npx tsx ./scripts/generate-app/index.ts",
@@ -28,7 +28,7 @@
 		"vite": "^6.1.0",
 		"vitest": "^1.5.0",
 		"wait-on": "^8.0.3",
-		"wrangler": "^3.112.0"
+		"wrangler": "^4.2.0"
 	},
 	"dependencies": {
 		"@ai-sdk/openai": "^1.1.9",
