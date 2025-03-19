@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { OAuthHelpers } from "../../lib/workers-oauth-provider";
+import { OAuthHelpers } from "workers-mcp/vendor/workers-oauth-provider/oauth-provider.js";
 
 export type Bindings = Env & {
 	OAUTH_PROVIDER: OAuthHelpers;

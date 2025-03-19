@@ -1,9 +1,9 @@
 import type { ExportedHandler } from "@cloudflare/workers-types";
 import app from "./routes";
-import OAuthProvider from "../lib/workers-oauth-provider";
-import { DurableMCP } from "./lib/MCPEntrypoint";
+import { DurableMCP } from "workers-mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import OAuthProvider from "workers-mcp/vendor/workers-oauth-provider/oauth-provider.js";
 
 export class MyMCP extends DurableMCP {
 	server = new McpServer({
@@ -26,8 +26,10 @@ export class MyMCP extends DurableMCP {
 export default new OAuthProvider({
 	apiRoute: "/sse",
 	// TODO: fix these types
-	apiHandler: MyMCP.mount("/sse") as unknown as ExportedHandler,
-	defaultHandler: app as unknown as ExportedHandler,
+	// @ts-ignore
+	apiHandler: MyMCP.mount("/sse"),
+	// @ts-ignore
+	defaultHandler: app,
 	authorizeEndpoint: "/authorize",
 	tokenEndpoint: "/token",
 	clientRegistrationEndpoint: "/register",
