@@ -26,20 +26,18 @@ To explore your new MCP api, you can use the [MCP Inspector](https://modelcontex
 
 - Start it with `npx @modelcontextprotocol/inspector`
 - [Within the inspector](http://localhost:5173), switch the Transport Type to `SSE` and enter `http://localhost:8787/sse` as the URL of the MCP server to connect to, and click "Connect"
-
-![MCP Inspector with the above config](img/mcp-inspector-sse-config.png)
-
 - You will navigate to a (mock) user/password login screen. Input any email and pass to login.
-
-![App login page](img/mcp-login.png)
-
 - You should be redirected back to the MCP Inspector and you can now list and call any defined tools!
 
-![MCP inspector with a toast saying the OAuth login succeeded](img/mcp-inspector-oauth-success.png)
+![MCP Inspector with the above config](img/mcp-inspector-sse-config.png)
 
 ![MCP Inspector with after a tool call](img/mcp-inspector-successful-tool-call.png)
 
 ## Connect Claude Desktop to your local server
+
+The MCP inspector is great, but we really want to connect this to Claude! Follow [Anthropic's Quickstart](<https://modelcontextprotocol.io/quickstart/user) and within Claude Desktop go to Settings > Developer > Edit Config to find your configuration file.
+
+Open the file in your text editor and replace it with this configuration:
 
 ```json
 {
@@ -54,6 +52,13 @@ To explore your new MCP api, you can use the [MCP Inspector](https://modelcontex
   }
 }
 ```
+
+This will run a local proxy and let Claude talk to your MCP server over HTTP
+
+When you open Claude a browser window should open and allow you to login. You should see the tools available in the bottom right. Given the right prompt Claude should ask to call the tool.
+
+![Clicking on the hammer icon shows a list of available tools](img/available-tools.png)
+![Claude answers the prompt "I seem to have lost my calculator and have run out of fingers. Could you use the math tool to add 23 and 19?" by invoking the MCP add tool](img/claude-does-math-the-fancy-way.png)
 
 ## Deploy to Cloudflare
 
@@ -70,3 +75,9 @@ Just like you did above in "Develop locally", run the MCP inspector:
 Then enter the `workers.dev` URL (ex: `worker-name.account-name.workers.dev/sse`) of your Worker in the inspector as the URL of the MCP server to connect to, and click "Connect".
 
 You've now connected to your MCP server from a remote MCP client.
+
+## Debugging
+
+```bash
+npx mcp-remote http://localhost:8787/sse
+```
