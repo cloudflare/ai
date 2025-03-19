@@ -1,0 +1,22 @@
+{
+  "name": "mcp-slack-oauth",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "cf-typegen": "wrangler types"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250310.0",
+    "@modelcontextprotocol/sdk": "^1.7.0",
+    "@slack/web-api": "^6.11.2",
+    "hono": "^4.7.4",
+    "just-pick": "^4.2.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.5.2",
+    "wrangler": "^3.112.0",
+    "zod": "^3.24.2"
+  }
+}

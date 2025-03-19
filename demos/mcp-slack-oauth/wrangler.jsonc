@@ -1,0 +1,38 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mcp-slack-oauth",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-10",
+  "compatibility_flags": ["nodejs_compat"],
+  "migrations": [
+    {
+      "new_sqlite_classes": ["SlackMCP"],
+      "tag": "v1"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "class_name": "SlackMCP",
+        "name": "MCP_OBJECT"
+      }
+    ]
+  },
+  "kv_namespaces": [
+    {
+      "binding": "OAUTH_KV",
+      "id": "<YOUR_KV_NAMESPACE_ID>"
+    }
+  ],
+  "vars": {
+    "SLACK_CLIENT_ID": "<YOUR_SLACK_CLIENT_ID>",
+    "SLACK_CLIENT_SECRET": "<YOUR_SLACK_CLIENT_SECRET>"
+  },
+  "observability": {
+    "enabled": true
+  }
+}
