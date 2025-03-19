@@ -29,9 +29,13 @@ To explore your new MCP api, you can use the [MCP Inspector](https://modelcontex
 - You will navigate to a (mock) user/password login screen. Input any email and pass to login.
 - You should be redirected back to the MCP Inspector and you can now list and call any defined tools!
 
-![MCP Inspector with the above config](img/mcp-inspector-sse-config.png)
+<div align="center">
+  <img src="img/mcp-inspector-sse-config.png" alt="MCP Inspector with the above config" width="600"/>
+</div>
 
-![MCP Inspector with after a tool call](img/mcp-inspector-successful-tool-call.png)
+<div align="center">
+  <img src="img/mcp-inspector-successful-tool-call.png" alt="MCP Inspector with after a tool call" width="600"/>
+</div>
 
 ## Connect Claude Desktop to your local MCP server
 
@@ -57,8 +61,13 @@ This will run a local proxy and let Claude talk to your MCP server over HTTP
 
 When you open Claude a browser window should open and allow you to login. You should see the tools available in the bottom right. Given the right prompt Claude should ask to call the tool.
 
-![Clicking on the hammer icon shows a list of available tools](img/available-tools.png)
-![Claude answers the prompt "I seem to have lost my calculator and have run out of fingers. Could you use the math tool to add 23 and 19?" by invoking the MCP add tool](img/claude-does-math-the-fancy-way.png)
+<div align="center">
+  <img src="img/available-tools.png" alt="Clicking on the hammer icon shows a list of available tools" width="600"/>
+</div>
+
+<div align="center">
+  <img src="img/claude-does-math-the-fancy-way.png" alt="Claude answers the prompt 'I seem to have lost my calculator and have run out of fingers. Could you use the math tool to add 23 and 19?' by invoking the MCP add tool" width="600"/>
+</div>
 
 ## Deploy to Cloudflare
 
