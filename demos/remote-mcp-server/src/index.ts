@@ -1,4 +1,3 @@
-import type { ExportedHandler } from "@cloudflare/workers-types";
 import app from "./routes";
 import { DurableMCP } from "workers-mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";

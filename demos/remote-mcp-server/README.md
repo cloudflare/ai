@@ -9,6 +9,22 @@
 
 You will be prompted with a (mock) user/password login screen. Enter any user/password and hit accept.
 
+## Connect Claude Desktop to your local server
+
+```json
+{
+  "mcpServers": {
+    "test": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "http://localhost:8787/sse"
+      ]
+    }
+  }
+}
+```
+
 ## Deploy to Cloudflare
 
 1. `npx wrangler@latest kv namespace create remote-mcp-server-oauth-kv`
