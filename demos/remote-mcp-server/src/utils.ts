@@ -2,6 +2,7 @@
 import { html, raw } from "hono/html";
 import type { HtmlEscapedString } from "hono/utils/html";
 import { marked } from "marked";
+import type { AuthRequest } from "@cloudflare/workers-oauth-provider";
 
 // This file mainly exists as a dumping ground for uninteresting html and CSS
 // to remove clutter and noise from the auth logic. You likely do not need
@@ -196,10 +197,14 @@ export const homeContent = async (): Promise<HtmlEscapedString> => {
 	`;
 };
 
-export const renderLoggedInForm = (randomString: string) => {
+export const renderLoggedInForm = (oauthReqInfo: AuthRequest) => {
 	return html`
 		<form action="/approve" method="POST" class="space-y-4">
-			<input type="hidden" name="randomString" value="${randomString}" />
+			<input
+				type="hidden"
+				name="oauthReqInfo"
+				value="${JSON.stringify(oauthReqInfo)}"
+			/>
 			<input type="hidden" name="email" value="user@example.com" />
 			<button
 				type="submit"
@@ -221,10 +226,14 @@ export const renderLoggedInForm = (randomString: string) => {
 	`;
 };
 
-export const renderLoggedOutForm = (randomString: string) => {
+export const renderLoggedOutForm = (oauthReqInfo: AuthRequest) => {
 	return html`
 		<form action="/approve" method="POST" class="space-y-4">
-			<input type="hidden" name="randomString" value="${randomString}" />
+			<input
+				type="hidden"
+				name="oauthReqInfo"
+				value="${JSON.stringify(oauthReqInfo)}"
+			/>
 			<div class="space-y-4">
 				<div>
 					<label
@@ -277,7 +286,7 @@ export const renderLoggedOutForm = (randomString: string) => {
 
 export const renderAuthorizeContent = async (
 	oauthScopes: { name: string; description: string }[],
-	randomString: string,
+	oauthReqInfo: AuthRequest,
 	isLoggedIn: boolean
 ) => {
 	return html`
@@ -310,8 +319,8 @@ export const renderAuthorizeContent = async (
 				</ul>
 			</div>
 			${isLoggedIn
-				? renderLoggedInForm(randomString)
-				: renderLoggedOutForm(randomString)}
+				? renderLoggedInForm(oauthReqInfo)
+				: renderLoggedOutForm(oauthReqInfo)}
 		</div>
 	`;
 };
@@ -373,4 +382,20 @@ export const renderAuthorizationRejectedContent = async (
 		"error",
 		redirectUrl
 	);
+};
+
+export const parseApproveFormBody = async (body: {
+	[x: string]: string | File;
+}) => {
+	const action = body.action as string;
+	const email = body.email as string;
+	const password = body.password as string;
+	let oauthReqInfo: AuthRequest | null = null;
+	try {
+		oauthReqInfo = JSON.parse(body.oauthReqInfo as string) as AuthRequest;
+	} catch (e) {
+		oauthReqInfo = null;
+	}
+
+	return { action, oauthReqInfo, email, password };
 };
