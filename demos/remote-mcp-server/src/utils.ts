@@ -8,10 +8,7 @@ import type { AuthRequest } from "@cloudflare/workers-oauth-provider";
 // to remove clutter and noise from the auth logic. You likely do not need
 // anything from this file.
 
-export const layout = (
-	content: HtmlEscapedString | string,
-	title: string
-) => html`
+export const layout = (content: HtmlEscapedString | string, title: string) => html`
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -191,7 +188,7 @@ We believe in simplicity and efficiency.
 `;
 
 export const homeContent = async (): Promise<HtmlEscapedString> => {
-	let content = await marked(homeMarkdown);
+	const content = await marked(homeMarkdown);
 	return html`
 		<div class="max-w-4xl mx-auto markdown">${raw(content)}</div>
 	`;
@@ -287,7 +284,7 @@ export const renderLoggedOutForm = (oauthReqInfo: AuthRequest) => {
 export const renderAuthorizeContent = async (
 	oauthScopes: { name: string; description: string }[],
 	oauthReqInfo: AuthRequest,
-	isLoggedIn: boolean
+	isLoggedIn: boolean,
 ) => {
 	return html`
 		<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
@@ -314,13 +311,11 @@ export const renderAuthorizeContent = async (
 									</p>
 								</div>
 							</li>
-						`
+						`,
 					)}
 				</ul>
 			</div>
-			${isLoggedIn
-				? renderLoggedInForm(oauthReqInfo)
-				: renderLoggedOutForm(oauthReqInfo)}
+			${isLoggedIn ? renderLoggedInForm(oauthReqInfo) : renderLoggedOutForm(oauthReqInfo)}
 		</div>
 	`;
 };
@@ -328,7 +323,7 @@ export const renderAuthorizeContent = async (
 export const renderApproveContent = async (
 	message: string,
 	status: string,
-	redirectUrl: string
+	redirectUrl: string,
 ) => {
 	return html`
 		<div
@@ -336,9 +331,11 @@ export const renderApproveContent = async (
 		>
 			<div class="mb-4">
 				<span
-					class="inline-block p-3 ${status === "success"
-						? "bg-green-100 text-green-800"
-						: "bg-red-100 text-red-800"} rounded-full"
+					class="inline-block p-3 ${
+						status === "success"
+							? "bg-green-100 text-green-800"
+							: "bg-red-100 text-red-800"
+					} rounded-full"
 				>
 					${status === "success" ? "✓" : "✗"}
 				</span>
@@ -364,24 +361,12 @@ export const renderApproveContent = async (
 	`;
 };
 
-export const renderAuthorizationApprovedContent = async (
-	redirectUrl: string
-) => {
-	return renderApproveContent(
-		"Authorization approved!",
-		"success",
-		redirectUrl
-	);
+export const renderAuthorizationApprovedContent = async (redirectUrl: string) => {
+	return renderApproveContent("Authorization approved!", "success", redirectUrl);
 };
 
-export const renderAuthorizationRejectedContent = async (
-	redirectUrl: string
-) => {
-	return renderApproveContent(
-		"Authorization rejected.",
-		"error",
-		redirectUrl
-	);
+export const renderAuthorizationRejectedContent = async (redirectUrl: string) => {
+	return renderApproveContent("Authorization rejected.", "error", redirectUrl);
 };
 
 export const parseApproveFormBody = async (body: {
