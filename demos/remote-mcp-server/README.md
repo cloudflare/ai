@@ -8,14 +8,12 @@ Let's get a remote MCP server up-and-running on Cloudflare Workers complete with
 # clone the repository
 git clone git@github.com:cloudflare/ai.git
 
-# navigate to this example
-cd ai/demos/remote-mcp-server
-
 # install dependencies
+cd ai
 npm install
 
 # run locally
-npm run dev
+npx nx dev remote-mcp-server
 ```
 
 You should be able to open [`http://localhost:8787/`](http://localhost:8787/) in your browser
@@ -39,7 +37,7 @@ To explore your new MCP api, you can use the [MCP Inspector](https://modelcontex
 
 ## Connect Claude Desktop to your local MCP server
 
-The MCP inspector is great, but we really want to connect this to Claude! Follow [Anthropic's Quickstart](<https://modelcontextprotocol.io/quickstart/user) and within Claude Desktop go to Settings > Developer > Edit Config to find your configuration file.
+The MCP inspector is great, but we really want to connect this to Claude! Follow [Anthropic's Quickstart](https://modelcontextprotocol.io/quickstart/user) and within Claude Desktop go to Settings > Developer > Edit Config to find your configuration file.
 
 Open the file in your text editor and replace it with this configuration:
 
