@@ -15,6 +15,11 @@ type Props = {
   accessToken: string
 }
 
+const ALLOWED_USERNAMES = new Set([
+  // Add GitHub usernames of users who should have access to the image generation tool
+  // For example: 'yourusername', 'coworkerusername'
+]);
+
 export class MyMCP extends DurableMCP<Props, Env> {
   server = new McpServer({
     name: 'Github OAuth Proxy Demo',
@@ -35,7 +40,7 @@ export class MyMCP extends DurableMCP<Props, Env> {
 
     // Dynamically add tools based on the user's login. In this case, I want to limit
     // access to my Image Generation tool to just me
-    if (this.props.login === 'geelen') {
+    if (ALLOWED_USERNAMES.has(this.props.login)) {
       this.server.tool(
         'generateImage',
         'Generate an image using the `flux-1-schnell` model. Works best with 8 steps.',

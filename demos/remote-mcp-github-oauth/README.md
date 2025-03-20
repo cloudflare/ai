@@ -1,34 +1,22 @@
-# GitHub OAuth MCP 
+# Model Context Protocol (MCP) Server + Github OAuth
 
-This project demos how to add authentication to an MCP (Model Context Protocol) server that's built on Cloudflare using GitHub login. This allows users to connect to your MCP server by signing in with their GitHub account.
+This is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server that supports remote MCP connections, with Github OAuth built-in.
 
-The MCP server (powered by Cloudflare Workers): 
+You can deploy it to your own Cloudflare account, and after you create your own Github OAuth client app, you'll have a fully functional remote MCP server that you can build off. Users will be able to connect to your MCP server by signing in with their GitHub account.
+
+You can use this as a reference example for how to integrate other OAuth providers with an MCP server deployed to Cloudflare, using the [`workers-oauth-provider` library](https://github.com/cloudflare/workers-oauth-provider).
+
+The MCP server (powered by [Cloudflare Workers](https://developers.cloudflare.com/workers/)): 
 
 * Acts as OAuth _Server_ to your MCP clients
 * Acts as OAuth _Client_ to your _real_ OAuth server (in this case, GitHub)
 
 ## Getting Started
 
-You'll need to create two GitHub OAuth applications:
-
-- One for local development
-- One for production deployment
-
-### For Local Development
-Create a new GitHub OAuth App
-- For the Homepage URL, specify `http://localhost:8788`
-- For the Authorization callback URL, specify `http://localhost:8788/callback`
-- Note your Client ID and generate a Client secret. 
-- Create a `.dev.vars` file in your project root with: 
-```
-GITHUB_CLIENT_ID=your_development_github_client_id
-GITHUB_CLIENT_SECRET=your_development_github_client_secret
-```
-
 ### For Production
-Create another OAuth App
-- For the Homepage URL, specify `https://<your-worker-name>.<your-subdomain>.workers.dev`
-- For the Authorization callback URL, specify `https://<your-worker-name>.<your-subdomain>.workers.dev/callback`
+Create a new [GitHub OAuth App](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app): 
+- For the Homepage URL, specify `https://mcp-github-oauth.<your-subdomain>.workers.dev`
+- For the Authorization callback URL, specify `https://mcp-github-oauth.<your-subdomain>.workers.dev/callback`
 - Note your Client ID and generate a Client secret. 
 - Set secrets via Wrangler
 ```bash
@@ -40,31 +28,27 @@ wrangler secret put GITHUB_CLIENT_SECRET
 `wrangler kv:namespace create "OAUTH_KV"`
 - Update the Wrangler file with the KV ID
 
-#### Develop & Test
-Run the server locally to make it available at `http://localhost:8788`
-`wrangler dev`
-
-Test the local server using [Inspector](https://modelcontextprotocol.io/docs/tools/inspector): 
-
-```
-npx @modelcontextprotocol/inspector@latest
-```
-Enter `http://localhost:8788/sse` and hit connect. Once you follow the prompts, you'll be able to "List Tools". 
-
 #### Deploy & Test
 Deploy the MCP server to make it available on your workers.dev domain 
 ` wrangler deploy`
 
-#### Using Inspector
-Enter `https://<your-worker-name>.<your-subdomain>.workers.dev/sse` and hit connect. Once you go through the authentication flow, you'll see the Tools working: 
+Test the remote server using [Inspector](https://modelcontextprotocol.io/docs/tools/inspector): 
+
+```
+npx @modelcontextprotocol/inspector@latest
+```
+Enter `https://mcp-github-oauth.<your-subdomain>.workers.dev/sse` and hit connect. Once you go through the authentication flow, you'll see the Tools working: 
 
 <img width="640" alt="image" src="https://github.com/user-attachments/assets/7973f392-0a9d-4712-b679-6dd23f824287" />
 
-#### Using Claude
+You now have a remote MCP server deployed! 
+
+#### Access the remote MCP server from Claude Desktop
 
 Open Claude Desktop and navigate to Settings -> Developer -> Edit Config. This opens the configuration file that controls which MCP servers Claude can access.
 
-Replace the content with this configuration: 
+Replace the content with the following configuration. Once you restart Claude Desktop, a browser window will open showing your OAuth login page. Complete the authentication flow to grant Claude access to your MCP server. After you grant access, the tools will become available for you to use. 
+
 ```
 {
   "mcpServers": {
@@ -72,18 +56,35 @@ Replace the content with this configuration:
       "command": "npx",
       "args": [
         "mcp-remote",
-        "https://<your-worker-name>.<your-subdomain>.workers.dev/sse"
+        "https://mcp-github-oauth.<your-subdomain>.workers.dev/sse"
       ]
     }
   }
 }
 ```
-Save the file and restart Claude Desktop. When Claude restarts, a browser window will open showing your OAuth login page. Complete the authentication flow to grant Claude access to your MCP server.
 
+Once the Tools (under 🔨) show up in the interface, you can ask Claude to use them. For example: "Could you use the math tool to add 23 and 19?". Claude should invoke the tool and show the result generated by the MCP server.
 
-You may see some error messages. This is because Claude Desktop doesn't yet support remote MCP servers, so it sometimes gets confused. To verify whether the MCP server is connected, hover over the 🔨 icon in the bottom right corner of Claude's interface. You should see your tools available there.
+### For Local Development
+If you'd like to iterate and test your MCP server, you can do so in local development. This will require you to create another OAuth App on GitHub: 
+- For the Homepage URL, specify `http://localhost:8788`
+- For the Authorization callback URL, specify `http://localhost:8788/callback`
+- Note your Client ID and generate a Client secret. 
+- Create a `.dev.vars` file in your project root with: 
+```
+GITHUB_CLIENT_ID=your_development_github_client_id
+GITHUB_CLIENT_SECRET=your_development_github_client_secret
+```
 
-Ask Claude to use one of your tools. For example: "Could you use the math tool to add 23 and 19?". Claude should invoke the tool and show the result generated by the MCP server.
+#### Develop & Test
+Run the server locally to make it available at `http://localhost:8788`
+`wrangler dev`
+
+To test the local server, enter `http://localhost:8788/sse` into Inspector and hit connect. Once you follow the prompts, you'll be able to "List Tools". 
+
+#### Using Claude and other MCP Clients
+
+When using Claude to connect to your remote MCP server, you may see some error messages. This is because Claude Desktop doesn't yet support remote MCP servers, so it sometimes gets confused. To verify whether the MCP server is connected, hover over the 🔨 icon in the bottom right corner of Claude's interface. You should see your tools available there.
 
 #### Using Cursor and other MCP Clients
 
