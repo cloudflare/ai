@@ -1,6 +1,6 @@
 // Route: Approve (POST)
 import { html } from "hono/html";
-import { AuthRequest } from "@cloudflare/workers-oauth-provider";
+import type { AuthRequest } from "@cloudflare/workers-oauth-provider";
 import { layout } from "../utils";
 import app from "./_app";
 

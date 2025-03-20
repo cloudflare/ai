@@ -47,9 +47,5 @@
 		"workers-ai-provider": "^0.2.0",
 		"zod": "^3.24.2"
 	},
-	"workspaces": [
-		"libs/*",
-		"demos/*",
-		"packages/*"
-	]
+	"workspaces": ["libs/*", "demos/*", "packages/*"]
 }
