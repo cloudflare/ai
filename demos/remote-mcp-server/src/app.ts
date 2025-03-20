@@ -30,17 +30,17 @@ app.use("*", async (c, next) => {
 	await next();
 });
 
-// Route: Homepage
+// Render a basic homepage placeholder to make sure the app is up
 app.get("/", async (c) => {
-	const isLoggedIn = c.get("isLoggedIn");
 	const content = await homeContent();
-	return c.html(layout(content, "MCP Remote Auth Demo - Home", isLoggedIn));
+	return c.html(layout(content, "MCP Remote Auth Demo - Home"));
 });
 
 app.get("/authorize", async (c) => {
 	const oauthReqInfo = await c.env.OAUTH_PROVIDER.parseAuthRequest(c.req.raw);
 	const randomString = crypto.randomUUID();
 	const value = JSON.stringify(oauthReqInfo);
+
 	await c.env.OAUTH_KV.put(`login:${randomString}`, value, {
 		expirationTtl: 600,
 	});
@@ -60,13 +60,7 @@ app.get("/authorize", async (c) => {
 		c.get("isLoggedIn")
 	);
 
-	return c.html(
-		layout(
-			content,
-			"MCP Remote Auth Demo - Authorization",
-			c.get("isLoggedIn")
-		)
-	);
+	return c.html(layout(content, "MCP Remote Auth Demo - Authorization"));
 });
 
 app.post("/approve", async (c) => {
@@ -123,11 +117,7 @@ app.post("/approve", async (c) => {
 	const content = await renderApproveContent(message, status, redirectUrl);
 
 	return c.html(
-		layout(
-			content,
-			"MCP Remote Auth Demo - Authorization Status",
-			c.get("isLoggedIn")
-		)
+		layout(content, "MCP Remote Auth Demo - Authorization Status")
 	);
 });
 
