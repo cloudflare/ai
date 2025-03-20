@@ -1,4 +1,4 @@
-import OAuthProvider, { AuthRequest, OAuthHelpers } from 'workers-mcp/vendor/workers-oauth-provider/oauth-provider.js'
+import OAuthProvider, { AuthRequest, OAuthHelpers } from '@cloudflare/workers-oauth-provider'
 import { DurableMCP } from 'workers-mcp'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
