@@ -42,32 +42,36 @@ app.get("/authorize", async (c) => {
 		{ name: "write_data", description: "Create and modify your data" },
 	];
 
-	const content = await renderAuthorizeContent(oauthScopes, oauthReqInfo, isLoggedIn);
+	const content = await renderAuthorizeContent(
+		oauthScopes,
+		oauthReqInfo,
+		isLoggedIn
+	);
 
 	return c.html(layout(content, "MCP Remote Auth Demo - Authorization"));
 });
 
 app.post("/approve", async (c) => {
-	const { action, oauthReqInfo, email, password } = await parseApproveFormBody(
-		await c.req.parseBody(),
-	);
+	const { action, oauthReqInfo, email, password } =
+		await parseApproveFormBody(await c.req.parseBody());
 
 	if (!oauthReqInfo) {
 		return c.html("INVALID LOGIN");
 	}
 
 	// If the user needs to both login and approve, we should validate the login first
-	if (action == "login_approve") {
+	if (action === "login_approve") {
 		// We'll allow any values for email and password for this demo
 		// but you could validate them here
 		// Ex:
 		// if (email !== "user@example.com" || password !== "password") {
+		// biome-ignore lint/correctness/noConstantCondition: This is a demo
 		if (false) {
 			return c.html(
 				layout(
 					await renderAuthorizationRejectedContent("/"),
-					"MCP Remote Auth Demo - Authorization Status",
-				),
+					"MCP Remote Auth Demo - Authorization Status"
+				)
 			);
 		}
 	}
@@ -89,8 +93,8 @@ app.post("/approve", async (c) => {
 	return c.html(
 		layout(
 			await renderAuthorizationApprovedContent(redirectTo),
-			"MCP Remote Auth Demo - Authorization Status",
-		),
+			"MCP Remote Auth Demo - Authorization Status"
+		)
 	);
 });
 
