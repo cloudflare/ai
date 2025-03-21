@@ -1,7 +1,7 @@
-import { Context } from 'hono'
+import type { Context } from 'hono'
 import { env } from 'hono/adapter'
-import { MiddlewareHandler } from 'hono/types'
-import { createRemoteJWKSet, jwtVerify } from 'jose'
+import type { MiddlewareHandler } from 'hono/types'
+import { createRemoteJWKSet, JWTHeaderParameters, JWTPayload, jwtVerify } from 'jose'
 
 import { HTTPException } from '../utils/http-exception'
 
@@ -75,7 +75,7 @@ export const jwt = (
             JWKS = createRemoteJWKSet(new URL(`https://${auth0_domain}/.well-known/jwks.json`))
         }
 
-        let token = parts[1]
+        const token = parts[1]
         if (!token || token.length === 0) {
             const errDescription = 'No token included in request'
             throw new HTTPException(401, {
@@ -88,9 +88,9 @@ export const jwt = (
             })
         }
 
-        let payload
-        let protectedHeader
-        let cause
+        let payload: JWTPayload | null = null
+        let protectedHeader: JWTHeaderParameters | null = null
+        let cause: Error | null = null
         try {
             const verified = await jwtVerify(token, JWKS, {
                 issuer: `https://${auth0_domain}/`,
