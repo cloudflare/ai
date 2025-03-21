@@ -69,7 +69,7 @@ When you open Claude a browser window should open and allow you to login. You sh
 
 ## Deploy to Cloudflare
 
-1. `npx wrangler@latest kv namespace create remote-mcp-server-oauth-kv`
+1. `npx wrangler kv namespace create OAUTH_KV`
 2. Follow the guidance to add the kv namespace ID to `wrangler.jsonc`
 3. `npm run deploy`
 
