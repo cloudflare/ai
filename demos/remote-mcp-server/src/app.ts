@@ -60,7 +60,7 @@ app.post("/approve", async (c) => {
 		await parseApproveFormBody(await c.req.parseBody());
 
 	if (!oauthReqInfo) {
-		return c.html("INVALID LOGIN");
+		return c.html("INVALID LOGIN", 401);
 	}
 
 	// If the user needs to both login and approve, we should validate the login first
