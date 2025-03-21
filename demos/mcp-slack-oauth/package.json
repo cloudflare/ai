@@ -1,5 +1,5 @@
 {
-	"name": "mcp-github-oauth",
+	"name": "mcp-slack-oauth",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
