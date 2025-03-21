@@ -9,10 +9,7 @@ import { env } from "cloudflare:workers";
 // to remove clutter and noise from the auth logic. You likely do not need
 // anything from this file.
 
-export const layout = (
-	content: HtmlEscapedString | string,
-	title: string
-) => html`
+export const layout = (content: HtmlEscapedString | string, title: string) => html`
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -191,7 +188,7 @@ export const homeContent = async (req: Request): Promise<HtmlEscapedString> => {
 
 export const renderLoggedInAuthorizeScreen = async (
 	oauthScopes: { name: string; description: string }[],
-	oauthReqInfo: AuthRequest
+	oauthReqInfo: AuthRequest,
 ) => {
 	return html`
 		<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
@@ -218,7 +215,7 @@ export const renderLoggedInAuthorizeScreen = async (
 									</p>
 								</div>
 							</li>
-						`
+						`,
 					)}
 				</ul>
 			</div>
@@ -252,7 +249,7 @@ export const renderLoggedInAuthorizeScreen = async (
 
 export const renderLoggedOutAuthorizeScreen = async (
 	oauthScopes: { name: string; description: string }[],
-	oauthReqInfo: AuthRequest
+	oauthReqInfo: AuthRequest,
 ) => {
 	return html`
 		<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
@@ -279,7 +276,7 @@ export const renderLoggedOutAuthorizeScreen = async (
 									</p>
 								</div>
 							</li>
-						`
+						`,
 					)}
 				</ul>
 			</div>
@@ -343,7 +340,7 @@ export const renderLoggedOutAuthorizeScreen = async (
 export const renderApproveContent = async (
 	message: string,
 	status: string,
-	redirectUrl: string
+	redirectUrl: string,
 ) => {
 	return html`
 		<div
@@ -351,9 +348,11 @@ export const renderApproveContent = async (
 		>
 			<div class="mb-4">
 				<span
-					class="inline-block p-3 ${status === "success"
-						? "bg-green-100 text-green-800"
-						: "bg-red-100 text-red-800"} rounded-full"
+					class="inline-block p-3 ${
+						status === "success"
+							? "bg-green-100 text-green-800"
+							: "bg-red-100 text-red-800"
+					} rounded-full"
 				>
 					${status === "success" ? "✓" : "✗"}
 				</span>
@@ -379,24 +378,12 @@ export const renderApproveContent = async (
 	`;
 };
 
-export const renderAuthorizationApprovedContent = async (
-	redirectUrl: string
-) => {
-	return renderApproveContent(
-		"Authorization approved!",
-		"success",
-		redirectUrl
-	);
+export const renderAuthorizationApprovedContent = async (redirectUrl: string) => {
+	return renderApproveContent("Authorization approved!", "success", redirectUrl);
 };
 
-export const renderAuthorizationRejectedContent = async (
-	redirectUrl: string
-) => {
-	return renderApproveContent(
-		"Authorization rejected.",
-		"error",
-		redirectUrl
-	);
+export const renderAuthorizationRejectedContent = async (redirectUrl: string) => {
+	return renderApproveContent("Authorization rejected.", "error", redirectUrl);
 };
 
 export const parseApproveFormBody = async (body: {

@@ -45,17 +45,11 @@ app.get("/authorize", async (c) => {
 	];
 
 	if (isLoggedIn) {
-		const content = await renderLoggedInAuthorizeScreen(
-			oauthScopes,
-			oauthReqInfo
-		);
+		const content = await renderLoggedInAuthorizeScreen(oauthScopes, oauthReqInfo);
 		return c.html(layout(content, "MCP Remote Auth Demo - Authorization"));
 	}
 
-	const content = await renderLoggedOutAuthorizeScreen(
-		oauthScopes,
-		oauthReqInfo
-	);
+	const content = await renderLoggedOutAuthorizeScreen(oauthScopes, oauthReqInfo);
 	return c.html(layout(content, "MCP Remote Auth Demo - Authorization"));
 });
 
@@ -63,8 +57,9 @@ app.get("/authorize", async (c) => {
 // This endpoint is responsible for validating any login information and
 // then completing the authorization request with the OAUTH_PROVIDER
 app.post("/approve", async (c) => {
-	const { action, oauthReqInfo, email, password } =
-		await parseApproveFormBody(await c.req.parseBody());
+	const { action, oauthReqInfo, email, password } = await parseApproveFormBody(
+		await c.req.parseBody(),
+	);
 
 	if (!oauthReqInfo) {
 		return c.html("INVALID LOGIN", 401);
@@ -81,8 +76,8 @@ app.post("/approve", async (c) => {
 			return c.html(
 				layout(
 					await renderAuthorizationRejectedContent("/"),
-					"MCP Remote Auth Demo - Authorization Status"
-				)
+					"MCP Remote Auth Demo - Authorization Status",
+				),
 			);
 		}
 	}
@@ -104,8 +99,8 @@ app.post("/approve", async (c) => {
 	return c.html(
 		layout(
 			await renderAuthorizationApprovedContent(redirectTo),
-			"MCP Remote Auth Demo - Authorization Status"
-		)
+			"MCP Remote Auth Demo - Authorization Status",
+		),
 	);
 });
 
