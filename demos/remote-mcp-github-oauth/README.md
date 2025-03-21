@@ -13,6 +13,9 @@ The MCP server (powered by [Cloudflare Workers](https://developers.cloudflare.co
 
 ## Getting Started
 
+Clone the repo & install dependencies
+`pnpm install`
+
 ### For Production
 Create a new [GitHub OAuth App](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app): 
 - For the Homepage URL, specify `https://mcp-github-oauth.<your-subdomain>.workers.dev`
@@ -42,6 +45,19 @@ Enter `https://mcp-github-oauth.<your-subdomain>.workers.dev/sse` and hit connec
 <img width="640" alt="image" src="https://github.com/user-attachments/assets/7973f392-0a9d-4712-b679-6dd23f824287" />
 
 You now have a remote MCP server deployed! 
+
+#### User Access Control
+
+By default, this implementation allows any authenticated GitHub user to access all the available tools. 
+
+If you want to restrict specific tools (like image generation) to only certain users, you can modify the `ALLOWED_USERNAMES` set in `src/index.ts`:
+
+```typescript
+// Only users with these GitHub usernames can access restricted tools
+const ALLOWED_USERNAMES = new Set([
+  'your-github-username',
+  'colleague-username'
+]);
 
 #### Access the remote MCP server from Claude Desktop
 

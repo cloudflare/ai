@@ -14,10 +14,12 @@ type Props = {
 	accessToken: string;
 };
 
+// To restrict access to specific users only, add their GitHub usernames to this Set.
+// Leave it empty to allow access to all authenticated users.
 const ALLOWED_USERNAMES = new Set([
-	// Add GitHub usernames of users who should have access to the image generation tool
-	// For example: 'yourusername', 'coworkerusername'
-]);
+	// Example: 'yourusername',
+	// 'colleague-username'
+  ]);
 
 export class MyMCP extends DurableMCP<Props, Env> {
 	server = new McpServer({
@@ -56,7 +58,7 @@ export class MyMCP extends DurableMCP<Props, Env> {
 
 		// Dynamically add tools based on the user's login. In this case, I want to limit
 		// access to my Image Generation tool to just me
-		if (ALLOWED_USERNAMES.has(this.props.login)) {
+		if (ALLOWED_USERNAMES.size === 0 || ALLOWED_USERNAMES.has(this.props.login)) {
 			this.server.tool(
 				"generateImage",
 				"Generate an image using the `flux-1-schnell` model. Works best with 8 steps.",
