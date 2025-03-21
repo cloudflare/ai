@@ -5,6 +5,7 @@
 		"create-demo": "npx tsx ./tools/create-demo/index.ts",
 		"format": "biome format --write",
 		"lint": "biome lint",
+		"prepare": "if [ \"$CI\" ]; then echo 'Skipping husky setup in CI'; else husky; fi",
 		"lint:fix": "biome lint --fix"
 	},
 	"devDependencies": {
