@@ -13,7 +13,7 @@ The MCP server (powered by [Cloudflare Workers](https://developers.cloudflare.co
 
 ## Getting Started
 
-Clone the repo & install dependencies: `pnpm install`
+Clone the repo & install dependencies: `npm install`
 
 ### For Production
 Create a new [GitHub OAuth App](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app): 
