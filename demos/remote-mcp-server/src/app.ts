@@ -27,9 +27,10 @@ app.get("/", async (c) => {
 // If the user is logged in, we'll show a form to approve the appropriate scopes
 // If the user is not logged in, we'll show a form to both login and approve the scopes
 app.get("/authorize", async (c) => {
-	// We don't have an actual auth system, so to demonstrate both paths, we'll randomize
-	// whether the user is already logged in
-	const isLoggedIn = Math.random() > 0.5;
+	// We don't have an actual auth system, so to demonstrate both paths, you can
+	// hard-code whether the user is logged in or not. We'll default to true
+	// const isLoggedIn = false;
+	const isLoggedIn = true;
 
 	const oauthReqInfo = await c.env.OAUTH_PROVIDER.parseAuthRequest(c.req.raw);
 
@@ -42,15 +43,21 @@ app.get("/authorize", async (c) => {
 		{ name: "write_data", description: "Create and modify your data" },
 	];
 
-	const content = await renderAuthorizeContent(oauthScopes, oauthReqInfo, isLoggedIn);
+	const content = await renderAuthorizeContent(
+		oauthScopes,
+		oauthReqInfo,
+		isLoggedIn
+	);
 
 	return c.html(layout(content, "MCP Remote Auth Demo - Authorization"));
 });
 
+// The /authorize page has a form that will POST to /approve
+// This endpoint is responsible for validating any login information and
+// then completing the authorization request with the OAUTH_PROVIDER
 app.post("/approve", async (c) => {
-	const { action, oauthReqInfo, email, password } = await parseApproveFormBody(
-		await c.req.parseBody(),
-	);
+	const { action, oauthReqInfo, email, password } =
+		await parseApproveFormBody(await c.req.parseBody());
 
 	if (!oauthReqInfo) {
 		return c.html("INVALID LOGIN");
@@ -67,8 +74,8 @@ app.post("/approve", async (c) => {
 			return c.html(
 				layout(
 					await renderAuthorizationRejectedContent("/"),
-					"MCP Remote Auth Demo - Authorization Status",
-				),
+					"MCP Remote Auth Demo - Authorization Status"
+				)
 			);
 		}
 	}
@@ -90,8 +97,8 @@ app.post("/approve", async (c) => {
 	return c.html(
 		layout(
 			await renderAuthorizationApprovedContent(redirectTo),
-			"MCP Remote Auth Demo - Authorization Status",
-		),
+			"MCP Remote Auth Demo - Authorization Status"
+		)
 	);
 });
 
