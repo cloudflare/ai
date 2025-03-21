@@ -3,12 +3,16 @@ import { html, raw } from "hono/html";
 import type { HtmlEscapedString } from "hono/utils/html";
 import { marked } from "marked";
 import type { AuthRequest } from "@cloudflare/workers-oauth-provider";
+import { env } from "cloudflare:workers";
 
 // This file mainly exists as a dumping ground for uninteresting html and CSS
 // to remove clutter and noise from the auth logic. You likely do not need
 // anything from this file.
 
-export const layout = (content: HtmlEscapedString | string, title: string) => html`
+export const layout = (
+	content: HtmlEscapedString | string,
+	title: string
+) => html`
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -173,22 +177,13 @@ export const layout = (content: HtmlEscapedString | string, title: string) => ht
 	</html>
 `;
 
-const homeMarkdown = `
-# Welcome to MCP Remote Auth Demo
-
-A professional, cheerful platform for all your needs.
-
-## What We Offer
-
-Our platform provides seamless integration with various services while maintaining the highest standards of security and user experience.
-
-We believe in simplicity and efficiency.
-
-> "The best way to predict the future is to create it." — Peter Drucker
-`;
-
-export const homeContent = async (): Promise<HtmlEscapedString> => {
-	const content = await marked(homeMarkdown);
+export const homeContent = async (req: Request): Promise<HtmlEscapedString> => {
+	// We have the README symlinked into the static directory, so we can fetch it
+	// and render it into HTML
+	let origin = new URL(req.url).origin;
+	let res = await env.ASSETS.fetch(`${origin}/README.md`);
+	let markdown = await res.text();
+	const content = await marked(markdown);
 	return html`
 		<div class="max-w-4xl mx-auto markdown">${raw(content)}</div>
 	`;
@@ -284,7 +279,7 @@ export const renderLoggedOutForm = (oauthReqInfo: AuthRequest) => {
 export const renderAuthorizeContent = async (
 	oauthScopes: { name: string; description: string }[],
 	oauthReqInfo: AuthRequest,
-	isLoggedIn: boolean,
+	isLoggedIn: boolean
 ) => {
 	return html`
 		<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
@@ -311,11 +306,13 @@ export const renderAuthorizeContent = async (
 									</p>
 								</div>
 							</li>
-						`,
+						`
 					)}
 				</ul>
 			</div>
-			${isLoggedIn ? renderLoggedInForm(oauthReqInfo) : renderLoggedOutForm(oauthReqInfo)}
+			${isLoggedIn
+				? renderLoggedInForm(oauthReqInfo)
+				: renderLoggedOutForm(oauthReqInfo)}
 		</div>
 	`;
 };
@@ -323,7 +320,7 @@ export const renderAuthorizeContent = async (
 export const renderApproveContent = async (
 	message: string,
 	status: string,
-	redirectUrl: string,
+	redirectUrl: string
 ) => {
 	return html`
 		<div
@@ -331,11 +328,9 @@ export const renderApproveContent = async (
 		>
 			<div class="mb-4">
 				<span
-					class="inline-block p-3 ${
-						status === "success"
-							? "bg-green-100 text-green-800"
-							: "bg-red-100 text-red-800"
-					} rounded-full"
+					class="inline-block p-3 ${status === "success"
+						? "bg-green-100 text-green-800"
+						: "bg-red-100 text-red-800"} rounded-full"
 				>
 					${status === "success" ? "✓" : "✗"}
 				</span>
@@ -361,12 +356,24 @@ export const renderApproveContent = async (
 	`;
 };
 
-export const renderAuthorizationApprovedContent = async (redirectUrl: string) => {
-	return renderApproveContent("Authorization approved!", "success", redirectUrl);
+export const renderAuthorizationApprovedContent = async (
+	redirectUrl: string
+) => {
+	return renderApproveContent(
+		"Authorization approved!",
+		"success",
+		redirectUrl
+	);
 };
 
-export const renderAuthorizationRejectedContent = async (redirectUrl: string) => {
-	return renderApproveContent("Authorization rejected.", "error", redirectUrl);
+export const renderAuthorizationRejectedContent = async (
+	redirectUrl: string
+) => {
+	return renderApproveContent(
+		"Authorization rejected.",
+		"error",
+		redirectUrl
+	);
 };
 
 export const parseApproveFormBody = async (body: {
