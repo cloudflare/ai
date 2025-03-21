@@ -5,4 +5,4 @@ interface Env {
 	SLACK_CLIENT_ID: string;
 	SLACK_CLIENT_SECRET: string;
 	MCP_OBJECT: DurableObjectNamespace<import("./src/index").SlackMCP>;
-}
+  }

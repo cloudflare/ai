@@ -1,7 +1,3 @@
-/**
- * For more details on how to configure Wrangler, refer to:
- * https://developers.cloudflare.com/workers/wrangler/configuration/
- */
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "mcp-slack-oauth",
@@ -25,14 +21,13 @@
   "kv_namespaces": [
     {
       "binding": "OAUTH_KV",
-      "id": "<YOUR_KV_NAMESPACE_ID>"
+      "id": "<YOUR_KV_NAMESPACE_ID"
     }
   ],
-  "vars": {
-    "SLACK_CLIENT_ID": "<YOUR_SLACK_CLIENT_ID>",
-    "SLACK_CLIENT_SECRET": "<YOUR_SLACK_CLIENT_SECRET>"
-  },
   "observability": {
     "enabled": true
+  },
+  "dev": {
+    "port": 8788
   }
 }

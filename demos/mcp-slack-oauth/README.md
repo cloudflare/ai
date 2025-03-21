@@ -18,30 +18,28 @@ This is a Model Context Protocol (MCP) server that provides read-only access to 
 
 ## Setup
 
-### 1. Create a Slack App
+### Create a Slack App
 
 1. Go to [https://api.slack.com/apps](https://api.slack.com/apps) and click "Create New App"
 2. Choose "From scratch" and give your app a name
 3. Select the workspace where you want to install the app
 
-### 2. Configure OAuth Settings
+### Configure OAuth Settings
 
 1. In the left sidebar, click on "OAuth & Permissions"
 2. Add the following scopes under "Bot Token Scopes":
    - `channels:history`
    - `channels:read`
    - `users:read`
-3. Add your redirect URL: `https://<your-worker-domain>/callback`
+3. Add your redirect URL: `https://mcp-slack-oauth.<your-subdomain>.workers.dev/callback`
 4. Make note of your Client ID and Client Secret from the "Basic Information" page
 
-### 3. Deploy to Cloudflare Workers
+### Deploy to Cloudflare Workers
 
-1. Update the `wrangler.jsonc` file with your Slack Client ID and Client Secret:
-   ```json
-   "vars": {
-     "SLACK_CLIENT_ID": "your-slack-client-id",
-     "SLACK_CLIENT_SECRET": "your-slack-client-secret"
-   }
+1. Add you Slack credentials (Slack Client ID and Client Secret) using Wrangler:
+   ```bash
+   wrangler secret put SLACK_CLIENT_ID
+   wrangler secret put SLACK_CLIENT_SECRET
    ```
 
 2. Create a KV namespace for OAuth token storage:
@@ -49,9 +47,10 @@ This is a Model Context Protocol (MCP) server that provides read-only access to 
    wrangler kv:namespace create OAUTH_KV
    ```
 
-3. Update the KV namespace ID in `wrangler.jsonc` with the ID you received:
+   Update the KV namespace in the `wrangler.jsonc` file with the ID you receive. 
+
    ```json
-   "kv_namespaces": [
+      "kv_namespaces": [
      {
        "binding": "OAUTH_KV",
        "id": "your-kv-namespace-id"
@@ -59,7 +58,7 @@ This is a Model Context Protocol (MCP) server that provides read-only access to 
    ]
    ```
 
-4. Deploy the worker:
+3. Deploy the Worker:
    ```bash
    npm run deploy
    ```
@@ -69,10 +68,40 @@ This is a Model Context Protocol (MCP) server that provides read-only access to 
 To use this service, connect to the SSE endpoint in your MCP client:
 
 ```
-https://<your-worker-domain>/sse
+https://mcp-slack-oauth.<your-subdomain>.workers.dev/sse
 ```
 
 You'll be prompted to authorize with Slack, and then you can use the available tools to access your Slack data.
+
+## Testing
+
+#### Using Inspector
+Test the remote server using [Inspector](https://modelcontextprotocol.io/docs/tools/inspector): 
+
+```
+npx @modelcontextprotocol/inspector@latest
+```
+Enter `https://mcp-slack-oauth.<your-subdomain>.workers.dev/sse` and hit connect. Once you go through the authentication flow, you'll see the Tools working. 
+
+#### Access the remote MCP server from Claude Desktop
+
+Open Claude Desktop and navigate to Settings -> Developer -> Edit Config. This opens the configuration file that controls which MCP servers Claude can access.
+
+Replace the content with the following configuration. Once you restart Claude Desktop, a browser window will open showing your OAuth login page. Complete the authentication flow to grant Claude access to your MCP server. After you grant access, the tools will become available for you to use. 
+
+```
+{
+  "mcpServers": {
+    "slack-mcp": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://mcp-slack-oauth.<your-subdomain>.workers.dev/sse"
+      ]
+    }
+  }
+}
+```
 
 ## Development
 
@@ -86,11 +115,25 @@ You'll be prompted to authorize with Slack, and then you can use the available t
    npm run dev
    ```
 
-## Security
+## How does it work? 
 
-This implementation uses OAuth for authentication and authorization, with the following security features:
+#### OAuth Provider
+The OAuth Provider library serves as a complete OAuth 2.1 server implementation for Cloudflare Workers. It handles the complexities of the OAuth flow, including token issuance, validation, and management. In this project, it plays the dual role of:
 
-- Uses minimal read-only scopes to limit access
-- Implements CSRF protection with state parameter
-- Stores OAuth tokens securely in Cloudflare KV
-- Demonstrates proper access control with the postMessage example
+- Authenticating MCP clients that connect to your server
+- Managing the connection to GitHub's OAuth services
+- Securely storing tokens and authentication state in KV storage
+
+#### Durable MCP
+Durable MCP extends the base MCP functionality with Cloudflare's Durable Objects, providing:
+- Persistent state management for your MCP server
+- Secure storage of authentication context between requests
+- Access to authenticated user information via `this.props`
+- Support for conditional tool availability based on user identity
+
+#### MCP Remote
+The MCP Remote library enables your server to expose tools that can be invoked by MCP clients like the Inspector. It:
+- Defines the protocol for communication between clients and your server
+- Provides a structured way to define tools
+- Handles serialization and deserialization of requests and responses
+- Maintains the Server-Sent Events (SSE) connection between clients and your server
