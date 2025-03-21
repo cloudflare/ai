@@ -5,10 +5,14 @@ import { layout } from "../utils";
 import app from "./_app";
 
 app.post("/approve", async (c) => {
-	const body = await c.req.parseBody();
-	const action = body.action as string;
-	const randomString = body.randomString as string;
-	const email = body.email as string;
+	const body = await c.req.parseBody<{
+		action: string;
+		randomString: string;
+		email: string;
+	}>();
+	const action = body.action;
+	const randomString = body.randomString;
+	const email = body.email;
 
 	console.log("Approval route called:", {
 		action,
@@ -51,9 +55,7 @@ app.post("/approve", async (c) => {
 	}
 
 	const content = await html`
-		<div
-			class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center"
-		>
+		<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
 			<div class="mb-4">
 				<span
 					class="inline-block p-3 ${
@@ -65,12 +67,8 @@ app.post("/approve", async (c) => {
 					${status === "success" ? "✓" : "✗"}
 				</span>
 			</div>
-			<h1 class="text-2xl font-heading font-bold mb-4 text-gray-900">
-				${message}
-			</h1>
-			<p class="mb-8 text-gray-600">
-				You will be redirected back to the application shortly.
-			</p>
+			<h1 class="text-2xl font-heading font-bold mb-4 text-gray-900">${message}</h1>
+			<p class="mb-8 text-gray-600">You will be redirected back to the application shortly.</p>
 			<a
 				href="/"
 				class="inline-block py-2 px-4 bg-primary text-white rounded-md font-medium hover:bg-primary/90 transition-colors"
@@ -79,8 +77,8 @@ app.post("/approve", async (c) => {
 			</a>
 			<script>
 				setTimeout(() => {
-					window.location.href = "${redirectUrl}";
-				}, 2000);
+					window.location.href = '${redirectUrl}'
+				}, 2000)
 			</script>
 		</div>
 	`;
