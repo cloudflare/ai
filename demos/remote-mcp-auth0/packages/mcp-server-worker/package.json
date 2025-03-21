@@ -1,0 +1,22 @@
+{
+	"name": "mcp-auth0-worker",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"cf-typegen": "wrangler types"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-oauth-provider": "^0.0.2",
+		"@modelcontextprotocol/sdk": "^1.7.0",
+		"hono": "^4.7.4",
+		"just-pick": "^4.2.0",
+		"workers-mcp": "0.1.0-3",
+		"zod": "^3.24.2"
+	},
+	"dependencies": {
+		"jose": "^6.0.10"
+	}
+}
