@@ -11,6 +11,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "^1.8.2",
 		"@clack/prompts": "^0.10.0",
+		"@cloudflare/vite-plugin": "^0.1.15",
 		"@types/ejs": "^3.1.5",
 		"@types/node": "^22.13.10",
 		"@types/wait-on": "^5.3.4",
