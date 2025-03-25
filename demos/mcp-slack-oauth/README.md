@@ -11,13 +11,6 @@ The MCP server (powered by Cloudflare Workers):
 Acts as OAuth Server to your MCP clients
 Acts as OAuth Client to your real OAuth server (in this case, Slack)
 
-## Features
-
-- Access to Slack channels
-- Ability to read and post messages
-- Supports SSE (Server-Sent Events)
-- Supports OAuth 2.1 for communications between the MCP client & server
-
 ## Available Tools
 
 - `whoami`: Get information about your Slack user
