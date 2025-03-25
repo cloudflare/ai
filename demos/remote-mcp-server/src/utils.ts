@@ -371,7 +371,7 @@ export const renderApproveContent = async (
 			</a>
 			<script>
 				setTimeout(() => {
-					window.location.href = "${redirectUrl}";
+	 				window.location.href = decodeURIComponent("${redirectUrl}").replace(/\&amp\;/g, '&');
 				}, 2000);
 			</script>
 		</div>
