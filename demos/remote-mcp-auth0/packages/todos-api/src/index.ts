@@ -35,10 +35,10 @@ app.get('/api/me', (c) => {
 })
 
 /**
- * GET /api/appointments
- * Returns the current user's appointments.
+ * GET /api/todos
+ * Returns the current user's todos.
  */
-app.get('/api/appointments', requireScope('read:appointments'), async (c) => {
+app.get('/api/todos', requireScope('read:todos'), async (c) => {
     const user = c.var.jwtPayload as JWTPayload
 
     return c.json({

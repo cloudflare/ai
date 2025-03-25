@@ -14,6 +14,8 @@ Once the API is created, enable "Offline Access" so we can get a refresh token.
 
 <img src="../../docs/offline-access.jpg" width="500" alt="Enable Offline Access">
 
+> Note: You can turn off the "Allow Skipping User Consent" if you want to force users to consent to the scopes.
+
 And finally add the following API permissions:
 
 - `read:todos`
