@@ -17,25 +17,19 @@ const app = new Hono<{ Bindings: Env & { OAUTH_PROVIDER: OAuthHelpers } }>();
 app.get("/authorize", async (c) => {
 	const oauthReqInfo = await c.env.OAUTH_PROVIDER.parseAuthRequest(c.req.raw);
 	if (!oauthReqInfo.clientId) {
-		return c.text("Invalid request", 400);
+	  return c.text("Invalid request", 400);
 	}
-
-	// Store the request info in KV to catch it on the callback
-	const randomString = crypto.randomUUID();
-	await c.env.OAUTH_KV.put(`login:${randomString}`, JSON.stringify(oauthReqInfo), {
-		expirationTtl: 600,
-	});
-
+  
 	return Response.redirect(
-		getUpstreamAuthorizeUrl({
-			upstream_url: "https://slack.com/oauth/v2/authorize",
-			scope: "channels:history,channels:read,users:read",
-			client_id: c.env.SLACK_CLIENT_ID,
-			redirect_uri: new URL("/callback", c.req.url).href,
-			state: randomString,
-		}),
+	  getUpstreamAuthorizeUrl({
+		upstream_url: "https://slack.com/oauth/v2/authorize",
+		scope: "channels:history,channels:read,users:read",
+		client_id: c.env.SLACK_CLIENT_ID,
+		redirect_uri: new URL("/callback", c.req.url).href,
+		state: btoa(JSON.stringify(oauthReqInfo)),
+	  }),
 	);
-});
+  });
 
 /**
  * OAuth Callback Endpoint
@@ -47,76 +41,84 @@ app.get("/authorize", async (c) => {
  */
 app.get("/callback", async (c) => {
 	const code = c.req.query("code") as string;
-
-	// Get the oauthReqInfo out of KV
-	const randomString = c.req.query("state");
-	if (!randomString) {
-		return c.text("Missing state", 400);
+  
+	// Get the oauthReqInfo directly from the state parameter
+	const state = c.req.query("state");
+	if (!state) {
+	  return c.text("Missing state", 400);
 	}
-	const oauthReqInfo = await c.env.OAUTH_KV.get<AuthRequest>(`login:${randomString}`, {
-		type: "json",
+	
+	// Parse the state to get the original OAuth request info
+	const oauthReqInfo = JSON.parse(atob(state)) as AuthRequest;
+	if (!oauthReqInfo.clientId) {
+	  return c.text("Invalid state", 400);
+	}
+  
+	console.log("Attempting token exchange with params:", {
+	  redirect_uri: new URL("/callback", c.req.url).href,
+	  code_exists: !!code
 	});
-	if (!oauthReqInfo) {
-		return c.text("Invalid state", 400);
-	}
-
+  
 	// Exchange the code for an access token
-  const response = await fetch("https://slack.com/api/oauth.v2.access", {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/x-www-form-urlencoded",
-		},
-		body: new URLSearchParams({
-			client_id: c.env.SLACK_CLIENT_ID,
-			client_secret: c.env.SLACK_CLIENT_SECRET,
-			code,
-			redirect_uri: new URL("/callback", c.req.url).href,
-		}).toString(),
+	const response = await fetch("https://slack.com/api/oauth.v2.access", {
+	  method: "POST",
+	  headers: {
+		"Content-Type": "application/x-www-form-urlencoded",
+	  },
+	  body: new URLSearchParams({
+		client_id: c.env.SLACK_CLIENT_ID,
+		client_secret: c.env.SLACK_CLIENT_SECRET,
+		code,
+		redirect_uri: new URL("/callback", c.req.url).href,
+	  }).toString(),
 	});
-
-	if (!resp.ok) {
-		console.log(await resp.text());
-		return c.text("Failed to fetch access token", 500);
+  
+	if (!response.ok) {
+	  const errorText = await response.text();
+	  console.log("Token exchange failed:", response.status, errorText);
+	  return c.text(`Failed to fetch access token: ${response.status} ${errorText}`, 500);
 	}
-
-	const data = await resp.json();
+  
+	const data = await response.json();
 	if (!data.ok) {
-		console.log(data);
-		return c.text(`Slack API error: ${data.error || "Unknown error"}`, 500);
+	  console.log("Slack API error:", data.error);
+	  return c.text(`Slack API error: ${data.error || "Unknown error"}`, 500);
 	}
-
+  
 	const accessToken = data.access_token;
 	if (!accessToken) {
-		return c.text("Missing access token", 400);
+	  return c.text("Missing access token", 400);
 	}
-
+  
 	// Get user info from the Slack API response
 	const userId = data.authed_user?.id || "unknown";
 	const userName = data.authed_user?.name || "unknown";
 	const teamId = data.team?.id || "unknown";
 	const teamName = data.team?.name || "unknown";
 	const scope = data.scope || "";
-
+  
+	console.log("Completing authorization with user:", userId);
+  
 	// Return back to the MCP client a new token
 	const { redirectTo } = await c.env.OAUTH_PROVIDER.completeAuthorization({
-		request: oauthReqInfo,
-		userId: userId,
-		metadata: {
-			label: userName,
-		},
-		scope: oauthReqInfo.scope,
-		// This will be available on this.props inside SlackMCP
-		props: {
-			userId,
-			userName,
-			teamId,
-			teamName,
-			accessToken,
-			scope,
-		},
+	  request: oauthReqInfo,
+	  userId: userId,
+	  metadata: {
+		label: userName,
+	  },
+	  scope: oauthReqInfo.scope,
+	  // This will be available on this.props inside SlackMCP
+	  props: {
+		userId,
+		userName,
+		teamId,
+		teamName,
+		accessToken,
+		scope,
+	  },
 	});
-
+  
 	return Response.redirect(redirectTo);
-});
+  });
 
 export const SlackHandler = app;
