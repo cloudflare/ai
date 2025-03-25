@@ -144,5 +144,5 @@ export default new OAuthProvider({
 	defaultHandler: SlackHandler,
 	authorizeEndpoint: "/authorize",
 	tokenEndpoint: "/token",
-	clientRegistrationEndpoint: "/register"
+	clientRegistrationEndpoint: "/register",
 });
