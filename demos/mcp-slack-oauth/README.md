@@ -13,7 +13,6 @@ This is a Model Context Protocol (MCP) server that provides read-only access to 
 - `whoami`: Get information about your Slack user
 - `listChannels`: Get a list of channels from your Slack workspace
 - `getChannelMessages`: Get recent messages from a specific channel
-- `getDailyUpdate`: Get a daily summary of important Slack messages
 - `postMessage`: Attempt to post a message (will fail with read-only permissions)
 
 ## Setup
