@@ -369,11 +369,13 @@ export const renderApproveContent = async (
 			>
 				Return to Home
 			</a>
-			<script>
-				setTimeout(() => {
-					window.location.href = "${redirectUrl}";
-				}, 2000);
-			</script>
+			${raw(`
+				<script>
+					setTimeout(() => {
+						window.location.href = "${redirectUrl}";
+					}, 2000);
+				</script>
+			`)}
 		</div>
 	`;
 };
