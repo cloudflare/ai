@@ -1,12 +1,22 @@
-# Slack OAuth MCP
+# Remote Slack MCP Server with OAuth
 
-This is a Model Context Protocol (MCP) server that provides read-only access to your Slack data using OAuth.
+This is an implementation of a remote Slack [MCP server](https://modelcontextprotocol.io/introduction) that requires users to login to their Slack account in order to use the tools to read and post messages from their channels. 
+
+You can deploy it to your own Cloudflare account, once you create a [Slack OAuth](https://api.slack.com/authentication/oauth-v2) app.
+
+You can use this as a reference example for how to integrate other OAuth providers with an MCP server deployed to Cloudflare, using the workers-oauth-provider library.
+
+The MCP server (powered by Cloudflare Workers):
+
+Acts as OAuth Server to your MCP clients
+Acts as OAuth Client to your real OAuth server (in this case, Slack)
 
 ## Features
 
-- Read-only access to Slack channels and messages
-- Daily summaries of important messages
-- Demonstration of secure OAuth scoping
+- Access to Slack channels
+- Ability to read and post messages
+- Supports SSE (Server-Sent Events)
+- Supports OAuth 2.1 for communications between the MCP client & server
 
 ## Available Tools
 
@@ -118,7 +128,6 @@ Replace the content with the following configuration. Once you restart Claude De
 
 #### OAuth Provider
 The OAuth Provider library serves as a complete OAuth 2.1 server implementation for Cloudflare Workers. It handles the complexities of the OAuth flow, including token issuance, validation, and management. In this project, it plays the dual role of:
-
 - Authenticating MCP clients that connect to your server
 - Managing the connection to GitHub's OAuth services
 - Securely storing tokens and authentication state in KV storage
