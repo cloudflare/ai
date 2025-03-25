@@ -4,19 +4,19 @@
  */
 {
 	"$schema": "../../node_modules/wrangler/config-schema.json",
-	"name": "mcp-auth0-oauth",
+	"name": "mcp-auth0-oidc",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-03-10",
 	"migrations": [
 		{
-			"new_sqlite_classes": ["MyMCP"],
+			"new_sqlite_classes": ["AuthenticatedMCP"],
 			"tag": "v1"
 		}
 	],
 	"durable_objects": {
 		"bindings": [
 			{
-				"class_name": "MyMCP",
+				"class_name": "AuthenticatedMCP",
 				"name": "MCP_OBJECT"
 			}
 		]
@@ -24,7 +24,7 @@
 	"kv_namespaces": [
 		{
 			"binding": "OAUTH_KV",
-			"id": "<Add-KV-ID>"
+			"id": "<Enter your KV ID here>"
 		}
 	],
 	"ai": {
