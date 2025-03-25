@@ -1,5 +1,5 @@
 {
-	"name": "api-worker",
+	"name": "todos-api",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
@@ -12,5 +12,8 @@
 		"@cloudflare/workers-types": "^4.20250310.0",
 		"hono": "^4.7.4",
 		"jose": "^6.0.10"
+	},
+	"dependencies": {
+		"@faker-js/faker": "^9.6.0"
 	}
 }
