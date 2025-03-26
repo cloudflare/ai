@@ -36,7 +36,7 @@ jobs:
       - id: changesets
         uses: changesets/action@v1
         with:
-          version: ./.github/version-and-install.sh
+          version: ../.github/version-and-install.sh
           publish: npx changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.CLOUDFLARE_AI_GITHUB_TOKEN }}
