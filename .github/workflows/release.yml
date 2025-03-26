@@ -39,6 +39,6 @@ jobs:
           version: ./.github/version-and-install.sh
           publish: npx changeset publish
         env:
-          GITHUB_TOKEN: ${{ secrets.WORKERS_AI_PROVIDER_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CLOUDFLARE_AI_GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
           NPM_PUBLISH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
