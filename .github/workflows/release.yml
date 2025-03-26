@@ -25,7 +25,6 @@ jobs:
         run: npm ci
 
       - name: Get changed packages
-        description: Get the list of changed packages
         id: changeset
         run: |
           npx changeset status --output test.json
