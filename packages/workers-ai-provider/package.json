@@ -21,5 +21,8 @@
 		"test": "vitest"
 	},
 	"files": ["dist", "src", "README.md", "package.json"],
-	"keywords": ["workers", "cloudflare", "ai", "vercel", "sdk", "provider", "chat", "serverless"]
+	"keywords": ["workers", "cloudflare", "ai", "vercel", "sdk", "provider", "chat", "serverless"],
+	"dependencies": {
+		"@cloudflare/workers-types": "^4.20250313.0"
+	}
 }

@@ -1,7 +1,6 @@
 import { type LanguageModelV1Prompt, UnsupportedFunctionalityError } from "@ai-sdk/provider";
 import type { WorkersAIChatPrompt } from "./workersai-chat-prompt";
 
-// TODO
 export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): WorkersAIChatPrompt {
 	const messages: WorkersAIChatPrompt = [];
 
