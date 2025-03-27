@@ -24,19 +24,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Get changed packages
-        id: changeset
-        run: |
-          npx changeset status --output test.json
-          echo "::set-output name=changed_packages::$(jq -r '.releases[].name' test.json | tr '\n' ' ')"
-
       - name: Test and Build
-        run: npx nx run-many -t lint test:ci type-check build -p "${{ steps.changeset.outputs.changed_packages }}"
+        run: npx nx build workers-ai-provider
 
       - id: changesets
         uses: changesets/action@v1
         with:
-          version: ../.github/version-and-install.sh
+          version: ./.github/version-and-install.sh
           publish: npx changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.CLOUDFLARE_AI_GITHUB_TOKEN }}
