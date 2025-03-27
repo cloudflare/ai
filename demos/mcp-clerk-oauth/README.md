@@ -16,7 +16,7 @@ The MCP server (powered by [Cloudflare Workers](https://developers.cloudflare.co
 ## Getting Started
 
 ### For Production
-Create a new [Clerk OAuth app](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app) for your instance: 
+Create a new [Clerk OAuth app](https://clerk.com/docs/advanced-usage/clerk-idp#create-a-clerk-o-auth-application) for your instance: 
 - For the Redirect URI, specify `https://mcp-clerk-oauth.<your-subdomain>.workers.dev/callback`
 - Note your Client ID and Client secret. 
 
