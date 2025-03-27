@@ -34,7 +34,6 @@ Create a new [Clerk OAuth app](https://docs.github.com/en/apps/oauth-apps/buildi
 wrangler secret put CLERK_APP_CLIENT_ID
 wrangler secret put CLERK_APP_CLIENT_SECRET
 wrangler secret put CLERK_APP_URL
-wrangler secret put CLERK_OAUTH_SCOPES
 ```
 
 #### Set up a KV namespace
