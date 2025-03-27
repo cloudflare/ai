@@ -1,10 +1,7 @@
-import type {
-	AuthRequest,
-	OAuthHelpers,
-} from "@cloudflare/workers-oauth-provider";
+import type { AuthRequest, OAuthHelpers } from "@cloudflare/workers-oauth-provider";
 import { Hono } from "hono";
 import { fetchUpstreamAuthToken, getUpstreamAuthorizeUrl } from "./utils";
-import { Props } from "./types";
+import type { Props } from "./types";
 
 const app = new Hono<{ Bindings: Env & { OAUTH_PROVIDER: OAuthHelpers } }>();
 
@@ -31,7 +28,7 @@ app.get("/authorize", async (c) => {
 			client_id: c.env.CLERK_APP_CLIENT_ID,
 			redirect_uri: new URL("/callback", c.req.url).href,
 			state: btoa(JSON.stringify(oauthReqInfo)),
-		})
+		}),
 	);
 });
 
@@ -45,9 +42,7 @@ app.get("/authorize", async (c) => {
  */
 app.get("/callback", async (c) => {
 	// Get the oauthReqInfo out of KV
-	const oauthReqInfo = JSON.parse(
-		atob(c.req.query("state") as string)
-	) as AuthRequest;
+	const oauthReqInfo = JSON.parse(atob(c.req.query("state") as string)) as AuthRequest;
 
 	if (!oauthReqInfo.clientId) {
 		return c.text("Invalid state", 400);

@@ -3,7 +3,7 @@ import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { ClerkHandler } from "./clerk-handler";
-import { Props } from "./types";
+import type { Props } from "./types";
 
 export class MyMCP extends McpAgent<Env, unknown, Props> {
 	server = new McpServer({
@@ -19,21 +19,18 @@ export class MyMCP extends McpAgent<Env, unknown, Props> {
 			{ a: z.number(), b: z.number() },
 			async ({ a, b }) => ({
 				content: [{ type: "text", text: String(a + b) }],
-			})
+			}),
 		);
 
 		// Gets the currently signed in user's info on your Clerk app.
 		this.server.tool("get_user", "Get the users info", {}, async () => {
 			const accessToken = this.props.accessToken;
 
-			const user = await fetch(
-				`${this.env.CLERK_APP_URL}/oauth/userinfo`,
-				{
-					headers: {
-						Authorization: `Bearer ${accessToken}`,
-					},
-				}
-			).then((r) => r.json());
+			const user = await fetch(`${this.env.CLERK_APP_URL}/oauth/userinfo`, {
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+				},
+			}).then((r) => r.json());
 
 			return {
 				content: [{ type: "text", text: JSON.stringify(user) }],

@@ -76,18 +76,14 @@ export async function fetchUpstreamAuthToken({
 		}).toString(),
 	});
 	if (!resp.ok) {
-		console.log(await resp.text());
-		return [
-			null,
-			new Response("Failed to fetch access token", { status: 500 }),
-		];
+		return [null, new Response("Failed to fetch access token", { status: 500 })];
 	}
 
 	const body = (await resp.json()) as {
 		access_token: string;
 	};
 
-	const accessToken = body?.["access_token"];
+	const accessToken = body?.access_token;
 
 	if (!accessToken) {
 		return [null, new Response("Missing access token", { status: 400 })];
