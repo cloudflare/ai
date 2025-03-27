@@ -1,6 +1,8 @@
 # Model Context Protocol (MCP) Server + Clerk OAuth
+<img width="500" alt="oauth-login" src="https://github.com/user-attachments/assets/c7142376-3668-4c25-befb-6010b1d3161f" />
+<img width="400" alt="oauth-login" src="https://github.com/user-attachments/assets/c42c42d9-3636-4f16-bb6b-92b78e782321" />
 
-This is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server that supports remote MCP connections, with Clerk OAuth for your instance built-in.
+This is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server that supports remote MCP connections, with [Clerk](http://clerk.com/) OAuth for your instance built-in.
 
 You can deploy it to your own Cloudflare account, and after you create your own Clerk OAuth client app for your instance, you'll have a fully functional remote MCP server that you can build off. Users will be able to connect to your MCP server by signing in with their account on your Clerk instance.
 
@@ -51,7 +53,7 @@ npx @modelcontextprotocol/inspector@latest
 ```
 Enter `https://mcp-clerk-oauth.<your-subdomain>.workers.dev/sse` and hit connect. Once you go through the authentication flow, you'll see the Tools working: 
 
-<img width="640" alt="image" src="https://github.com/user-attachments/assets/7973f392-0a9d-4712-b679-6dd23f824287" />
+<img width="640" alt="oauth-login" src="https://github.com/user-attachments/assets/c7142376-3668-4c25-befb-6010b1d3161f" />
 
 You now have a remote MCP server deployed! 
 
