@@ -1,5 +1,5 @@
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
-import { DurableMCP } from "workers-mcp";
+import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { Octokit } from "octokit";
@@ -19,7 +19,7 @@ const ALLOWED_USERNAMES = new Set([
 	// For example: 'yourusername', 'coworkerusername'
 ]);
 
-export class MyMCP extends DurableMCP<Props, Env> {
+export class MyMCP extends McpAgent<Props, Env> {
 	server = new McpServer({
 		name: "Github OAuth Proxy Demo",
 		version: "1.0.0",

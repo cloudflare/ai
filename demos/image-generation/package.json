@@ -1,32 +1,29 @@
 {
-	"name": "routing",
+	"name": "image-generation",
 	"type": "module",
 	"scripts": {
-		"dev": "vite",
 		"build": "vite build",
-		"preview": "npm run build && vite preview",
+		"cf-typegen": "wrangler types",
 		"deploy": "npm run build && wrangler deploy",
+		"dev": "vite",
+		"format": "biome lint --error-on-warnings",
+		"lint": "biome lint --error-on-warnings",
+		"preview": "npm run build && vite preview",
+		"start": "npm run dev",
 		"test": "vitest",
 		"test:ci": "vitest --watch=false",
-		"cf-typegen": "wrangler types",
-		"lint": "biome lint --error-on-warnings",
-		"lint:fix": "biome lint --fix",
 		"type-check": "tsc --noEmit"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^1.8.2",
-		"@cloudflare/vite-plugin": "^0.1.15",
 		"@cloudflare/vitest-pool-workers": "^0.7.5",
 		"typescript": "^5.5.2",
-		"vite": "^6.1.0",
 		"vitest": "~3.0.7",
 		"wrangler": "^4.2.0"
 	},
 	"dependencies": {
-		"agents-sdk": "^0.0.27",
-		"ai": "^4.1.39",
-		"hono": "^4.7.1",
 		"workers-ai-provider": "^0.2.1",
-		"zod": "^3.24.2"
+		"hono": "^4.7.1",
+		"zod": "^3.24.2",
+		"ai": "^4.1.39"
 	}
 }

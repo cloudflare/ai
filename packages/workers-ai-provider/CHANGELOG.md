@@ -1,5 +1,11 @@
 # workers-ai-provider
 
+## 0.2.1
+
+### Patch Changes
+
+- [#47](https://github.com/cloudflare/ai/pull/47) [`e000b7c`](https://github.com/cloudflare/ai/commit/e000b7c1c4a03f50810154854a001fa5500d8591) Thanks [@andyjessop](https://github.com/andyjessop)! - chore: implement generateImage function
+
 ## 0.2.0
 
 ### Minor Changes

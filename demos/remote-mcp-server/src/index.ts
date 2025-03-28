@@ -1,10 +1,10 @@
 import app from "./app";
-import { DurableMCP } from "workers-mcp";
+import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
 
-export class MyMCP extends DurableMCP {
+export class MyMCP extends McpAgent {
 	server = new McpServer({
 		name: "Demo",
 		version: "1.0.0",
