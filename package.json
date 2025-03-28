@@ -5,11 +5,13 @@
 		"create-demo": "npx tsx ./tools/create-demo/index.ts",
 		"format": "biome format --write",
 		"lint": "biome lint",
+		"prepare": "if [ \"$CI\" ]; then echo 'Skipping husky setup in CI'; else husky; fi",
 		"lint:fix": "biome lint --fix"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.8.2",
 		"@clack/prompts": "^0.10.0",
+		"@cloudflare/vite-plugin": "^0.1.15",
 		"@types/ejs": "^3.1.5",
 		"@types/node": "^22.13.10",
 		"@types/wait-on": "^5.3.4",
