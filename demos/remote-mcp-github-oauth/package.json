@@ -9,8 +9,8 @@
 		"cf-typegen": "wrangler types"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20250310.0",
 		"@cloudflare/workers-oauth-provider": "^0.0.2",
+		"@cloudflare/workers-types": "^4.20250310.0",
 		"@modelcontextprotocol/sdk": "^1.7.0",
 		"hono": "^4.7.4",
 		"just-pick": "^4.2.0",
@@ -20,5 +20,9 @@
 		"workers-mcp": "0.1.0-3",
 		"wrangler": "^3.112.0",
 		"zod": "^3.24.2"
+	},
+	"dependencies": {
+		"@cloudflare/vite-plugin": "^0.1.19",
+		"vite": "^6.2.3"
 	}
 }

@@ -18,11 +18,12 @@
 		"@biomejs/biome": "^1.8.2",
 		"@cloudflare/vitest-pool-workers": "^0.7.5",
 		"typescript": "^5.5.2",
+		"vite": "^6.2.3",
 		"vitest": "~3.0.7",
-		"vite": "^6.1.0",
 		"wrangler": "^4.2.0"
 	},
 	"dependencies": {
+		"@cloudflare/vite-plugin": "^0.1.19",
 		"agents-sdk": "^0.0.27",
 		"ai": "^4.1.39",
 		"hono": "^4.7.1",

@@ -14,7 +14,9 @@
 		"vitest": "~3.0.7"
 	},
 	"dependencies": {
+		"@cloudflare/vite-plugin": "^0.1.19",
 		"ai": "^4.1.39",
+		"vite": "^6.2.3",
 		"zod": "^3.24.2"
 	}
 }
