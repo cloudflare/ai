@@ -122,7 +122,7 @@ Replace the content with the following configuration. Once you restart Claude De
 #### OAuth Provider
 The OAuth Provider library serves as a complete OAuth 2.1 server implementation for Cloudflare Workers. It handles the complexities of the OAuth flow, including token issuance, validation, and management. In this project, it plays the dual role of:
 - Authenticating MCP clients that connect to your server
-- Managing the connection to GitHub's OAuth services
+- Managing the connection to Slack's OAuth services
 - Securely storing tokens and authentication state in KV storage
 
 #### McpAgent
