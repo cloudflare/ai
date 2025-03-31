@@ -1,11 +1,10 @@
-import { z } from "zod";
 import { Hono } from "hono";
 import { DurableMCP } from "workers-mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import OAuthProvider, { type OAuthHelpers } from "@cloudflare/workers-oauth-provider";
 
 import type { UserProps } from "./types";
-import { authorize, callback } from "./auth";
+import { authorize, callback, confirmConsent } from "./auth";
 
 export class AuthenticatedMCP extends DurableMCP<UserProps, Env> {
 	server = new McpServer({
@@ -63,6 +62,7 @@ export class AuthenticatedMCP extends DurableMCP<UserProps, Env> {
 // Initialize the Hono app with the routes for the OAuth Provider.
 const app = new Hono<{ Bindings: Env & { OAUTH_PROVIDER: OAuthHelpers } }>();
 app.get("/authorize", authorize);
+app.post("/authorize/consent", confirmConsent);
 app.get("/callback", callback);
 
 export default new OAuthProvider({
