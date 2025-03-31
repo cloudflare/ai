@@ -78,3 +78,13 @@ In the Auth0 dashboard, also make sure to add a new Callback URL for your deploy
 ```bash
 https://mcp-auth0-oidc.<your-subdomain>.workers.dev/callback
 ```
+
+To test this you can now use the Workers AI LLM Playground. Navigate to [https://playground.ai.cloudflare.com/](https://playground.ai.cloudflare.com/) and connect to your MCP server on the bottom left using the following URL pattern:
+
+```bash
+https://mcp-auth0-oidc.<your-subdomain>.workers.dev/sse
+```
+
+This will open a popup where you can sign in after which you'll be able to use all of the tools.
+
+<img src="../../docs/playground.jpg" width="500" alt="Workers AI LLM Playground">
