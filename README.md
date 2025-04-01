@@ -5,6 +5,7 @@ This repository contains various packages and demo apps related consuming Cloudf
 ## Packages
 
 - [`workers-ai-provider`](./packages/workers-ai-provider/README.md): A custom provider that enables [Workers AI](https://ai.cloudflare.com/)'s models for the [Vercel AI SDK](https://sdk.vercel.ai/).
+- [`ai-gateway-provider`](./packages/ai-gateway-provider/README.md): [AI Gateway](https://developers.cloudflare.com/ai-gateway/) Provider for [Vercel AI SDK](https://sdk.vercel.ai/).
 
 ## Local Development
 
