@@ -1,0 +1,37 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "mcp-clerk-oauth",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-03-10",
+	"vars": {
+		"CLERK_BACKEND_URL": "https://api.clerk.com/v1"
+	},
+	"migrations": [
+		{
+			"new_sqlite_classes": [
+				"MyMCP"
+			],
+			"tag": "v1"
+		}
+	],
+	"durable_objects": {
+		"bindings": [
+			{
+				"class_name": "MyMCP",
+				"name": "MCP_OBJECT"
+			}
+		]
+	},
+	"ai": {
+		"binding": "AI"
+	},
+	"observability": {
+		"enabled": true
+	},
+	"dev": {
+		"port": 8788
+	},
+	"compatibility_flags": [
+    	"nodejs_als"
+  	]
+}

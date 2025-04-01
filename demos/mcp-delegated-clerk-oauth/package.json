@@ -1,0 +1,25 @@
+{
+	"name": "mcp-delegated-clerk-oauth",
+	"type": "module",
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"cf-typegen": "wrangler types",
+		"format": "biome format --write",
+		"lint": "biome lint --error-on-warnings",
+		"lint:fix": "biome lint --fix"
+	},
+	"devDependencies": {
+		"typescript": "^5.5.2",
+		"wrangler": "^4.2.0",
+		"@biomejs/biome": "^1.8.2"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "^0.0.2",
+		"@modelcontextprotocol/sdk": "^1.7.0",
+		"hono": "^4.7.4",
+		"agents": "^0.0.46",
+		"zod": "^3.24.2"
+	}
+}
