@@ -45,8 +45,8 @@ We will also create a set of scopes that our users can grant to third-party appl
 1. In your terminal, clone the project and install dependencies:
 
 ```bash
-git clone https://github.com/stytchauth/mcp-stytch-b2b-okr-manager.git
-cd mcp-stytch-b2b-okr-manager
+git clone https://github.com/cloudflare/agents.git
+cd agents/demos/mcp-stytch-b2b-okr-manager
 npm i
 ```
 
