@@ -1,0 +1,60 @@
+/* Modal Overlay - background behind the modal */
+.modal-overlay {
+    position: fixed; /* Sticks to the whole screen */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+    display: flex;
+    justify-content: center; /* Center modal horizontally */
+    align-items: center; /* Center modal vertically */
+    z-index: 999; /* Ensure it's on top of other elements */
+}
+
+/* Modal Content - the box itself */
+.modal-content {
+    background: #fff; /* White background for the modal */
+    border-radius: 8px; /* Smooth edges */
+    max-width: 500px; /* Maximum width for the modal */
+    width: 90%; /* Make it responsive on smaller devices */
+    padding: 20px; /* Spacing inside the modal */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    position: relative; /* Ensures close button is positioned relative to this */
+    animation: modal-fade-in 0.3s ease-in-out; /* Smooth fade-in effect */
+}
+
+/* Close Button */
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+}
+
+/* Close button hover effect */
+.modal-close:hover {
+    color: #ff0000; /* Highlight close button when hover */
+}
+
+/* Modal Body Content */
+.modal-body {
+    margin-top: 10px;
+}
+
+/* Fade-in animation */
+@keyframes modal-fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
