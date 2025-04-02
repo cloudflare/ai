@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"target": "esNext",
+		"module": "commonjs",
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"skipLibCheck": true,
+		"noUncheckedIndexedAccess": true,
+		"noEmit": true
+	},
+	"include": ["src/*.ts", "src/**/*.ts"]
+}
