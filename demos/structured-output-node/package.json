@@ -1,5 +1,6 @@
 {
 	"name": "structured-output-node",
+	"private": true,
 	"type": "module",
 	"scripts": {
 		"dev": "npx tsx ./src/index.ts",

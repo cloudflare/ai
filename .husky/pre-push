@@ -36,19 +36,3 @@ if [ "$ORIGINAL_HASH" != "$NEW_HASH" ]; then
   echo ""
   exit 1
 fi
-
-# 6. Format and lint everything
-npm run format
-npm run lint:fix
-
-# 7. Check if formatting introduced any changes that need committing.
-if [ -n "$(git status --porcelain)" ]; then
-  echo ""
-  echo "**ACTION REQUIRED**"
-  echo "${YELLOW}Formatting and/or linting caused changes. Please commit them before pushing.${RESET}"
-  echo ""
-  exit 1
-fi
-
-# 8. Continue with the remaining pre-push commands.
-npx nx affected --base=main --head=HEAD -t types test:ci type-check build

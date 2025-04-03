@@ -1,5 +1,23 @@
 # workers-ai-provider
 
+## 0.3.0
+
+### Minor Changes
+
+- [#72](https://github.com/cloudflare/ai/pull/72) [`9b8dfc1`](https://github.com/cloudflare/ai/commit/9b8dfc1adc94079728634994d6afe81028ea11d8) Thanks [@andyjessop](https://github.com/andyjessop)! - feat: allow passthrough options as model settings
+
+## 0.2.2
+
+### Patch Changes
+
+- [#65](https://github.com/cloudflare/ai/pull/65) [`b17cf52`](https://github.com/cloudflare/ai/commit/b17cf52757e51eb30da25370319daf8efc43791e) Thanks [@andyjessop](https://github.com/andyjessop)! - fix: gracefully handles streaming chunk without response property
+
+## 0.2.1
+
+### Patch Changes
+
+- [#47](https://github.com/cloudflare/ai/pull/47) [`e000b7c`](https://github.com/cloudflare/ai/commit/e000b7c1c4a03f50810154854a001fa5500d8591) Thanks [@andyjessop](https://github.com/andyjessop)! - chore: implement generateImage function
+
 ## 0.2.0
 
 ### Minor Changes

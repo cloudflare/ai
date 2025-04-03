@@ -1,5 +1,6 @@
 {
 	"name": "test-utils",
+	"private": true,
 	"scripts": {
 		"format": "biome format --write",
 		"test": "vitest",

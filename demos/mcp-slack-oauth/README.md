@@ -35,6 +35,7 @@ Acts as OAuth Client to your real OAuth server (in this case, Slack)
    - `users:read`
 3. Add your redirect URL: `https://mcp-slack-oauth.<your-subdomain>.workers.dev/callback`
 4. Make note of your Client ID and Client Secret from the "Basic Information" page
+5. *Optional* enable "Token Rotation" to use short-lived access tokens, which are automatically refreshed when the MCP client refreshes _its_ tokens (see `refreshSlackToken` for more details)
 
 ### Deploy to Cloudflare Workers
 

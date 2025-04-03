@@ -3,18 +3,7 @@ import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { WebClient } from "@slack/web-api";
-import { SlackHandler } from "./slack-handler";
-
-// Context from the auth process, encrypted & stored in the auth token
-// and provided to the DurableMCP as this.props
-type Props = {
-	userId: string;
-	userName: string;
-	teamId: string;
-	teamName: string;
-	accessToken: string;
-	scope: string;
-};
+import { type Props, refreshSlackToken, SlackHandler } from "./slack-handler";
 
 // To restrict access to specific users only, add their Slack userIDs to this Set.
 // Leave it empty to allow access to all authenticated users.
@@ -22,7 +11,7 @@ const ALLOWED_USERIDS = new Set([
 	// Example: 'U01234567',
 ]);
 
-export class SlackMCP extends McpAgent<Props, Env> {
+export class SlackMCP extends McpAgent<Env, unknown, Props> {
 	server = new McpServer({
 		name: "Slack Assistant MCP",
 		version: "1.0.0",
@@ -144,5 +133,18 @@ export default new OAuthProvider({
 	defaultHandler: SlackHandler,
 	authorizeEndpoint: "/authorize",
 	tokenEndpoint: "/token",
-	clientRegistrationEndpoint: "/register"
+	clientRegistrationEndpoint: "/register",
+	tokenExchangeCallback: async (options) => {
+		if (options.grantType === 'refresh_token') {
+			// Some Slack OAuth tokens don't expire, in which case we won't get a refreshToken,
+			// and there's nothing to do here.
+			if (!options.props.refreshToken) return
+
+			// Keep most of the existing props, but override whatever needs changing
+			return {
+				...options.props,
+				...await refreshSlackToken(options.props.refreshToken)
+			}
+		}
+	}
 });

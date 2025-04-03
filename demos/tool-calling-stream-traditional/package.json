@@ -1,5 +1,6 @@
 {
 	"name": "tool-calling-stream-traditional",
+	"private": true,
 	"type": "module",
 	"scripts": {
 		"dev": "vite",

@@ -1,5 +1,6 @@
 {
 	"name": "middleware",
+	"private": true,
 	"scripts": {
 		"format": "biome format --write"
 	}

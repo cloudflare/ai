@@ -1,7 +1,9 @@
+import { createRun } from "./utils";
 import { WorkersAIChatLanguageModel } from "./workersai-chat-language-model";
 import type { WorkersAIChatSettings } from "./workersai-chat-settings";
-import type { TextGenerationModels } from "./workersai-models";
-import { createRun } from "./utils";
+import { WorkersAIImageModel } from "./workersai-image-model";
+import type { WorkersAIImageSettings } from "./workersai-image-settings";
+import type { ImageGenerationModels, TextGenerationModels } from "./workersai-models";
 
 export type WorkersAISettings = (
 	| {
@@ -36,7 +38,6 @@ export type WorkersAISettings = (
 
 export interface WorkersAI {
 	(modelId: TextGenerationModels, settings?: WorkersAIChatSettings): WorkersAIChatLanguageModel;
-
 	/**
 	 * Creates a model for text generation.
 	 **/
@@ -44,6 +45,11 @@ export interface WorkersAI {
 		modelId: TextGenerationModels,
 		settings?: WorkersAIChatSettings,
 	): WorkersAIChatLanguageModel;
+
+	/**
+	 * Creates a model for image generation.
+	 **/
+	image(modelId: ImageGenerationModels, settings?: WorkersAIImageSettings): WorkersAIImageModel;
 }
 
 /**
@@ -59,7 +65,7 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 	} else {
 		const { accountId, apiKey } = options;
 		binding = {
-			run: createRun(accountId, apiKey),
+			run: createRun({ accountId, apiKey }),
 		} as Ai;
 	}
 
@@ -67,9 +73,6 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 		throw new Error("Either a binding or credentials must be provided.");
 	}
 
-	/**
-	 * Helper function to create a chat model instance.
-	 */
 	const createChatModel = (modelId: TextGenerationModels, settings: WorkersAIChatSettings = {}) =>
 		new WorkersAIChatLanguageModel(modelId, settings, {
 			provider: "workersai.chat",
@@ -77,7 +80,17 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 			gateway: options.gateway,
 		});
 
-	const provider = function (modelId: TextGenerationModels, settings?: WorkersAIChatSettings) {
+	const createImageModel = (
+		modelId: ImageGenerationModels,
+		settings: WorkersAIImageSettings = {},
+	) =>
+		new WorkersAIImageModel(modelId, settings, {
+			provider: "workersai.image",
+			binding,
+			gateway: options.gateway,
+		});
+
+	const provider = (modelId: TextGenerationModels, settings?: WorkersAIChatSettings) => {
 		if (new.target) {
 			throw new Error("The WorkersAI model function cannot be called with the new keyword.");
 		}
@@ -85,6 +98,8 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 	};
 
 	provider.chat = createChatModel;
+	provider.image = createImageModel;
+	provider.imageModel = createImageModel;
 
 	return provider;
 }

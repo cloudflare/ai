@@ -1,8 +1,19 @@
 {
-	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"types": ["../../types/workerd.d.ts"],
-		"noEmit": false
+		"lib": ["ESNext"],
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleDetection": "force",
+		"allowJs": true,
+		"moduleResolution": "bundler",
+		"verbatimModuleSyntax": true,
+		"noEmit": false,
+		"strict": true,
+		"skipLibCheck": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"types": ["@cloudflare/workers-types/experimental"]
 	},
 	"include": ["src/**/*.ts"]
 }

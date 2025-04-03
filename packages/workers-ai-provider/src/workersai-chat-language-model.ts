@@ -139,6 +139,8 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 	): Promise<Awaited<ReturnType<LanguageModelV1["doGenerate"]>>> {
 		const { args, warnings } = this.getArgs(options);
 
+		const { gateway, safePrompt, ...passthroughOptions } = this.settings;
+
 		const output = await this.config.binding.run(
 			args.model,
 			{
@@ -150,7 +152,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 				// @ts-expect-error response_format not yet added to types
 				response_format: args.response_format,
 			},
-			{ gateway: this.config.gateway ?? this.settings.gateway },
+			{ gateway: this.config.gateway ?? gateway, ...passthroughOptions },
 		);
 
 		if (output instanceof ReadableStream) {
@@ -221,6 +223,8 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 		}
 
 		// [2] ...otherwise, we just proceed as normal and stream the response directly from the remote model.
+		const { gateway, ...passthroughOptions } = this.settings;
+
 		const response = await this.config.binding.run(
 			args.model,
 			{
@@ -233,7 +237,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 				// @ts-expect-error response_format not yet added to types
 				response_format: args.response_format,
 			},
-			{ gateway: this.config.gateway ?? this.settings.gateway },
+			{ gateway: this.config.gateway ?? gateway, ...passthroughOptions },
 		);
 
 		if (!(response instanceof ReadableStream)) {
@@ -257,7 +261,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 						if (chunk.usage) {
 							usage = mapWorkersAIUsage(chunk);
 						}
-						chunk.response.length &&
+						chunk.response?.length &&
 							controller.enqueue({
 								type: "text-delta",
 								textDelta: chunk.response,

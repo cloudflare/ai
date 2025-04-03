@@ -1,5 +1,6 @@
 {
 	"name": "model-scraper",
+	"private": true,
 	"type": "module",
 	"scripts": {
 		"dev": "CLOUDFLARE_ENV=development vite",
@@ -28,7 +29,7 @@
 		"agents-sdk": "^0.0.27",
 		"ai": "^4.1.39",
 		"hono": "^4.7.1",
-		"workers-ai-provider": "^0.2.0",
+		"workers-ai-provider": "^0.3.0",
 		"zod": "^3.24.2"
 	}
 }

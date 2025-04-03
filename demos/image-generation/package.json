@@ -1,0 +1,30 @@
+{
+	"name": "image-generation",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build",
+		"cf-typegen": "wrangler types",
+		"deploy": "npm run build && wrangler deploy",
+		"dev": "vite",
+		"format": "biome lint --error-on-warnings",
+		"lint": "biome lint --error-on-warnings",
+		"preview": "npm run build && vite preview",
+		"start": "npm run dev",
+		"test": "vitest",
+		"test:ci": "vitest --watch=false",
+		"type-check": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "^0.7.5",
+		"typescript": "^5.5.2",
+		"vitest": "~3.0.7",
+		"wrangler": "^4.2.0"
+	},
+	"dependencies": {
+		"workers-ai-provider": "^0.3.0",
+		"hono": "^4.7.1",
+		"zod": "^3.24.2",
+		"ai": "^4.1.39"
+	}
+}
