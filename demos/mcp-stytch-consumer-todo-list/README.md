@@ -30,8 +30,8 @@ Follow the steps below to get this application fully functional and running usin
 In your terminal clone the project and install dependencies:
 
 ```bash
-git clone https://github.com/stytchauth/mcp-stytch-consumer-todo-list.git
-cd mcp-stytch-consumer-todo-list
+git clone https://github.com/cloudflare/ai.git
+cd ai/demos/mcp-stytch-consumer-todo-list
 npm i
 ```
 
