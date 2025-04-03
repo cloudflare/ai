@@ -1,0 +1,80 @@
+body {
+    margin: 0;
+    min-height: 100vh;
+    color: rgb(29, 29, 29);
+    background-color: rgb(251, 250, 249);
+}
+
+#root {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+
+    font-family: 'IBM Plex Sans', monospace;
+    line-height: 1.5;
+
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 40vh;
+    max-width: 40vw;
+    margin-top: 10vh;
+}
+
+footer {
+    min-height: 10vh;
+}
+
+button {
+    border: none;
+    margin-left: 10px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button.primary {
+    background-color: #1D1D1D;
+    color: #FFF;
+}
+
+button.primary:hover {
+    background-color: rgb(163, 163, 163);
+}
+
+.todoEditor {
+    input[type='text'] {
+        padding: 10px;
+        width: 200px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        flex-grow: 1;
+    }
+
+    ul {
+        padding: 0;
+    }
+
+    li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-width: 40vw;
+        margin-bottom: 8px;
+    }
+
+    li button {
+        margin-left: 10px;
+    }
+}
+

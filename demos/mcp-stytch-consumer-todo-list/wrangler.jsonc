@@ -1,0 +1,73 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "mcp-stytch-consumer-todo-list",
+	"main": "api/index.ts",
+	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_date": "2025-03-19",
+	"observability": {
+		"enabled": true
+	},
+	"dev": {
+		"port": 3000
+	},
+	/**
+	 * Smart Placement
+	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
+	 */
+	// "placement": { "mode": "smart" },
+	/**
+	 * Bindings
+	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
+	 * databases, object storage, AI inference, real-time communication and more.
+	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
+	 */
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": [
+				"TodoMCP"
+			]
+		}
+	],
+	"durable_objects": {
+		"bindings": [
+			{
+				"class_name": "TodoMCP",
+				"name": "MCP_OBJECT"
+			}
+		]
+	},
+	"kv_namespaces": [
+		{
+			"binding": "TODOS",
+			"id": "<TODO_FROM_CLOUDFLARE>"
+		}
+	],
+	/**
+	 * Environment Variables
+	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
+	 */
+	//	"vars": {},
+	/**
+	 * Note: Use secrets to store sensitive data.
+	 * https://developers.cloudflare.com/workers/configuration/secrets/
+	 */
+	/**
+	 * Static Assets
+	 * https://developers.cloudflare.com/workers/static-assets/binding/
+	 */
+	"assets": {
+		"run_worker_first": true,
+		"not_found_handling": "single-page-application",
+		"binding": "ASSETS"
+	}
+	/**
+	 * Service Bindings (communicate between multiple Workers)
+	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
+	 */
+	// "services": [{ "binding": "MY_SERVICE", "service": "my-service" }]
+}
