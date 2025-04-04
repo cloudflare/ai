@@ -28,9 +28,7 @@
 	"migrations": [
 		{
 			"tag": "v1",
-			"new_sqlite_classes": [
-				"TodoMCP"
-			]
+			"new_sqlite_classes": ["TodoMCP"]
 		}
 	],
 	"durable_objects": {
