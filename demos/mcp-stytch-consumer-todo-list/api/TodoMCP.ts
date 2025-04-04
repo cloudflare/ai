@@ -1,4 +1,7 @@
-import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
+import {
+	McpServer,
+	ResourceTemplate,
+} from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { todoService } from "./TodoService.ts";
 import { AuthenticationContext, Todo } from "../types";
@@ -12,12 +15,12 @@ export class TodoMCP extends McpAgent<Env, unknown, AuthenticationContext> {
 	async init() {}
 
 	get todoService() {
-		return todoService(this.env, this.props.claims.sub);
+		return todoService(this.env as Env, this.props.claims.sub);
 	}
 
 	formatResponse = (
 		description: string,
-		newState: Todo[],
+		newState: Todo[]
 	): {
 		content: Array<{ type: "text"; text: string }>;
 	} => {
@@ -25,7 +28,11 @@ export class TodoMCP extends McpAgent<Env, unknown, AuthenticationContext> {
 			content: [
 				{
 					type: "text",
-					text: `Success! ${description}\n\nNew state:\n${JSON.stringify(newState, null, 2)}}`,
+					text: `Success! ${description}\n\nNew state:\n${JSON.stringify(
+						newState,
+						null,
+						2
+					)}}`,
 				},
 			],
 		};
@@ -64,7 +71,7 @@ export class TodoMCP extends McpAgent<Env, unknown, AuthenticationContext> {
 						},
 					],
 				};
-			},
+			}
 		);
 
 		server.tool(
@@ -74,7 +81,7 @@ export class TodoMCP extends McpAgent<Env, unknown, AuthenticationContext> {
 			async ({ todoText }) => {
 				const todos = await this.todoService.add(todoText);
 				return this.formatResponse("TODO added successfully", todos);
-			},
+			}
 		);
 
 		server.tool(
@@ -83,8 +90,11 @@ export class TodoMCP extends McpAgent<Env, unknown, AuthenticationContext> {
 			{ todoID: z.string() },
 			async ({ todoID }) => {
 				const todos = await this.todoService.markCompleted(todoID);
-				return this.formatResponse("TODO completed successfully", todos);
-			},
+				return this.formatResponse(
+					"TODO completed successfully",
+					todos
+				);
+			}
 		);
 
 		server.tool(
@@ -94,7 +104,7 @@ export class TodoMCP extends McpAgent<Env, unknown, AuthenticationContext> {
 			async ({ todoID }) => {
 				const todos = await this.todoService.delete(todoID);
 				return this.formatResponse("TODO deleted successfully", todos);
-			},
+			}
 		);
 
 		return server;
