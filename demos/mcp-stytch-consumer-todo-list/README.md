@@ -1,6 +1,7 @@
 # Workers + Stytch TODO App MCP Server
 
 This is a Workers server that composes three functions:
+
 * A static website built using React and Vite on top of [Worker Assets](https://developers.cloudflare.com/workers/static-assets/)
 * A REST API built using Hono on top of [Workers KV](https://developers.cloudflare.com/kv/) 
 * A [Model Context Protocol](https://modelcontextprotocol.io/introduction) Server built using on top of [Workers Durable Objects](https://developers.cloudflare.com/durable-objects/)
@@ -9,7 +10,6 @@ User and client identity is managed using [Stytch](https://stytch.com/). Put tog
 
 This demo uses the [Stytch Consumer](https://stytch.com/b2c) product, which is purpose-built for Consumer SaaS authentication requirements.
 If you are more interested in Stytch's [B2B](https://stytch.com/b2b) product, see [this demo](https://github.com/stytchauth/mcp-stytch-b2b-okr-manager/) instead.
-
 
 ## Set up
 
@@ -31,8 +31,9 @@ In your terminal clone the project and install dependencies:
 
 ```bash
 git clone https://github.com/cloudflare/ai.git
-cd ai/demos/mcp-stytch-consumer-todo-list
+cd ai
 npm i
+cd demos/mcp-stytch-consumer-todo-list
 ```
 
 Next, create an `.env.local` file by running the command below which copies the contents of `.env.template`.
@@ -72,11 +73,12 @@ npm run dev
 The application will be available at [`http://localhost:3000`](http://localhost:3000) and the MCP server will be available at `http://localhost:3000/sse`.
 
 Test your MCP server using the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector)
+
 ```bash
 npx @modelcontextprotocol/inspector@latest
 ```
 
-##  Deploy to Cloudflare Workers
+## Deploy to Cloudflare Workers
 
 Click the button - **you'll need to configure environment variables after the initial deployment**. 
 
@@ -100,7 +102,6 @@ wrangler kv namespace create TODOS
    }
 ]
 ```
-
 
 3. Upload your Stytch Env Vars for use by the worker
 
