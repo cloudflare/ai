@@ -1,0 +1,15 @@
+{
+	"name": "@cloudflare/agents-mcp-client-example",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"start": "vite dev",
+		"build": "vite build",
+		"deploy": "wrangler deploy"
+	},
+	"keywords": [],
+	"author": "",
+	"dependencies": {
+		"agents-repo": "github:cmsparks/agents#csparks/mcp-client-auth"
+	}
+}
