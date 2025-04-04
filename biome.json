@@ -4,7 +4,7 @@
 		"enabled": true
 	},
 	"files": {
-		"ignore": ["worker-configuration.d.ts", "types/workerd.d.ts", "demos/mcp-stytch-consumer-todo-list/*"]
+		"ignore": ["worker-configuration.d.ts", "types/workerd.d.ts", "demos/mcp-stytch-consumer-todo-list/*", "demos/mcp-stytch-b2b-okr-manager/*"]
 	},
 	"vcs": {
 		"enabled": true,

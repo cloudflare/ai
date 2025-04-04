@@ -28,9 +28,7 @@
 	"migrations": [
 		{
 			"tag": "v1",
-			"new_sqlite_classes": [
-				"OKRManagerMCP"
-			]
+			"new_sqlite_classes": ["OKRManagerMCP"]
 		}
 	],
 	"durable_objects": {
