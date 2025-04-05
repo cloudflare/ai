@@ -1,8 +1,16 @@
 import type { Context } from "hono";
-import { getCookie, setCookie } from "hono/cookie";
 import { html, raw } from "hono/html";
 import * as oauth from "oauth4webapi";
-import type { AuthRequest, OAuthHelpers } from "@cloudflare/workers-oauth-provider";
+import { getCookie, setCookie } from "hono/cookie";
+
+import { env } from "cloudflare:workers";
+import type {
+	AuthRequest,
+	OAuthHelpers,
+	TokenExchangeCallbackOptions,
+	TokenExchangeCallbackResult,
+} from "@cloudflare/workers-oauth-provider";
+
 import type { UserProps } from "./types";
 
 type Auth0AuthRequest = {
@@ -244,12 +252,74 @@ export async function callback(c: Context<{ Bindings: Env & { OAUTH_PROVIDER: OA
 			tokenSet: {
 				idToken: result.id_token,
 				accessToken: result.access_token,
+				accessTokenTTL: result.expires_in,
 				refreshToken: result.refresh_token,
 			},
 		} as UserProps,
 	});
 
 	return Response.redirect(redirectTo);
+}
+
+/**
+ * Token Exchange Callback
+ *
+ * This function handles the token exchange callback for the CloudflareOAuth Provider and allows us to then interact with the Upstream IdP (your Auth0 tenant)
+ */
+export async function tokenExchangeCallback(
+	options: TokenExchangeCallbackOptions,
+): Promise<TokenExchangeCallbackResult | void> {
+	// During the Authorization Code Exchange, we want to make sure that the Access Token issued
+	// by the MCP Server has the same TTL as the one issued by Auth0.
+	if (options.grantType === "authorization_code") {
+		return {
+			newProps: {
+				...options.props,
+			},
+			accessTokenTTL: options.props.tokenSet.accessTokenTTL,
+		};
+	} else if (options.grantType === "refresh_token") {
+		const auth0RefreshToken = options.props.tokenSet.refreshToken;
+		if (!auth0RefreshToken) {
+			throw new Error("No Auth0 refresh token found");
+		}
+
+		const { as, client, clientAuth } = await getOidcConfig({
+			issuer: `https://${env.AUTH0_DOMAIN}/`,
+			client_id: env.AUTH0_CLIENT_ID,
+			client_secret: env.AUTH0_CLIENT_SECRET,
+		});
+
+		// Perform the refresh token exchange with Auth0.
+		const response = await oauth.refreshTokenGrantRequest(
+			as,
+			client,
+			clientAuth,
+			auth0RefreshToken,
+		);
+		const refreshTokenResponse = await oauth.processRefreshTokenResponse(as, client, response);
+
+		// Get the claims from the id_token
+		const claims = oauth.getValidatedIdTokenClaims(refreshTokenResponse);
+		if (!claims) {
+			throw new Error("Received invalid id_token from Auth0");
+		}
+
+		// Store the new token set and claims.
+		return {
+			newProps: {
+				...options.props,
+				claims: claims,
+				tokenSet: {
+					idToken: refreshTokenResponse.id_token,
+					accessToken: refreshTokenResponse.access_token,
+					accessTokenTTL: refreshTokenResponse.expires_in,
+					refreshToken: refreshTokenResponse.refresh_token || auth0RefreshToken,
+				},
+			},
+			accessTokenTTL: refreshTokenResponse.expires_in,
+		};
+	}
 }
 
 /**

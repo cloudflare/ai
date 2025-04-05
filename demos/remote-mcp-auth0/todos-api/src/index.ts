@@ -42,7 +42,7 @@ app.get("/api/todos", requireScope("read:todos"), async (c) => {
 	const user = c.var.jwtPayload as JWTPayload;
 
 	return c.json({
-		appointments: faker.helpers.multiple(
+		todos: faker.helpers.multiple(
 			() => ({
 				id: faker.string.uuid(),
 				owner: user.sub,

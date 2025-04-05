@@ -21,10 +21,21 @@ export const jwt = (
 
 	return async function jwt(ctx, next) {
 		const auth0Env = env<Auth0JwtEnv>(ctx);
-		const { auth0_domain, auth0_audience } = options || {
+
+		const { auth0_domain: raw_auth0_domain, auth0_audience } = options || {
 			auth0_domain: auth0Env.AUTH0_DOMAIN,
 			auth0_audience: auth0Env.AUTH0_AUDIENCE,
 		};
+
+		let normalizedDomain = raw_auth0_domain || "";
+		if (normalizedDomain.startsWith("https://")) {
+			normalizedDomain = normalizedDomain.substring(8);
+		}
+		if (normalizedDomain.endsWith("/")) {
+			normalizedDomain = normalizedDomain.substring(0, normalizedDomain.length - 1);
+		}
+
+		const auth0_domain = normalizedDomain;
 		if (!auth0_domain || auth0_domain.length === 0) {
 			throw new Error('JWT auth middleware requires options "auth0_domain"');
 		}

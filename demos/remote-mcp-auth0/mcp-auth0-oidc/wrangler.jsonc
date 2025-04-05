@@ -3,10 +3,10 @@
  * https://developers.cloudflare.com/workers/wrangler/configuration/
  */
 {
-	"$schema": "../../node_modules/wrangler/config-schema.json",
+	"$schema": "./node_modules/wrangler/config-schema.json",
 	"name": "mcp-auth0-oidc",
 	"main": "src/index.ts",
-	"compatibility_date": "2025-03-10",
+	"compatibility_date": "2025-04-01",
 	"migrations": [
 		{
 			"new_sqlite_classes": ["AuthenticatedMCP"],

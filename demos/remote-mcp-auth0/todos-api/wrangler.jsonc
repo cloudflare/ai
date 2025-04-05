@@ -1,0 +1,16 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "todos-api",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-04-01",
+	"observability": {
+		"enabled": true
+	},
+	"dev": {
+		"port": 8789
+	}
+}

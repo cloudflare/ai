@@ -1,5 +1,5 @@
 {
-	"name": "mcp-auth0",
+	"name": "todos-api",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
@@ -9,8 +9,12 @@
 		"cf-typegen": "wrangler types"
 	},
 	"devDependencies": {
+		"@cloudflare/workers-types": "^4.20250405.0",
+		"@faker-js/faker": "^9.6.0",
+		"hono": "^4.7.5",
+		"jose": "^6.0.10",
 		"prettier": "^3.5.3",
-		"typescript": "^5.5.2",
-		"wrangler": "^4.3.0"
+		"typescript": "^5.8.3",
+		"wrangler": "^4.7.2"
 	}
 }

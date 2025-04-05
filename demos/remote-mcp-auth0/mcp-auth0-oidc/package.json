@@ -10,12 +10,15 @@
 	},
 	"devDependencies": {
 		"@cloudflare/workers-oauth-provider": "^0.0.2",
-		"@cloudflare/workers-types": "^4.20250310.0",
-		"@modelcontextprotocol/sdk": "^1.7.0",
-		"hono": "^4.7.4",
+		"@cloudflare/workers-types": "^4.20250405.0",
+		"@modelcontextprotocol/sdk": "^1.8.0",
+		"hono": "^4.7.5",
 		"jose": "^6.0.10",
 		"just-pick": "^4.2.0",
-		"oauth4webapi": "^3.3.1",
+		"oauth4webapi": "^3.4.0",
+		"prettier": "^3.5.3",
+		"typescript": "^5.8.3",
+		"wrangler": "^4.7.2",
 		"workers-mcp": "0.1.0-3",
 		"zod": "^3.24.2"
 	}
