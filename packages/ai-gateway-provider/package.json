@@ -1,6 +1,6 @@
 {
 	"name": "ai-gateway-provider",
-	"version": "0.0.3",
+	"version": "0.0.5",
 	"description": "AI Gateway Provider for AI-SDK",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
@@ -21,7 +21,7 @@
 	"homepage": "https://github.com/cloudflare/ai",
 	"repository": {
 		"type": "git",
-		"url": "git@github.com:cloudflare/ai.git"
+		"url": "git+ssh://git@github.com/cloudflare/ai.git"
 	},
 	"bugs": {
 		"url": "https://github.com/cloudflare/ai/issues"
