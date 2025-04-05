@@ -86,14 +86,132 @@ export class AiGatewayChatLanguageModel implements LanguageModelV1 {
 		this.config = config;
 	}
 
-	doStream(options: LanguageModelV1CallOptions): PromiseLike<{
-		stream: ReadableStream<LanguageModelV1StreamPart>;
-		rawCall: { rawPrompt: unknown; rawSettings: Record<string, unknown> };
-		rawResponse?: { headers?: Record<string, string> };
-		request?: { body?: string };
-		warnings?: Array<LanguageModelV1CallWarning>;
-	}> {
-		throw new Error("Method not implemented.");
+	async doStream(
+		options: Parameters<LanguageModelV1["doStream"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV1["doStream"]>>> {
+		const requests: { url: string; request: Request; modelProvider: string }[] = [];
+
+		for (const model of this.models) {
+			if (!model.config || !Object.keys(model.config).includes("fetch")) {
+				throw new Error(
+					`Sorry, but provider "${model.provider}" is currently not supported, please open a issue in the github repo!`,
+				);
+			}
+
+			model.config.fetch = (url, request) => {
+				requests.push({
+					url: url as string,
+					request: request as Request,
+					modelProvider: model.provider,
+				});
+				throw new AiGatewayInternalFetchError("Stopping provider execution...");
+			};
+
+			try {
+				await model.doStream(options);
+			} catch (e) {
+				if (!(e instanceof AiGatewayInternalFetchError)) {
+					throw e;
+				}
+			}
+		}
+
+		const body = await Promise.all(
+			requests.map(async (req) => {
+				let providerConfig = null;
+				for (const provider of ProvidersConfigs) {
+					if (req.url.includes(provider.url)) {
+						providerConfig = provider;
+					}
+				}
+
+				if (!providerConfig) {
+					throw new Error(
+						`Sorry, but provider "${req.modelProvider}" is currently not supported, please open a issue in the github repo!`,
+					);
+				}
+
+				if (!req.request.body) {
+					throw new Error("Ai Gateway provider received an unexpected empty body");
+				}
+
+				return {
+					provider: providerConfig.name,
+					endpoint: req.url.replace(providerConfig.url, ""),
+					headers: req.request.headers,
+					query: await streamToObject(req.request.body),
+				};
+			}),
+		);
+
+		const headers = parseAiGatewayOptions(this.config.options ?? {});
+
+		let resp: Response;
+		if ("binding" in this.config) {
+			const updatedBody = body.map((obj) => {
+				return {
+					...obj,
+					headers: {
+						...(obj.headers ?? {}),
+						...Object.fromEntries(headers.entries()),
+					},
+				};
+			});
+
+			resp = await this.config.binding.run(updatedBody);
+		} else {
+			headers.set("Content-Type", "application/json");
+			headers.set("cf-aig-authorization", `Bearer ${this.config.apiKey}`);
+
+			resp = await fetch(
+				`https://gateway.ai.cloudflare.com/v1/${this.config.accountId}/${this.config.gateway}`,
+				{
+					method: "POST",
+					headers: headers,
+					body: JSON.stringify(body),
+				},
+			);
+		}
+
+		if (resp.status === 400) {
+			const cloneResp = resp.clone();
+			const result: { success?: boolean; error?: { code: number; message: string }[] } =
+				await cloneResp.json();
+			if (
+				result.success === false &&
+				result.error &&
+				result.error.length > 0 &&
+				result.error[0]?.code === 2001
+			) {
+				throw new AiGatewayDoesNotExist("This AI gateway does not exist");
+			}
+		} else if (resp.status === 401) {
+			const cloneResp = resp.clone();
+			const result: { success?: boolean; error?: { code: number; message: string }[] } =
+				await cloneResp.json();
+			if (
+				result.success === false &&
+				result.error &&
+				result.error.length > 0 &&
+				result.error[0]?.code === 2009
+			) {
+				throw new AiGatewayUnauthorizedError(
+					"Your AI Gateway has authentication active, but you didn't provide a valid apiKey",
+				);
+			}
+		}
+
+		const step = Number.parseInt(resp.headers.get("cf-aig-step") ?? "0");
+
+		if (!this.models[step]) {
+			throw new Error("Unexpected AI Gateway Error");
+		}
+
+		this.models[step].config = {
+			...this.models[step].config,
+			fetch: (url, req) => resp as unknown as Promise<Response>,
+		};
+		return this.models[step].doStream(options);
 	}
 
 	async doGenerate(
