@@ -1,11 +1,11 @@
-# Remote MCP Server on Cloudflare
+# Remote MCP Server on Cloudflare that queries AutoRAG
 
-Let's get a remote MCP server up-and-running on Cloudflare Workers complete with OAuth login!
+This remote MCP server exposes a tool that queries an [AutoRAG](https://developers.cloudflare.com/autorag) on Cloudflare, allowing you to provide Claude.ai, Cursor, or any other AI Assistant that supports MCP with the ability to run queries.
 
 ## Develop locally
 
 ```bash
-# clone the repository
+# clone this repository
 git clone git@github.com:cloudflare/ai.git
 
 # install dependencies
@@ -13,7 +13,7 @@ cd ai
 npm install
 
 # run locally
-npx nx dev remote-mcp-server
+npx nx dev remote-mcp-server-autorag
 ```
 
 You should be able to open [`http://localhost:8787/`](http://localhost:8787/) in your browser
@@ -90,7 +90,7 @@ Update the Claude configuration file to point to your `workers.dev` URL (ex: `wo
 ```json
 {
   "mcpServers": {
-    "math": {
+    "remote-mcp-server-autorag": {
       "command": "npx",
       "args": [
         "mcp-remote",
