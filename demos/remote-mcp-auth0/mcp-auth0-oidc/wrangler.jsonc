@@ -7,6 +7,7 @@
 	"name": "mcp-auth0-oidc",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-04-01",
+	"compatibility_flags": ["nodejs_compat"],
 	"migrations": [
 		{
 			"new_sqlite_classes": ["AuthenticatedMCP"],

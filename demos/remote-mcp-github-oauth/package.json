@@ -1,5 +1,5 @@
 {
-	"name": "mcp-github-oauth",
+	"name": "remote-mcp-github-oauth",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
@@ -12,7 +12,7 @@
 		"@cloudflare/workers-oauth-provider": "^0.0.2",
 		"@cloudflare/workers-types": "^4.20250310.0",
 		"@modelcontextprotocol/sdk": "^1.7.0",
-		"agents": "^0.0.45",
+		"agents": "^0.0.53",
 		"hono": "^4.7.4",
 		"just-pick": "^4.2.0",
 		"octokit": "^4.1.2",
