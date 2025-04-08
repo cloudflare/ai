@@ -3,6 +3,15 @@ import { Hono } from "hono";
 import { Octokit } from "octokit";
 import { fetchUpstreamAuthToken, getUpstreamAuthorizeUrl } from "./utils";
 
+// Context from the auth process, encrypted & stored in the auth token
+// and provided to the DurableMCP as this.props
+export type Props = {
+	login: string;
+	name: string;
+	email: string;
+	accessToken: string;
+};
+
 const app = new Hono<{ Bindings: Env & { OAUTH_PROVIDER: OAuthHelpers } }>();
 
 /**
