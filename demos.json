@@ -77,6 +77,9 @@
     },
     "./demos/ui-worker": {
       "package_json_hash": "a987a629a06e6377b612b6dded24d1a868b7483d"
+    },
+    "./demos/remote-mcp-workers-observability": {
+      "package_json_hash": "b69737bbfa45255cbab851829ef57990a4e78885"
     }
   }
 }
