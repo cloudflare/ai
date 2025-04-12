@@ -155,7 +155,7 @@ export const layout = (content: HtmlEscapedString | string, title: string) => ht
 					<a
 						href="/"
 						class="text-xl font-heading font-bold text-primary hover:text-primary/80 transition-colors"
-						>MCP Remote Auth Demo</a
+						>Remote MCP Server with Descope Auth Demo</a
 					>
 				</div>
 			</header>
@@ -165,7 +165,7 @@ export const layout = (content: HtmlEscapedString | string, title: string) => ht
 			<footer class="bg-gray-100 py-6 mt-12">
 				<div class="container mx-auto px-4 text-center text-gray-600">
 					<p>
-						&copy; ${new Date().getFullYear()} MCP Remote Auth Demo.
+						&copy; ${new Date().getFullYear()} Remote MCP Server with Descope Auth Demo.
 						All rights reserved.
 					</p>
 				</div>
