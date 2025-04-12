@@ -64,10 +64,7 @@ export default new Hono<{ Bindings: Bindings }>()
 	})
 
 	// Protected MCP routes
-	.use("/sse/*", async (c, next) => {
-		const provider = new DescopeMcpProvider({}, { env: c.env as unknown as Record<string, string> });
-		return descopeMcpBearerAuth(provider)(c, next);
-	})
+	.use("/sse/*", descopeMcpBearerAuth())
 	.route("/sse", new Hono().mount("/", (req, env, ctx) => {
 		const authHeader = req.headers.get("authorization");
 		ctx.props = {
@@ -75,8 +72,3 @@ export default new Hono<{ Bindings: Bindings }>()
 		};
 		return MyMCP.mount("/sse").fetch(req, env, ctx);
 	}))
-	// Message route
-	.use("/message/*", async (c, next) => {
-		const provider = new DescopeMcpProvider({}, { env: c.env as unknown as Record<string, string> });
-		return descopeMcpBearerAuth(provider)(c, next);
-	});

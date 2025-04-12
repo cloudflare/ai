@@ -150,9 +150,9 @@ async function verifyAccessToken(
 export function descopeMcpBearerAuth(
   provider?: DescopeMcpProvider,
 ): MiddlewareHandler {
-  const authProvider = provider || new DescopeMcpProvider();
-
   return async (c: Context, next) => {
+    const authProvider = provider || new DescopeMcpProvider({}, { env: c.env as unknown as Record<string, string> });
+
     try {
       const authHeader = c.req.header("Authorization");
       if (!authHeader) {
