@@ -1,0 +1,4 @@
+[vars]
+DESCOPE_PROJECT_ID = "your_project_id"
+DESCOPE_MANAGEMENT_KEY = "your_management_key"
+SERVER_URL = "your_server_url"
