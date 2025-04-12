@@ -37,7 +37,7 @@ cd ai
 npm install
 
 # run locally
-npx nx dev mcp-server-delegated-auth-descope
+npx nx dev remote-mcp-server-descope-auth
 ```
 
 You should be able to open [`http://localhost:8787/`](http://localhost:8787/) in your browser
