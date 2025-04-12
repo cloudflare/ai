@@ -1,5 +1,5 @@
 {
-	"name": "mcp-server-delegated-auth-descope",
+	"name": "remote-mcp-server-descope-auth",
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
