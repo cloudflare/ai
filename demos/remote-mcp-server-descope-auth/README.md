@@ -89,10 +89,6 @@ Then enter the `workers.dev` URL (ex: `worker-name.account-name.workers.dev/sse`
 
 You've now connected to your MCP server from a remote MCP client. You can pass in a bearer token like mentioned above.
 
-## Connect Claude Desktop to your remote MCP server
-
-TODO: We need to support arbitrary headers to the `mcp-remote` proxy
-
 ## Debugging
 
 Should anything go wrong it can be helpful to restart Claude, or to try connecting directly to your

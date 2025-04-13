@@ -56,10 +56,6 @@ To explore your new MCP api, you can use the [MCP Inspector](https://modelcontex
   <img src="img/mcp-inspector-sse-config.png" alt="MCP Inspector with the above config" width="600"/>
 </div>
 
-## Connect Claude Desktop to your local MCP server
-
-TODO: We need to support arbitrary headers to the `mcp-remote` proxy
-
 ## Deploy to Cloudflare
 
 1. Set up your secrets in Cloudflare:
