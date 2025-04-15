@@ -819,9 +819,6 @@ importers:
 
   demos/remote-mcp-server-descope-auth:
     dependencies:
-      '@cloudflare/workers-oauth-provider':
-        specifier: ^0.0.2
-        version: 0.0.2
       '@modelcontextprotocol/sdk':
         specifier: ^1.7.0
         version: 1.9.0
