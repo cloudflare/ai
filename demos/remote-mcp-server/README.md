@@ -2,6 +2,8 @@
 
 Let's get a remote MCP server up-and-running on Cloudflare Workers complete with OAuth login!
 
+[![Deploy to Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/ai/tree/main/demos/remote-mcp-server)
+
 ## Develop locally
 
 ```bash
