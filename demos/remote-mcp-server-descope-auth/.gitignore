@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+coverage
+logs
+tmp
+.wrangler
+.env
+.env.local
+.dev.vars
