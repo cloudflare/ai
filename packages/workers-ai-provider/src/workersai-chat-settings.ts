@@ -8,6 +8,12 @@ export type WorkersAIChatSettings = {
 	safePrompt?: boolean;
 
 	/**
+	 * Whether to allow the model to execute calls when the last message was not a user message. Turns off streaming.
+	 * Defaults to `false`.
+	 */
+	sequentialCalls?: boolean;
+
+	/**
 	 * Optionally set Cloudflare AI Gateway options.
 	 * @deprecated
 	 */
