@@ -9,7 +9,9 @@
 	"compatibility_date": "2025-03-10",
 	"migrations": [
 		{
-			"new_sqlite_classes": ["MyMCP"],
+			"new_sqlite_classes": [
+				"MyMCP"
+			],
 			"tag": "v1"
 		}
 	],
@@ -24,5 +26,12 @@
 	"observability": {
 		"enabled": true
 	},
-	"assets": { "directory": "./static/", "binding": "ASSETS" }
+	"assets": {
+		"directory": "./static/",
+		"binding": "ASSETS"
+	},
+	"vars": {
+		"DESCOPE_PROJECT_ID": "your_project_id",
+		"SERVER_URL": "https://your_worker_slug.your_account_name.workers.dev"
+	}
 }

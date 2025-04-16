@@ -17,17 +17,17 @@ Before you begin, ensure you have:
    - [Management Key](https://app.descope.com/settings/company/managementkeys)
 
 2. Create a `.dev.vars` file in your project root (this file is gitignored):
+
 ```bash
 # .dev.vars
 DESCOPE_PROJECT_ID="your_project_id"
 DESCOPE_MANAGEMENT_KEY="your_management_key"
 # For local development
 SERVER_URL="http://localhost:8787"
-# For production (replace with your worker URL)
-# SERVER_URL="https://mcp-server-delegated-auth-descope.your-account-name.workers.dev"
 ```
 
 3. Clone and set up the repository:
+
 ```bash
 # clone the repository
 git clone git@github.com:cloudflare/ai.git
@@ -56,23 +56,27 @@ To explore your new MCP api, you can use the [MCP Inspector](https://modelcontex
   <img src="img/mcp-inspector-sse-config.png" alt="MCP Inspector with the above config" width="600"/>
 </div>
 
-## Connect Claude Desktop to your local MCP server
-
-TODO: We need to support arbitrary headers to the `mcp-remote` proxy
-
 ## Deploy to Cloudflare
 
 1. Set up your secrets in Cloudflare:
+
 ```bash
 # Set Descope credentials as secrets
-wrangler secret put DESCOPE_PROJECT_ID
 wrangler secret put DESCOPE_MANAGEMENT_KEY
-
-# Set your server URL as a secret
-wrangler secret put SERVER_URL
 ```
 
-2. Deploy the worker:
+2. Set your Descope `project_id` and your hosted worker's `server_url` to the `wrangler.jsonc` file:
+
+```bash
+# wrangler.jsonc
+"vars": {
+ "DESCOPE_PROJECT_ID": "your_project_id",
+ "SERVER_URL": "https://your_worker_slug.your_account_name.workers.dev"
+}
+```
+
+3. Deploy the worker:
+
 ```bash
 npm run deploy
 ```
@@ -89,27 +93,11 @@ Then enter the `workers.dev` URL (ex: `worker-name.account-name.workers.dev/sse`
 
 You've now connected to your MCP server from a remote MCP client. You can pass in a bearer token like mentioned above.
 
-## Debugging
-
-Should anything go wrong it can be helpful to restart Claude, or to try connecting directly to your
-MCP server on the command line with the following command.
-
-```bash
-npx mcp-remote http://localhost:8787/sse
-```
-
-In some rare cases it may help to clear the files added to `~/.mcp-auth`
-
-```bash
-rm -rf ~/.mcp-auth
-```
-
 ## Features
 
 The MCP server implementation includes:
 
 - 🔐 OAuth 2.0/2.1 Authorization Server Metadata (RFC 8414)
 - 🔑 Dynamic Client Registration (RFC 7591)
-- 🎫 Token Revocation (RFC 7009)
 - 🔒 PKCE Support
 - 📝 Bearer Token Authentication
