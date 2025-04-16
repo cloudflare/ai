@@ -17,7 +17,7 @@
 		"@stytch/react": "^19.4.1",
 		"@stytch/vanilla-js": "^5.18.6",
 		"commander": "^11.1.0",
-		"agents": "^0.0.47",
+		"agents": "^0.0.53",
 		"hono": "^4.7.4",
 		"lucide-react": "^0.484.0",
 		"react": "^18.3.1",

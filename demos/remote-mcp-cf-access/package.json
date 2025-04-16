@@ -1,0 +1,25 @@
+{
+    "name": "mcp-access-oauth",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "deploy": "wrangler deploy",
+        "dev": "wrangler dev",
+        "start": "wrangler dev",
+        "cf-typegen": "wrangler types"
+    },
+    "devDependencies": {
+        "@cloudflare/workers-oauth-provider": "^0.0.2",
+        "@cloudflare/workers-types": "^4.20250310.0",
+        "@modelcontextprotocol/sdk": "^1.7.0",
+        "agents": "^0.0.45",
+        "hono": "^4.7.4",
+        "just-pick": "^4.2.0",
+        "octokit": "^4.1.2",
+        "prettier": "^3.5.3",
+        "typescript": "^5.5.2",
+        "workers-mcp": "0.1.0-3",
+        "wrangler": "^3.112.0",
+        "zod": "^3.24.2"
+    }
+}

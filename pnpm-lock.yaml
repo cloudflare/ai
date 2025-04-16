@@ -23,9 +23,9 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.7.0
         version: 1.9.0
-      agents-sdk:
-        specifier: ^0.0.27
-        version: 0.0.27(@cloudflare/workers-types@4.20250407.0)
+      agents:
+        specifier: ^0.0.53
+        version: 0.0.53(@cloudflare/workers-types@4.20250407.0)
       ai:
         specifier: ^4.1.39
         version: 4.3.4(react@19.1.0)(zod@3.24.2)
@@ -339,8 +339,8 @@ importers:
         specifier: ^1.7.0
         version: 1.9.0
       agents:
-        specifier: ^0.0.43
-        version: 0.0.43(@cloudflare/workers-types@4.20250407.0)
+        specifier: ^0.0.53
+        version: 0.0.53(@cloudflare/workers-types@4.20250407.0)
       hono:
         specifier: ^4.7.4
         version: 4.7.6
@@ -413,8 +413,8 @@ importers:
         specifier: ^5.18.6
         version: 5.21.1
       agents:
-        specifier: ^0.0.47
-        version: 0.0.47(@cloudflare/workers-types@4.20250407.0)
+        specifier: ^0.0.53
+        version: 0.0.53(@cloudflare/workers-types@4.20250407.0)
       commander:
         specifier: ^11.1.0
         version: 11.1.0
@@ -495,8 +495,8 @@ importers:
         specifier: ^5.18.6
         version: 5.21.1
       agents:
-        specifier: ^0.0.46
-        version: 0.0.46(@cloudflare/workers-types@4.20250407.0)
+        specifier: ^0.0.53
+        version: 0.0.53(@cloudflare/workers-types@4.20250407.0)
       hono:
         specifier: ^4.7.4
         version: 4.7.6
@@ -747,7 +747,7 @@ importers:
         specifier: ^3.24.2
         version: 3.24.2
 
-  demos/remote-mcp-github-oauth:
+  demos/remote-mcp-cf-access:
     devDependencies:
       '@cloudflare/workers-oauth-provider':
         specifier: ^0.0.2
@@ -786,6 +786,45 @@ importers:
         specifier: ^3.24.2
         version: 3.24.2
 
+  demos/remote-mcp-github-oauth:
+    devDependencies:
+      '@cloudflare/workers-oauth-provider':
+        specifier: ^0.0.2
+        version: 0.0.2
+      '@cloudflare/workers-types':
+        specifier: ^4.20250310.0
+        version: 4.20250407.0
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.7.0
+        version: 1.9.0
+      agents:
+        specifier: ^0.0.53
+        version: 0.0.53(@cloudflare/workers-types@4.20250407.0)
+      hono:
+        specifier: ^4.7.4
+        version: 4.7.6
+      just-pick:
+        specifier: ^4.2.0
+        version: 4.2.0
+      octokit:
+        specifier: ^4.1.2
+        version: 4.1.2
+      prettier:
+        specifier: ^3.5.3
+        version: 3.5.3
+      typescript:
+        specifier: ^5.5.2
+        version: 5.8.3
+      workers-mcp:
+        specifier: 0.1.0-3
+        version: 0.1.0-3
+      wrangler:
+        specifier: ^3.112.0
+        version: 3.114.4(@cloudflare/workers-types@4.20250407.0)
+      zod:
+        specifier: ^3.24.2
+        version: 3.24.2
+
   demos/remote-mcp-server:
     dependencies:
       '@cloudflare/workers-oauth-provider':
@@ -795,8 +834,8 @@ importers:
         specifier: ^1.7.0
         version: 1.9.0
       agents:
-        specifier: ^0.0.43
-        version: 0.0.43(@cloudflare/workers-types@4.20250407.0)
+        specifier: ^0.0.53
+        version: 0.0.53(@cloudflare/workers-types@4.20250407.0)
       hono:
         specifier: ^4.7.4
         version: 4.7.6
@@ -3151,17 +3190,8 @@ packages:
     resolution: {integrity: sha512-9utR0g4nBld2ksuDCqxFmCZtAvmFbccrQ4nEF3LQgsJDVjUZoSte43IrdEOul49PwF5XU/Mu/Yq2s/3uCuxOTQ==}
     deprecated: This package has been renamed to 'agents'
 
-  agents@0.0.43:
-    resolution: {integrity: sha512-4acJ/rseNeF7k4oU29KjBXPWZXMrsBwY3Z6cBGvfwkrs3X+7dIlyNpm/eqTSUTgndUoPTdt8ygNWyA2CG+By7A==}
-
   agents@0.0.45:
     resolution: {integrity: sha512-HWVs2McC1DNCQ5V54Lplbx/VmIf84FYjJZTDVwB00YHnM7Yh6TlmAM5uBOd77MW7WyRZKGIo1D4R/sAPkz10/w==}
-
-  agents@0.0.46:
-    resolution: {integrity: sha512-YC49h/KCP1Og7Pd0XVWD22f5Xg6MevUL0qtIJUjK3xP7Zb2F9lGzGqcvgkRmqalLEwZByZqDknvMb9nuDPnVXg==}
-
-  agents@0.0.47:
-    resolution: {integrity: sha512-DiNRi4cps9FEh67j0CntlV4hHy4vkJgRaZtGmAUdf1yslj0TUvx89liS2wAVYKAyy3HgFiMxvELGLV4nWNs+jw==}
 
   agents@0.0.53:
     resolution: {integrity: sha512-FNQlUW4pNJ/vOlHfMzIH15rB+7IY2TykyyPtnR0cIRJkDAKKSKYlboMmBcyWUpMumw0En/CMR/G/lEU2kPwxcQ==}
@@ -4846,9 +4876,6 @@ packages:
 
   partysocket@0.0.0-548c226:
     resolution: {integrity: sha512-sPY8fFu+Y6um9E2K9Hf2s1UFm9JD+sg5bawJZGX/NZG8ZW/ZkQ6XP1uDlfXqdCFg8FwTM4BojKuIZfKHf31n3g==}
-
-  partysocket@1.1.0:
-    resolution: {integrity: sha512-G+fYGqBPx5tCjqmUmhtIKxZqnS/JjYd0E94hqRe+MRvggZ/RNy3+07t+WxewqdW+BlXEhW9eXu9WA5CjCn9BDQ==}
 
   partysocket@1.1.2:
     resolution: {integrity: sha512-vWyxg0dYJewBsT6BaYkq+DEavYw+N/8J0jUXYSuZRRJdnmMJY+rkCg19t/8c3pTSyg8FjJH8VzIaHBhFMQRDIw==}
@@ -7912,39 +7939,12 @@ snapshots:
     transitivePeerDependencies:
       - '@cloudflare/workers-types'
 
-  agents@0.0.43(@cloudflare/workers-types@4.20250407.0):
-    dependencies:
-      cron-schedule: 5.0.4
-      nanoid: 5.1.5
-      partyserver: 0.0.66(@cloudflare/workers-types@4.20250407.0)
-      partysocket: 1.1.0
-    transitivePeerDependencies:
-      - '@cloudflare/workers-types'
-
   agents@0.0.45(@cloudflare/workers-types@4.20250407.0):
     dependencies:
       cron-schedule: 5.0.4
       nanoid: 5.1.5
       partyserver: 0.0.66(@cloudflare/workers-types@4.20250407.0)
       partysocket: 1.1.2
-    transitivePeerDependencies:
-      - '@cloudflare/workers-types'
-
-  agents@0.0.46(@cloudflare/workers-types@4.20250407.0):
-    dependencies:
-      cron-schedule: 5.0.4
-      nanoid: 5.1.5
-      partyserver: 0.0.66(@cloudflare/workers-types@4.20250407.0)
-      partysocket: 1.1.2
-    transitivePeerDependencies:
-      - '@cloudflare/workers-types'
-
-  agents@0.0.47(@cloudflare/workers-types@4.20250407.0):
-    dependencies:
-      cron-schedule: 5.0.4
-      nanoid: 5.1.5
-      partyserver: 0.0.66(@cloudflare/workers-types@4.20250407.0)
-      partysocket: 1.1.3
     transitivePeerDependencies:
       - '@cloudflare/workers-types'
 
@@ -9644,10 +9644,6 @@ snapshots:
       nanoid: 5.1.5
 
   partysocket@0.0.0-548c226:
-    dependencies:
-      event-target-shim: 6.0.2
-
-  partysocket@1.1.0:
     dependencies:
       event-target-shim: 6.0.2
 
