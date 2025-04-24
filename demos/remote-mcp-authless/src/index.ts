@@ -62,8 +62,6 @@ export default {
 	fetch(request: Request, env: Env, ctx: ExecutionContext) {
 		const url = new URL(request.url);
 
-		console.log(request.method, request.url, request.headers);
-
 		if (url.pathname === "/sse" || url.pathname === "/sse/message") {
 			// @ts-ignore
 			return MyMCP.serveSSE("/sse").fetch(request, env, ctx);
