@@ -15,8 +15,8 @@
     "wrangler": "^4.2.0"
   },
   "dependencies": {
-		"agents": "^0.0.53",
     "@modelcontextprotocol/sdk": "^1.7.0",
+    "agents": "^0.0.65",
     "zod": "^3.24.2"
   }
 }
