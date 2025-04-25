@@ -7,6 +7,5 @@
     "deploy": "wrangler deploy"
   },
   "devDependencies": {
-    "wrangler": "^4.2.0"
   }
 }
