@@ -16,6 +16,7 @@
 	"license": "MIT",
 	"scripts": {
 		"build": "rm -rf dist && tsup src/index.ts --dts --sourcemap --format esm --target es2020",
+		"prepare": "pnpm build",
 		"format": "biome format --write",
 		"test:ci": "vitest --watch=false",
 		"test": "vitest"
