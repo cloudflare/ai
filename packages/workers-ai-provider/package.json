@@ -25,17 +25,7 @@
 	"keywords": ["workers", "cloudflare", "ai", "vercel", "sdk", "provider", "chat", "serverless"],
   "packageManager": "pnpm@10.10.0",
 	"dependencies": {
-		"@ai-sdk/provider": "^1.1.3"
-	},
-	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20250429.0"
-	},
-	"peerDependencies": {
+		"@ai-sdk/provider": "^1.1.3",
 		"@cloudflare/workers-types": ">=4"
-	},
-	"peerDependenciesMeta": {
-		"@cloudflare/workers-types": {
-			"optional": true
-		}
 	}
 }
