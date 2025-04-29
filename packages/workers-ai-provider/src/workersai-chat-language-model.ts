@@ -8,9 +8,9 @@ import { convertToWorkersAIChatMessages } from "./convert-to-workersai-chat-mess
 import type { WorkersAIChatSettings } from "./workersai-chat-settings";
 import type { TextGenerationModels } from "./workersai-models";
 
-import { events } from "fetch-event-stream";
 import { mapWorkersAIUsage } from "./map-workersai-usage";
-import type { WorkersAIChatPrompt } from "./workersai-chat-prompt";
+import { getMappedStream } from "./streaming";
+import { lastMessageWasUser, prepareToolsAndToolChoice } from "./utils";
 
 type WorkersAIChatConfig = {
 	provider: string;
@@ -244,96 +244,10 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 			throw new Error("This shouldn't happen");
 		}
 
-		const chunkEvent = events(new Response(response));
-		let usage = { promptTokens: 0, completionTokens: 0 };
-
 		return {
-			stream: new ReadableStream<LanguageModelV1StreamPart>({
-				async start(controller) {
-					for await (const event of chunkEvent) {
-						if (!event.data) {
-							continue;
-						}
-						if (event.data === "[DONE]") {
-							break;
-						}
-						const chunk = JSON.parse(event.data);
-						if (chunk.usage) {
-							usage = mapWorkersAIUsage(chunk);
-						}
-						chunk.response?.length &&
-							controller.enqueue({
-								type: "text-delta",
-								textDelta: chunk.response,
-							});
-					}
-					controller.enqueue({
-						type: "finish",
-						finishReason: "stop",
-						usage: usage,
-					});
-					controller.close();
-				},
-			}),
+			stream: getMappedStream(new Response(response)),
 			rawCall: { rawPrompt: args.messages, rawSettings: args },
 			warnings,
 		};
 	}
-}
-
-function prepareToolsAndToolChoice(
-	mode: Parameters<LanguageModelV1["doGenerate"]>[0]["mode"] & {
-		type: "regular";
-	},
-) {
-	// when the tools array is empty, change it to undefined to prevent errors:
-	const tools = mode.tools?.length ? mode.tools : undefined;
-
-	if (tools == null) {
-		return { tools: undefined, tool_choice: undefined };
-	}
-
-	const mappedTools = tools.map((tool) => ({
-		type: "function",
-		function: {
-			name: tool.name,
-			// @ts-expect-error - description is not a property of tool
-			description: tool.description,
-			// @ts-expect-error - parameters is not a property of tool
-			parameters: tool.parameters,
-		},
-	}));
-
-	const toolChoice = mode.toolChoice;
-
-	if (toolChoice == null) {
-		return { tools: mappedTools, tool_choice: undefined };
-	}
-
-	const type = toolChoice.type;
-
-	switch (type) {
-		case "auto":
-			return { tools: mappedTools, tool_choice: type };
-		case "none":
-			return { tools: mappedTools, tool_choice: type };
-		case "required":
-			return { tools: mappedTools, tool_choice: "any" };
-
-		// workersAI does not support tool mode directly,
-		// so we filter the tools and force the tool choice through 'any'
-		case "tool":
-			return {
-				tools: mappedTools.filter((tool) => tool.function.name === toolChoice.toolName),
-				tool_choice: "any",
-			};
-		default: {
-			const exhaustiveCheck = type satisfies never;
-			throw new Error(`Unsupported tool choice type: ${exhaustiveCheck}`);
-		}
-	}
-}
-
-function lastMessageWasUser(messages: WorkersAIChatPrompt) {
-	return messages.length > 0 && messages[messages.length - 1].role === "user";
 }

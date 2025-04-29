@@ -1,15 +1,14 @@
 import {
 	type LanguageModelV1,
 	type LanguageModelV1CallWarning,
-	type LanguageModelV1StreamPart,
 	UnsupportedFunctionalityError,
 } from "@ai-sdk/provider";
-import { events } from "fetch-event-stream";
 
+import type { AutoRAGChatSettings } from "./autorag-chat-settings";
 import { convertToWorkersAIChatMessages } from "./convert-to-workersai-chat-messages";
 import { mapWorkersAIUsage } from "./map-workersai-usage";
-import type { WorkersAIChatPrompt } from "./workersai-chat-prompt";
-import type { WorkersAIChatSettings } from "./workersai-chat-settings";
+import { getMappedStream } from "./streaming";
+import { prepareToolsAndToolChoice } from "./utils";
 import type { TextGenerationModels } from "./workersai-models";
 
 type AutoRAGChatConfig = {
@@ -23,13 +22,13 @@ export class AutoRAGChatLanguageModel implements LanguageModelV1 {
 	readonly defaultObjectGenerationMode = "json";
 
 	readonly modelId: TextGenerationModels;
-	readonly settings: WorkersAIChatSettings;
+	readonly settings: AutoRAGChatSettings;
 
 	private readonly config: AutoRAGChatConfig;
 
 	constructor(
 		modelId: TextGenerationModels,
-		settings: WorkersAIChatSettings,
+		settings: AutoRAGChatSettings,
 		config: AutoRAGChatConfig,
 	) {
 		this.modelId = modelId;
@@ -127,7 +126,7 @@ export class AutoRAGChatLanguageModel implements LanguageModelV1 {
 		const { args, warnings } = this.getArgs(options);
 
 		const output = await this.config.binding.aiSearch({
-			query: args.messages.map(({ content, role }) => `${role}: ${content}`).join("\n"),
+			query: args.messages.map(({ content, role }) => `${role}: ${content}`).join("\n\n"),
 		});
 
 		return {
@@ -152,144 +151,17 @@ export class AutoRAGChatLanguageModel implements LanguageModelV1 {
 	): Promise<Awaited<ReturnType<LanguageModelV1["doStream"]>>> {
 		const { args, warnings } = this.getArgs(options);
 
-		// [1] When the latest message is not a tool response, we use the regular generate function
-		// and simulate it as a streamed response in order to satisfy the AI SDK's interface for
-		// doStream...
-		if (args.tools?.length && lastMessageWasUser(args.messages)) {
-			const response = await this.doGenerate(options);
-
-			if (response instanceof ReadableStream) {
-				throw new Error("This shouldn't happen");
-			}
-
-			return {
-				stream: new ReadableStream<LanguageModelV1StreamPart>({
-					async start(controller) {
-						if (response.text) {
-							controller.enqueue({
-								type: "text-delta",
-								textDelta: response.text,
-							});
-						}
-						if (response.toolCalls) {
-							for (const toolCall of response.toolCalls) {
-								controller.enqueue({
-									type: "tool-call",
-									...toolCall,
-								});
-							}
-						}
-						controller.enqueue({
-							type: "finish",
-							finishReason: "stop",
-							usage: response.usage,
-						});
-						controller.close();
-					},
-				}),
-				rawCall: { rawPrompt: args.messages, rawSettings: args },
-				warnings,
-			};
-		}
-
-		const query = args.messages.map(({ content, role }) => `${role}: ${content}`).join("\n");
+		const query = args.messages.map(({ content, role }) => `${role}: ${content}`).join("\n\n");
 
 		const response = await this.config.binding.aiSearch({
 			query,
 			stream: true,
 		});
 
-		const chunkEvent = events(response);
-		let usage = { promptTokens: 0, completionTokens: 0 };
-
 		return {
-			stream: new ReadableStream<LanguageModelV1StreamPart>({
-				async start(controller) {
-					for await (const event of chunkEvent) {
-						if (!event.data) {
-							continue;
-						}
-						if (event.data === "[DONE]") {
-							break;
-						}
-						const chunk = JSON.parse(event.data);
-						console.log(chunk);
-						if (chunk.usage) {
-							usage = mapWorkersAIUsage(chunk);
-						}
-						chunk.response?.length &&
-							controller.enqueue({
-								type: "text-delta",
-								textDelta: chunk.response,
-							});
-					}
-					controller.enqueue({
-						type: "finish",
-						finishReason: "stop",
-						usage: usage,
-					});
-					controller.close();
-				},
-			}),
+			stream: getMappedStream(response),
 			rawCall: { rawPrompt: args.messages, rawSettings: args },
 			warnings,
 		};
 	}
-}
-
-function prepareToolsAndToolChoice(
-	mode: Parameters<LanguageModelV1["doGenerate"]>[0]["mode"] & {
-		type: "regular";
-	},
-) {
-	// when the tools array is empty, change it to undefined to prevent errors:
-	const tools = mode.tools?.length ? mode.tools : undefined;
-
-	if (tools == null) {
-		return { tools: undefined, tool_choice: undefined };
-	}
-
-	const mappedTools = tools.map((tool) => ({
-		type: "function",
-		function: {
-			name: tool.name,
-			// @ts-expect-error - description is not a property of tool
-			description: tool.description,
-			// @ts-expect-error - parameters is not a property of tool
-			parameters: tool.parameters,
-		},
-	}));
-
-	const toolChoice = mode.toolChoice;
-
-	if (toolChoice == null) {
-		return { tools: mappedTools, tool_choice: undefined };
-	}
-
-	const type = toolChoice.type;
-
-	switch (type) {
-		case "auto":
-			return { tools: mappedTools, tool_choice: type };
-		case "none":
-			return { tools: mappedTools, tool_choice: type };
-		case "required":
-			return { tools: mappedTools, tool_choice: "any" };
-
-		// workersAI does not support tool mode directly,
-		// so we filter the tools and force the tool choice through 'any'
-		case "tool":
-			return {
-				tools: mappedTools.filter((tool) => tool.function.name === toolChoice.toolName),
-				tool_choice: "any",
-			};
-		default: {
-			const exhaustiveCheck = type satisfies never;
-			throw new Error(`Unsupported tool choice type: ${exhaustiveCheck}`);
-		}
-	}
-}
-
-function lastMessageWasUser(messages: WorkersAIChatPrompt) {
-	return messages.length > 0 && messages[messages.length - 1]!.role === "user";
 }
