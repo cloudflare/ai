@@ -30,7 +30,7 @@
 		"@cloudflare/workers-types": "^4.20250429.0"
 	},
 	"peerDependencies": {
-		"@cloudflare/workers-types": "^4.20250429.0"
+		"@cloudflare/workers-types": "@>=4"
 	},
 	"peerDependenciesMeta": {
 		"@cloudflare/workers-types": {

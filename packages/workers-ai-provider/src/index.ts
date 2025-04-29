@@ -111,7 +111,7 @@ export type AutoRAGSettings = {
 };
 
 export interface AutoRAGProvider {
-	(options: AutoRAGChatSettings): AutoRAGChatLanguageModel;
+	(options?: AutoRAGChatSettings): AutoRAGChatLanguageModel;
 	/**
 	 * Creates a model for text generation.
 	 **/
