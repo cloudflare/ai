@@ -130,19 +130,20 @@ export class AutoRAGChatLanguageModel implements LanguageModelV1 {
 			query: args.messages.map(({ content, role }) => `${role}: ${content}`).join("\n"),
 		});
 
-		if (output instanceof ReadableStream) {
-			throw new Error("This shouldn't happen");
-		}
-
 		return {
-			text:
-				typeof output.response === "object" && output.response !== null
-					? JSON.stringify(output.response) // ai-sdk expects a string here
-					: output.response,
+			text: output.response,
 			finishReason: "stop", // TODO: mapWorkersAIFinishReason(response.finish_reason),
 			rawCall: { rawPrompt: args.messages, rawSettings: args },
 			usage: mapWorkersAIUsage(output),
 			warnings,
+			sources: output.data.map(({ file_id, filename, score }) => ({
+				id: file_id,
+				sourceType: "url",
+				url: filename,
+				providerMetadata: {
+					attributes: { score },
+				},
+			})),
 		};
 	}
 

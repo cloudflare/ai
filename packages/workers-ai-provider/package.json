@@ -16,6 +16,7 @@
 	"license": "MIT",
 	"scripts": {
 		"build": "rm -rf dist && tsup src/index.ts --dts --sourcemap --format esm --target es2020",
+		"prepare": "pnpm build",
 		"format": "biome format --write",
 		"test:ci": "vitest --watch=false",
 		"test": "vitest"
@@ -25,8 +26,11 @@
 	"dependencies": {
 		"@ai-sdk/provider": "^1.1.3"
 	},
-	"peerDependencies": {
+	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20250429.0"
+	},
+	"peerDependencies": {
+		"@cloudflare/workers-types": ">=4"
 	},
 	"peerDependenciesMeta": {
 		"@cloudflare/workers-types": {
