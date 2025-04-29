@@ -1,3 +1,5 @@
+import { AutoRAGChatLanguageModel } from "./autorag-chat-language-model";
+import type { AutoRAGChatSettings } from "./autorag-chat-settings";
 import { createRun } from "./utils";
 import { WorkersAIChatLanguageModel } from "./workersai-chat-language-model";
 import type { WorkersAIChatSettings } from "./workersai-chat-settings";
@@ -100,6 +102,42 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 	provider.chat = createChatModel;
 	provider.image = createImageModel;
 	provider.imageModel = createImageModel;
+
+	return provider;
+}
+
+export type AutoRAGSettings = {
+	binding: AutoRAG;
+};
+
+export interface AutoRAGProvider {
+	(options?: AutoRAGChatSettings): AutoRAGChatLanguageModel;
+	/**
+	 * Creates a model for text generation.
+	 **/
+	chat(settings?: AutoRAGChatSettings): AutoRAGChatLanguageModel;
+}
+
+/**
+ * Create a Workers AI provider instance.
+ */
+export function createAutoRAG(options: AutoRAGSettings): AutoRAGProvider {
+	const binding = options.binding;
+
+	const createChatModel = (settings: AutoRAGChatSettings = {}) =>
+		new AutoRAGChatLanguageModel("@cf/meta/llama-3.3-70b-instruct-fp8-fast", settings, {
+			provider: "autorag.chat",
+			binding,
+		});
+
+	const provider = (settings?: AutoRAGChatSettings) => {
+		if (new.target) {
+			throw new Error("The WorkersAI model function cannot be called with the new keyword.");
+		}
+		return createChatModel(settings);
+	};
+
+	provider.chat = createChatModel;
 
 	return provider;
 }
