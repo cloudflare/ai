@@ -9,7 +9,7 @@
         "cf-typegen": "wrangler types"
     },
     "devDependencies": {
-        "@cloudflare/workers-oauth-provider": "^0.0.2",
+        "@cloudflare/workers-oauth-provider": "^0.0.5",
         "@cloudflare/workers-types": "^4.20250310.0",
         "@modelcontextprotocol/sdk": "^1.7.0",
         "agents": "^0.0.45",

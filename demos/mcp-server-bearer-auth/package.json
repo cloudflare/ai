@@ -17,7 +17,7 @@
 		"wrangler": "^4.2.0"
 	},
 	"dependencies": {
-		"@cloudflare/workers-oauth-provider": "^0.0.2",
+		"@cloudflare/workers-oauth-provider": "^0.0.5",
 		"@modelcontextprotocol/sdk": "^1.7.0",
 		"agents": "^0.0.53",
 		"hono": "^4.7.4",
