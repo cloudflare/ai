@@ -1,7 +1,10 @@
 import { type LanguageModelV1Prompt, UnsupportedFunctionalityError } from "@ai-sdk/provider";
 import type { WorkersAIChatPrompt } from "./workersai-chat-prompt";
 
-export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): WorkersAIChatPrompt {
+export function convertToWorkersAIChatMessages(
+  prompt: LanguageModelV1Prompt,
+  excludeContentWithToolCalls = false
+): WorkersAIChatPrompt {
 	const messages: WorkersAIChatPrompt = [];
 
 	for (const { role, content } of prompt) {
@@ -71,7 +74,7 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): W
 
 				messages.push({
 					role: "assistant",
-					content: text,
+					content: excludeContentWithToolCalls && toolCalls.length > 0 ? undefined : text, // fix for mistral
 					tool_calls:
 						toolCalls.length > 0
 							? toolCalls.map(({ function: { name, arguments: args } }) => ({
@@ -88,6 +91,7 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): W
 				for (const toolResponse of content) {
 					messages.push({
 						role: "tool",
+						tool_call_id: toolResponse.toolCallId, // required by mistral
 						name: toolResponse.toolName,
 						content: JSON.stringify(toolResponse.result),
 					});

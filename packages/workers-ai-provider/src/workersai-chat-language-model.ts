@@ -83,7 +83,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 			random_seed: seed,
 
 			// messages:
-			messages: convertToWorkersAIChatMessages(prompt),
+			messages: convertToWorkersAIChatMessages(prompt, this.modelId.includes('mistral')),
 		};
 
 		switch (type) {
@@ -139,7 +139,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 	): Promise<Awaited<ReturnType<LanguageModelV1["doGenerate"]>>> {
 		const { args, warnings } = this.getArgs(options);
 
-		const { gateway, safePrompt, ...passthroughOptions } = this.settings;
+		const { gateway, safePrompt, sequentialCalls, ...passthroughOptions } = this.settings;
 
 		const output = await this.config.binding.run(
 			args.model,
@@ -181,11 +181,14 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 		options: Parameters<LanguageModelV1["doStream"]>[0],
 	): Promise<Awaited<ReturnType<LanguageModelV1["doStream"]>>> {
 		const { args, warnings } = this.getArgs(options);
+		const { gateway, safePrompt, sequentialCalls, ...passthroughOptions } = this.settings;
 
 		// [1] When the latest message is not a tool response, we use the regular generate function
 		// and simulate it as a streamed response in order to satisfy the AI SDK's interface for
 		// doStream...
-		if (args.tools?.length && lastMessageWasUser(args.messages)) {
+		// To allow a model to chain together tool calls, `sequentialCalls` can be set to `true`.
+		// This will make all responses be simulated streams.
+		if (args.tools?.length && (!!sequentialCalls || lastMessageWasUser(args.messages))) {
 			const response = await this.doGenerate(options);
 
 			if (response instanceof ReadableStream) {
@@ -223,7 +226,6 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 		}
 
 		// [2] ...otherwise, we just proceed as normal and stream the response directly from the remote model.
-		const { gateway, ...passthroughOptions } = this.settings;
 
 		const response = await this.config.binding.run(
 			args.model,
