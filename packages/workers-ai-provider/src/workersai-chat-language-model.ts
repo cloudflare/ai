@@ -175,12 +175,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 				typeof output.response === "object" && output.response !== null
 					? JSON.stringify(output.response) // ai-sdk expects a string here
 					: output.response,
-			toolCalls: output.tool_calls?.map((toolCall) => ({
-				toolCallType: "function",
-				toolCallId: toolCall.name,
-				toolName: toolCall.name,
-				args: JSON.stringify(toolCall.arguments || {}),
-			})),
+			toolCalls: processToolCalls(output),
 			finishReason: "stop", // TODO: mapWorkersAIFinishReason(response.finish_reason),
 			rawCall: { rawPrompt: messages, rawSettings: args },
 			usage: mapWorkersAIUsage(output),
@@ -305,6 +300,38 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 			warnings,
 		};
 	}
+}
+
+function processToolCalls(output: any) {
+	// Check for OpenAI format tool calls first
+	if (output.tool_calls && Array.isArray(output.tool_calls)) {
+		return output.tool_calls.map((toolCall: any) => {
+			// Handle new format
+			if (toolCall.function && toolCall.id) {
+				return {
+					toolCallType: "function",
+					toolCallId: toolCall.id,
+					toolName: toolCall.function.name,
+					args:
+						typeof toolCall.function.arguments === "string"
+							? toolCall.function.arguments
+							: JSON.stringify(toolCall.function.arguments || {}),
+				};
+			} else {
+				return {
+					toolCallType: "function",
+					toolCallId: toolCall.name,
+					toolName: toolCall.name,
+					args:
+						typeof toolCall.arguments === "string"
+							? toolCall.arguments
+							: JSON.stringify(toolCall.arguments || {}),
+				};
+			}
+		});
+	}
+
+	return [];
 }
 
 function prepareToolsAndToolChoice(
