@@ -19,7 +19,7 @@
         "prettier": "^3.5.3",
         "typescript": "^5.5.2",
         "workers-mcp": "0.1.0-3",
-        "wrangler": "^3.112.0",
+        "wrangler": "^4.14.4",
         "zod": "^3.24.2"
     }
 }
