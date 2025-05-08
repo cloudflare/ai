@@ -19,7 +19,7 @@
 	"devDependencies": {
 		"@cloudflare/vite-plugin": "^1.0.0",
 		"@biomejs/biome": "^1.8.2",
-		"@cloudflare/vitest-pool-workers": "^0.7.5",
+		"@cloudflare/vitest-pool-workers": "^0.8.27",
 		"typescript": "^5.5.2",
 		"vitest": "~3.0.7",
 		"wrangler": "^4.2.0"
