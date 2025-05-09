@@ -1,0 +1,25 @@
+{
+  "name": "remote-mcp-logto",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "format": "biome format --write",
+    "lint:fix": "biome lint --fix",
+    "start": "wrangler dev",
+    "cf-typegen": "wrangler types"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.2",
+    "wrangler": "^4.14.2"
+  },
+  "dependencies": {
+    "@cloudflare/workers-oauth-provider": "^0.0.5",
+    "@logto/node": "^3.1.4",
+    "@modelcontextprotocol/sdk": "^1.7.0",
+    "agents": "^0.0.65",
+    "hono": "^4.7.8",
+    "zod": "^3.24.2"
+  }
+}
