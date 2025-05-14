@@ -13,21 +13,21 @@ export interface AiRun {
 	<Name extends keyof AiModels>(
 		model: Name,
 		inputs: AiModels[Name]["inputs"],
-		options: AiOptions & { returnRawResponse: true }
+		options: AiOptions & { returnRawResponse: true },
 	): Promise<Response>;
 
 	// (2) Return a stream if the input has `stream: true`.
 	<Name extends keyof AiModels>(
 		model: Name,
 		inputs: AiModels[Name]["inputs"] & { stream: true },
-		options?: AiOptions
+		options?: AiOptions,
 	): Promise<ReadableStream<Uint8Array>>;
 
 	// (3) Return post-processed outputs by default.
 	<Name extends keyof AiModels>(
 		model: Name,
 		inputs: AiModels[Name]["inputs"],
-		options?: AiOptions
+		options?: AiOptions,
 	): Promise<AiModels[Name]["postProcessedOutputs"]>;
 }
 
@@ -64,19 +64,10 @@ export function createRun(config: CreateRunConfig): AiRun {
 	return async function run<Name extends keyof AiModels>(
 		model: Name,
 		inputs: AiModels[Name]["inputs"],
-		options?: AiOptions & Record<string, StringLike>
-	): Promise<
-		| Response
-		| ReadableStream<Uint8Array>
-		| AiModels[Name]["postProcessedOutputs"]
-	> {
-		const {
-			gateway,
-			prefix,
-			extraHeaders,
-			returnRawResponse,
-			...passthroughOptions
-		} = options || {};
+		options?: AiOptions & Record<string, StringLike>,
+	): Promise<Response | ReadableStream<Uint8Array> | AiModels[Name]["postProcessedOutputs"]> {
+		const { gateway, prefix, extraHeaders, returnRawResponse, ...passthroughOptions } =
+			options || {};
 
 		const urlParams = new URLSearchParams();
 		for (const [key, value] of Object.entries(passthroughOptions)) {
@@ -89,7 +80,7 @@ export function createRun(config: CreateRunConfig): AiRun {
 				urlParams.append(key, valueStr);
 			} catch (error) {
 				throw new Error(
-					`Value for option '${key}' is not able to be coerced into a string.`
+					`Value for option '${key}' is not able to be coerced into a string.`,
 				);
 			}
 		}
@@ -137,7 +128,7 @@ export function createRun(config: CreateRunConfig): AiRun {
 export function prepareToolsAndToolChoice(
 	mode: Parameters<LanguageModelV1["doGenerate"]>[0]["mode"] & {
 		type: "regular";
-	}
+	},
 ) {
 	// when the tools array is empty, change it to undefined to prevent errors:
 	const tools = mode.tools?.length ? mode.tools : undefined;
@@ -177,9 +168,7 @@ export function prepareToolsAndToolChoice(
 		// so we filter the tools and force the tool choice through 'any'
 		case "tool":
 			return {
-				tools: mappedTools.filter(
-					(tool) => tool.function.name === toolChoice.toolName
-				),
+				tools: mappedTools.filter((tool) => tool.function.name === toolChoice.toolName),
 				tool_choice: "any",
 			};
 		default: {
@@ -190,9 +179,7 @@ export function prepareToolsAndToolChoice(
 }
 
 export function lastMessageWasUser<T extends { role: string }>(messages: T[]) {
-	return (
-		messages.length > 0 && messages[messages.length - 1]!.role === "user"
-	);
+	return messages.length > 0 && messages[messages.length - 1]!.role === "user";
 }
 
 export function processToolCalls(output: any) {
