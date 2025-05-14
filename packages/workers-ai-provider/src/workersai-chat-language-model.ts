@@ -10,11 +10,7 @@ import type { TextGenerationModels } from "./workersai-models";
 
 import { mapWorkersAIUsage } from "./map-workersai-usage";
 import { getMappedStream } from "./streaming";
-import {
-	lastMessageWasUser,
-	prepareToolsAndToolChoice,
-	processToolCalls,
-} from "./utils";
+import { lastMessageWasUser, prepareToolsAndToolChoice, processToolCalls } from "./utils";
 
 type WorkersAIChatConfig = {
 	provider: string;
@@ -34,7 +30,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 	constructor(
 		modelId: TextGenerationModels,
 		settings: WorkersAIChatSettings,
-		config: WorkersAIChatConfig
+		config: WorkersAIChatConfig,
 	) {
 		this.modelId = modelId;
 		this.settings = settings;
@@ -135,16 +131,14 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 	}
 
 	async doGenerate(
-		options: Parameters<LanguageModelV1["doGenerate"]>[0]
+		options: Parameters<LanguageModelV1["doGenerate"]>[0],
 	): Promise<Awaited<ReturnType<LanguageModelV1["doGenerate"]>>> {
 		const { args, warnings } = this.getArgs(options);
 
 		const { gateway, safePrompt, ...passthroughOptions } = this.settings;
 
 		// Extract image from messages if present
-		const { messages, images } = convertToWorkersAIChatMessages(
-			options.prompt
-		);
+		const { messages, images } = convertToWorkersAIChatMessages(options.prompt);
 
 		// TODO: support for multiple images
 		if (images.length !== 0 && images.length !== 1) {
@@ -167,7 +161,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 				// @ts-expect-error response_format not yet added to types
 				response_format: args.response_format,
 			},
-			{ gateway: this.config.gateway ?? gateway, ...passthroughOptions }
+			{ gateway: this.config.gateway ?? gateway, ...passthroughOptions },
 		);
 
 		if (output instanceof ReadableStream) {
@@ -188,14 +182,12 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 	}
 
 	async doStream(
-		options: Parameters<LanguageModelV1["doStream"]>[0]
+		options: Parameters<LanguageModelV1["doStream"]>[0],
 	): Promise<Awaited<ReturnType<LanguageModelV1["doStream"]>>> {
 		const { args, warnings } = this.getArgs(options);
 
 		// Extract image from messages if present
-		const { messages, images } = convertToWorkersAIChatMessages(
-			options.prompt
-		);
+		const { messages, images } = convertToWorkersAIChatMessages(options.prompt);
 
 		// [1] When the latest message is not a tool response, we use the regular generate function
 		// and simulate it as a streamed response in order to satisfy the AI SDK's interface for
@@ -262,7 +254,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 				// @ts-expect-error response_format not yet added to types
 				response_format: args.response_format,
 			},
-			{ gateway: this.config.gateway ?? gateway, ...passthroughOptions }
+			{ gateway: this.config.gateway ?? gateway, ...passthroughOptions },
 		);
 
 		if (!(response instanceof ReadableStream)) {
