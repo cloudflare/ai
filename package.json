@@ -54,6 +54,13 @@
 	},
 	"packageManager": "pnpm@10.10.0",
 	"pnpm": {
-		"onlyBuiltDependencies": ["@biomejs/biome", "esbuild", "msw", "nx", "sharp", "workerd"]
+		"onlyBuiltDependencies": [
+			"@biomejs/biome",
+			"esbuild",
+			"msw",
+			"nx",
+			"sharp",
+			"workerd"
+		]
 	}
 }
