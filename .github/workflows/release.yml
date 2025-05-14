@@ -23,10 +23,12 @@ jobs:
       - uses: actions/setup-node@v4
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --child-concurrency=10
+        run: pnpm install --no-frozen-lockfile --child-concurrency=10
 
       - name: Test and Build
-        run: pnpm nx build workers-ai-provider
+        run: |
+          pnpm nx build workers-ai-provider
+          pnpm nx build ai-gateway-provider
 
       - id: changesets
         uses: changesets/action@v1

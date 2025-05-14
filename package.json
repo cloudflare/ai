@@ -1,5 +1,5 @@
 {
-	"name": "ai-mono",
+	"name": "@cloudflare/ai-mono",
 	"author": "Andy Jessop",
 	"scripts": {
 		"create-demo": "tsx ./tools/create-demo/index.ts",
@@ -11,49 +11,56 @@
 		"lint-npm-lockfiles": "aicli lint-npm-lockfiles"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^1.8.2",
-		"@clack/prompts": "^0.10.0",
+		"@biomejs/biome": "^1.9.4",
+		"@clack/prompts": "^0.10.1",
 		"@repo/aicli": "workspace:*",
 		"@types/ejs": "^3.1.5",
-		"@types/node": "^22.13.10",
+		"@types/node": "^22.15.17",
 		"@types/wait-on": "^5.3.4",
 		"get-port": "^7.1.0",
-		"globals": "^15.14.0",
+		"globals": "^16.1.0",
 		"handlebars": "^4.7.8",
 		"husky": "^9.1.7",
-		"miniflare": "^3.20250204.1",
-		"msw": "^2.7.3",
-		"nx": "20.5.0",
-		"tsx": "^4.19.3",
-		"typescript": "^5.5.2",
-		"vite": "^6.2.4",
-		"vitest": "~3.0.7",
+		"miniflare": "^4.20250507.0",
+		"msw": "^2.8.0",
+		"nx": "21.0.3",
+		"tsx": "^4.19.4",
+		"typescript": "^5.8.3",
+		"vite": "^6.3.5",
+		"vitest": "~3.1.3",
 		"wait-on": "^8.0.3",
-		"wrangler": "^4.2.0"
+		"wrangler": "^4.14.4"
 	},
 	"dependencies": {
-		"@ai-sdk/openai": "^1.1.9",
+		"@ai-sdk/openai": "^1.3.22",
 		"@changesets/changelog-github": "^0.5.1",
-		"@changesets/cli": "^2.28.1",
-		"@cloudflare/workers-oauth-provider": "^0.0.2",
-		"@modelcontextprotocol/sdk": "^1.7.0",
-		"agents": "^0.0.53",
-		"ai": "^4.1.39",
+		"@changesets/cli": "^2.29.3",
+		"@cloudflare/workers-oauth-provider": "^0.0.5",
+		"@langchain/core": "^0.3.55",
+		"@modelcontextprotocol/sdk": "^1.11.1",
+		"agents": "^0.0.80",
+		"ai": "^4.3.15",
 		"chalk": "^5.4.1",
 		"dayjs": "^1.11.13",
-		"dotenv": "^16.4.7",
+		"dotenv": "^16.5.0",
 		"ejs": "^3.1.10",
-		"eventsource-parser": "^3.0.0",
+		"eventsource-parser": "^3.0.1",
 		"fetch-event-stream": "^0.1.5",
-		"hono": "^4.7.1",
-		"langchain": "^0.3.15",
-		"marked": "^15.0.7",
+		"hono": "^4.7.9",
+		"langchain": "^0.3.24",
+		"marked": "^15.0.11",
 		"tsup": "^8.4.0",
-		"workers-ai-provider": "^0.2.1",
-		"zod": "^3.24.2"
+		"zod": "^3.24.4"
 	},
-	"packageManager": "pnpm@10.7.1",
+	"packageManager": "pnpm@10.10.0",
 	"pnpm": {
-		"onlyBuiltDependencies": ["@biomejs/biome", "esbuild", "msw", "nx", "sharp", "workerd"]
+		"onlyBuiltDependencies": [
+			"@biomejs/biome",
+			"esbuild",
+			"msw",
+			"nx",
+			"sharp",
+			"workerd"
+		]
 	}
 }

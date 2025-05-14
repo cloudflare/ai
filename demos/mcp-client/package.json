@@ -1,21 +1,21 @@
 {
-  "name": "@cloudflare/agents-mcp-client-example",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "start": "vite dev",
-    "build": "vite build",
-    "deploy": "npx wrangler deploy --var HOST:$(./get-subdomain.sh)"
-  },
-  "keywords": [],
-  "author": "",
-  "dependencies": {
-    "@cloudflare/vite-plugin": "^1.0.0",
-    "@modelcontextprotocol/sdk": "^1.8.0",
-    "@vitejs/plugin-react": "^4.3.4",
-    "agents": "^0.0.54",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "vite": "^6.2.5"
-  }
+	"name": "@cloudflare/agents-mcp-client-example",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"start": "vite dev",
+		"build": "vite build",
+		"deploy": "npx wrangler deploy --var HOST:$(./get-subdomain.sh)"
+	},
+	"keywords": [],
+	"author": "",
+	"dependencies": {
+		"@cloudflare/vite-plugin": "^1.1.1",
+		"@modelcontextprotocol/sdk": "^1.11.1",
+		"@vitejs/plugin-react": "^4.4.1",
+		"agents": "^0.0.80",
+		"react": "^19.1.0",
+		"react-dom": "^19.1.0",
+		"vite": "^6.3.5"
+	}
 }

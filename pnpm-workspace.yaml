@@ -1,8 +1,10 @@
 packages:
   - ./libs/*
   - ./demos/*
+  - ./demos/remote-mcp-auth0/*
   - ./packages/*
   - ./tools/aicli
 onlyBuiltDependencies:
   - esbuild
   - workerd
+autoInstallPeers: false

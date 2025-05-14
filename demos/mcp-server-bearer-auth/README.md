@@ -38,7 +38,24 @@ To explore your new MCP api, you can use the [MCP Inspector](https://modelcontex
 
 ## Connect Claude Desktop to your local MCP server
 
-TODO: We need to support arbitrary headers to the `mcp-remote` proxy
+```json
+{
+  "mcpServers": {
+    "remote-mcp-server-bearer-auth": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "http://localhost:8787/sse",
+        "--header",
+        "Authorization: Bearer ${AUTH_TOKEN}"
+      ]
+    },
+    "env": {
+      "AUTH_TOKEN": "..."
+    }
+  }
+}
+```
 
 ## Deploy to Cloudflare
 
@@ -53,10 +70,6 @@ Just like you did above in "Develop locally", run the MCP inspector:
 Then enter the `workers.dev` URL (ex: `worker-name.account-name.workers.dev/sse`) of your Worker in the inspector as the URL of the MCP server to connect to, and click "Connect".
 
 You've now connected to your MCP server from a remote MCP client. You can pass in a bearer token like mentioned above
-
-## Connect Claude Desktop to your remote MCP server
-
-TODO: We need to support arbitrary headers to the `mcp-remote` proxy
 
 ## Debugging
 

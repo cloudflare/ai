@@ -1,5 +1,23 @@
 # workers-ai-provider
 
+## 0.4.0
+
+### Minor Changes
+
+- [#153](https://github.com/cloudflare/ai/pull/153) [`ae5ac12`](https://github.com/cloudflare/ai/commit/ae5ac12cd4f1b17792af29e05cccc0c9403f38d9) Thanks [@JoaquinGimenez1](https://github.com/JoaquinGimenez1)! - Add support for new tool call format
+
+## 0.3.2
+
+### Patch Changes
+
+- [`3ba9ac5`](https://github.com/cloudflare/ai/commit/3ba9ac5f1594d71dbedda8fec469084510afea43) Thanks [@threepointone](https://github.com/threepointone)! - Update dependencies
+
+## 0.3.1
+
+### Patch Changes
+
+- [#137](https://github.com/cloudflare/ai/pull/137) [`cb2cc87`](https://github.com/cloudflare/ai/commit/cb2cc871566c4dbe8a09711ee86944ddcdb15bc6) Thanks [@mchenco](https://github.com/mchenco)! - adding vision support (For Llama 3.2 11b vision right now)
+
 ## 0.3.0
 
 ### Minor Changes

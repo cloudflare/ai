@@ -8,7 +8,7 @@ import type { AutoRAGChatSettings } from "./autorag-chat-settings";
 import { convertToWorkersAIChatMessages } from "./convert-to-workersai-chat-messages";
 import { mapWorkersAIUsage } from "./map-workersai-usage";
 import { getMappedStream } from "./streaming";
-import { prepareToolsAndToolChoice } from "./utils";
+import { prepareToolsAndToolChoice, processToolCalls } from "./utils";
 import type { TextGenerationModels } from "./workersai-models";
 
 type AutoRAGChatConfig = {
@@ -29,7 +29,7 @@ export class AutoRAGChatLanguageModel implements LanguageModelV1 {
 	constructor(
 		modelId: TextGenerationModels,
 		settings: AutoRAGChatSettings,
-		config: AutoRAGChatConfig,
+		config: AutoRAGChatConfig
 	) {
 		this.modelId = modelId;
 		this.settings = settings;
@@ -121,16 +121,21 @@ export class AutoRAGChatLanguageModel implements LanguageModelV1 {
 	}
 
 	async doGenerate(
-		options: Parameters<LanguageModelV1["doGenerate"]>[0],
+		options: Parameters<LanguageModelV1["doGenerate"]>[0]
 	): Promise<Awaited<ReturnType<LanguageModelV1["doGenerate"]>>> {
 		const { args, warnings } = this.getArgs(options);
 
+		const { messages } = convertToWorkersAIChatMessages(options.prompt);
+
 		const output = await this.config.binding.aiSearch({
-			query: args.messages.map(({ content, role }) => `${role}: ${content}`).join("\n\n"),
+			query: messages
+				.map(({ content, role }) => `${role}: ${content}`)
+				.join("\n\n"),
 		});
 
 		return {
 			text: output.response,
+			toolCalls: processToolCalls(output),
 			finishReason: "stop", // TODO: mapWorkersAIFinishReason(response.finish_reason),
 			rawCall: { rawPrompt: args.messages, rawSettings: args },
 			usage: mapWorkersAIUsage(output),
@@ -147,11 +152,15 @@ export class AutoRAGChatLanguageModel implements LanguageModelV1 {
 	}
 
 	async doStream(
-		options: Parameters<LanguageModelV1["doStream"]>[0],
+		options: Parameters<LanguageModelV1["doStream"]>[0]
 	): Promise<Awaited<ReturnType<LanguageModelV1["doStream"]>>> {
 		const { args, warnings } = this.getArgs(options);
 
-		const query = args.messages.map(({ content, role }) => `${role}: ${content}`).join("\n\n");
+		const { messages } = convertToWorkersAIChatMessages(options.prompt);
+
+		const query = messages
+			.map(({ content, role }) => `${role}: ${content}`)
+			.join("\n\n");
 
 		const response = await this.config.binding.aiSearch({
 			query,

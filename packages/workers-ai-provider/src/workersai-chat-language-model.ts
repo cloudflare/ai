@@ -10,7 +10,11 @@ import type { TextGenerationModels } from "./workersai-models";
 
 import { mapWorkersAIUsage } from "./map-workersai-usage";
 import { getMappedStream } from "./streaming";
-import { lastMessageWasUser, prepareToolsAndToolChoice } from "./utils";
+import {
+	lastMessageWasUser,
+	prepareToolsAndToolChoice,
+	processToolCalls,
+} from "./utils";
 
 type WorkersAIChatConfig = {
 	provider: string;
@@ -30,7 +34,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 	constructor(
 		modelId: TextGenerationModels,
 		settings: WorkersAIChatSettings,
-		config: WorkersAIChatConfig,
+		config: WorkersAIChatConfig
 	) {
 		this.modelId = modelId;
 		this.settings = settings;
@@ -43,7 +47,6 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 
 	private getArgs({
 		mode,
-		prompt,
 		maxTokens,
 		temperature,
 		topP,
@@ -81,9 +84,6 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 			temperature,
 			top_p: topP,
 			random_seed: seed,
-
-			// messages:
-			messages: convertToWorkersAIChatMessages(prompt),
 		};
 
 		switch (type) {
@@ -135,24 +135,39 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 	}
 
 	async doGenerate(
-		options: Parameters<LanguageModelV1["doGenerate"]>[0],
+		options: Parameters<LanguageModelV1["doGenerate"]>[0]
 	): Promise<Awaited<ReturnType<LanguageModelV1["doGenerate"]>>> {
 		const { args, warnings } = this.getArgs(options);
 
 		const { gateway, safePrompt, ...passthroughOptions } = this.settings;
 
+		// Extract image from messages if present
+		const { messages, images } = convertToWorkersAIChatMessages(
+			options.prompt
+		);
+
+		// TODO: support for multiple images
+		if (images.length !== 0 && images.length !== 1) {
+			throw new Error("Multiple images are not yet supported as input");
+		}
+
+		const imagePart = images[0];
+
 		const output = await this.config.binding.run(
 			args.model,
 			{
-				messages: args.messages,
+				messages: messages,
 				max_tokens: args.max_tokens,
 				temperature: args.temperature,
 				tools: args.tools,
 				top_p: args.top_p,
+				// Convert Uint8Array to Array of integers for Llama 3.2 Vision model
+				// TODO: maybe use the base64 string version?
+				...(imagePart ? { image: Array.from(imagePart.image) } : {}),
 				// @ts-expect-error response_format not yet added to types
 				response_format: args.response_format,
 			},
-			{ gateway: this.config.gateway ?? gateway, ...passthroughOptions },
+			{ gateway: this.config.gateway ?? gateway, ...passthroughOptions }
 		);
 
 		if (output instanceof ReadableStream) {
@@ -164,28 +179,28 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 				typeof output.response === "object" && output.response !== null
 					? JSON.stringify(output.response) // ai-sdk expects a string here
 					: output.response,
-			toolCalls: output.tool_calls?.map((toolCall) => ({
-				toolCallType: "function",
-				toolCallId: toolCall.name,
-				toolName: toolCall.name,
-				args: JSON.stringify(toolCall.arguments || {}),
-			})),
+			toolCalls: processToolCalls(output),
 			finishReason: "stop", // TODO: mapWorkersAIFinishReason(response.finish_reason),
-			rawCall: { rawPrompt: args.messages, rawSettings: args },
+			rawCall: { rawPrompt: messages, rawSettings: args },
 			usage: mapWorkersAIUsage(output),
 			warnings,
 		};
 	}
 
 	async doStream(
-		options: Parameters<LanguageModelV1["doStream"]>[0],
+		options: Parameters<LanguageModelV1["doStream"]>[0]
 	): Promise<Awaited<ReturnType<LanguageModelV1["doStream"]>>> {
 		const { args, warnings } = this.getArgs(options);
+
+		// Extract image from messages if present
+		const { messages, images } = convertToWorkersAIChatMessages(
+			options.prompt
+		);
 
 		// [1] When the latest message is not a tool response, we use the regular generate function
 		// and simulate it as a streamed response in order to satisfy the AI SDK's interface for
 		// doStream...
-		if (args.tools?.length && lastMessageWasUser(args.messages)) {
+		if (args.tools?.length && lastMessageWasUser(messages)) {
 			const response = await this.doGenerate(options);
 
 			if (response instanceof ReadableStream) {
@@ -217,7 +232,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 						controller.close();
 					},
 				}),
-				rawCall: { rawPrompt: args.messages, rawSettings: args },
+				rawCall: { rawPrompt: messages, rawSettings: args },
 				warnings,
 			};
 		}
@@ -225,19 +240,29 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 		// [2] ...otherwise, we just proceed as normal and stream the response directly from the remote model.
 		const { gateway, ...passthroughOptions } = this.settings;
 
+		// TODO: support for multiple images
+		if (images.length !== 0 && images.length !== 1) {
+			throw new Error("Multiple images are not yet supported as input");
+		}
+
+		const imagePart = images[0];
+
 		const response = await this.config.binding.run(
 			args.model,
 			{
-				messages: args.messages,
+				messages: messages,
 				max_tokens: args.max_tokens,
 				stream: true,
 				temperature: args.temperature,
 				tools: args.tools,
 				top_p: args.top_p,
+				// Convert Uint8Array to Array of integers for Llama 3.2 Vision model
+				// TODO: maybe use the base64 string version?
+				...(imagePart ? { image: Array.from(imagePart.image) } : {}),
 				// @ts-expect-error response_format not yet added to types
 				response_format: args.response_format,
 			},
-			{ gateway: this.config.gateway ?? gateway, ...passthroughOptions },
+			{ gateway: this.config.gateway ?? gateway, ...passthroughOptions }
 		);
 
 		if (!(response instanceof ReadableStream)) {
@@ -246,7 +271,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 
 		return {
 			stream: getMappedStream(new Response(response)),
-			rawCall: { rawPrompt: args.messages, rawSettings: args },
+			rawCall: { rawPrompt: messages, rawSettings: args },
 			warnings,
 		};
 	}

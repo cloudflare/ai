@@ -1,8 +1,23 @@
-import { type LanguageModelV1Prompt, UnsupportedFunctionalityError } from "@ai-sdk/provider";
+import type {
+	LanguageModelV1Prompt,
+	LanguageModelV1ProviderMetadata,
+} from "@ai-sdk/provider";
 import type { WorkersAIChatPrompt } from "./workersai-chat-prompt";
 
-export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): WorkersAIChatPrompt {
+export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): {
+	messages: WorkersAIChatPrompt;
+	images: {
+		mimeType: string | undefined;
+		image: Uint8Array;
+		providerMetadata: LanguageModelV1ProviderMetadata | undefined;
+	}[];
+} {
 	const messages: WorkersAIChatPrompt = [];
+	const images: {
+		mimeType: string | undefined;
+		image: Uint8Array;
+		providerMetadata: LanguageModelV1ProviderMetadata | undefined;
+	}[] = [];
 
 	for (const { role, content } of prompt) {
 		switch (role) {
@@ -21,13 +36,22 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): W
 									return part.text;
 								}
 								case "image": {
-									throw new UnsupportedFunctionalityError({
-										functionality: "image-part",
-									});
+									// Extract image from this part
+									if (part.image instanceof Uint8Array) {
+										// Store the image data directly as Uint8Array
+										// For Llama 3.2 Vision model, which needs array of integers
+										images.push({
+											mimeType: part.mimeType,
+											image: part.image,
+											providerMetadata:
+												part.providerMetadata,
+										});
+									}
+									return ""; // No text for the image part
 								}
 							}
 						})
-						.join(""),
+						.join("\n"),
 				});
 				break;
 			}
@@ -64,7 +88,9 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): W
 						}
 						default: {
 							const exhaustiveCheck = part;
-							throw new Error(`Unsupported part: ${exhaustiveCheck}`);
+							throw new Error(
+								`Unsupported part: ${exhaustiveCheck}`,
+							);
 						}
 					}
 				}
@@ -74,11 +100,15 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): W
 					content: text,
 					tool_calls:
 						toolCalls.length > 0
-							? toolCalls.map(({ function: { name, arguments: args } }) => ({
-									id: "null",
-									type: "function",
-									function: { name, arguments: args },
-								}))
+							? toolCalls.map(
+									({
+										function: { name, arguments: args },
+									}) => ({
+										id: "null",
+										type: "function",
+										function: { name, arguments: args },
+									}),
+								)
 							: undefined,
 				});
 
@@ -101,5 +131,5 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): W
 		}
 	}
 
-	return messages;
+	return { messages, images };
 }

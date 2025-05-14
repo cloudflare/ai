@@ -1,0 +1,8 @@
+.venv/
+.venv-pyodide/
+.pytest_cache/
+node_modules/
+__pycache__/
+src/vendor/
+.vscode/
+.wrangler/

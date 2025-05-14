@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vision",
+  "main": "src/server/index.ts",
+  "compatibility_date": "2025-04-04",
+  "assets": {
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS",
+    "directory": "./dist/client",
+  },
+  "observability": {
+    "enabled": true,
+  },
+  "ai": {
+    "binding": "AI",
+  },
+}

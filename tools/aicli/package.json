@@ -1,5 +1,7 @@
 {
 	"name": "@repo/aicli",
+	"private": true,
+	"version": "0.0.1",
 	"description": "A handy CLI for developing demos",
 	"directories": {
 		"bin": "bin"
@@ -7,13 +9,13 @@
 	"dependencies": {
 		"@commander-js/extra-typings": "^13.1.0",
 		"commander": "^13.1.0",
-		"zod": "^3.24.2",
-		"zx": "8.3.2",
-		"tsx": "^4.19.3"
+		"zod": "^3.24.4",
+		"zx": "8.5.3",
+		"tsx": "^4.19.4"
 	},
 	"devDependencies": {
-		"@types/node": "^22.9.1",
-		"typescript": "^5.7.2"
+		"@types/node": "^22.15.17",
+		"typescript": "^5.8.3"
 	},
 	"scripts": {
 		"format": "biome format --write",

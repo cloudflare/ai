@@ -1,11 +1,11 @@
 import { generateObject, type LanguageModel } from "ai";
 import z from "zod";
-import type { Schedule } from "agents-sdk";
+import type { Schedule } from "agents";
 
 export async function extractScheduleId(
 	model: LanguageModel,
 	query: string,
-	schedules: Schedule[],
+	schedules: Schedule[]
 ) {
 	const { object } = await generateObject({
 		model,

@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 pnpm changeset version
-pnpm install
+# pnpm install --no-frozen-lockfile

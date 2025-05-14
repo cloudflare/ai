@@ -53,8 +53,8 @@ export async function lintNpmLockfiles(): Promise<void> {
 		if (modified) {
 			echo(
 				chalk.red(
-					`npm package lock for ${name} is out of date! Please run \`pnpm run generate-npm-lockfiles\``,
-				),
+					`npm package lock for ${name} is out of date! Please run \`pnpm run generate-npm-lockfiles\``
+				)
 			);
 			process.exit(1);
 		}
@@ -66,15 +66,10 @@ class DemosConfig {
 	demos: Config["demos"] = {};
 
 	async load(): Promise<DemosConfig> {
-		const cfg = await fs
-			.readFile(this.configPath)
-			.then((c) => Config.parse(JSON.parse(c.toString())))
-			.catch(
-				() =>
-					({
-						demos: {},
-					}) satisfies Config,
-			);
+		const cfg = Config.parse(
+			JSON.parse(await fs.readFile(this.configPath, "utf8"))
+		);
+
 		this.demos = cfg.demos;
 		return this;
 	}
@@ -87,8 +82,8 @@ class DemosConfig {
 					demos: this.demos,
 				} satisfies Config),
 				null,
-				2,
-			),
+				2
+			)
 		);
 	}
 

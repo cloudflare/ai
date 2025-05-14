@@ -1,0 +1,14 @@
+{
+  "printWidth": 140,
+  "singleQuote": true,
+  "semi": false,
+  "useTabs": false,
+  "overrides": [
+    {
+      "files": ["*.jsonc"],
+      "options": {
+        "trailingComma": "none"
+      }
+    }
+  ]
+}
