@@ -7,4 +7,3 @@ packages:
 onlyBuiltDependencies:
   - esbuild
   - workerd
-autoInstallPeers: false
