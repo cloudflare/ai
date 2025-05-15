@@ -8,7 +8,8 @@
 		"format": "biome format --write",
 		"lint:fix": "biome lint --fix",
 		"start": "wrangler dev",
-		"cf-typegen": "wrangler types"
+		"cf-typegen": "wrangler types",
+		"type-check": "tsc --noEmit"
 	},
 	"devDependencies": {
 		"typescript": "^5.8.3",

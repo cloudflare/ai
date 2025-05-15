@@ -19,6 +19,6 @@
 	},
 	"scripts": {
 		"format": "biome format --write",
-		"type-check": "tsc"
+		"type-check": "tsc --noEmit"
 	}
 }

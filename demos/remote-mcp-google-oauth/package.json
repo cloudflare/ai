@@ -1,26 +1,27 @@
 {
-    "name": "remote-mcp-google-oauth",
-    "version": "0.0.1",
-    "private": true,
-    "scripts": {
-        "deploy": "wrangler deploy",
-        "dev": "wrangler dev",
-        "start": "wrangler dev",
-        "cf-typegen": "wrangler types"
-    },
-    "devDependencies": {
-        "@cloudflare/workers-types": "^4.20250509.0",
-        "prettier": "^3.5.3",
-        "typescript": "^5.8.3",
-        "wrangler": "^4.14.4"
-    },
-    "dependencies": {
-        "@cloudflare/workers-oauth-provider": "^0.0.5",
-        "@modelcontextprotocol/sdk": "^1.11.1",
-        "agents": "^0.0.80",
-        "hono": "^4.7.9",
-        "just-pick": "^4.2.0",
-        "workers-mcp": "0.1.0-3",
-        "zod": "^3.24.4"
-    }
+  "name": "remote-mcp-google-oauth",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "cf-typegen": "wrangler types",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250509.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3",
+    "wrangler": "^4.14.4"
+  },
+  "dependencies": {
+    "@cloudflare/workers-oauth-provider": "^0.0.5",
+    "@modelcontextprotocol/sdk": "^1.11.1",
+    "agents": "^0.0.80",
+    "hono": "^4.7.9",
+    "just-pick": "^4.2.0",
+    "workers-mcp": "0.1.0-3",
+    "zod": "^3.24.4"
+  }
 }

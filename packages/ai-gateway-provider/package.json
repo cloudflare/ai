@@ -21,7 +21,11 @@
 	},
 	"keywords": [
 		"cloudflare",
-		"worker"
+		"workers",
+		"rag",
+		"ai",
+		"agents",
+		"autorag"
 	],
 	"author": "Gabriel Massadas <https://github.com/g4brym>",
 	"license": "MIT",

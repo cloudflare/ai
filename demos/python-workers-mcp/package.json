@@ -6,7 +6,8 @@
 	"scripts": {
 		"build": "./build.sh",
 		"dev": "wrangler dev",
-		"deploy": "wrangler deploy"
+		"deploy": "wrangler deploy",
+		"type-check": "tsc --noEmit"
 	},
 	"devDependencies": {
 		"wrangler": "^4.14.4"

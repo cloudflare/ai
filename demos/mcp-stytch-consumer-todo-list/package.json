@@ -7,7 +7,7 @@
 		"dev": "vite",
 		"build": "vite build",
 		"lint": "eslint .",
-		"typecheck": "tsc --noEmit",
+		"type-check": "tsc --noEmit",
 		"preview": "npm run build && vite preview",
 		"deploy": "npm run build && wrangler deploy",
 		"cf-typegen": "wrangler types"

@@ -1,7 +1,4 @@
-import type {
-	LanguageModelV1Prompt,
-	LanguageModelV1ProviderMetadata,
-} from "@ai-sdk/provider";
+import type { LanguageModelV1Prompt, LanguageModelV1ProviderMetadata } from "@ai-sdk/provider";
 import type { WorkersAIChatPrompt } from "./workersai-chat-prompt";
 
 export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): {
@@ -43,8 +40,7 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): {
 										images.push({
 											mimeType: part.mimeType,
 											image: part.image,
-											providerMetadata:
-												part.providerMetadata,
+											providerMetadata: part.providerMetadata,
 										});
 									}
 									return ""; // No text for the image part
@@ -88,9 +84,7 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): {
 						}
 						default: {
 							const exhaustiveCheck = part;
-							throw new Error(
-								`Unsupported part: ${exhaustiveCheck}`,
-							);
+							throw new Error(`Unsupported part: ${exhaustiveCheck}`);
 						}
 					}
 				}
@@ -100,15 +94,11 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): {
 					content: text,
 					tool_calls:
 						toolCalls.length > 0
-							? toolCalls.map(
-									({
-										function: { name, arguments: args },
-									}) => ({
-										id: "null",
-										type: "function",
-										function: { name, arguments: args },
-									}),
-								)
+							? toolCalls.map(({ function: { name, arguments: args } }) => ({
+									id: "null",
+									type: "function",
+									function: { name, arguments: args },
+								}))
 							: undefined,
 				});
 
