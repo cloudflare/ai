@@ -19,19 +19,24 @@ export class SlackMCP extends McpAgent<Env, unknown, Props> {
 
 	async init() {
 		// Who am I tool
-		this.server.tool("whoami", "Get information about your Slack user", {}, async () => ({
-			content: [
-				{
-					type: "text",
-					text: JSON.stringify({
-						userId: this.props.userId,
-						userName: this.props.userName,
-						teamName: this.props.teamName,
-						scope: this.props.scope,
-					}),
-				},
-			],
-		}));
+		this.server.tool(
+			"whoami",
+			"Get information about your Slack user",
+			{},
+			async () => ({
+				content: [
+					{
+						type: "text",
+						text: JSON.stringify({
+							userId: this.props.userId,
+							userName: this.props.userName,
+							teamName: this.props.teamName,
+							scope: this.props.scope,
+						}),
+					},
+				],
+			}),
+		);
 
 		// List channels tool
 		this.server.tool(
@@ -117,7 +122,7 @@ export class SlackMCP extends McpAgent<Env, unknown, Props> {
 						content: [
 							{
 								type: "text",
-								text: `Failed to post message as expected with read-only permissions: ${error.message || JSON.stringify(error)}\n\nThis demonstrates that the MCP has properly limited access to read-only operations.`,
+								text: `Failed to post message as expected with read-only permissions: ${(error as Error).message || JSON.stringify(error)}\n\nThis demonstrates that the MCP has properly limited access to read-only operations.`,
 							},
 						],
 					};
@@ -129,24 +134,24 @@ export class SlackMCP extends McpAgent<Env, unknown, Props> {
 
 export default new OAuthProvider({
 	apiRoute: "/sse",
-	apiHandler: SlackMCP.mount("/sse"),
-	defaultHandler: SlackHandler,
+	apiHandler: SlackMCP.mount("/sse") as any,
+	defaultHandler: SlackHandler as any,
 	authorizeEndpoint: "/authorize",
 	tokenEndpoint: "/token",
 	clientRegistrationEndpoint: "/register",
 	tokenExchangeCallback: async (options) => {
-		if (options.grantType === 'refresh_token') {
+		if (options.grantType === "refresh_token") {
 			// Some Slack OAuth tokens don't expire, in which case we won't get a refreshToken,
 			// and there's nothing to do here.
-			if (!options.props.refreshToken) return
+			if (!options.props.refreshToken) return;
 
 			// Keep most of the existing props, but override whatever needs changing
 			return {
 				newProps: {
 					...options.props,
-					...await refreshSlackToken(options.props.refreshToken)
-				}
-			}
+					...(await refreshSlackToken(options.props.refreshToken)),
+				},
+			};
 		}
-	}
+	},
 });

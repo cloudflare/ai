@@ -13,7 +13,7 @@ trim_trailing_whitespace = false
 
 [*.{js,jsx,ts,tsx,json,css,html}]
 indent_style = tab
-indent_size = 4
+indent_size = 2
 
 [*.{yml,yaml}]
 indent_style = space

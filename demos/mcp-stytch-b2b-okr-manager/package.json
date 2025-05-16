@@ -10,7 +10,8 @@
 		"preview": "npm run build && vite preview",
 		"deploy": "npm run build && wrangler deploy",
 		"cf-typegen": "wrangler types",
-		"update-policy": "node update-policy.js"
+		"update-policy": "node update-policy.js",
+		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "^1.11.1",
