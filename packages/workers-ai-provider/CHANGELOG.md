@@ -1,5 +1,11 @@
 # workers-ai-provider
 
+## 0.5.0
+
+### Minor Changes
+
+- [#163](https://github.com/cloudflare/ai/pull/163) [`6b25ed7`](https://github.com/cloudflare/ai/commit/6b25ed701252346d135135aca40e53157a27bdf3) Thanks [@andyjessop](https://github.com/andyjessop)! - feat: adds support for embed and embedMany
+
 ## 0.4.1
 
 ### Patch Changes

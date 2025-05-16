@@ -2,7 +2,7 @@
 	"name": "workers-ai-provider",
 	"description": "Workers AI Provider for the vercel AI SDK",
 	"type": "module",
-	"version": "0.4.1",
+	"version": "0.5.0",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"repository": {
@@ -21,8 +21,22 @@
 		"test:ci": "vitest --watch=false",
 		"test": "vitest"
 	},
-	"files": ["dist", "src", "README.md", "package.json"],
-	"keywords": ["workers", "cloudflare", "ai", "vercel", "sdk", "provider", "chat", "serverless"],
+	"files": [
+		"dist",
+		"src",
+		"README.md",
+		"package.json"
+	],
+	"keywords": [
+		"workers",
+		"cloudflare",
+		"ai",
+		"vercel",
+		"sdk",
+		"provider",
+		"chat",
+		"serverless"
+	],
 	"dependencies": {
 		"@cloudflare/workers-types": ">=4",
 		"@ai-sdk/provider": "^1.1.3"
