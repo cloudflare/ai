@@ -1,4 +1,4 @@
-import type { LanguageModelV1 } from "@ai-sdk/provider";
+import type { LanguageModelV1, LanguageModelV1FunctionToolCall } from "@ai-sdk/provider";
 
 /**
  * General AI run interface with overloads to handle distinct return types.
@@ -182,33 +182,79 @@ export function lastMessageWasUser<T extends { role: string }>(messages: T[]) {
 	return messages.length > 0 && messages[messages.length - 1]!.role === "user";
 }
 
-export function processToolCalls(output: any) {
+function mergePartialToolCalls(partialCalls: any[]) {
+	const mergedCallsByIndex: any = {};
+
+	for (const partialCall of partialCalls) {
+		const index = partialCall.index;
+
+		if (!mergedCallsByIndex[index]) {
+			mergedCallsByIndex[index] = {
+				id: partialCall.id || "",
+				type: partialCall.type || "",
+				function: {
+					name: partialCall.function?.name || "",
+					arguments: "",
+				},
+			};
+		} else {
+			if (partialCall.id) {
+				mergedCallsByIndex[index].id = partialCall.id;
+			}
+			if (partialCall.type) {
+				mergedCallsByIndex[index].type = partialCall.type;
+			}
+
+			if (partialCall.function?.name) {
+				mergedCallsByIndex[index].function.name = partialCall.function.name;
+			}
+		}
+
+		// Append arguments if available, this assumes arguments come in the right order
+		if (partialCall.function?.arguments) {
+			mergedCallsByIndex[index].function.arguments += partialCall.function.arguments;
+		}
+	}
+
+	return Object.values(mergedCallsByIndex);
+}
+
+function processToolCall(toolCall: any): LanguageModelV1FunctionToolCall {
+	if (toolCall.function && toolCall.id) {
+		return {
+			toolCallType: "function",
+			toolCallId: toolCall.id,
+			toolName: toolCall.function.name,
+			args:
+				typeof toolCall.function.arguments === "string"
+					? toolCall.function.arguments
+					: JSON.stringify(toolCall.function.arguments || {}),
+		};
+	}
+	return {
+		toolCallType: "function",
+		toolCallId: toolCall.name,
+		toolName: toolCall.name,
+		args:
+			typeof toolCall.arguments === "string"
+				? toolCall.arguments
+				: JSON.stringify(toolCall.arguments || {}),
+	};
+}
+
+export function processToolCalls(output: any): LanguageModelV1FunctionToolCall[] {
 	// Check for OpenAI format tool calls first
 	if (output.tool_calls && Array.isArray(output.tool_calls)) {
 		return output.tool_calls.map((toolCall: any) => {
-			// Handle new format
-			if (toolCall.function && toolCall.id) {
-				return {
-					toolCallType: "function",
-					toolCallId: toolCall.id,
-					toolName: toolCall.function.name,
-					args:
-						typeof toolCall.function.arguments === "string"
-							? toolCall.function.arguments
-							: JSON.stringify(toolCall.function.arguments || {}),
-				};
-			}
-			return {
-				toolCallType: "function",
-				toolCallId: toolCall.name,
-				toolName: toolCall.name,
-				args:
-					typeof toolCall.arguments === "string"
-						? toolCall.arguments
-						: JSON.stringify(toolCall.arguments || {}),
-			};
+			const processedToolCall = processToolCall(toolCall);
+			return processedToolCall;
 		});
 	}
 
 	return [];
+}
+
+export function processPartialToolCalls(partialToolCalls: any[]) {
+	const mergedToolCalls = mergePartialToolCalls(partialToolCalls);
+	return processToolCalls({ tool_calls: mergedToolCalls });
 }
