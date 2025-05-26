@@ -1,15 +1,15 @@
 import { events } from "fetch-event-stream";
 
-import type { LanguageModelV1StreamPart } from "@ai-sdk/provider";
+import type { LanguageModelV2StreamPart, LanguageModelV2Usage } from "@ai-sdk/provider";
 import { mapWorkersAIUsage } from "./map-workersai-usage";
 import { processPartialToolCalls } from "./utils";
 
 export function getMappedStream(response: Response) {
 	const chunkEvent = events(response);
-	let usage = { promptTokens: 0, completionTokens: 0 };
+	let usage: LanguageModelV2Usage = { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
 	const partialToolCalls: any[] = [];
 
-	return new ReadableStream<LanguageModelV1StreamPart>({
+	return new ReadableStream<LanguageModelV2StreamPart>({
 		async start(controller) {
 			for await (const event of chunkEvent) {
 				if (!event.data) {
@@ -28,8 +28,10 @@ export function getMappedStream(response: Response) {
 				}
 				chunk.response?.length &&
 					controller.enqueue({
-						type: "text-delta",
-						textDelta: chunk.response,
+						// type: "text-delta",
+						// textDelta: chunk.response,
+						type: "text",
+						text: chunk.response,
 					});
 			}
 
