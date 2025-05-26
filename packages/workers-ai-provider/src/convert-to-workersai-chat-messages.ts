@@ -1,19 +1,19 @@
-import type { LanguageModelV1Prompt, LanguageModelV1ProviderMetadata } from "@ai-sdk/provider";
+import type { LanguageModelV2Prompt, LanguageModelV2ProviderMetadata } from "@ai-sdk/provider";
 import type { WorkersAIChatPrompt } from "./workersai-chat-prompt";
 
-export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): {
+export function convertToWorkersAIChatMessages(prompt: LanguageModelV2Prompt): {
 	messages: WorkersAIChatPrompt;
 	images: {
 		mimeType: string | undefined;
 		image: Uint8Array;
-		providerMetadata: LanguageModelV1ProviderMetadata | undefined;
+		providerMetadata: LanguageModelV2ProviderMetadata | undefined;
 	}[];
 } {
 	const messages: WorkersAIChatPrompt = [];
 	const images: {
 		mimeType: string | undefined;
 		image: Uint8Array;
-		providerMetadata: LanguageModelV1ProviderMetadata | undefined;
+		providerMetadata: LanguageModelV2ProviderMetadata | undefined;
 	}[] = [];
 
 	for (const { role, content } of prompt) {
@@ -95,10 +95,10 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): {
 					tool_calls:
 						toolCalls.length > 0
 							? toolCalls.map(({ function: { name, arguments: args } }) => ({
-									id: "null",
-									type: "function",
-									function: { name, arguments: args },
-								}))
+								id: "null",
+								type: "function",
+								function: { name, arguments: args },
+							}))
 							: undefined,
 				});
 

@@ -824,7 +824,7 @@ importers:
         version: 1.12.0
       '@workos-inc/node':
         specifier: ^7.51.0
-        version: 7.51.0(express@5.1.0)
+        version: 7.52.0(express@5.1.0)
       agents:
         specifier: ^0.0.93
         version: 0.0.93(@cloudflare/workers-types@4.20250525.0)(react@19.1.0)
@@ -1574,8 +1574,11 @@ importers:
   packages/workers-ai-provider:
     dependencies:
       '@ai-sdk/provider':
-        specifier: ^1.1.3
-        version: 1.1.3
+        specifier: 2.0.0-alpha.4
+        version: 2.0.0-alpha.4
+      '@ai-sdk/provider-utils':
+        specifier: 3.0.0-alpha.4
+        version: 3.0.0-alpha.4(zod@3.25.28)
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20250525.0
@@ -1620,8 +1623,18 @@ packages:
     peerDependencies:
       zod: ^3.23.8
 
+  '@ai-sdk/provider-utils@3.0.0-alpha.4':
+    resolution: {integrity: sha512-edEnOh8i676TLX8ibWD69gHTaU6btJ9uCN+7/8vXWlMHZJo2ST4mgjRP5f6xC4rH8XXVMYK0rVPwbnuyR/PGzA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.23.8
+
   '@ai-sdk/provider@1.1.3':
     resolution: {integrity: sha512-qZMxYJ0qqX/RfnuIaab+zp8UAeJn/ygXXAffR5I4N0n1IrvA6qBsjc8hXLmBiMV2zoXlifkacF7sEFnYnjBcqg==}
+    engines: {node: '>=18'}
+
+  '@ai-sdk/provider@2.0.0-alpha.4':
+    resolution: {integrity: sha512-g6IVjm0iGasiv4fAv6TtPIDTfeMTqFRQt3J6Jz8skm/Tb2r48qKEtcKNrDSpspDIFrQJ4fuC1Xw/aAPrVCs7tQ==}
     engines: {node: '>=18'}
 
   '@ai-sdk/react@1.2.12':
@@ -2968,6 +2981,9 @@ packages:
     resolution: {integrity: sha512-3HoDwV6+ZSTfV+DsbnUd82GlZY0a+DPXuHQHpxWTqgxjM3JWZyGiwR+ov3d2M16pWiMzA+l58UJ5lm1znGq0yA==}
     engines: {node: '>= 18', npm: '>= 8.6.0'}
 
+  '@standard-schema/spec@1.0.0':
+    resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
+
   '@stytch/core@2.50.1':
     resolution: {integrity: sha512-6p9C+HCXobq4WQcDZx+xf40mOd1QK4/6zzo2o0tyuqSj+Po1emg0YOHDT7KPEJqyksBhC6FKvDNKOP01jvQI0g==}
 
@@ -3227,8 +3243,8 @@ packages:
   '@vitest/utils@3.1.4':
     resolution: {integrity: sha512-yriMuO1cfFhmiGc8ataN51+9ooHRuURdfAZfwFd3usWynjzpLslZdYnRegTv32qdgtJTsj15FoeZe2g15fY1gg==}
 
-  '@workos-inc/node@7.51.0':
-    resolution: {integrity: sha512-08y449PDWdPjziyIxal+Bap2iUpcQ989b9VUg3DiJdv95xC6WCVtaFVAG7FLr8aJmX2DaeCdrBpMR3HTowrxSQ==}
+  '@workos-inc/node@7.52.0':
+    resolution: {integrity: sha512-BTQsXlQQ1i8URg4rn9yBNGp840Je7ZAg/i6VpEQ13pLbHnJpxNobX3gJDoxRiSb+KR0jMP19KZ4X8si7E1xH/g==}
     engines: {node: '>=16'}
 
   '@yarnpkg/lockfile@1.1.0':
@@ -6009,7 +6025,18 @@ snapshots:
       secure-json-parse: 2.7.0
       zod: 3.25.28
 
+  '@ai-sdk/provider-utils@3.0.0-alpha.4(zod@3.25.28)':
+    dependencies:
+      '@ai-sdk/provider': 2.0.0-alpha.4
+      '@standard-schema/spec': 1.0.0
+      zod: 3.25.28
+      zod-to-json-schema: 3.24.5(zod@3.25.28)
+
   '@ai-sdk/provider@1.1.3':
+    dependencies:
+      json-schema: 0.4.0
+
+  '@ai-sdk/provider@2.0.0-alpha.4':
     dependencies:
       json-schema: 0.4.0
 
@@ -7355,6 +7382,8 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
+  '@standard-schema/spec@1.0.0': {}
+
   '@stytch/core@2.50.1':
     dependencies:
       uuid: 8.3.2
@@ -7686,7 +7715,7 @@ snapshots:
       loupe: 3.1.3
       tinyrainbow: 2.0.0
 
-  '@workos-inc/node@7.51.0(express@5.1.0)':
+  '@workos-inc/node@7.52.0(express@5.1.0)':
     dependencies:
       iron-session: 6.3.1(express@5.1.0)
       jose: 5.6.3

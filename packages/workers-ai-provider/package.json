@@ -21,10 +21,25 @@
 		"test:ci": "vitest --watch=false",
 		"test": "vitest"
 	},
-	"files": ["dist", "src", "README.md", "package.json"],
-	"keywords": ["workers", "cloudflare", "ai", "vercel", "sdk", "provider", "chat", "serverless"],
+	"files": [
+		"dist",
+		"src",
+		"README.md",
+		"package.json"
+	],
+	"keywords": [
+		"workers",
+		"cloudflare",
+		"ai",
+		"vercel",
+		"sdk",
+		"provider",
+		"chat",
+		"serverless"
+	],
 	"dependencies": {
-		"@ai-sdk/provider": "^1.1.3"
+		"@ai-sdk/provider": "2.0.0-alpha.4",
+		"@ai-sdk/provider-utils": "3.0.0-alpha.4"
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20250525.0"

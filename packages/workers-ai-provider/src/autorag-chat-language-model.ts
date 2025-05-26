@@ -1,14 +1,12 @@
 import {
-	type LanguageModelV1,
-	type LanguageModelV1CallWarning,
-	UnsupportedFunctionalityError,
+	type LanguageModelV2,
+	type LanguageModelV2CallWarning,
 } from "@ai-sdk/provider";
 
 import type { AutoRAGChatSettings } from "./autorag-chat-settings";
 import { convertToWorkersAIChatMessages } from "./convert-to-workersai-chat-messages";
 import { mapWorkersAIUsage } from "./map-workersai-usage";
 import { getMappedStream } from "./streaming";
-import { prepareToolsAndToolChoice, processToolCalls } from "./utils";
 import type { TextGenerationModels } from "./workersai-models";
 
 type AutoRAGChatConfig = {
@@ -17,12 +15,14 @@ type AutoRAGChatConfig = {
 	gateway?: GatewayOptions;
 };
 
-export class AutoRAGChatLanguageModel implements LanguageModelV1 {
-	readonly specificationVersion = "v1";
+export class AutoRAGChatLanguageModel implements LanguageModelV2 {
+	readonly specificationVersion = "v2";
 	readonly defaultObjectGenerationMode = "json";
 
 	readonly modelId: TextGenerationModels;
 	readonly settings: AutoRAGChatSettings;
+
+	readonly supportedUrls = {}
 
 	private readonly config: AutoRAGChatConfig;
 
@@ -41,14 +41,13 @@ export class AutoRAGChatLanguageModel implements LanguageModelV1 {
 	}
 
 	private getArgs({
-		mode,
 		prompt,
 		frequencyPenalty,
 		presencePenalty,
-	}: Parameters<LanguageModelV1["doGenerate"]>[0]) {
-		const type = mode.type;
-
-		const warnings: LanguageModelV1CallWarning[] = [];
+		tools,
+		toolChoice,
+	}: Parameters<LanguageModelV2["doGenerate"]>[0]) {
+		const warnings: LanguageModelV2CallWarning[] = [];
 
 		if (frequencyPenalty != null) {
 			warnings.push({
@@ -72,58 +71,21 @@ export class AutoRAGChatLanguageModel implements LanguageModelV1 {
 			messages: convertToWorkersAIChatMessages(prompt),
 		};
 
-		switch (type) {
-			case "regular": {
-				return {
-					args: { ...baseArgs, ...prepareToolsAndToolChoice(mode) },
-					warnings,
-				};
-			}
-
-			case "object-json": {
-				return {
-					args: {
-						...baseArgs,
-						response_format: {
-							type: "json_schema",
-							json_schema: mode.schema,
-						},
-						tools: undefined,
-					},
-					warnings,
-				};
-			}
-
-			case "object-tool": {
-				return {
-					args: {
-						...baseArgs,
-						tool_choice: "any",
-						tools: [{ type: "function", function: mode.tool }],
-					},
-					warnings,
-				};
-			}
-
-			// @ts-expect-error - this is unreachable code
-			// TODO: fixme
-			case "object-grammar": {
-				throw new UnsupportedFunctionalityError({
-					functionality: "object-grammar mode",
-				});
-			}
-
-			default: {
-				const exhaustiveCheck = type satisfies never;
-				throw new Error(`Unsupported type: ${exhaustiveCheck}`);
-			}
+		return {
+			args: {
+				...baseArgs,
+				tool_choice: toolChoice,
+				tools
+			},
+			warnings,
 		}
+
 	}
 
 	async doGenerate(
-		options: Parameters<LanguageModelV1["doGenerate"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV1["doGenerate"]>>> {
-		const { args, warnings } = this.getArgs(options);
+		options: Parameters<LanguageModelV2["doGenerate"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV2["doGenerate"]>>> {
+		const { warnings } = this.getArgs(options);
 
 		const { messages } = convertToWorkersAIChatMessages(options.prompt);
 
@@ -131,28 +93,29 @@ export class AutoRAGChatLanguageModel implements LanguageModelV1 {
 			query: messages.map(({ content, role }) => `${role}: ${content}`).join("\n\n"),
 		});
 
+		//@ts-ignore
 		return {
-			text: output.response,
-			toolCalls: processToolCalls(output),
+			// content: output.response,
+			// toolCalls: processToolCalls(output),
 			finishReason: "stop", // TODO: mapWorkersAIFinishReason(response.finish_reason),
-			rawCall: { rawPrompt: args.messages, rawSettings: args },
+			// rawCall: { rawPrompt: args.messages, rawSettings: args },
 			usage: mapWorkersAIUsage(output),
 			warnings,
-			sources: output.data.map(({ file_id, filename, score }) => ({
-				id: file_id,
-				sourceType: "url",
-				url: filename,
-				providerMetadata: {
-					attributes: { score },
-				},
-			})),
+			// sources: output.data.map(({ file_id, filename, score }) => ({
+			// 	id: file_id,
+			// 	sourceType: "url",
+			// 	url: filename,
+			// 	providerMetadata: {
+			// 		attributes: { score },
+			// 	},
+			// })),
 		};
 	}
 
 	async doStream(
-		options: Parameters<LanguageModelV1["doStream"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV1["doStream"]>>> {
-		const { args, warnings } = this.getArgs(options);
+		options: Parameters<LanguageModelV2["doStream"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV2["doStream"]>>> {
+		// const { args, warnings } = this.getArgs(options);
 
 		const { messages } = convertToWorkersAIChatMessages(options.prompt);
 
@@ -165,8 +128,8 @@ export class AutoRAGChatLanguageModel implements LanguageModelV1 {
 
 		return {
 			stream: getMappedStream(response),
-			rawCall: { rawPrompt: args.messages, rawSettings: args },
-			warnings,
+			// rawCall: { rawPrompt: args.messages, rawSettings: args },
+			// warnings,
 		};
 	}
 }
