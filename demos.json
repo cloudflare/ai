@@ -97,10 +97,10 @@
       "package_json_hash": "de5fc86ebf8604e019a04561733c02388ccf3b6a"
     },
     "./demos/remote-mcp-server-descope-auth": {
-      "package_json_hash": "b31fc72007f98e3e9520872a8fb01538ca44dd88"
+      "package_json_hash": "a24da263c35e1a2fbcfcf9c03e02382077f7ca13"
     },
     "./demos/remote-mcp-server-autorag": {
-      "package_json_hash": "a93dce6a8571eab97f445269732a8cb9e9ef86e8"
+      "package_json_hash": "ab1be9af71c2ef28043ed6ac391064139377d37e"
     }
   }
 }

@@ -23,6 +23,9 @@
 			},
 			"style": {
 				"noNonNullAssertion": "off"
+			},
+			"complexity": {
+				"noBannedTypes": "off"
 			}
 		}
 	},

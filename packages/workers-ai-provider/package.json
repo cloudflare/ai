@@ -21,22 +21,8 @@
 		"test:ci": "vitest --watch=false",
 		"test": "vitest"
 	},
-	"files": [
-		"dist",
-		"src",
-		"README.md",
-		"package.json"
-	],
-	"keywords": [
-		"workers",
-		"cloudflare",
-		"ai",
-		"vercel",
-		"sdk",
-		"provider",
-		"chat",
-		"serverless"
-	],
+	"files": ["dist", "src", "README.md", "package.json"],
+	"keywords": ["workers", "cloudflare", "ai", "vercel", "sdk", "provider", "chat", "serverless"],
 	"dependencies": {
 		"@ai-sdk/provider": "^1.1.3"
 	},
