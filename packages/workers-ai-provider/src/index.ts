@@ -1,3 +1,6 @@
+import {
+	type ProviderV2,
+} from '@ai-sdk/provider';
 import { AutoRAGChatLanguageModel } from "./autorag-chat-language-model";
 import type { AutoRAGChatSettings } from "./autorag-chat-settings";
 import { createRun } from "./utils";
@@ -15,30 +18,31 @@ import type {
 	TextGenerationModels,
 } from "./workersai-models";
 
+
 export type WorkersAISettings = (
 	| {
-			/**
-			 * Provide a Cloudflare AI binding.
-			 */
-			binding: Ai;
+		/**
+		 * Provide a Cloudflare AI binding.
+		 */
+		binding: Ai;
 
-			/**
-			 * Credentials must be absent when a binding is given.
-			 */
-			accountId?: never;
-			apiKey?: never;
-	  }
+		/**
+		 * Credentials must be absent when a binding is given.
+		 */
+		accountId?: never;
+		apiKey?: never;
+	}
 	| {
-			/**
-			 * Provide Cloudflare API credentials directly. Must be used if a binding is not specified.
-			 */
-			accountId: string;
-			apiKey: string;
-			/**
-			 * Both binding must be absent if credentials are used directly.
-			 */
-			binding?: never;
-	  }
+		/**
+		 * Provide Cloudflare API credentials directly. Must be used if a binding is not specified.
+		 */
+		accountId: string;
+		apiKey: string;
+		/**
+		 * Both binding must be absent if credentials are used directly.
+		 */
+		binding?: never;
+	}
 ) & {
 	/**
 	 * Optionally specify a gateway.
@@ -46,10 +50,14 @@ export type WorkersAISettings = (
 	gateway?: GatewayOptions;
 };
 
-export interface WorkersAI {
+export interface WorkersAI extends ProviderV2 {
 	(modelId: TextGenerationModels, settings?: WorkersAIChatSettings): WorkersAIChatLanguageModel;
 	/**
 	 * Creates a model for text generation.
+	 **/
+
+	/**
+	 * @deprecated Use `.languageModel()` instead.
 	 **/
 	chat(
 		modelId: TextGenerationModels,
@@ -73,8 +81,19 @@ export interface WorkersAI {
 
 	/**
 	 * Creates a model for image generation.
+	 * @deprecated use .imageModel() instead.
 	 **/
 	image(modelId: ImageGenerationModels, settings?: WorkersAIImageSettings): WorkersAIImageModel;
+
+	/**
+	 * Creates a model for text generation.
+	 **/
+	languageModel(modelId: TextGenerationModels, settings?: WorkersAIChatSettings): WorkersAIChatLanguageModel;
+
+	/**
+	 * Creates a model for image generation.
+	 **/
+	imageModel(modelId: string, settings?: WorkersAIImageSettings): WorkersAIImageModel;
 }
 
 /**
@@ -83,6 +102,7 @@ export interface WorkersAI {
 export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 	// Use a binding if one is directly provided. Otherwise use credentials to create
 	// a `run` method that calls the Cloudflare REST API.
+	console.log("Creating Workers AI provider with options:", options);
 	let binding: Ai | undefined;
 
 	if (options.binding) {
@@ -131,7 +151,8 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 		return createChatModel(modelId, settings);
 	};
 
-	provider.chat = createChatModel;
+	provider.chat = createChatModel; // Deprecated alias for `languageModel`
+	provider.languageModel = createChatModel;
 	provider.embedding = createEmbeddingModel;
 	provider.textEmbedding = createEmbeddingModel;
 	provider.textEmbeddingModel = createEmbeddingModel;

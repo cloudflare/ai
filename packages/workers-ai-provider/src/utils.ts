@@ -1,4 +1,4 @@
-import type { LanguageModelV1, LanguageModelV1FunctionToolCall } from "@ai-sdk/provider";
+import type { LanguageModelV2, LanguageModelV1FunctionToolCall } from "@ai-sdk/provider";
 
 /**
  * General AI run interface with overloads to handle distinct return types.
@@ -85,9 +85,8 @@ export function createRun(config: CreateRunConfig): AiRun {
 			}
 		}
 
-		const url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}${
-			urlParams ? `?${urlParams}` : ""
-		}`;
+		const url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}${urlParams ? `?${urlParams}` : ""
+			}`;
 
 		// Merge default and custom headers.
 		const headers = {
@@ -126,7 +125,8 @@ export function createRun(config: CreateRunConfig): AiRun {
 }
 
 export function prepareToolsAndToolChoice(
-	mode: Parameters<LanguageModelV1["doGenerate"]>[0]["mode"] & {
+	//@ts-ignore
+	mode: Parameters<LanguageModelV2["doGenerate"]>[0]["mode"] & {
 		type: "regular";
 	},
 ) {
@@ -137,13 +137,12 @@ export function prepareToolsAndToolChoice(
 		return { tools: undefined, tool_choice: undefined };
 	}
 
+	//@ts-ignore
 	const mappedTools = tools.map((tool) => ({
 		type: "function",
 		function: {
 			name: tool.name,
-			// @ts-expect-error - description is not a property of tool
 			description: tool.description,
-			// @ts-expect-error - parameters is not a property of tool
 			parameters: tool.parameters,
 		},
 	}));
@@ -168,10 +167,12 @@ export function prepareToolsAndToolChoice(
 		// so we filter the tools and force the tool choice through 'any'
 		case "tool":
 			return {
+				//@ts-ignore
 				tools: mappedTools.filter((tool) => tool.function.name === toolChoice.toolName),
 				tool_choice: "any",
 			};
 		default: {
+			//@ts-ignore
 			const exhaustiveCheck = type satisfies never;
 			throw new Error(`Unsupported tool choice type: ${exhaustiveCheck}`);
 		}
