@@ -2,7 +2,7 @@
 
 This is a sample [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server that supports remote MCP clients to connect and authenticate using [Asgardeo](https://wso2.com/asgardeo/).
 
-[Asgardeo](https://wso2.com/asgardeo/) authenticates users accessing the MCP server and allows you to control tool access based on application-level and organization-level permissions defined for each user.
+Asgardeo authenticates users accessing the MCP server and allows you to control tool access based on application-level and organization-level permissions defined for each user.
 
 
 The MCP server is powered by [Cloudflare Workers](https://developers.cloudflare.com/workers/):
@@ -14,9 +14,9 @@ The MCP server is powered by [Cloudflare Workers](https://developers.cloudflare.
 ## Getting Started
 
 Before you start make sure you have the following prerequisites:
-- [Asgardeo account](https://wso2.com/asgardeo/docs/get-started/create-asgardeo-account/){:target="_blank"}. 
-- Install [Node.js](https://nodejs.org/en/download/package-manager){:target="_blank"} version 18.x or higher on your system.
-- A [Cloudflare](https://www.cloudflare.com/en-gb/lp/pg-one-platform-ppc/){:target="_blank"}account for deployment
+- [Asgardeo account](https://wso2.com/asgardeo/docs/get-started/create-asgardeo-account/). 
+- Install [Node.js](https://nodejs.org/en/download/package-manager) version 18.x or higher on your system.
+- A [Cloudflare](https://www.cloudflare.com/en-gb/lp/pg-one-platform-ppc/)account for deployment
 
 
 ### Configure Asgardeo
@@ -39,7 +39,8 @@ Make a note of the following values from the **Protocol** and **Info** tabs of t
 
 ---
 
-### For Local Development
+## Local Development and Testing 
+
 
 Clone the repo directly & install dependencies using the following given instructions. 
 
@@ -74,9 +75,9 @@ npm run dev
 
 ```
 
-To authenticate with Asgardeo, you must first have a user account created. If you haven’t done so already, follow this [guide](https://wso2.com/asgardeo/docs/guides/users/manage-users/#onboard-single-user){:target="_blank"} to create a user in Asgardeo.
+To authenticate with Asgardeo, you must first have a user account created. If you haven’t done so already, follow this [guide](https://wso2.com/asgardeo/docs/guides/users/manage-users/#onboard-single-user) to create a user in Asgardeo.
 
-Next, start MCP [Inspector](https://modelcontextprotocol.io/docs/tools/inspector){:target="_blank"} locally using the following command. 
+Next, start MCP [Inspector](https://modelcontextprotocol.io/docs/tools/inspector) locally using the following command. 
 
 ```
 npx @modelcontextprotocol/inspector
@@ -88,9 +89,7 @@ To test the local server, switch the Transport Type to `SSE` and enter `http://l
 <img src="./img/inspector-local.png" width="750" alt="Testing localy using the Inspector ">
 
 
----
-
-Alternatively, you can test using the [**Cloudflare Workers AI LLM Playground**](https://playground.ai.cloudflare.com/){:target="_blank"}.
+Alternatively, you can test using the [**Cloudflare Workers AI LLM Playground**](https://playground.ai.cloudflare.com/).
 Simply enter `http://localhost:8787/sse` as the MCP server URL and click **Connect**. This will redirect you to the Asgardeo login page. Once you've completed the login process, you’ll be able to interact with the LLM in the Playground and use the tools defined in your MCP server.
 
 For example, try asking the LLM: **“Who am I?”**
@@ -98,8 +97,7 @@ For example, try asking the LLM: **“Who am I?”**
 <img src="./img/playground-local.png" width="750" alt="Testing localy using the Playground ">
 
 
-### For Production
-
+### Deploying to Cloudflare
 
 First, create a KV namespace in Cloudflare using the following command. 
 
@@ -167,7 +165,7 @@ https://remote-mcp-asgardeo.<your-subdomain>.workers.dev/sse
 To test the remote server, switch the Transport Type to `SSE` and enter `https://remote-mcp-asgardeo.<your-subdomain>.workers.dev/sse` in the Inspector and hit connect. Once you follow the prompts, you’ll be able to authenticate with Asgardeo and use features such as “List Tools” in the Inspector. When you invoke the userInfo tool. 
 
 
-Alternatively, you can test using the [**Cloudflare Workers AI LLM Playground**](https://playground.ai.cloudflare.com/){:target="_blank"}.
+Alternatively, you can test using the [**Cloudflare Workers AI LLM Playground**](https://playground.ai.cloudflare.com/).
 Simply enter `https://remote-mcp-asgardeo.<your-subdomain>.workers.dev/sse` as the MCP server URL and click **Connect**. This will redirect you to the Asgardeo login page. Once you've completed the login process, you’ll be able to interact with the LLM in the Playground and use the tools defined in your MCP server.
 
 For example, try asking the LLM: **“Who am I?”**
@@ -196,8 +194,8 @@ To support this role-based access scenario, Asgardeo returns user roles for auth
 To try this out:
 
 1. Create a new role called `manager` in Asgardeo.
-2. Assign the role to a user by following [this guide](https://wso2.com/asgardeo/docs/guides/users/manage-roles/){:target="_blank"}.
-3. Ensure that user roles are configured to be returned as attributes in the ID token or user info endpoint by following the relevant configuration instructions [here](https://wso2.com/asgardeo/docs/guides/users/attributes/manage-attributes/){:target="_blank"}.
+2. Assign the role to a user by following [this guide](https://wso2.com/asgardeo/docs/guides/users/manage-roles/).
+3. Ensure that user roles are configured to be returned as attributes in the ID token or user info endpoint by following the relevant configuration instructions [here](https://wso2.com/asgardeo/docs/guides/users/attributes/manage-attributes/).
 
 
 
@@ -221,8 +219,6 @@ Replace the content with the following configuration. Once you restart Claude De
 }
 ```
 
-Once the Tools (under 🔨) show up in the interface, you can ask Claude to use them. For example: "Could you use the math tool to add 23 and 19?". Claude should invoke the tool and show the result generated by the MCP server.
-
-
+Once the Tools (under 🔨) show up in the interface, you can ask Claude to use them. 
 
 
