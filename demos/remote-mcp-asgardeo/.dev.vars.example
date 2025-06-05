@@ -1,0 +1,9 @@
+ASGARDEO_CLIENT_ID=<your client id>
+ASGARDEO_CLIENT_SECRET=<your client secret>
+ASGARDEO_BASE_URL=https://api.asgardeo.io/t/<your Asgardeo org>
+ASGARDEO_SCOPE=openid profile email roles
+COOKIE_ENCRYPTION_KEY=<your cookie cookie encryption key>
+
+
+
+
