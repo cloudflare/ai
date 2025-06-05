@@ -101,6 +101,9 @@
     },
     "./demos/remote-mcp-server-autorag": {
       "package_json_hash": "7bd3df4bdc16dfd2e1ce4a6d892d78069bf0e758"
+    },
+    "./demos/remote-mcp-asgardeo": {
+      "package_json_hash": "e5888297e347f4f791353981f7bc3d6fbb08e0ac"
     }
   }
 }
