@@ -107,14 +107,13 @@ npx wrangler kv namespace create OAUTH_KV
 
 Make sure to update **wrangler.jsonc** file with the **id** value received after running the above command. 
 
-```json
+```
 "kv_namespaces": [
-		{
-			"binding": "OAUTH_KV",
-			"id": "<ID>",
-		}
-	]
-
+  {
+    "binding": "OAUTH_KV",
+    "id": "<your-kv-id>"
+  }
+],
 ```
 
 
@@ -127,7 +126,7 @@ npx wrangler@latest secret put ASGARDEO_CLIENT_ID
 npx wrangler@latest secret put ASGARDEO_CLIENT_SECRET
 npx wrangler@latest secret put ASGARDEO_BASE_URL
 npx wrangler@latest secret put ASGARDEO_SCOPE
-wrangler secret put COOKIE_ENCRYPTION_KEY # add any random string here e.g. openssl rand -hex 32
+npx wrangler@latest secret put COOKIE_ENCRYPTION_KEY # add any random string here e.g. openssl rand -hex 32
 ```
 
 You can use the values stored in  **`.dev.vars`** file with the above command. 
