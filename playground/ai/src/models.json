@@ -1,0 +1,1036 @@
+[
+	{
+		"id": "f8703a00-ed54-4f98-bdc3-cd9a813286f3",
+		"source": 1,
+		"name": "@cf/qwen/qwen1.5-0.5b-chat",
+		"description": "Qwen1.5 is the improved version of Qwen, the large language model series developed by Alibaba Cloud.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["text-generation"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/qwen/qwen1.5-0.5b-chat"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "eaf31752-a074-441f-8b70-d593255d2811",
+		"source": 1,
+		"name": "@cf/huggingface/distilbert-sst-2-int8",
+		"description": "Distilled BERT model that was finetuned on SST-2 for sentiment classification",
+		"task": {
+			"id": "19606750-23ed-4371-aab2-c20349b53a60",
+			"name": "Text Classification",
+			"description": "Sentiment analysis or text classification is a common NLP task that classifies a text input into labels or classes."
+		},
+		"tags": ["huggingface", "text-classification"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/Intel/distilbert-base-uncased-finetuned-sst-2-english-int8-static"
+			},
+			{
+				"property_id": "beta",
+				"value": "false"
+			}
+		]
+	},
+	{
+		"id": "d9b7a55c-cefa-4208-8ab3-11497a2b046c",
+		"source": 2,
+		"name": "@hf/thebloke/llamaguard-7b-awq",
+		"description": "Llama Guard is a model for classifying the safety of LLM prompts and responses, using a taxonomy of safety risks.\n",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["huggingface", "text-generation"],
+		"properties": [
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "d2ba5c6b-bbb7-49d6-b466-900654870cd6",
+		"source": 2,
+		"name": "@hf/thebloke/neural-chat-7b-v3-1-awq",
+		"description": "This model is a fine-tuned 7B parameter LLM on the Intel Gaudi 2 processor from the mistralai/Mistral-7B-v0.1 on the open source dataset Open-Orca/SlimOrca.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["huggingface", "text-generation"],
+		"properties": [
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "d21cf46a-b08e-4e0a-b351-aa78f5e2dc5c",
+		"source": 1,
+		"name": "@cf/deepseek-ai/deepseek-math-7b-base",
+		"description": "DeepSeekMath is initialized with DeepSeek-Coder-v1.5 7B and continues pre-training on math-related tokens sourced from Common Crawl, together with natural language and code data for 500B tokens.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["text-generation"],
+		"properties": [
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "cc34ce52-3059-415f-9a48-12aa919d37ee",
+		"source": 1,
+		"name": "@cf/facebook/detr-resnet-50",
+		"description": "DEtection TRansformer (DETR) model trained end-to-end on COCO 2017 object detection (118k annotated images).",
+		"task": {
+			"id": "9c178979-90d9-49d8-9e2c-0f1cf01815d4",
+			"name": "Object Detection",
+			"description": "Object detection models can detect instances of objects like persons, faces, license plates, or others in an image. This task takes an image as input and returns a list of detected objects, each one containing a label, a probability score, and its surrounding box coordinates."
+		},
+		"tags": ["object-detection"],
+		"properties": [
+			{
+				"property_id": "beta",
+				"value": "true"
+			},
+			{
+				"property_id": "constellation_config",
+				"value": "{}"
+			}
+		]
+	},
+	{
+		"id": "ca54bcd6-0d98-4739-9b3b-5c8b4402193d",
+		"source": 1,
+		"name": "@cf/meta/llama-2-7b-chat-fp16",
+		"description": "Full precision (fp16) generative text model with 7 billion parameters from Meta",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["meta", "text-generation"],
+		"properties": [
+			{
+				"property_id": "terms",
+				"value": "https://ai.meta.com/resources/models-and-libraries/llama-downloads/"
+			},
+			{
+				"property_id": "info",
+				"value": "https://ai.meta.com/llama/"
+			},
+			{
+				"property_id": "context_length_limit",
+				"value": "3072"
+			},
+			{
+				"property_id": "sequence_length_limit",
+				"value": "2500"
+			},
+			{
+				"property_id": "constellation_config",
+				"value": "infer_response_cache: in_memory\n\nmax_requests_per_min:\n  default: 5\n  accounts:\n    32118455: 60 # ai.cloudflare.com staging\n    50147400: 60 # ai.cloudflare.com\n\nneurons:\n  metrics:\n    - name: input_tokens\n      neuron_cost: 0.3672\n    - name: output_tokens\n      neuron_cost: 0.3672\nmax_concurrent_requests: 1"
+			},
+			{
+				"property_id": "beta",
+				"value": "false"
+			}
+		]
+	},
+	{
+		"id": "c907d0f9-d69d-4e93-b501-4daeb4fd69eb",
+		"source": 1,
+		"name": "@cf/mistral/mistral-7b-instruct-v0.1",
+		"description": "Instruct fine-tuned version of the Mistral-7b generative text model with 7 billion parameters",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["mistral", "text-generation"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://mistral.ai/news/announcing-mistral-7b/"
+			},
+			{
+				"property_id": "constellation_config",
+				"value": "max_concurrent_requests: 10"
+			},
+			{
+				"property_id": "beta",
+				"value": "false"
+			}
+		]
+	},
+	{
+		"id": "c1c12ce4-c36a-4aa6-8da4-f63ba4b8984d",
+		"source": 1,
+		"name": "@cf/openai/whisper",
+		"description": "Automatic speech recognition (ASR) system trained on 680,000 hours of multilingual and multitask supervised data",
+		"task": {
+			"id": "dfce1c48-2a81-462e-a7fd-de97ce985207",
+			"name": "Automatic Speech Recognition",
+			"description": "Automatic speech recognition (ASR) models convert a speech signal, typically an audio input, to text."
+		},
+		"tags": ["automatic-speech-recognition", "openai"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://openai.com/research/whisper"
+			},
+			{
+				"property_id": "constellation_config",
+				"value": "max_requests_per_min:\n  default: 120\n  accounts:\n    32118455: 1440 # ai.cloudflare.com staging\n    50147400: 1440 # ai.cloudflare.com\n    52406228: 1440 # rchen@ account\n    7677216: 1440 # Cloudflare Stream Production Account\n\ndownloads:\n  \"model-repository/whisper/1/huggingface-model-cache/merges.txt\":\n    url: https://pub-aad46f56812e4449bc904f1d68336a16.r2.dev/whisper-base/merges.txt\n    sha256sum: 78f27f801feb4283ae969d4cadacb28fc051b655647402b1a252c7079ea11c46\n  \"model-repository/whisper/1/huggingface-model-cache/vocab.json\":\n    url: https://pub-aad46f56812e4449bc904f1d68336a16.r2.dev/whisper-base/vocab.json\n    sha256sum: 8f680bba319e01a653d2e8a5dbc17a9157179e0576e6ce74ce0c06356c6e24f9\n  \"model-repository/whisper/1/huggingface-model-cache/tokenizer.json\":\n    url: https://pub-aad46f56812e4449bc904f1d68336a16.r2.dev/whisper-base/tokenizer.json\n    sha256sum: dfc530298b6fbed1a97c6472c575b026453706e2a204c7f7038f2c9d208b0759\n  \"model-repository/whisper/1/huggingface-model-cache/model.safetensors\":\n    url: https://pub-aad46f56812e4449bc904f1d68336a16.r2.dev/whisper-base/model.safetensors\n    sha256sum: 07cadb9f25677c8d50df603e66a98fbd842cce45047139baeb16e6219a1e807b\n\nneurons:\n  metrics:\n    - name: audio_seconds\n      neuron_cost: 0.6856583333\nmax_concurrent_requests: 1"
+			},
+			{
+				"property_id": "beta",
+				"value": "false"
+			}
+		]
+	},
+	{
+		"id": "bf6ddd21-6477-4681-bbbe-24c3d5423e78",
+		"source": 1,
+		"name": "@cf/tinyllama/tinyllama-1.1b-chat-v1.0",
+		"description": "The TinyLlama project aims to pretrain a 1.1B Llama model on 3 trillion tokens. This is the chat model finetuned on top of TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["text-generation"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "b375b9cb-51e5-40d7-a601-45d86387cb8c",
+		"source": 2,
+		"name": "@hf/thebloke/orca-2-13b-awq",
+		"description": "Orca 2 is a helpful assistant that is built for research purposes only and provides a single turn response in tasks such as reasoning over user given data, reading comprehension, math problem solving and text summarization. ",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["experimental", "text-generation"],
+		"properties": [
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "ae426c8e-bab9-44f0-810b-194736a98f93",
+		"source": 2,
+		"name": "@hf/thebloke/codellama-7b-instruct-awq",
+		"description": "CodeLlama 7B Instruct AWQ is an efficient, accurate and blazing-fast low-bit weight quantized Code Llama variant.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["codellama", "experimental", "text-generation"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/TheBloke/CodeLlama-7B-Instruct-AWQ"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "a9abaef0-3031-47ad-8790-d311d8684c6c",
+		"source": 1,
+		"name": "@cf/runwayml/stable-diffusion-v1-5-inpainting",
+		"description": "Stable Diffusion Inpainting is a latent text-to-image diffusion model capable of generating photo-realistic images given any text input, with the extra capability of inpainting the pictures by using a mask.",
+		"task": {
+			"id": "3d6e1f35-341b-4915-a6c8-9a7142a9033a",
+			"name": "Text-to-Image",
+			"description": "Generates images from input text. These models can be used to generate and modify images based on text prompts."
+		},
+		"tags": ["text-to-image"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/runwayml/stable-diffusion-inpainting"
+			},
+			{
+				"property_id": "terms",
+				"value": "https://github.com/runwayml/stable-diffusion/blob/main/LICENSE"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "9d2ab560-065e-4d0d-a789-d4bc7468d33e",
+		"source": 1,
+		"name": "@cf/thebloke/discolm-german-7b-v1-awq",
+		"description": "DiscoLM German 7b is a Mistral-based large language model with a focus on German-language applications. AWQ is an efficient, accurate and blazing-fast low-bit weight quantization method, currently supporting 4-bit quantization.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["text-generation"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/TheBloke/DiscoLM_German_7b_v1-AWQ"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "9c95c39d-45b3-4163-9631-22f0c0dc3b14",
+		"source": 1,
+		"name": "@cf/meta/llama-2-7b-chat-int8",
+		"description": "Quantized (int8) generative text model with 7 billion parameters from Meta",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["meta", "text-generation"],
+		"properties": [
+			{
+				"property_id": "terms",
+				"value": "https://ai.meta.com/resources/models-and-libraries/llama-downloads/"
+			},
+			{
+				"property_id": "info",
+				"value": "https://ai.meta.com/llama/"
+			},
+			{
+				"property_id": "context_length_limit",
+				"value": "2048"
+			},
+			{
+				"property_id": "sequence_length_limit",
+				"value": "1800"
+			},
+			{
+				"property_id": "constellation_config",
+				"value": "infer_response_cache: in_memory\n\nmax_requests_per_min:\n  default: 5\n  accounts:\n    32118455: 60 # ai.cloudflare.com staging\n    50147400: 60 # ai.cloudflare.com\n    48546443: 1000 # workers ai\n    56599770: 1000 # talkmap\n\nneurons:\n  metrics:\n    - name: input_tokens\n      neuron_cost: 0.1836\n    - name: output_tokens\n      neuron_cost: 0.1836\nmax_concurrent_requests: 4"
+			},
+			{
+				"property_id": "beta",
+				"value": "false"
+			}
+		]
+	},
+	{
+		"id": "980ec5e9-33c2-483a-a2d8-cd092fdf273f",
+		"source": 2,
+		"name": "@hf/thebloke/mistral-7b-instruct-v0.1-awq",
+		"description": "Mistral 7B Instruct v0.1 AWQ is an efficient, accurate and blazing-fast low-bit weight quantized Mistral variant.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["mistral", "text-generation"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.1-AWQ"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "95025a2f-b9b0-486c-88f1-c7281be10124",
+		"source": 2,
+		"name": "@hf/thebloke/openchat_3.5-awq",
+		"description": "OpenChat is an innovative library of open-source language models, fine-tuned with C-RLFT - a strategy inspired by offline reinforcement learning. AWQ is an efficient, accurate and blazing-fast low-bit weight quantization method, currently supporting 4-bit quantization.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["experimental", "text-generation"],
+		"properties": [
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "90a20ae7-7cf4-4eb3-8672-8fc4ee580635",
+		"source": 1,
+		"name": "@cf/qwen/qwen1.5-7b-chat-awq",
+		"description": "Qwen1.5 is the improved version of Qwen, the large language model series developed by Alibaba Cloud. AWQ is an efficient, accurate and blazing-fast low-bit weight quantization method, currently supporting 4-bit quantization.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["text-generation"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/qwen/qwen1.5-7b-chat-awq"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "85c5a3c6-24b0-45e7-b23a-023182578822",
+		"source": 2,
+		"name": "@hf/thebloke/llama-2-13b-chat-awq",
+		"description": "Llama 2 13B Chat AWQ is an efficient, accurate and blazing-fast low-bit weight quantized Llama 2 variant.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["meta", "text-generation"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/TheBloke/Llama-2-13B-chat-AWQ"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "7f9a76e1-d120-48dd-a565-101d328bbb02",
+		"source": 1,
+		"name": "@cf/microsoft/resnet-50",
+		"description": "50 layers deep image classification CNN trained on more than 1M images from ImageNet",
+		"task": {
+			"id": "00cd182b-bf30-4fc4-8481-84a3ab349657",
+			"name": "Image Classification",
+			"description": "Image classification models take an image input and assigns it labels or classes."
+		},
+		"tags": ["image-classification", "microsoft"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://www.microsoft.com/en-us/research/blog/microsoft-vision-model-resnet-50-combines-web-scale-data-and-multi-task-learning-to-achieve-state-of-the-art/"
+			},
+			{
+				"property_id": "constellation_config",
+				"value": "max_requests_per_min:\n  default: 180\n  accounts:\n    32118455: 2160 # ai.cloudflare.com staging\n    50147400: 2160 # ai.cloudflare.com\n\nneurons:\n  cost_per_infer: 0.2280555556\nmax_concurrent_requests: 100"
+			},
+			{
+				"property_id": "beta",
+				"value": "false"
+			}
+		]
+	},
+	{
+		"id": "7f797b20-3eb0-44fd-b571-6cbbaa3c423b",
+		"source": 1,
+		"name": "@cf/bytedance/stable-diffusion-xl-lightning",
+		"description": "SDXL-Lightning is a lightning-fast text-to-image generation model. It can generate high-quality 1024px images in a few steps.",
+		"task": {
+			"id": "3d6e1f35-341b-4915-a6c8-9a7142a9033a",
+			"name": "Text-to-Image",
+			"description": "Generates images from input text. These models can be used to generate and modify images based on text prompts."
+		},
+		"tags": ["text-to-image"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/ByteDance/SDXL-Lightning"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "7f180530-2e16-4116-9d26-f49fbed9d372",
+		"source": 2,
+		"name": "@hf/thebloke/deepseek-coder-6.7b-base-awq",
+		"description": "Deepseek Coder is composed of a series of code language models, each trained from scratch on 2T tokens, with a composition of 87% code and 13% natural language in both English and Chinese.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["huggingface", "text-generation"],
+		"properties": [
+			{
+				"property_id": "terms",
+				"value": "https://huggingface.co/TheBloke/deepseek-coder-6.7B-base-AWQ"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "7912c0ab-542e-44b9-b9ee-3113d226a8b5",
+		"source": 1,
+		"name": "@cf/lykon/dreamshaper-8-lcm",
+		"description": "Stable Diffusion model that has been fine-tuned to be better at photorealism without sacrificing range.",
+		"task": {
+			"id": "3d6e1f35-341b-4915-a6c8-9a7142a9033a",
+			"name": "Text-to-Image",
+			"description": "Generates images from input text. These models can be used to generate and modify images based on text prompts."
+		},
+		"tags": ["text-to-image"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/Lykon/DreamShaper"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "6d52253a-b731-4a03-b203-cde2d4fae871",
+		"source": 1,
+		"name": "@cf/stabilityai/stable-diffusion-xl-base-1.0",
+		"description": "Diffusion-based text-to-image generative model by Stability AI. Generates and modify images based on text prompts.",
+		"task": {
+			"id": "3d6e1f35-341b-4915-a6c8-9a7142a9033a",
+			"name": "Text-to-Image",
+			"description": "Generates images from input text. These models can be used to generate and modify images based on text prompts."
+		},
+		"tags": ["stabilityai", "text-to-image"],
+		"properties": [
+			{
+				"property_id": "terms",
+				"value": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/blob/main/LICENSE.md"
+			},
+			{
+				"property_id": "info",
+				"value": "https://stability.ai/stable-diffusion"
+			},
+			{
+				"property_id": "constellation_config",
+				"value": "# infer_response_cache: r2\n\nmax_requests_per_min:\n  default: 120\n  accounts:\n    32118455: 1440 # ai.cloudflare.com staging\n    50147400: 1440 # ai.cloudflare.com\n    13852056: 1440 # Firewall Team for `@RespectTables ai`\n\nneurons:\n  metrics:\n    - name: inference_steps\n      neuron_cost: 0\nmax_concurrent_requests: 1"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "6ade40e1-1646-4013-8da0-95abb3360e33",
+		"source": 1,
+		"name": "@cf/meta/detr-resnet-50",
+		"description": "DEtection TRansformer (DETR) model with ResNet-50 backbone for image object detection.",
+		"task": {
+			"id": "9c178979-90d9-49d8-9e2c-0f1cf01815d4",
+			"name": "Object Detection",
+			"description": "Object detection models can detect instances of objects like persons, faces, license plates, or others in an image. This task takes an image as input and returns a list of detected objects, each one containing a label, a probability score, and its surrounding box coordinates."
+		},
+		"tags": ["experimental", "meta", "text-generation"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/facebook/detr-resnet-50"
+			},
+			{
+				"property_id": "constellation_config",
+				"value": "max_requests_per_min:\n  default: 180\n\nneurons:\n  cost_per_infer: 0.6841666668  # ...3x that of resnet-50 (:shrug:).\nmax_concurrent_requests: 100"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "673c56cc-8553-49a1-b179-dd549ec9209a",
+		"source": 2,
+		"name": "@hf/thebloke/openhermes-2.5-mistral-7b-awq",
+		"description": "OpenHermes 2.5 Mistral 7B is a state of the art Mistral Fine-tune, a continuation of OpenHermes 2 model, which trained on additional code datasets.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["huggingface", "text-generation"],
+		"properties": [
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "617e7ec3-bf8d-4088-a863-4f89582d91b5",
+		"source": 1,
+		"name": "@cf/meta/m2m100-1.2b",
+		"description": "Multilingual encoder-decoder (seq-to-seq) model trained for Many-to-Many multilingual translation",
+		"task": {
+			"id": "f57d07cb-9087-487a-bbbf-bc3e17fecc4b",
+			"name": "Translation",
+			"description": "Translation models convert a sequence of text from one language to another."
+		},
+		"tags": ["meta", "translation"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://github.com/facebookresearch/fairseq/tree/main/examples/m2m_100"
+			},
+			{
+				"property_id": "languages",
+				"value": "english, chinese, french, spanish, arabic, russian, german, japanese, portuguese, hindi"
+			},
+			{
+				"property_id": "terms",
+				"value": "https://github.com/facebookresearch/fairseq/blob/main/LICENSE"
+			},
+			{
+				"property_id": "constellation_config",
+				"value": "max_requests_per_min:\n  default: 120\n  accounts:\n    32118455: 1440 # ai.cloudflare.com staging\n    50147400: 1440 # ai.cloudflare.com\n    13852056: 1440 # Firewall Team for `@RespectTables ai`\n\ndownloads:\n  \"model-repository/m2m100-1.2b/1/huggingface-model-cache/pytorch_model.bin\":\n    url: https://pub-aad46f56812e4449bc904f1d68336a16.r2.dev/m2m100-1.2b/pytorch_model.bin\n    sha256sum: a58ef8f42362ef12adeddc600b3425f1e2bbd019cfa6aae6b0051e2e3e055cd4\n\nneurons:\n  metrics:\n    - name: input_tokens\n      neuron_cost: 0.03105\n    - name: output_tokens\n      neuron_cost: 0.03105\nmax_concurrent_requests: 128\n"
+			},
+			{
+				"property_id": "beta",
+				"value": "false"
+			}
+		]
+	},
+	{
+		"id": "60474554-f03b-4ff4-8ecc-c1b7c71d7b29",
+		"source": 2,
+		"name": "@hf/thebloke/deepseek-coder-6.7b-instruct-awq",
+		"description": "Deepseek Coder is composed of a series of code language models, each trained from scratch on 2T tokens, with a composition of 87% code and 13% natural language in both English and Chinese.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["huggingface", "text-generation"],
+		"properties": [
+			{
+				"property_id": "terms",
+				"value": "https://huggingface.co/TheBloke/deepseek-coder-6.7B-instruct-AWQ"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "5c96a15e-b236-45bb-8759-345445b87e20",
+		"source": 2,
+		"name": "@hf/baai/bge-base-en-v1.5",
+		"description": "BAAI general embedding (bge) models transform any given text into a compact vector.",
+		"task": {
+			"id": "0137cdcf-162a-4108-94f2-1ca59e8c65ee",
+			"name": "Text Embeddings",
+			"description": "Feature extraction models transform raw data into numerical features that can be processed while preserving the information in the original dataset. These models are ideal as part of building vector search applications or Retrieval Augmented Generation workflows with Large Language Models (LLM)."
+		},
+		"tags": ["text-embeddings"],
+		"properties": [
+			{
+				"property_id": "beta",
+				"value": "false"
+			}
+		]
+	},
+	{
+		"id": "57fbd08a-a4c4-411c-910d-b9459ff36c20",
+		"source": 1,
+		"name": "@cf/baai/bge-small-en-v1.5",
+		"description": "BAAI general embedding (bge) models transform any given text into a compact vector",
+		"task": {
+			"id": "0137cdcf-162a-4108-94f2-1ca59e8c65ee",
+			"name": "Text Embeddings",
+			"description": "Feature extraction models transform raw data into numerical features that can be processed while preserving the information in the original dataset. These models are ideal as part of building vector search applications or Retrieval Augmented Generation workflows with Large Language Models (LLM)."
+		},
+		"tags": ["baai", "text-embeddings"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/BAAI/bge-base-en-v1.5"
+			},
+			{
+				"property_id": "max_input_tokens",
+				"value": "512"
+			},
+			{
+				"property_id": "output_dimensions",
+				"value": "384"
+			},
+			{
+				"property_id": "constellation_config",
+				"value": "infer_response_cache: in_memory\n\nmax_requests_per_min:\n  default: 180\n\nneurons:\n  metrics:\n    - name: input_tokens\n      neuron_cost: 0.001840833333\nmax_concurrent_requests: 100"
+			},
+			{
+				"property_id": "beta",
+				"value": "false"
+			}
+		]
+	},
+	{
+		"id": "4c3a544e-da47-4336-9cea-c7cbfab33f16",
+		"source": 1,
+		"name": "@cf/deepseek-ai/deepseek-math-7b-instruct",
+		"description": "DeepSeekMath-Instruct 7B is a mathematically instructed tuning model derived from DeepSeekMath-Base 7B. DeepSeekMath is initialized with DeepSeek-Coder-v1.5 7B and continues pre-training on math-related tokens sourced from Common Crawl, together with natural language and code data for 500B tokens.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["text-generation"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/deepseek-ai/deepseek-math-7b-instruct"
+			},
+			{
+				"property_id": "terms",
+				"value": "https://github.com/deepseek-ai/DeepSeek-Math/blob/main/LICENSE-MODEL"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "48dd2443-0c61-43b2-8894-22abddf1b081",
+		"source": 1,
+		"name": "@cf/tiiuae/falcon-7b-instruct",
+		"description": "Falcon-7B-Instruct is a 7B parameters causal decoder-only model built by TII based on Falcon-7B and finetuned on a mixture of chat/instruct datasets.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["text-generation"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/tiiuae/falcon-7b-instruct"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "429b9e8b-d99e-44de-91ad-706cf8183658",
+		"source": 1,
+		"name": "@cf/baai/bge-base-en-v1.5",
+		"description": "BAAI general embedding (bge) models transform any given text into a compact vector",
+		"task": {
+			"id": "0137cdcf-162a-4108-94f2-1ca59e8c65ee",
+			"name": "Text Embeddings",
+			"description": "Feature extraction models transform raw data into numerical features that can be processed while preserving the information in the original dataset. These models are ideal as part of building vector search applications or Retrieval Augmented Generation workflows with Large Language Models (LLM)."
+		},
+		"tags": ["baai", "text-embeddings"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/BAAI/bge-base-en-v1.5"
+			},
+			{
+				"property_id": "max_input_tokens",
+				"value": "512"
+			},
+			{
+				"property_id": "output_dimensions",
+				"value": "768"
+			},
+			{
+				"property_id": "constellation_config",
+				"value": "infer_response_cache: in_memory\n\nmax_requests_per_min:\n  default: 180\n  accounts:\n    32118455: 2160 # ai.cloudflare.com staging\n    50147400: 2160 # ai.cloudflare.com\n\nneurons:\n  metrics:\n    - name: input_tokens\n      neuron_cost: 0.0060575\nmax_concurrent_requests: 100"
+			},
+			{
+				"property_id": "beta",
+				"value": "false"
+			}
+		]
+	},
+	{
+		"id": "3dca5889-db3e-4973-aa0c-3a4a6bd22d29",
+		"source": 1,
+		"name": "@cf/unum/uform-gen2-qwen-500m",
+		"description": "UForm-Gen is a small generative vision-language model primarily designed for Image Captioning and Visual Question Answering. The model was pre-trained on the internal image captioning dataset and fine-tuned on public instructions datasets: SVIT, LVIS, VQAs datasets.",
+		"task": {
+			"id": "882a91d1-c331-4eec-bdad-834c919942a8",
+			"name": "Image-to-Text",
+			"description": null
+		},
+		"tags": ["image-to-text"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://www.unum.cloud/"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "3976bab8-3810-4ad8-8580-ab1e22de7823",
+		"source": 2,
+		"name": "@hf/thebloke/zephyr-7b-beta-awq",
+		"description": "Zephyr 7B Beta AWQ is an efficient, accurate and blazing-fast low-bit weight quantized Zephyr model variant.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["huggingface", "text-generation"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/TheBloke/zephyr-7B-beta-AWQ"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "3222ddb3-e211-4fd9-9a6d-79a80e47b3a6",
+		"source": 1,
+		"name": "@cf/qwen/qwen1.5-1.8b-chat",
+		"description": "Qwen1.5 is the improved version of Qwen, the large language model series developed by Alibaba Cloud.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["text-generation"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/qwen/qwen1.5-1.8b-chat"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "1dc9e589-df6b-4e66-ac9f-ceff42d64983",
+		"source": 1,
+		"name": "@cf/defog/sqlcoder-7b-2",
+		"description": "This model is intended to be used by non-technical users to understand data inside their SQL databases. ",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["text-generation"],
+		"properties": [
+			{
+				"property_id": "terms",
+				"value": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+			},
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/defog/sqlcoder-7b-2"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "1d933df3-680f-4280-940d-da87435edb07",
+		"source": 1,
+		"name": "@cf/microsoft/phi-2",
+		"description": "Phi-2 is a Transformer-based model with a next-word prediction objective, trained on 1.4T tokens from multiple passes on a mixture of Synthetic and Web datasets for NLP and coding.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["text-generation"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/microsoft/phi-2"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "19bd38eb-bcda-4e53-bec2-704b4689b43a",
+		"source": 1,
+		"name": "@cf/facebook/bart-large-cnn",
+		"description": "BART is a transformer encoder-encoder (seq2seq) model with a bidirectional (BERT-like) encoder and an autoregressive (GPT-like) decoder. You can use this model for text summarization.",
+		"task": {
+			"id": "6f4e65d8-da0f-40d2-9aa4-db582a5a04fd",
+			"name": "Summarization",
+			"description": "Summarization is the task of producing a shorter version of a document while preserving its important information. Some models can extract text from the original input, while other models can generate entirely new text."
+		},
+		"tags": ["summarization"],
+		"properties": [
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "19547f04-7a6a-4f87-bf2c-f5e32fb12dc5",
+		"source": 1,
+		"name": "@cf/runwayml/stable-diffusion-v1-5-img2img",
+		"description": "Stable Diffusion is a latent text-to-image diffusion model capable of generating photo-realistic images. Img2img generate a new image from an input image with Stable Diffusion. ",
+		"task": {
+			"id": "3d6e1f35-341b-4915-a6c8-9a7142a9033a",
+			"name": "Text-to-Image",
+			"description": "Generates images from input text. These models can be used to generate and modify images based on text prompts."
+		},
+		"tags": ["text-to-image"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/runwayml/stable-diffusion-v1-5"
+			},
+			{
+				"property_id": "terms",
+				"value": "https://github.com/runwayml/stable-diffusion/blob/main/LICENSE"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "09d113a9-03c4-420e-b6f2-52ad4b3bed45",
+		"source": 1,
+		"name": "@cf/qwen/qwen1.5-14b-chat-awq",
+		"description": "Qwen1.5 is the improved version of Qwen, the large language model series developed by Alibaba Cloud. AWQ is an efficient, accurate and blazing-fast low-bit weight quantization method, currently supporting 4-bit quantization.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["text-generation"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/qwen/qwen1.5-14b-chat-awq"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "081054cd-a254-4349-855e-6dc0996277fa",
+		"source": 1,
+		"name": "@cf/openchat/openchat-3.5-0106",
+		"description": "OpenChat is an innovative library of open-source language models, fine-tuned with C-RLFT - a strategy inspired by offline reinforcement learning.",
+		"task": {
+			"id": "c329a1f9-323d-4e91-b2aa-582dd4188d34",
+			"name": "Text Generation",
+			"description": "Family of generative text models, such as large language models (LLM), that can be adapted for a variety of natural language tasks."
+		},
+		"tags": ["text-generation"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/openchat/openchat-3.5-0106"
+			},
+			{
+				"property_id": "beta",
+				"value": "true"
+			}
+		]
+	},
+	{
+		"id": "01bc2fb0-4bca-4598-b985-d2584a3f46c0",
+		"source": 1,
+		"name": "@cf/baai/bge-large-en-v1.5",
+		"description": "BAAI general embedding (bge) models transform any given text into a compact vector",
+		"task": {
+			"id": "0137cdcf-162a-4108-94f2-1ca59e8c65ee",
+			"name": "Text Embeddings",
+			"description": "Feature extraction models transform raw data into numerical features that can be processed while preserving the information in the original dataset. These models are ideal as part of building vector search applications or Retrieval Augmented Generation workflows with Large Language Models (LLM)."
+		},
+		"tags": ["baai", "text-embeddings"],
+		"properties": [
+			{
+				"property_id": "info",
+				"value": "https://huggingface.co/BAAI/bge-base-en-v1.5"
+			},
+			{
+				"property_id": "max_input_tokens",
+				"value": "512"
+			},
+			{
+				"property_id": "output_dimensions",
+				"value": "1024"
+			},
+			{
+				"property_id": "constellation_config",
+				"value": "infer_response_cache: in_memory\n\nmax_requests_per_min:\n  default: 120\n\nneurons:\n  metrics:\n    - name: input_tokens\n      neuron_cost: 0.01858166667\nmax_concurrent_requests: 100"
+			},
+			{
+				"property_id": "beta",
+				"value": "false"
+			}
+		]
+	}
+]

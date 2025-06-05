@@ -1,0 +1,44 @@
+{
+	"name": "@cloudflare/ai-playground",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"start": "vite dev",
+		"start:demo": "CLOUDFLARE_ACCOUNT_ID=85d0c02b57ed75faf9b18f92d5c01602 vite dev",
+		"build": "vite build",
+		"deploy": "vite build && wrangler deploy",
+		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+		"type-check": "tsc --noEmit"
+	},
+	"dependencies": {
+		"ai": "^4.3.16",
+		"downshift": "^9.0.9",
+		"react": "^19.1.0",
+		"react-dom": "^19.1.0",
+		"react-hotkeys-hook": "^5.1.0",
+		"react-router-dom": "^7.6.2",
+		"react-textarea-autosize": "^8.5.9",
+		"workers-ai-provider": "0.6.0",
+		"zod": "^3.25.51"
+	},
+	"devDependencies": {
+		"@ai-sdk/react": "^1.2.12",
+		"@cloudflare/vite-plugin": "^1.5.0",
+		"@cloudflare/workers-types": "^4.20250605.0",
+		"@modelcontextprotocol/sdk": "^1.12.1",
+		"@tailwindcss/vite": "^4.1.8",
+		"@types/react": "^19.1.6",
+		"@types/react-dom": "^19.1.6",
+		"@vitejs/plugin-react": "^4.5.1",
+		"eslint": "^9.28.0",
+		"eslint-plugin-react": "^7.37.5",
+		"eslint-plugin-react-hooks": "^5.2.0",
+		"eslint-plugin-react-refresh": "^0.4.20",
+		"prettier": "^3.5.3",
+		"tailwindcss": "^4.1.8",
+		"typescript": "^5.8.3",
+		"use-mcp": "^0.0.7",
+		"vite": "^6.3.5",
+		"wrangler": "^4.19.1"
+	}
+}
