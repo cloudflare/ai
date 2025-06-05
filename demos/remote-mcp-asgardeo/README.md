@@ -107,7 +107,7 @@ npx wrangler kv namespace create OAUTH_KV
 
 Make sure to update **wrangler.jsonc** file with the **id** value received after running the above command. 
 
-```bash
+```json
 "kv_namespaces": [
 		{
 			"binding": "OAUTH_KV",
@@ -116,6 +116,8 @@ Make sure to update **wrangler.jsonc** file with the **id** value received after
 	]
 
 ```
+
+
 
 Then, set the following secrets via Wrangler by running the following commands. 
 
