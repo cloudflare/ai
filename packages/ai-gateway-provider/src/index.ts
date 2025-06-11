@@ -1,10 +1,6 @@
-import type {
-	LanguageModelV1,
-	LanguageModelV1CallOptions,
-	LanguageModelV1CallWarning,
-	LanguageModelV1StreamPart,
-} from "@ai-sdk/provider";
+import type { LanguageModelV1 } from "@ai-sdk/provider";
 import type { FetchFunction } from "@ai-sdk/provider-utils";
+import { providers } from "./providers";
 
 export class AiGatewayInternalFetchError extends Error {}
 
@@ -17,44 +13,6 @@ async function streamToObject(stream: ReadableStream) {
 	return await response.json();
 }
 
-const ProvidersConfigs = [
-	{
-		url: "https://api.openai.com/",
-		name: "openai",
-	},
-	{
-		url: "https://api.deepseek.com/",
-		name: "deepseek",
-	},
-	{
-		url: "https://api.anthropic.com/",
-		name: "anthropic",
-	},
-	{
-		url: "https://generativelanguage.googleapis.com/",
-		name: "google-ai-studio",
-	},
-	{
-		url: "https://api.x.ai/",
-		name: "grok",
-	},
-	{
-		url: "https://api.mistral.ai/",
-		name: "mistral",
-	},
-	{
-		url: "https://api.perplexity.ai/",
-		name: "perplexity-ai",
-	},
-	{
-		url: "https://api.replicate.com/",
-		name: "replicate",
-	},
-	{
-		url: "https://api.groq.com/openai/v1/",
-		name: "groq",
-	},
-];
 
 type InternalLanguageModelV1 = LanguageModelV1 & { config?: { fetch?: FetchFunction | undefined } };
 
@@ -124,8 +82,8 @@ export class AiGatewayChatLanguageModel implements LanguageModelV1 {
 		const body = await Promise.all(
 			requests.map(async (req) => {
 				let providerConfig = null;
-				for (const provider of ProvidersConfigs) {
-					if (req.url.includes(provider.url)) {
+				for (const provider of providers) {
+					if (provider.regex.test(req.url)) {
 						providerConfig = provider;
 					}
 				}
@@ -142,7 +100,7 @@ export class AiGatewayChatLanguageModel implements LanguageModelV1 {
 
 				return {
 					provider: providerConfig.name,
-					endpoint: req.url.replace(providerConfig.url, ""),
+					endpoint: providerConfig.transformEndpoint(req.url),
 					headers: req.request.headers,
 					query: await streamToObject(req.request.body),
 				};
