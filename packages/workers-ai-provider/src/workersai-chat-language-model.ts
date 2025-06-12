@@ -11,11 +11,27 @@ import type { TextGenerationModels } from "./workersai-models";
 import { mapWorkersAIUsage } from "./map-workersai-usage";
 import { getMappedStream } from "./streaming";
 import { lastMessageWasUser, prepareToolsAndToolChoice, processToolCalls } from "./utils";
+import { mapWorkersAIFinishReason } from "./map-workersai-finish-reason";
 
 type WorkersAIChatConfig = {
 	provider: string;
 	binding: Ai;
 	gateway?: GatewayOptions;
+};
+
+type WorkersAIResponse = {
+	response?: string | object;
+	choices?: Array<{
+		message?: {
+			content?: string;
+			reasoning_content?: string;
+			tool_calls?: any[];
+			role?: string;
+		};
+		finish_reason?: string;
+	}>;
+	usage?: any;
+	// ... other existing fields
 };
 
 export class WorkersAIChatLanguageModel implements LanguageModelV1 {
@@ -130,6 +146,37 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 		}
 	}
 
+	private extractResponseData(output: WorkersAIResponse) {
+		// Handle new format with choices array
+		if (output.choices && output.choices.length > 0) {
+			const choice = output.choices[0];
+			const message = choice.message;
+
+			return {
+				text: message?.content ?? undefined,
+				reasoningContent: message?.reasoning_content ?? undefined,
+				toolCalls: message?.tool_calls
+					? processToolCalls({ tool_calls: message.tool_calls })
+					: [],
+				finishReason: mapWorkersAIFinishReason(choice.finish_reason),
+				// @ts-ignore
+				usage: mapWorkersAIUsage(output),
+			};
+		}
+
+		return {
+			text:
+				typeof output.response === "object" && output.response !== null
+					? JSON.stringify(output.response)
+					: output.response || "",
+			toolCalls: processToolCalls(output),
+			finishReason: "stop",
+			reasoningContent: undefined,
+			// @ts-ignore
+			usage: mapWorkersAIUsage(output),
+		};
+	}
+
 	async doGenerate(
 		options: Parameters<LanguageModelV1["doGenerate"]>[0],
 	): Promise<Awaited<ReturnType<LanguageModelV1["doGenerate"]>>> {
@@ -168,17 +215,20 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 			throw new Error("This shouldn't happen");
 		}
 
-		return {
-			text:
-				typeof output.response === "object" && output.response !== null
-					? JSON.stringify(output.response) // ai-sdk expects a string here
-					: output.response,
-			toolCalls: processToolCalls(output),
-			finishReason: "stop", // TODO: mapWorkersAIFinishReason(response.finish_reason),
-			rawCall: { rawPrompt: messages, rawSettings: args },
-			usage: mapWorkersAIUsage(output),
+		const responseData = this.extractResponseData(output);
+
+		const response: Awaited<ReturnType<LanguageModelV1["doGenerate"]>> = {
+			text: responseData.text,
+			reasoning: responseData.reasoningContent,
+			toolCalls: responseData.toolCalls,
+			finishReason: responseData.finishReason as any,
+			rawCall: { rawPrompt: options.prompt, rawSettings: args },
+			rawResponse: { body: output },
+			usage: responseData.usage,
 			warnings,
 		};
+
+		return response;
 	}
 
 	async doStream(

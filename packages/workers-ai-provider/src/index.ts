@@ -160,10 +160,15 @@ export function createAutoRAG(options: AutoRAGSettings): AutoRAGProvider {
 	const binding = options.binding;
 
 	const createChatModel = (settings: AutoRAGChatSettings = {}) =>
-		new AutoRAGChatLanguageModel("@cf/meta/llama-3.3-70b-instruct-fp8-fast", settings, {
-			provider: "autorag.chat",
-			binding,
-		});
+		new AutoRAGChatLanguageModel(
+			// @ts-ignore
+			"@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+			settings,
+			{
+				provider: "autorag.chat",
+				binding,
+			},
+		);
 
 	const provider = (settings?: AutoRAGChatSettings) => {
 		if (new.target) {
