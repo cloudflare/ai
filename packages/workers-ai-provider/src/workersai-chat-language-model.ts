@@ -158,6 +158,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 					: [],
 				finishReason: choice.finish_reason === "tool_calls" ? "tool-calls" : "stop",
 				reasoningContent: message?.reasoning_content, // New field for reasoning
+				// @ts-ignore
 				usage: mapWorkersAIUsage(output),
 			};
 		}
@@ -171,6 +172,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 			toolCalls: processToolCalls(output),
 			finishReason: "stop",
 			reasoningContent: undefined,
+			// @ts-ignore
 			usage: mapWorkersAIUsage(output),
 		};
 	}
@@ -217,6 +219,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 
 		// Create the base response
 		const response: Awaited<ReturnType<LanguageModelV1["doGenerate"]>> = {
+			// @ts-ignore
 			text: responseData.text,
 			toolCalls: responseData.toolCalls,
 			finishReason: responseData.finishReason as any,
