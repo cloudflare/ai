@@ -11,6 +11,7 @@ import type { TextGenerationModels } from "./workersai-models";
 import { mapWorkersAIUsage } from "./map-workersai-usage";
 import { getMappedStream } from "./streaming";
 import { lastMessageWasUser, prepareToolsAndToolChoice, processToolCalls } from "./utils";
+import { mapWorkersAIFinishReason } from "./map-workersai-finish-reason";
 
 type WorkersAIChatConfig = {
 	provider: string;
@@ -152,18 +153,17 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 			const message = choice.message;
 
 			return {
-				text: message?.content || "",
+				text: message?.content ?? undefined,
+				reasoningContent: message?.reasoning_content ?? undefined,
 				toolCalls: message?.tool_calls
 					? processToolCalls({ tool_calls: message.tool_calls })
 					: [],
-				finishReason: choice.finish_reason === "tool_calls" ? "tool-calls" : "stop",
-				reasoningContent: message?.reasoning_content, // New field for reasoning
+				finishReason: mapWorkersAIFinishReason(choice.finish_reason),
 				// @ts-ignore
 				usage: mapWorkersAIUsage(output),
 			};
 		}
 
-		// Handle legacy format (existing behavior)
 		return {
 			text:
 				typeof output.response === "object" && output.response !== null
@@ -217,22 +217,16 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 
 		const responseData = this.extractResponseData(output);
 
-		// Create the base response
 		const response: Awaited<ReturnType<LanguageModelV1["doGenerate"]>> = {
-			// @ts-ignore
 			text: responseData.text,
+			reasoning: responseData.reasoningContent,
 			toolCalls: responseData.toolCalls,
 			finishReason: responseData.finishReason as any,
-			rawCall: { rawPrompt: messages, rawSettings: args },
+			rawCall: { rawPrompt: options.prompt, rawSettings: args },
+			rawResponse: { body: output },
 			usage: responseData.usage,
 			warnings,
 		};
-
-		responseData.reasoningContent;
-		// Add reasoning content as experimental data if present
-		if (responseData.reasoningContent) {
-			(response as any).experimental_reasoning = responseData.reasoningContent;
-		}
 
 		return response;
 	}
