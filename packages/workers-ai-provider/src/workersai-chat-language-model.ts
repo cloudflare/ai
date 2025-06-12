@@ -18,6 +18,21 @@ type WorkersAIChatConfig = {
 	gateway?: GatewayOptions;
 };
 
+type WorkersAIResponse = {
+	response?: string | object;
+	choices?: Array<{
+		message?: {
+			content?: string;
+			reasoning_content?: string;
+			tool_calls?: any[];
+			role?: string;
+		};
+		finish_reason?: string;
+	}>;
+	usage?: any;
+	// ... other existing fields
+};
+
 export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 	readonly specificationVersion = "v1";
 	readonly defaultObjectGenerationMode = "json";
@@ -130,6 +145,36 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 		}
 	}
 
+	private extractResponseData(output: WorkersAIResponse) {
+		// Handle new format with choices array
+		if (output.choices && output.choices.length > 0) {
+			const choice = output.choices[0];
+			const message = choice.message;
+
+			return {
+				text: message?.content || "",
+				toolCalls: message?.tool_calls
+					? processToolCalls({ tool_calls: message.tool_calls })
+					: [],
+				finishReason: choice.finish_reason === "tool_calls" ? "tool-calls" : "stop",
+				reasoningContent: message?.reasoning_content, // New field for reasoning
+				usage: mapWorkersAIUsage(output),
+			};
+		}
+
+		// Handle legacy format (existing behavior)
+		return {
+			text:
+				typeof output.response === "object" && output.response !== null
+					? JSON.stringify(output.response)
+					: output.response || "",
+			toolCalls: processToolCalls(output),
+			finishReason: "stop",
+			reasoningContent: undefined,
+			usage: mapWorkersAIUsage(output),
+		};
+	}
+
 	async doGenerate(
 		options: Parameters<LanguageModelV1["doGenerate"]>[0],
 	): Promise<Awaited<ReturnType<LanguageModelV1["doGenerate"]>>> {
@@ -168,17 +213,25 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 			throw new Error("This shouldn't happen");
 		}
 
-		return {
-			text:
-				typeof output.response === "object" && output.response !== null
-					? JSON.stringify(output.response) // ai-sdk expects a string here
-					: output.response,
-			toolCalls: processToolCalls(output),
-			finishReason: "stop", // TODO: mapWorkersAIFinishReason(response.finish_reason),
+		const responseData = this.extractResponseData(output);
+
+		// Create the base response
+		const response: Awaited<ReturnType<LanguageModelV1["doGenerate"]>> = {
+			text: responseData.text,
+			toolCalls: responseData.toolCalls,
+			finishReason: responseData.finishReason as any,
 			rawCall: { rawPrompt: messages, rawSettings: args },
-			usage: mapWorkersAIUsage(output),
+			usage: responseData.usage,
 			warnings,
 		};
+
+		responseData.reasoningContent;
+		// Add reasoning content as experimental data if present
+		if (responseData.reasoningContent) {
+			(response as any).experimental_reasoning = responseData.reasoningContent;
+		}
+
+		return response;
 	}
 
 	async doStream(
