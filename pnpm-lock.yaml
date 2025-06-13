@@ -749,6 +749,40 @@ importers:
         specifier: ^4.19.1
         version: 4.19.1(@cloudflare/workers-types@4.20250610.0)
 
+  demos/remote-mcp-asgardeo:
+    dependencies:
+      '@cloudflare/workers-oauth-provider':
+        specifier: ^0.0.5
+        version: 0.0.5
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.12.1
+        version: 1.12.1
+      agents:
+        specifier: ^0.0.94
+        version: 0.0.94(@cloudflare/workers-types@4.20250605.0)(react@19.1.0)
+      hono:
+        specifier: ^4.7.11
+        version: 4.7.11
+      just-pick:
+        specifier: ^4.2.0
+        version: 4.2.0
+      workers-mcp:
+        specifier: ^0.0.13
+        version: 0.0.13
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20250605.0
+        version: 4.20250605.0
+      prettier:
+        specifier: ^3.5.3
+        version: 3.5.3
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
+      wrangler:
+        specifier: ^4.19.1
+        version: 4.19.1(@cloudflare/workers-types@4.20250605.0)
+
   demos/remote-mcp-auth0/mcp-auth0-oidc:
     dependencies:
       '@cloudflare/workers-oauth-provider':
