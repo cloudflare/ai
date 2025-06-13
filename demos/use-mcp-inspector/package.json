@@ -1,0 +1,35 @@
+{
+	"name": "mcp-inspector",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "tsc -b && pnpm run build:only",
+		"build:only": "vite build",
+		"lint": "biome lint --error-on-warnings",
+		"preview": "vite preview",
+		"deploy": "pnpm run build:only && wrangler deploy",
+		"type-check": "tsc --noEmit"
+	},
+	"dependencies": {
+		"lucide-react": "^0.514.0",
+		"react": "^19.1.0",
+		"react-dom": "^19.1.0",
+		"use-mcp": "^0.0.8"
+	},
+	"devDependencies": {
+		"@cloudflare/vite-plugin": "^1.5.0",
+		"@tailwindcss/typography": "^0.5.16",
+		"@tailwindcss/vite": "^4.1.8",
+		"@types/react": "^19.1.7",
+		"@types/react-dom": "^19.1.6",
+		"@vitejs/plugin-react": "^4.5.2",
+		"globals": "^16.2.0",
+		"prettier": "^3.5.3",
+		"tailwindcss": "^4.1.8",
+		"typescript": "^5.8.3",
+		"vite": "^6.3.5",
+		"wrangler": "^4.19.1"
+	}
+}

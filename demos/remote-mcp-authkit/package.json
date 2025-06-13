@@ -16,16 +16,16 @@
 	"dependencies": {
 		"@cloudflare/workers-oauth-provider": "^0.0.5",
 		"@modelcontextprotocol/sdk": "^1.12.1",
-		"@workos-inc/node": "^7.53.0",
-		"agents": "^0.0.94",
+		"@workos-inc/node": "^7.54.0",
+		"agents": "^0.0.95",
 		"hono": "^4.7.11",
 		"jose": "^6.0.11",
 		"workers-mcp": "^0.0.13",
-		"zod": "^3.25.51"
+		"zod": "^3.25.61"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
-		"@cloudflare/workers-types": "^4.20250605.0",
+		"@cloudflare/workers-types": "^4.20250610.0",
 		"typescript": "^5.8.3",
 		"wrangler": "^4.19.1"
 	}

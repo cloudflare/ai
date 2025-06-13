@@ -12,17 +12,17 @@
 	"author": "",
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "^1.12.1",
-		"agents": "^0.0.94",
+		"agents": "^0.0.95",
 		"nanoid": "^5.1.5",
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0"
 	},
 	"devDependencies": {
 		"@cloudflare/vite-plugin": "^1.5.0",
-		"@cloudflare/workers-types": "^4.20250605.0",
-		"@types/react": "^19.1.6",
+		"@cloudflare/workers-types": "^4.20250610.0",
+		"@types/react": "^19.1.7",
 		"@types/react-dom": "^19.1.6",
-		"@vitejs/plugin-react": "^4.5.1",
+		"@vitejs/plugin-react": "^4.5.2",
 		"vite": "^6.3.5"
 	}
 }

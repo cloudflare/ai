@@ -12,15 +12,15 @@
   "dependencies": {
     "@cloudflare/workers-oauth-provider": "^0.0.5",
     "@modelcontextprotocol/sdk": "^1.12.1",
-    "agents": "^0.0.94",
+    "agents": "^0.0.95",
     "hono": "^4.7.11",
     "just-pick": "^4.2.0",
     "octokit": "^5.0.3",
     "workers-mcp": "^0.0.13",
-    "zod": "^3.25.51"
+    "zod": "^3.25.61"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250605.0",
+    "@cloudflare/workers-types": "^4.20250610.0",
     "prettier": "^3.5.3",
     "typescript": "^5.8.3",
     "wrangler": "^4.19.1"

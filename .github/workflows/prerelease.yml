@@ -1,0 +1,34 @@
+name: Prerelease
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    if: ${{ github.repository_owner == 'cloudflare' }}
+    timeout-minutes: 5
+    runs-on: ubuntu-22.04
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile --child-concurrency=10
+
+      - name: Test and Build
+        run: |
+          pnpm nx build workers-ai-provider
+          pnpm nx build ai-gateway-provider
+
+      - run: pnpm dlx pkg-pr-new publish './packages/*' --bin

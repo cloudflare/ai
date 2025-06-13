@@ -1,0 +1,23 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "workers-ai-playground",
+	"compatibility_date": "2025-05-08",
+	"compatibility_flags": ["nodejs_compat"],
+	"main": "src/server/index.ts",
+	"vars": {
+		"CLOUDFLARE_ACCOUNT_ID": "85d0c02b57ed75faf9b18f92d5c01602"
+	},
+	"ai": {
+		"binding": "AI"
+	},
+	"env": {
+		"production": {
+			"vars": {
+				"CLOUDFLARE_ACCOUNT_ID": "85d0c02b57ed75faf9b18f92d5c01602"
+			},
+			"ai": {
+				"binding": "AI"
+			}
+		}
+	}
+}
