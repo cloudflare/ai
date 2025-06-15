@@ -184,7 +184,7 @@ const App = () => {
 			});
 	}, []);
 
-	useHotkeys("meta+enter", () => handleSubmit(), {
+	useHotkeys("meta+enter, ctrl+enter", () => handleSubmit(), {
 		enableOnFormTags: ["textarea"],
 	});
 
