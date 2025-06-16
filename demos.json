@@ -104,6 +104,9 @@
     },
     "./demos/use-mcp-inspector": {
       "package_json_hash": "488066edda9d3573e65b9b80627ccebae1acc551"
+    },
+    "./demos/remote-mcp-asgardeo": {
+      "package_json_hash": "e5888297e347f4f791353981f7bc3d6fbb08e0ac"
     }
   }
 }
