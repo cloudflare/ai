@@ -18,14 +18,14 @@
 		"hono": "^4.7.11",
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0",
-		"workers-ai-provider": "0.6.0",
-		"zod": "^3.25.51"
+		"workers-ai-provider": "0.6.1",
+		"zod": "^3.25.61"
 	},
 	"devDependencies": {
 		"@cloudflare/vite-plugin": "^1.5.0",
-		"@types/react": "^19.1.6",
+		"@types/react": "^19.1.7",
 		"@types/react-dom": "^19.1.6",
-		"@vitejs/plugin-react": "^4.5.1",
+		"@vitejs/plugin-react": "^4.5.2",
 		"typescript": "^5.8.3",
 		"vite": "^6.3.5",
 		"wrangler": "^4.19.1"

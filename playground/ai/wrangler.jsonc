@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "workers-ai-playground",
+  "compatibility_date": "2025-05-08",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "src/server/index.ts",
+  "ai": {
+    "binding": "AI",
+  },
+}

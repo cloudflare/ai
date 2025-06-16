@@ -19,10 +19,10 @@
 		"workers-mcp": "^0.0.13"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20250605.0",
+		"@cloudflare/workers-types": "^4.20250610.0",
 		"prettier": "^3.5.3",
 		"typescript": "^5.8.3",
 		"wrangler": "^4.19.1",
-		"zod": "^3.25.51"
+		"zod": "^3.25.61"
 	}
 }

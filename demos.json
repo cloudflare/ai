@@ -1,106 +1,109 @@
 {
   "demos": {
     "./demos/agent-scheduler": {
-      "package_json_hash": "859562c2544027887512d4e67d17be082093f951"
+      "package_json_hash": "cf08ea3161f6f1e43cdba16794c503ba2e2f0e0d"
     },
     "./demos/agent-task-manager": {
-      "package_json_hash": "5919e1d6da61d5405cce6ad544ee29547f544fbe"
+      "package_json_hash": "ec7e28c8e505fbbfb5bd9b282db88c5b094da5a0"
     },
     "./demos/agent-task-manager-human-in-the-loop": {
-      "package_json_hash": "7a2cd46fe76171744409a942e84838a5c00f2058"
+      "package_json_hash": "7fdc5e4486faf447dcc46430fbd7b4daf81e0558"
     },
     "./demos/evaluator-optimiser": {
-      "package_json_hash": "47d0f26e7ae500af5221e35eadaac67dcf36e1e8"
+      "package_json_hash": "53ab803909af35fdef9ee9aafd7bb4b28ebb607e"
     },
     "./demos/image-generation": {
-      "package_json_hash": "07476c98852eb3f2d518ad05eebb7cb62ae02021"
+      "package_json_hash": "97d2c7611df3b940e8267acc99cdc7b41985bfd3"
     },
     "./demos/mcp-client": {
-      "package_json_hash": "06376418e3f321f7f1e9bde9be5a78626a9d46e0"
+      "package_json_hash": "a7728e158325ca54a07d46b325acb79797cb3037"
     },
     "./demos/mcp-server-bearer-auth": {
-      "package_json_hash": "ad986e1ad603a63a0e27382ee77fd6fd89619086"
+      "package_json_hash": "e08793673474addbb58a5fd86dc08487eef7a335"
     },
     "./demos/mcp-slack-oauth": {
-      "package_json_hash": "c6c5050d41ca861a043c9fa417894479f7ff9b1c"
+      "package_json_hash": "366dd535b2118f84f62a62fe5d8c45c4eac149c6"
     },
     "./demos/mcp-stytch-b2b-okr-manager": {
-      "package_json_hash": "9cbd2f2607be40bbf29826631e5e027eeb994415"
+      "package_json_hash": "3d6ca843ffc611d1b49792d81b7455f83ddeb512"
     },
     "./demos/mcp-stytch-consumer-todo-list": {
-      "package_json_hash": "30d44f29a31596734e3fe1f29d0449e441116b44"
+      "package_json_hash": "8f664d77b937ae6178eaae60a5fedaefe68cb62d"
     },
     "./demos/model-scraper": {
-      "package_json_hash": "3d008cf7749af57f9acd5ababa03363464121a28"
+      "package_json_hash": "009e965b950b663fbc043337fbd6a60180f67da1"
     },
     "./demos/orchestrator-workers": {
-      "package_json_hash": "0a1892efbaa782d757d33e78e63478478ee89920"
+      "package_json_hash": "bea638fae4aa967e068ed8e37c578341851dcb7b"
     },
     "./demos/parallelisation": {
-      "package_json_hash": "f98e0d4aa86dc7a3b1f5147402dd5b49d8d57adc"
+      "package_json_hash": "ed27352e35bf5112053ac18cb1ca2664c9b850bf"
     },
     "./demos/prompt-chaining": {
-      "package_json_hash": "09409d846eac80207cb3ea1cdb90c7d06ce358b3"
+      "package_json_hash": "d640a3d58737fbe880dff4523884656dc04e98a9"
     },
     "./demos/remote-mcp-authkit": {
-      "package_json_hash": "50855c523fa18c02299a88120fe72f8b3c695f16"
+      "package_json_hash": "0f82a65d028614999a16c7807c740687049428cd"
     },
     "./demos/remote-mcp-github-oauth": {
-      "package_json_hash": "abd7f36d3be6f89fcaa59910fe42476a5daa8ceb"
+      "package_json_hash": "0b79e566301c077625995597ba4b1e7eba1d915f"
     },
     "./demos/remote-mcp-server": {
-      "package_json_hash": "b23a203be8043df453acd41f80bdf2ce1f5200af"
+      "package_json_hash": "95155f0d8285186152b777b07a919e6de08b3693"
     },
     "./demos/routing": {
-      "package_json_hash": "1cb9b0cc27a44e92106a6d4cfbc3bc6e37b0b6d3"
+      "package_json_hash": "e90779c4f4f61c27c7376c03c8c6dc1580004471"
     },
     "./demos/structured-output": {
-      "package_json_hash": "a0212e8ee70aa54f1dffe85fa8d5bbe05d9f5405"
+      "package_json_hash": "a52d4b67b391dc8801d863ed5c6e3facdaa23c3d"
     },
     "./demos/structured-output-node": {
-      "package_json_hash": "e375cb8909e5c5457862c69b768bb25360a16167"
+      "package_json_hash": "e939d224fb80ecd4b49c6b74c235a97413da82ac"
     },
     "./demos/text-generation": {
-      "package_json_hash": "d50545c0374ce3645b478bf9724ac3ca6f8a4c3a"
+      "package_json_hash": "bbe295cacade9c0267ef88dc937590ddf3703d52"
     },
     "./demos/text-generation-stream": {
-      "package_json_hash": "8cdcf31b06b7e8112a70c2b9c10d31268723a7ab"
+      "package_json_hash": "741cd478fd31f9088c8870af2b4ec4a5dd846aa4"
     },
     "./demos/tool-calling": {
-      "package_json_hash": "c6da80449fb9b2a13c2442505e3f3b7b9dfb04d0"
+      "package_json_hash": "a2ecc2a204f52eac964316cae4c3a9f82d04a00a"
     },
     "./demos/tool-calling-stream": {
-      "package_json_hash": "21bc92e3b56ee1e8a68166484a13636227ee6cb5"
+      "package_json_hash": "5049386ab6c3c689033604b3022e7c52b4791d7f"
     },
     "./demos/tool-calling-stream-traditional": {
-      "package_json_hash": "51df0bf289c7603e06f2343c9457c3d6ca52f0f8"
+      "package_json_hash": "726e8ca98bf2cf3d6898b9f4469b54d5550417c5"
     },
     "./demos/ui-worker": {
-      "package_json_hash": "50bd2261a0b157dcdc8ca23115ed53d7a48b7eb1"
+      "package_json_hash": "04e1607331492b19862202a75244b9c26012812d"
     },
     "./demos/remote-mcp-cf-access": {
-      "package_json_hash": "f91d85a207dfe409e2528de1ec098c0df09da7ef"
+      "package_json_hash": "ad2f078a3a2de29243112b7b0a19183d58eaad40"
     },
     "./demos/remote-mcp-authless": {
-      "package_json_hash": "2094f83d5db5914a98d0dbb7d92008eac69c8488"
+      "package_json_hash": "b461b3e5e2347fa2a7ee67cd19bd386c48c9b04c"
     },
     "./demos/python-workers-mcp": {
       "package_json_hash": "a4f6e28b2240dca24ebaaadf9baa62cc7f692be1"
     },
     "./demos/vision": {
-      "package_json_hash": "1ad3c79ca15a1a513e81a602c5566ec9d8794d03"
+      "package_json_hash": "a2978b39bfbdd8ca98d7a5ebf9259e4964649174"
     },
     "./demos/remote-mcp-google-oauth": {
-      "package_json_hash": "8de7a8f11f4a9b3ef78a4370437b2fd8d225b8e3"
+      "package_json_hash": "6ad2e82003af3508e5cd92b4a93ae087b3cdf7f3"
     },
     "./demos/remote-mcp-logto": {
-      "package_json_hash": "a006e42177c9936c2c5e4155f37a9472c8499653"
+      "package_json_hash": "0befc8821e3fd630bc6048c2bd8b95a739e395be"
     },
     "./demos/remote-mcp-server-descope-auth": {
-      "package_json_hash": "770a3c122c2e2e6df52f029a8ac4ddb46854c06d"
+      "package_json_hash": "82d83172531107a1d32c99b652bc95313ad00765"
     },
     "./demos/remote-mcp-server-autorag": {
-      "package_json_hash": "7bd3df4bdc16dfd2e1ce4a6d892d78069bf0e758"
+      "package_json_hash": "b58b59b7c6e3344311e07c2ca0ecde221dab2d4a"
+    },
+    "./demos/use-mcp-inspector": {
+      "package_json_hash": "7b39e5c6392dc48ba6c09c5e2e4cc459fc792b76"
     }
   }
 }
