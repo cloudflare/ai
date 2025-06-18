@@ -9,7 +9,6 @@ export type WorkersAIChatSettings = {
 
 	/**
 	 * Optionally set Cloudflare AI Gateway options.
-	 * @deprecated
 	 */
 	gateway?: GatewayOptions;
 } & {
