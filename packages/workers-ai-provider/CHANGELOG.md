@@ -1,5 +1,11 @@
 # workers-ai-provider
 
+## 0.6.4
+
+### Patch Changes
+
+- [#208](https://github.com/cloudflare/ai/pull/208) [`a08f7d4`](https://github.com/cloudflare/ai/commit/a08f7d41f77aa527eeb966dde97e963150d3038e) Thanks [@G4brym](https://github.com/G4brym)! - Remove @Deprecated flag on gateway option
+
 ## 0.6.3
 
 ### Patch Changes

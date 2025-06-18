@@ -1,5 +1,11 @@
 # ai-gateway-provider
 
+## 0.0.10
+
+### Patch Changes
+
+- [#201](https://github.com/cloudflare/ai/pull/201) [`6bb06b3`](https://github.com/cloudflare/ai/commit/6bb06b347e4ecd784e179aee42d3ce57d1855b2b) Thanks [@TimoWilhelm](https://github.com/TimoWilhelm)! - Add Azure OpenAI support to gateway
+
 ## 0.0.9
 
 ### Patch Changes

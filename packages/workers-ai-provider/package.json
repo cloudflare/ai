@@ -2,7 +2,7 @@
 	"name": "workers-ai-provider",
 	"description": "Workers AI Provider for the vercel AI SDK",
 	"type": "module",
-	"version": "0.6.3",
+	"version": "0.6.4",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"repository": {

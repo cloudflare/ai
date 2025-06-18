@@ -15,7 +15,7 @@
 		"react-hotkeys-hook": "^5.1.0",
 		"react-router-dom": "^7.6.2",
 		"react-textarea-autosize": "^8.5.9",
-		"workers-ai-provider": "0.6.3",
+		"workers-ai-provider": "0.6.4",
 		"zod": "^3.25.67"
 	},
 	"devDependencies": {
