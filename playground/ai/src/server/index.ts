@@ -17,11 +17,7 @@ type PostInferenceBody = {
 	tools: Tool[];
 };
 
-async function replyToMessage(
-	request: Request,
-	env: Env,
-	_ctx: ExecutionContext,
-) {
+async function replyToMessage(request: Request, env: Env, _ctx: ExecutionContext) {
 	const modelNames = models.map((model) => model.name);
 
 	const {

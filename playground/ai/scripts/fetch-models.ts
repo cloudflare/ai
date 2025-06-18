@@ -34,9 +34,7 @@ async function main() {
 
 	const data = await Promise.all([
 		fetch(modelsEndpoint, reqParams).then((res) => res.json<Result<Model>>()),
-		fetch(finetunesEndpoint, reqParams).then((res) =>
-			res.json<Result<FineTune>>(),
-		),
+		fetch(finetunesEndpoint, reqParams).then((res) => res.json<Result<FineTune>>()),
 	]);
 
 	const models = data[0].result

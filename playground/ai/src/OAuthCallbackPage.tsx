@@ -25,9 +25,7 @@ export default function OAuthCallbackPage() {
 					message: res.error,
 				}),
 			)
-			.catch((err: Error) =>
-				setResult({ status: "error", message: err.message }),
-			);
+			.catch((err: Error) => setResult({ status: "error", message: err.message }));
 	}, [searchParams]);
 
 	return (
@@ -37,9 +35,7 @@ export default function OAuthCallbackPage() {
 			{result.status === "success" && (
 				<p>Authentication successful! You can close this window.</p>
 			)}
-			{result.status === "error" && (
-				<p>Authentication error: {result.message}</p>
-			)}
+			{result.status === "error" && <p>Authentication error: {result.message}</p>}
 		</div>
 	);
 }

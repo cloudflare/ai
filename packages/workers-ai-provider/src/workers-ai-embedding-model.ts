@@ -74,6 +74,7 @@ export class WorkersAIEmbeddingModel implements EmbeddingModelV1<string> {
 
 		const response = await this.config.binding.run(
 			this.modelId,
+			// @ts-ignore: Error introduced with "@cloudflare/workers-types": "^4.20250617.0"
 			{
 				text: values,
 			},
@@ -81,6 +82,7 @@ export class WorkersAIEmbeddingModel implements EmbeddingModelV1<string> {
 		);
 
 		return {
+			// @ts-ignore: Error introduced with "@cloudflare/workers-types": "^4.20250617.0"
 			embeddings: response.data,
 		};
 	}

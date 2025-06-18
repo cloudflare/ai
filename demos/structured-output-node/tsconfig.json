@@ -14,7 +14,7 @@
 		"forceConsistentCasingInFileNames": true,
 		"strict": true,
 		"skipLibCheck": true,
-		"types": ["@cloudflare/workers-types/experimental", "node"]
+		"types": ["@cloudflare/workers-types", "node"]
 	},
 	"include": ["src/**/*.ts"]
 }

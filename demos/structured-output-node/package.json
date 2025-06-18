@@ -11,12 +11,12 @@
 	},
 	"dependencies": {
 		"ai": "^4.3.16",
-		"zod": "^3.25.61"
+		"zod": "^3.25.67"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^1.9.4",
-		"@cloudflare/workers-types": "^4.20250610.0",
+		"@biomejs/biome": "^2.0.0",
+		"@cloudflare/workers-types": "^4.20250618.0",
 		"typescript": "^5.8.3",
-		"vitest": "~3.1.4"
+		"vitest": "~3.2.4"
 	}
 }

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useMcp, type UseMcpResult, type Tool } from 'use-mcp/react'
 import { Info, X } from 'lucide-react'
 
@@ -49,7 +49,15 @@ export function McpServers({ onToolsUpdate }: { onToolsUpdate?: (tools: Tool[]) 
 	const executionLogRefs = useRef<Record<string, HTMLTextAreaElement | null>>({})
 
 	// Extract connection properties
-	const { state, tools, error, log, authUrl, disconnect, authenticate } = connectionData
+	const {
+		state,
+		tools,
+		//error,
+		log,
+		authUrl,
+		disconnect,
+		authenticate,
+	} = connectionData
 
 	// Notify parent component when tools change
 	useEffect(() => {
@@ -138,11 +146,9 @@ export function McpServers({ onToolsUpdate }: { onToolsUpdate?: (tools: Tool[]) 
 	// Initialize form data when tools change
 	useEffect(() => {
 		const newForms: Record<string, Record<string, any>> = {}
-		/* biome-ignore lint/complexity/noForEach: eh */
 		tools.forEach((tool: Tool) => {
 			if (tool.inputSchema?.properties) {
 				const formData: Record<string, any> = {}
-				/* biome-ignore lint/complexity/noForEach: eh */
 				Object.entries(tool.inputSchema.properties).forEach(([key, schema]: [string, any]) => {
 					// Set default values based on type
 					if (schema.type === 'number' || schema.type === 'integer') {
@@ -207,7 +213,6 @@ export function McpServers({ onToolsUpdate }: { onToolsUpdate?: (tools: Tool[]) 
 
 	// Auto-scroll execution logs to bottom when they change
 	useEffect(() => {
-		/* biome-ignore lint/complexity/noForEach: eh */
 		Object.keys(toolExecutionLogs).forEach((toolName) => {
 			const textarea = executionLogRefs.current[toolName]
 			if (textarea) {
@@ -247,7 +252,6 @@ export function McpServers({ onToolsUpdate }: { onToolsUpdate?: (tools: Tool[]) 
 					}}
 				/>
 			)
-			/* biome-ignore lint/style/noUselessElse: eh */
 		} else if (schema.type === 'boolean') {
 			return (
 				<input
@@ -257,7 +261,6 @@ export function McpServers({ onToolsUpdate }: { onToolsUpdate?: (tools: Tool[]) 
 					onChange={(e) => handleFormChange(toolName, fieldName, e.target.checked)}
 				/>
 			)
-			/* biome-ignore lint/style/noUselessElse: eh */
 		} else {
 			// String or other text input
 			return (
@@ -346,7 +349,7 @@ export function McpServers({ onToolsUpdate }: { onToolsUpdate?: (tools: Tool[]) 
 					) : (
 						<div className="border border-gray-200 rounded p-4 bg-gray-50 space-y-6">
 							{tools.map((tool: Tool, index: number) => (
-								// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+								// biome-ignore lint/suspicious/noArrayIndexKey: eh
 								<div key={index}>
 									{/* Tool title outside the card */}
 									<h4 className="font-bold text-base text-black mb-2">{tool.name}</h4>
@@ -433,7 +436,7 @@ export function McpServers({ onToolsUpdate }: { onToolsUpdate?: (tools: Tool[]) 
 						{log.length > 0 ? (
 							log.map((entry, index) => (
 								<div
-									// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+									// biome-ignore lint/suspicious/noArrayIndexKey: eh
 									key={index}
 									className={`py-0.5 ${
 										entry.level === 'debug'

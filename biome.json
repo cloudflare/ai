@@ -1,34 +1,38 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.6.2/schema.json",
-	"organizeImports": {
+	"$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
+	"assist": {
+		"actions": {
+			"source": {
+				"useSortedKeys": "on"
+			}
+		},
 		"enabled": true
 	},
 	"files": {
-		"ignore": ["worker-configuration.d.ts", "types/workerd.d.ts", "demos/*"]
-	},
-	"vcs": {
-		"enabled": true,
-		"clientKind": "git",
-		"useIgnoreFile": true
-	},
-	"linter": {
-		"enabled": true,
-		"rules": {
-			"recommended": true,
-			"suspicious": {
-				"noExplicitAny": "off",
-				"noDebugger": "off",
-				"noConsoleLog": "off",
-				"noConfusingVoidType": "off"
-			},
-			"style": {
-				"noNonNullAssertion": "off"
-			}
-		}
+		"includes": ["!worker-configuration.d.ts", "!types/workerd.d.ts", "!demos/*"]
 	},
 	"formatter": {
 		"enabled": true,
 		"indentWidth": 4,
 		"lineWidth": 100
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"style": {
+				"noNonNullAssertion": "off"
+			},
+			"suspicious": {
+				"noConfusingVoidType": "off",
+				"noDebugger": "off",
+				"noExplicitAny": "off"
+			}
+		}
+	},
+	"vcs": {
+		"clientKind": "git",
+		"enabled": true,
+		"useIgnoreFile": true
 	}
 }

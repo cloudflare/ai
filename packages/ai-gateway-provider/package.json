@@ -1,11 +1,15 @@
 {
 	"name": "ai-gateway-provider",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"description": "AI Gateway Provider for AI-SDK",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
 	"types": "./dist/index.d.ts",
-	"files": ["dist", "LICENSE", "README.md"],
+	"files": [
+		"dist",
+		"LICENSE",
+		"README.md"
+	],
 	"scripts": {
 		"build": "rm -rf dist && tsup src/index.ts --dts --sourcemap --format cjs,esm --target es2020",
 		"format": "biome format --write",
@@ -16,7 +20,14 @@
 	"publishConfig": {
 		"access": "public"
 	},
-	"keywords": ["cloudflare", "workers", "rag", "ai", "agents", "autorag"],
+	"keywords": [
+		"cloudflare",
+		"workers",
+		"rag",
+		"ai",
+		"agents",
+		"autorag"
+	],
 	"author": "Gabriel Massadas <https://github.com/g4brym>",
 	"license": "MIT",
 	"homepage": "https://github.com/cloudflare/ai",
@@ -33,7 +44,7 @@
 		"ai": "^4.3.16"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^1.9.4",
+		"@biomejs/biome": "^2.0.0",
 		"tsup": "^8.5.0",
 		"typescript": "^5.8.3"
 	}

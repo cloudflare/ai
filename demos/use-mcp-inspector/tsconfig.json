@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "es2021",
-		"lib": ["es2021"],
+		"lib": ["dom", "es2021"],
 		"jsx": "react-jsx",
 		"types": ["vite/client"],
 		"module": "es2022",
@@ -16,5 +16,5 @@
 		"strict": true,
 		"skipLibCheck": true
 	},
-	"include": ["**/*.ts"]
+	"include": ["**/*.ts", "**/*.tsx"]
 }

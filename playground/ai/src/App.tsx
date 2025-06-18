@@ -75,19 +75,10 @@ const App = () => {
 	const [error, setError] = useState("");
 	const [codeVisible, setCodeVisible] = useState(false);
 	const [settingsVisible, setSettingsVisible] = useState(false);
-	const [systemMessage, setSystemMessage] = useState(
-		"You are a helpful assistant",
-	);
+	const [systemMessage, setSystemMessage] = useState("You are a helpful assistant");
 	const [mcpTools, setMcpTools] = useState<Tool[]>([]);
 
-	const {
-		messages,
-		input,
-		handleInputChange,
-		handleSubmit,
-		status,
-		setMessages,
-	} = useChat({
+	const { messages, input, handleInputChange, handleSubmit, status, setMessages } = useChat({
 		api: "/api/inference",
 		body: {
 			lora: params.lora,
@@ -111,8 +102,7 @@ const App = () => {
 						Object.entries(args).map(([key, value]) => {
 							// console.log({ key, value });
 							if (
-								(mcpTool.inputSchema.properties?.[key] as any)?.type ===
-									"number" &&
+								(mcpTool.inputSchema.properties?.[key] as any)?.type === "number" &&
 								typeof value === "string"
 							) {
 								return [key, Number(value)];
@@ -284,8 +274,8 @@ const App = () => {
 							</div>
 
 							<p className="text-gray-400 text-sm mt-1 mb-4">
-								Explore different Text Generation models by drafting messages
-								and fine-tuning your responses.
+								Explore different Text Generation models by drafting messages and
+								fine-tuning your responses.
 							</p>
 
 							<div className="md:mb-4">
@@ -430,19 +420,25 @@ const App = () => {
 													<div key={i}>
 														<div className="w-full text-center italic text-xs text-gray-400 font-mono max-h-20 overflow-auto break-all px-2 whitespace-pre-line">
 															[tool] {part.toolInvocation.toolName}(
-															{JSON.stringify(part.toolInvocation.args)})
-															=&gt;&nbsp;
+															{JSON.stringify(
+																part.toolInvocation.args,
+															)}
+															) =&gt;&nbsp;
 															{part.toolInvocation.state === "call" &&
 															status === "ready"
 																? "awaiting confirmation..."
-																: part.toolInvocation.state === "call"
+																: part.toolInvocation.state ===
+																		"call"
 																	? "pending..."
-																	: part.toolInvocation.state === "result"
+																	: part.toolInvocation.state ===
+																			"result"
 																		? part.toolInvocation.result
 																		: null}
 														</div>
 														{part.toolInvocation.state === "result" &&
-														part.toolInvocation.result.match(/\[blob:.*]/) ? (
+														part.toolInvocation.result.match(
+															/\[blob:.*]/,
+														) ? (
 															<img
 																className="block max-w-md mx-auto mt-3"
 																src={
@@ -465,7 +461,8 @@ const App = () => {
 												<button
 													type="button"
 													className={`px-3 py-2 bg-orange-100 hover:bg-orange-200 rounded-lg text-sm capitalize cursor-pointer ${
-														(streaming || loading) && "pointer-events-none"
+														(streaming || loading) &&
+														"pointer-events-none"
 													}`}
 												>
 													{message.role}
@@ -474,7 +471,8 @@ const App = () => {
 											<div className="relative grow">
 												<TextareaAutosize
 													className={`rounded-md p-3 w-full resize-none mt-[-6px] hover:bg-gray-50 ${
-														(streaming || loading) && "pointer-events-none"
+														(streaming || loading) &&
+														"pointer-events-none"
 													}`}
 													value={message.content}
 													disabled={true}
@@ -535,9 +533,7 @@ const App = () => {
 
 						<div className="sticky mt-auto bottom-0 left-0 right-0 bg-white flex items-center p-5 border-t border-t-gray-200">
 							{error ? (
-								<div className="text-sm text-red-600 md:block hidden">
-									{error}
-								</div>
+								<div className="text-sm text-red-600 md:block hidden">{error}</div>
 							) : (
 								<div className="text-sm text-gray-400 md:block hidden">
 									Send messages and generate a response (⌘/Ctrl + Enter)

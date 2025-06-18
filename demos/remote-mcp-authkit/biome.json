@@ -1,10 +1,15 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.6.2/schema.json",
-	"organizeImports": {
-		"enabled": true
+	"$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
+	"assist": {
+		"enabled": true,
+		"actions": {
+			"source": {
+				"useSortedKeys": "on"
+			}
+		}
 	},
 	"files": {
-		"ignore": ["worker-configuration.d.ts", "types/workerd.d.ts"]
+		"includes": ["!worker-configuration.d.ts", "!types/workerd.d.ts"]
 	},
 	"vcs": {
 		"enabled": true,
@@ -18,7 +23,6 @@
 			"suspicious": {
 				"noExplicitAny": "off",
 				"noDebugger": "off",
-				"noConsoleLog": "off",
 				"noConfusingVoidType": "off"
 			},
 			"style": {

@@ -11,19 +11,19 @@
   },
   "dependencies": {
     "@cloudflare/workers-oauth-provider": "^0.0.5",
-    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@modelcontextprotocol/sdk": "^1.12.3",
     "agents": "^0.0.95",
-    "hono": "^4.7.11",
+    "hono": "^4.8.0",
     "jose": "^6.0.11",
     "just-pick": "^4.2.0",
-    "oauth4webapi": "^3.5.2",
+    "oauth4webapi": "^3.5.3",
     "workers-mcp": "^0.0.13",
-    "zod": "^3.25.61"
+    "zod": "^3.25.67"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250610.0",
+    "@cloudflare/workers-types": "^4.20250618.0",
     "prettier": "^3.5.3",
     "typescript": "^5.8.3",
-    "wrangler": "^4.19.1"
+    "wrangler": "^4.20.1"
   }
 }

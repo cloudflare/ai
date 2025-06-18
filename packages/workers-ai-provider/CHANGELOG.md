@@ -1,5 +1,17 @@
 # workers-ai-provider
 
+## 0.6.3
+
+### Patch Changes
+
+- [#206](https://github.com/cloudflare/ai/pull/206) [`f7aa30d`](https://github.com/cloudflare/ai/commit/f7aa30d9ee61fdc0330ea62c206a7ff3a3f64401) Thanks [@threepointone](https://github.com/threepointone)! - update dependencies
+
+## 0.6.2
+
+### Patch Changes
+
+- [#197](https://github.com/cloudflare/ai/pull/197) [`6506faa`](https://github.com/cloudflare/ai/commit/6506faacd50f066e86f6cd9c0eae297afc523bca) Thanks [@JoaquinGimenez1](https://github.com/JoaquinGimenez1)! - Add rawResponse from Workers AI
+
 ## 0.6.1
 
 ### Patch Changes

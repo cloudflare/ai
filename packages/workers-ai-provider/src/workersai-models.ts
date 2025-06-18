@@ -4,7 +4,7 @@
 export type TextGenerationModels = Exclude<
 	value2key<AiModels, BaseAiTextGeneration>,
 	value2key<AiModels, BaseAiTextToImage>
->;
+>; // This needs to be fixed to allow more models
 
 /*
  * The names of the BaseAiTextToImage models.

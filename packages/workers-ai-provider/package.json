@@ -2,7 +2,7 @@
 	"name": "workers-ai-provider",
 	"description": "Workers AI Provider for the vercel AI SDK",
 	"type": "module",
-	"version": "0.6.1",
+	"version": "0.6.3",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"repository": {
@@ -43,7 +43,7 @@
 		"@ai-sdk/provider-utils": "^2.2.8"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20250610.0",
-		"zod": "^3.25.61"
+		"@cloudflare/workers-types": "^4.20250618.0",
+		"zod": "^3.25.67"
 	}
 }

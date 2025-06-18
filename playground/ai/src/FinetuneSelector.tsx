@@ -37,10 +37,7 @@ const FinetuneSelector = ({
 	return (
 		<div className="relative">
 			{/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
-			<label
-				{...getLabelProps()}
-				className="font-semibold text-sm block mb-1 md:block"
-			>
+			<label {...getLabelProps()} className="font-semibold text-sm block mb-1 md:block">
 				Finetune
 			</label>
 			<div
@@ -54,9 +51,7 @@ const FinetuneSelector = ({
 			</div>
 
 			{selectedItem && (
-				<span className="mt-2 block text-gray-400 text-sm">
-					{selectedItem.description}
-				</span>
+				<span className="mt-2 block text-gray-400 text-sm">{selectedItem.description}</span>
 			)}
 
 			<ul

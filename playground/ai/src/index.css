@@ -13,14 +13,7 @@ body,
 }
 
 .bg-ai-loop {
-	background-image: linear-gradient(
-		75deg,
-		#901475,
-		#ce2f55,
-		#ff6633,
-		#ce2f55,
-		#901475
-	);
+	background-image: linear-gradient(75deg, #901475, #ce2f55, #ff6633, #ce2f55, #901475);
 }
 
 button {

@@ -14,8 +14,7 @@ function McpConnection({
 	onConnectionUpdate: (data: ConnectionData) => void;
 }) {
 	// Build custom headers object
-	const customHeaders =
-		headerKey && bearerToken ? { [headerKey]: `Bearer ${bearerToken}` } : {};
+	const customHeaders = headerKey && bearerToken ? { [headerKey]: `Bearer ${bearerToken}` } : {};
 
 	// Use the MCP hook with the server URL
 	const connection = useMcp({
@@ -58,8 +57,7 @@ export function McpServers({
 		retry: () => {},
 		disconnect: () => {},
 		authenticate: () => Promise.resolve(undefined),
-		callTool: (name: string, args?: Record<string, unknown>) =>
-			Promise.resolve(undefined),
+		callTool: (name: string, args?: Record<string, unknown>) => Promise.resolve(undefined),
 		clearStorage: () => {},
 	});
 	const logRef = useRef<HTMLDivElement>(null);
@@ -73,8 +71,7 @@ export function McpServers({
 	const [showToken, setShowToken] = useState<boolean>(false);
 
 	// Extract connection properties
-	const { state, tools, error, log, authUrl, retry, disconnect, authenticate } =
-		connectionData;
+	const { state, tools, error, log, authUrl, retry, disconnect, authenticate } = connectionData;
 
 	// Notify parent component when tools change
 	useEffect(() => {
@@ -107,8 +104,7 @@ export function McpServers({
 			retry: () => {},
 			disconnect: () => {},
 			authenticate: () => Promise.resolve(undefined),
-			callTool: (name: string, args?: Record<string, unknown>) =>
-				Promise.resolve(undefined),
+			callTool: (name: string, args?: Record<string, unknown>) => Promise.resolve(undefined),
 			clearStorage: () => {},
 		});
 	};
@@ -136,9 +132,7 @@ export function McpServers({
 		switch (state) {
 			case "discovering":
 				return (
-					<span className={`${baseClasses} bg-blue-100 text-blue-800`}>
-						Discovering
-					</span>
+					<span className={`${baseClasses} bg-blue-100 text-blue-800`}>Discovering</span>
 				);
 			case "authenticating":
 				return (
@@ -154,22 +148,14 @@ export function McpServers({
 				);
 			case "loading":
 				return (
-					<span className={`${baseClasses} bg-orange-100 text-orange-800`}>
-						Loading
-					</span>
+					<span className={`${baseClasses} bg-orange-100 text-orange-800`}>Loading</span>
 				);
 			case "ready":
 				return (
-					<span className={`${baseClasses} bg-green-100 text-green-800`}>
-						Connected
-					</span>
+					<span className={`${baseClasses} bg-green-100 text-green-800`}>Connected</span>
 				);
 			case "failed":
-				return (
-					<span className={`${baseClasses} bg-red-100 text-red-800`}>
-						Failed
-					</span>
-				);
+				return <span className={`${baseClasses} bg-red-100 text-red-800`}>Failed</span>;
 
 			/* biome-ignore lint/complexity/noUselessSwitchCase: eh */
 			case "not-connected":

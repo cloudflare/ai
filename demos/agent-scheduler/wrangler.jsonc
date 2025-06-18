@@ -1,26 +1,27 @@
 {
-	"$schema": "../../node_modules/wrangler/config-schema.json",
-	"name": "agent-task-manager-scheduled",
-	"main": "src/index.ts",
-	"compatibility_date": "2025-02-24",
-	"observability": {
-		"enabled": true
-	},
-	"ai": {
-		"binding": "AI"
-	},
-	"durable_objects": {
-		"bindings": [
-			{
-				"name": "SCHEDULER_AGENT",
-				"class_name": "SchedulerAgent"
-			}
-		]
-	},
-	"migrations": [
-		{
-			"tag": "v1",
-			"new_sqlite_classes": ["SchedulerAgent"]
-		}
-	]
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "agent-task-manager-scheduled",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-02-24",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true
+  },
+  "ai": {
+    "binding": "AI"
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "SCHEDULER_AGENT",
+        "class_name": "SchedulerAgent"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["SchedulerAgent"]
+    }
+  ]
 }

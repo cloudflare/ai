@@ -18,6 +18,7 @@ const workersai = createWorkersAI({
 console.log("Generating structured output for a sourdough recipe...");
 
 const { object } = await generateObject({
+	// @ts-expect-error - this is a valid model, we need to fix this
 	model: workersai("@cf/meta/llama-3.3-70b-instruct-fp8-fast"),
 	schema: z.object({
 		recipe: z.object({
