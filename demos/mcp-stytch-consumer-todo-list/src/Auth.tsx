@@ -96,7 +96,7 @@ export function Authenticate() {
 		client.oauth.authenticate(token, { session_duration_minutes: 60 }).then(onLoginComplete);
 	}, [client]);
 
-	return <>Loading...</>;
+	return "Loading...";
 }
 
 export const Logout = () => {

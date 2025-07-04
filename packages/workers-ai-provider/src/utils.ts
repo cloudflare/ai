@@ -269,3 +269,19 @@ export function processPartialToolCalls(partialToolCalls: any[]) {
 	const mergedToolCalls = mergePartialToolCalls(partialToolCalls);
 	return processToolCalls({ tool_calls: mergedToolCalls });
 }
+
+export function processText(output: AiTextGenerationOutput): string | undefined {
+	// @ts-expect-error OpenAI format not typed yet
+	if (output?.choices?.[0]?.message?.content.length) {
+		// @ts-expect-error OpenAI format not typed yet
+		return output?.choices?.[0]?.message?.content;
+	}
+
+	if ("response" in output) {
+		if (typeof output.response === "object" && output.response !== null) {
+			return JSON.stringify(output.response); // ai-sdk expects a string here
+		}
+
+		return output.response;
+	}
+}

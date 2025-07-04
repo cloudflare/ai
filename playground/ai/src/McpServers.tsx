@@ -46,7 +46,7 @@ export function McpServers({ onToolsUpdate }: { onToolsUpdate?: (tools: any[]) =
 	const [serverUrl, setServerUrl] = useState(() => {
 		return sessionStorage.getItem("mcpServerUrl") || "";
 	});
-	const [transportType, setTransportType] = useState<"auto" | "http" | "sse">(() => {
+	const [transportType, _setTransportType] = useState<"auto" | "http" | "sse">(() => {
 		return (sessionStorage.getItem("mcpTransportType") as "auto" | "http" | "sse") || "auto";
 	});
 	const [isActive, setIsActive] = useState(false);

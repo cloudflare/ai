@@ -303,7 +303,7 @@ describe("REST API - Streaming Text Tests", () => {
 							id: "chatcmpl-2d657a54f93d4ecbb966cc50efd42819",
 							object: "chat.completion",
 							created: 1750346826,
-							model: "@cf/qwen/qwen3-30b-a3b-fp8",
+							model: TEST_MODEL,
 							choices: [
 								{
 									index: 0,
@@ -379,6 +379,67 @@ describe("REST API - Streaming Text Tests", () => {
 				type: "tool-call",
 			},
 		]);
+	});
+
+	it("should handle content and reasoning_content fields if present", async () => {
+		server.use(
+			http.post(
+				`https://api.cloudflare.com/client/v4/accounts/${TEST_ACCOUNT_ID}/ai/run/${TEST_MODEL}`,
+				async () => {
+					return new Response(
+						[
+							`data: {"id":"chatcmpl-edc8406714f74cca9cff55f929272d9a","object":"chat.completion.chunk","created":1751570976,"model":"${TEST_MODEL}","choices":[{"index":0,"delta":{"role":"assistant","content":""},"logprobs":null,"finish_reason":null}],"usage":{"prompt_tokens":13,"total_tokens":13,"completion_tokens":0}}\n\n`,
+							`data: {"id":"chatcmpl-edc8406714f74cca9cff55f929272d9a","object":"chat.completion.chunk","created":1751570976,"model":"${TEST_MODEL}","choices":[{"index":0,"delta":{"reasoning_content":"Okay"},"logprobs":null,"finish_reason":null}],"usage":{"prompt_tokens":13,"total_tokens":16,"completion_tokens":3}}\n\n`,
+							`data: {"id":"chatcmpl-edc8406714f74cca9cff55f929272d9a","object":"chat.completion.chunk","created":1751570976,"model":"${TEST_MODEL}","choices":[{"index":0,"delta":{"reasoning_content":","},"logprobs":null,"finish_reason":null}],"usage":{"prompt_tokens":13,"total_tokens":17,"completion_tokens":4}}\n\n`,
+							`data: {"id":"chatcmpl-edc8406714f74cca9cff55f929272d9a","object":"chat.completion.chunk","created":1751570976,"model":"${TEST_MODEL}","choices":[{"index":0,"delta":{"reasoning_content":" the"},"logprobs":null,"finish_reason":null}],"usage":{"prompt_tokens":13,"total_tokens":18,"completion_tokens":5}}\n\n`,
+							`data: {"id":"chatcmpl-edc8406714f74cca9cff55f929272d9a","object":"chat.completion.chunk","created":1751570976,"model":"${TEST_MODEL}","choices":[{"index":0,"delta":{"reasoning_content":" user is asking"},"logprobs":null,"finish_reason":null}],"usage":{"prompt_tokens":13,"total_tokens":19,"completion_tokens":6}}\n\n`,
+							`data: {"id":"chatcmpl-7047b0aace8d4e5888c1a01a0673f3ff","object":"chat.completion.chunk","created":1751571006,"model":"${TEST_MODEL}","choices":[{"index":0,"delta":{"content":"A"},"logprobs":null,"finish_reason":null}],"usage":{"prompt_tokens":13,"total_tokens":461,"completion_tokens":448}}\n\n`,
+							`data: {"id":"chatcmpl-7047b0aace8d4e5888c1a01a0673f3ff","object":"chat.completion.chunk","created":1751571006,"model":"${TEST_MODEL}","choices":[{"index":0,"delta":{"content":" **"},"logprobs":null,"finish_reason":null}],"usage":{"prompt_tokens":13,"total_tokens":462,"completion_tokens":449}}\n\n`,
+							`data: {"id":"chatcmpl-7047b0aace8d4e5888c1a01a0673f3ff","object":"chat.completion.chunk","created":1751571006,"model":"${TEST_MODEL}","choices":[{"index":0,"delta":{"content":"cow is cool"},"logprobs":null,"finish_reason":null}],"usage":{"prompt_tokens":13,"total_tokens":463,"completion_tokens":450}}\n\n`,
+							`data: {"id":"chatcmpl-7047b0aace8d4e5888c1a01a0673f3ff","object":"chat.completion.chunk","created":1751571006,"model":"${TEST_MODEL}","choices":[],"usage":{"prompt_tokens":13,"total_tokens":1035,"completion_tokens":1022}}\n\n`,
+							"[DONE]\n\n",
+						].join(""),
+						{
+							headers: {
+								"Content-Type": "text/event-stream",
+								"Transfer-Encoding": "chunked",
+							},
+							status: 200,
+						},
+					);
+				},
+			),
+		);
+
+		const workersai = createWorkersAI({
+			accountId: TEST_ACCOUNT_ID,
+			apiKey: TEST_API_KEY,
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			messages: [
+				{
+					role: "user",
+					content: "what is a cow?",
+				},
+			],
+		});
+
+		let reasoning = "";
+		let content = "";
+
+		for await (const chunk of result.fullStream) {
+			if (chunk.type === "reasoning") {
+				reasoning += chunk.textDelta;
+			}
+			if (chunk.type === "text-delta") {
+				content += chunk.textDelta;
+			}
+		}
+
+		expect(reasoning).toEqual("Okay, the user is asking");
+		expect(content).toEqual("A **cow is cool");
 	});
 });
 
@@ -598,7 +659,7 @@ describe("Binding - Streaming Text Tests", () => {
 						id: "chatcmpl-2d657a54f93d4ecbb966cc50efd42819",
 						object: "chat.completion",
 						created: 1750346826,
-						model: "@cf/qwen/qwen3-30b-a3b-fp8",
+						model: TEST_MODEL,
 						choices: [
 							{
 								index: 0,
@@ -698,6 +759,277 @@ describe("Binding - Streaming Text Tests", () => {
 			toolName: "get_temperature",
 			type: "tool-call",
 		});
+	});
+
+	it("should handle content and reasoning_content fields if present", async () => {
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () => {
+					return mockStream([
+						{
+							id: "chatcmpl-66bc193872fa4979a778bbbdee8c22f9",
+							object: "chat.completion.chunk",
+							created: 1751559514,
+							model: TEST_MODEL,
+							choices: [
+								{
+									index: 0,
+									delta: { reasoning_content: "Okay" },
+									logprobs: null,
+									finish_reason: null,
+								},
+							],
+							usage: {
+								prompt_tokens: 13,
+								total_tokens: 16,
+								completion_tokens: 3,
+							},
+						},
+
+						{
+							id: "chatcmpl-66bc193872fa4979a778bbbdee8c22f9",
+							object: "chat.completion.chunk",
+							created: 1751559514,
+							model: TEST_MODEL,
+							choices: [
+								{
+									index: 0,
+									delta: { reasoning_content: "," },
+									logprobs: null,
+									finish_reason: null,
+								},
+							],
+							usage: {
+								prompt_tokens: 13,
+								total_tokens: 17,
+								completion_tokens: 4,
+							},
+						},
+
+						{
+							id: "chatcmpl-66bc193872fa4979a778bbbdee8c22f9",
+							object: "chat.completion.chunk",
+							created: 1751559514,
+							model: TEST_MODEL,
+							choices: [
+								{
+									index: 0,
+									delta: { reasoning_content: " the" },
+									logprobs: null,
+									finish_reason: null,
+								},
+							],
+							usage: {
+								prompt_tokens: 13,
+								total_tokens: 18,
+								completion_tokens: 5,
+							},
+						},
+
+						{
+							id: "chatcmpl-66bc193872fa4979a778bbbdee8c22f9",
+							object: "chat.completion.chunk",
+							created: 1751559514,
+							model: TEST_MODEL,
+							choices: [
+								{
+									index: 0,
+									delta: { reasoning_content: " user" },
+									logprobs: null,
+									finish_reason: null,
+								},
+							],
+							usage: {
+								prompt_tokens: 13,
+								total_tokens: 19,
+								completion_tokens: 6,
+							},
+						},
+
+						{
+							id: "chatcmpl-66bc193872fa4979a778bbbdee8c22f9",
+							object: "chat.completion.chunk",
+							created: 1751559514,
+							model: TEST_MODEL,
+							choices: [
+								{
+									index: 0,
+									delta: { reasoning_content: " is asking" },
+									logprobs: null,
+									finish_reason: null,
+								},
+							],
+							usage: {
+								prompt_tokens: 13,
+								total_tokens: 20,
+								completion_tokens: 7,
+							},
+						},
+
+						{
+							id: "chatcmpl-66bc193872fa4979a778bbbdee8c22f9",
+							object: "chat.completion.chunk",
+							created: 1751559514,
+							model: TEST_MODEL,
+							choices: [
+								{
+									index: 0,
+									delta: { content: "\n\n" },
+									logprobs: null,
+									finish_reason: null,
+								},
+							],
+							usage: {
+								prompt_tokens: 13,
+								total_tokens: 557,
+								completion_tokens: 544,
+							},
+						},
+
+						{
+							id: "chatcmpl-66bc193872fa4979a778bbbdee8c22f9",
+							object: "chat.completion.chunk",
+							created: 1751559514,
+							model: TEST_MODEL,
+							choices: [
+								{
+									index: 0,
+									delta: { content: "A" },
+									logprobs: null,
+									finish_reason: null,
+								},
+							],
+							usage: {
+								prompt_tokens: 13,
+								total_tokens: 558,
+								completion_tokens: 545,
+							},
+						},
+
+						{
+							id: "chatcmpl-66bc193872fa4979a778bbbdee8c22f9",
+							object: "chat.completion.chunk",
+							created: 1751559514,
+							model: TEST_MODEL,
+							choices: [
+								{
+									index: 0,
+									delta: { content: " cow" },
+									logprobs: null,
+									finish_reason: null,
+								},
+							],
+							usage: {
+								prompt_tokens: 13,
+								total_tokens: 559,
+								completion_tokens: 546,
+							},
+						},
+
+						{
+							id: "chatcmpl-66bc193872fa4979a778bbbdee8c22f9",
+							object: "chat.completion.chunk",
+							created: 1751559514,
+							model: TEST_MODEL,
+							choices: [
+								{
+									index: 0,
+									delta: { content: " is cool" },
+									logprobs: null,
+									finish_reason: null,
+								},
+							],
+							usage: {
+								prompt_tokens: 13,
+								total_tokens: 1224,
+								completion_tokens: 1211,
+							},
+						},
+
+						{
+							id: "chatcmpl-66bc193872fa4979a778bbbdee8c22f9",
+							object: "chat.completion.chunk",
+							created: 1751559514,
+							model: TEST_MODEL,
+							choices: [
+								{
+									index: 0,
+									delta: { content: "." },
+									logprobs: null,
+									finish_reason: null,
+								},
+							],
+							usage: {
+								prompt_tokens: 13,
+								total_tokens: 1225,
+								completion_tokens: 1212,
+							},
+						},
+
+						{
+							id: "chatcmpl-66bc193872fa4979a778bbbdee8c22f9",
+							object: "chat.completion.chunk",
+							created: 1751559514,
+							model: TEST_MODEL,
+							choices: [
+								{
+									index: 0,
+									delta: { content: "" },
+									logprobs: null,
+									finish_reason: "stop",
+									stop_reason: null,
+								},
+							],
+							usage: {
+								prompt_tokens: 13,
+								total_tokens: 1226,
+								completion_tokens: 1213,
+							},
+						},
+
+						{
+							id: "chatcmpl-66bc193872fa4979a778bbbdee8c22f9",
+							object: "chat.completion.chunk",
+							created: 1751559514,
+							model: TEST_MODEL,
+							choices: [],
+							usage: {
+								prompt_tokens: 13,
+								total_tokens: 1226,
+								completion_tokens: 1213,
+							},
+						},
+
+						"[DONE]",
+					]);
+				},
+			},
+		});
+
+		const result = await streamText({
+			model: workersai(TEST_MODEL),
+			messages: [
+				{
+					role: "user",
+					content: "what is a cow?",
+				},
+			],
+		});
+
+		let reasoning = "";
+		let content = "";
+
+		for await (const chunk of result.fullStream) {
+			if (chunk.type === "reasoning") {
+				reasoning += chunk.textDelta;
+			}
+			if (chunk.type === "text-delta") {
+				content += chunk.textDelta;
+			}
+		}
+
+		expect(reasoning).toEqual("Okay, the user is asking");
+		expect(content).toEqual("\n\nA cow is cool.");
 	});
 });
 

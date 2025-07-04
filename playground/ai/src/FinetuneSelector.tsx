@@ -37,7 +37,10 @@ const FinetuneSelector = ({
 	return (
 		<div className="relative">
 			{/* biome-ignore lint/a11y/noLabelWithoutControl: it's fine */}
-			<label {...getLabelProps()} className="font-semibold text-sm block mb-1 md:block">
+			<label
+				{...getLabelProps()}
+				className="font-semibold text-sm block mb-1 md:block"
+			>
 				Finetune
 			</label>
 			<div
@@ -47,12 +50,13 @@ const FinetuneSelector = ({
 				<div className="w-full whitespace-nowrap items-center flex">
 					{selectedItem ? selectedItem.name : "None"}
 				</div>
-				{/** biome-ignore lint/complexity/noUselessFragments: it's fine */}
 				<span className="px-2">{isOpen ? <>&#8593;</> : <>&#8595;</>}</span>
 			</div>
 
 			{selectedItem && (
-				<span className="mt-2 block text-gray-400 text-sm">{selectedItem.description}</span>
+				<span className="mt-2 block text-gray-400 text-sm">
+					{selectedItem.description}
+				</span>
 			)}
 
 			<ul

@@ -8,7 +8,12 @@ import { convertToWorkersAIChatMessages } from "./convert-to-workersai-chat-mess
 import { mapWorkersAIFinishReason } from "./map-workersai-finish-reason";
 import { mapWorkersAIUsage } from "./map-workersai-usage";
 import { getMappedStream } from "./streaming";
-import { lastMessageWasUser, prepareToolsAndToolChoice, processToolCalls } from "./utils";
+import {
+	lastMessageWasUser,
+	prepareToolsAndToolChoice,
+	processText,
+	processToolCalls,
+} from "./utils";
 import type { WorkersAIChatSettings } from "./workersai-chat-settings";
 import type { TextGenerationModels } from "./workersai-models";
 
@@ -172,10 +177,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 			finishReason: mapWorkersAIFinishReason(output),
 			rawCall: { rawPrompt: messages, rawSettings: args },
 			rawResponse: { body: output },
-			text:
-				typeof output.response === "object" && output.response !== null
-					? JSON.stringify(output.response) // ai-sdk expects a string here
-					: output.response,
+			text: processText(output),
 			toolCalls: processToolCalls(output),
 			// @ts-ignore: Missing types
 			reasoning: output?.choices?.[0]?.message?.reasoning_content,

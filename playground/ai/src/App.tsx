@@ -204,7 +204,6 @@ const App = () => {
 											fill="url(#paint2_linear_1012_8647)"
 										/>
 										<defs>
-											{/** biome-ignore lint/nursery/useUniqueElementIds: it's fine */}
 											<linearGradient
 												id="paint0_linear_1012_8647"
 												x1="5.37109"
@@ -217,7 +216,6 @@ const App = () => {
 												<stop offset="0.505208" stopColor="#CE2F55" />
 												<stop offset="1" stopColor="#FF6633" />
 											</linearGradient>
-											{/** biome-ignore lint/nursery/useUniqueElementIds: it's fine */}
 											<linearGradient
 												id="paint1_linear_1012_8647"
 												x1="0.325684"
@@ -230,7 +228,6 @@ const App = () => {
 												<stop offset="0.505208" stopColor="#CE2F55" />
 												<stop offset="1" stopColor="#FF6633" />
 											</linearGradient>
-											{/** biome-ignore lint/nursery/useUniqueElementIds: it's fine */}
 											<linearGradient
 												id="paint2_linear_1012_8647"
 												x1="-5.51246e-08"

@@ -225,7 +225,6 @@ const ModelSelector = ({
 				/>
 				{inputValue || !selectedItem ? <span /> : <ModelRow model={selectedItem} />}
 				<span className="px-2" {...getToggleButtonProps()}>
-					{/** biome-ignore lint/complexity/noUselessFragments: it's fine */}
 					{isOpen ? <>&#8593;</> : <>&#8595;</>}
 				</span>
 			</div>

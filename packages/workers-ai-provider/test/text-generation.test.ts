@@ -150,4 +150,54 @@ describe("Binding - Text Generation Tests", () => {
 		expect(capturedOptions).toHaveProperty("aBool", true);
 		expect(capturedOptions).toHaveProperty("aNumber", 1);
 	});
+
+	it("should handle content and reasoning_content", async () => {
+		const workersai = createWorkersAI({
+			binding: {
+				run: async (_modelName: string, _inputs: any, _options?: any) => {
+					return {
+						id: "chatcmpl-ef1d02dcbb6e4cf89f0dddaf2e2ff0a6",
+						object: "chat.completion",
+						created: 1751560708,
+						model: TEST_MODEL,
+						choices: [
+							{
+								index: 0,
+								message: {
+									role: "assistant",
+									reasoning_content: "Okay, the user is asking",
+									content: "A **cow** is a domesticated, herbivorous mammal",
+									tool_calls: [],
+								},
+								logprobs: null,
+								finish_reason: "stop",
+								stop_reason: null,
+							},
+						],
+						usage: {
+							prompt_tokens: 1,
+							completion_tokens: 2,
+							total_tokens: 3,
+						},
+						prompt_logprobs: null,
+					};
+				},
+			},
+		});
+
+		const model = workersai(TEST_MODEL);
+
+		const result = await generateText({
+			model: model,
+			messages: [
+				{
+					role: "user",
+					content: "what is a cow?",
+				},
+			],
+		});
+
+		expect(result.reasoning).toBe("Okay, the user is asking");
+		expect(result.text).toBe("A **cow** is a domesticated, herbivorous mammal");
+	});
 });
