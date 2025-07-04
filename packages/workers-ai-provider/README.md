@@ -78,6 +78,36 @@ const text = await streamText({
 });
 ```
 
+### Using generateText for Non-Streaming Responses
+
+If you prefer to get a complete text response rather than a stream, you can use the `generateText` function:
+
+```ts
+import { createWorkersAI } from "workers-ai-provider";
+import { generateText } from "ai";
+
+type Env = {
+  AI: Ai;
+};
+
+export default {
+  async fetch(req: Request, env: Env) {
+    const workersai = createWorkersAI({ binding: env.AI });
+    
+    const { text } = await generateText({
+      model: workersai("@cf/meta/llama-3.3-70b-instruct-fp8-fast"),
+      prompt: "Write a short poem about clouds",
+    });
+
+    return new Response(JSON.stringify({ generatedText: text }), {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  },
+};
+```
+
 ### Using AutoRAG
 
 The provider now supports [Cloudflare's AutoRAG](https://developers.cloudflare.com/autorag/), allowing you to prompt your AutoRAG models directly from the Vercel AI SDK. Here's how to use it in your Worker:
