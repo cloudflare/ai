@@ -1,4 +1,4 @@
-import type { LanguageModelV1 } from "@ai-sdk/provider";
+import type { LanguageModelV2 } from "@ai-sdk/provider";
 import type { FetchFunction } from "@ai-sdk/provider-utils";
 import { providers } from "./providers";
 
@@ -13,13 +13,17 @@ async function streamToObject(stream: ReadableStream) {
 	return await response.json();
 }
 
-type InternalLanguageModelV1 = LanguageModelV1 & { config?: { fetch?: FetchFunction | undefined } };
+type InternalLanguageModelV2 = LanguageModelV2 & { config?: { fetch?: FetchFunction | undefined } };
 
-export class AiGatewayChatLanguageModel implements LanguageModelV1 {
-	readonly specificationVersion = "v1";
+export class AiGatewayChatLanguageModel implements LanguageModelV2 {
+	readonly specificationVersion = "v2";
 	readonly defaultObjectGenerationMode = "json";
 
-	readonly models: InternalLanguageModelV1[];
+	readonly supportedUrls: Record<string, RegExp[]> | PromiseLike<Record<string, RegExp[]>> = {
+		// No URLS are supported for this language model
+	};
+
+	readonly models: InternalLanguageModelV2[];
 	readonly config: AiGatewaySettings;
 
 	get modelId(): string {
@@ -38,13 +42,13 @@ export class AiGatewayChatLanguageModel implements LanguageModelV1 {
 		return this.models[0].provider;
 	}
 
-	constructor(models: LanguageModelV1[], config: AiGatewaySettings) {
+	constructor(models: LanguageModelV2[], config: AiGatewaySettings) {
 		this.models = models;
 		this.config = config;
 	}
 
 	async processModelRequest<
-		T extends LanguageModelV1["doStream"] | LanguageModelV1["doGenerate"],
+		T extends LanguageModelV2["doStream"] | LanguageModelV2["doGenerate"],
 	>(
 		options: Parameters<T>[0],
 		modelMethod: "doStream" | "doGenerate",
@@ -175,22 +179,22 @@ export class AiGatewayChatLanguageModel implements LanguageModelV1 {
 	}
 
 	async doStream(
-		options: Parameters<LanguageModelV1["doStream"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV1["doStream"]>>> {
-		return this.processModelRequest<LanguageModelV1["doStream"]>(options, "doStream");
+		options: Parameters<LanguageModelV2["doStream"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV2["doStream"]>>> {
+		return this.processModelRequest<LanguageModelV2["doStream"]>(options, "doStream");
 	}
 
 	async doGenerate(
-		options: Parameters<LanguageModelV1["doGenerate"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV1["doGenerate"]>>> {
-		return this.processModelRequest<LanguageModelV1["doGenerate"]>(options, "doGenerate");
+		options: Parameters<LanguageModelV2["doGenerate"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV2["doGenerate"]>>> {
+		return this.processModelRequest<LanguageModelV2["doGenerate"]>(options, "doGenerate");
 	}
 }
 
 export interface AiGateway {
-	(models: LanguageModelV1 | LanguageModelV1[]): LanguageModelV1;
+	(models: LanguageModelV2 | LanguageModelV2[]): LanguageModelV2;
 
-	chat(models: LanguageModelV1 | LanguageModelV1[]): LanguageModelV1;
+	chat(models: LanguageModelV2 | LanguageModelV2[]): LanguageModelV2;
 }
 
 export type AiGatewayReties = {
@@ -223,11 +227,11 @@ export type AiGatewayBindingSettings = {
 export type AiGatewaySettings = AiGatewayAPISettings | AiGatewayBindingSettings;
 
 export function createAiGateway(options: AiGatewaySettings): AiGateway {
-	const createChatModel = (models: LanguageModelV1 | LanguageModelV1[]) => {
+	const createChatModel = (models: LanguageModelV2 | LanguageModelV2[]) => {
 		return new AiGatewayChatLanguageModel(Array.isArray(models) ? models : [models], options);
 	};
 
-	const provider = (models: LanguageModelV1 | LanguageModelV1[]) => createChatModel(models);
+	const provider = (models: LanguageModelV2 | LanguageModelV2[]) => createChatModel(models);
 
 	provider.chat = createChatModel;
 
