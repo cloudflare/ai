@@ -182,7 +182,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV2 {
 	async doStream(
 		options: Parameters<LanguageModelV2["doStream"]>[0],
 	): Promise<Awaited<ReturnType<LanguageModelV2["doStream"]>>> {
-		const { args } = this.getArgs(options);
+		const { args, warnings } = this.getArgs(options);
 
 		// Extract image from messages if present
 		const { messages, images } = convertToWorkersAIChatMessages(options.prompt);
@@ -201,6 +201,12 @@ export class WorkersAIChatLanguageModel implements LanguageModelV2 {
 				// rawCall: { rawPrompt: messages, rawSettings: args },
 				stream: new ReadableStream<LanguageModelV2StreamPart>({
 					async start(controller) {
+						// Emit the stream-start part with warnings
+						controller.enqueue({
+							type: "stream-start",
+							warnings: warnings as LanguageModelV2CallWarning[],
+						});
+
 						for (const contentPart of response.content) {
 							if (contentPart.type === "text") {
 								controller.enqueue({
@@ -263,11 +269,37 @@ export class WorkersAIChatLanguageModel implements LanguageModelV2 {
 			throw new Error("This shouldn't happen");
 		}
 
+		// Create a new stream that first emits the stream-start part with warnings,
+		// then pipes through the rest of the response stream
+		const stream = new ReadableStream<LanguageModelV2StreamPart>({
+			start(controller) {
+				// Emit the stream-start part with warnings
+				controller.enqueue({
+					type: "stream-start",
+					warnings: warnings as LanguageModelV2CallWarning[],
+				});
+
+				// Pipe the rest of the response stream
+				const reader = getMappedStream(new Response(response)).getReader();
+
+				function push() {
+					reader.read().then(({ done, value }) => {
+						if (done) {
+							controller.close();
+							return;
+						}
+						controller.enqueue(value);
+						push();
+					});
+				}
+				push();
+			},
+		});
+
 		return {
-			// TODO DHRAVYA: not sure about rawCalls and warnings inclusino
+			stream,
+			// TODO DHRAVYA: not sure about rawCalls
 			// rawCall: { rawPrompt: messages, rawSettings: args },
-			stream: getMappedStream(new Response(response)),
-			// warnings,
 		};
 	}
 }
