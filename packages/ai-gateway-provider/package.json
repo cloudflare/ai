@@ -1,6 +1,6 @@
 {
 	"name": "ai-gateway-provider",
-	"version": "0.0.11",
+	"version": "1.0.11",
 	"description": "AI Gateway Provider for AI-SDK",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
