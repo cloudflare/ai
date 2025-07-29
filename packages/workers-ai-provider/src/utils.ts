@@ -1,4 +1,4 @@
-import type { LanguageModelV1, LanguageModelV1FunctionToolCall } from "@ai-sdk/provider";
+import type { LanguageModelV2, LanguageModelV2ToolCall } from "@ai-sdk/provider";
 
 /**
  * General AI run interface with overloads to handle distinct return types.
@@ -127,29 +127,21 @@ export function createRun(config: CreateRunConfig): AiRun {
 }
 
 export function prepareToolsAndToolChoice(
-	mode: Parameters<LanguageModelV1["doGenerate"]>[0]["mode"] & {
-		type: "regular";
-	},
+	tools: Parameters<LanguageModelV2["doGenerate"]>[0]["tools"],
+	toolChoice: Parameters<LanguageModelV2["doGenerate"]>[0]["toolChoice"],
 ) {
-	// when the tools array is empty, change it to undefined to prevent errors:
-	const tools = mode.tools?.length ? mode.tools : undefined;
-
 	if (tools == null) {
 		return { tool_choice: undefined, tools: undefined };
 	}
 
 	const mappedTools = tools.map((tool) => ({
 		function: {
-			// @ts-expect-error - description is not a property of tool
-			description: tool.description,
+			description: tool.type === "function" && tool.description,
 			name: tool.name,
-			// @ts-expect-error - parameters is not a property of tool
-			parameters: tool.parameters,
+			inputSchema: tool.type === "function" && tool.inputSchema,
 		},
 		type: "function",
 	}));
-
-	const toolChoice = mode.toolChoice;
 
 	if (toolChoice == null) {
 		return { tool_choice: undefined, tools: mappedTools };
@@ -220,31 +212,31 @@ function mergePartialToolCalls(partialCalls: any[]) {
 	return Object.values(mergedCallsByIndex);
 }
 
-function processToolCall(toolCall: any): LanguageModelV1FunctionToolCall {
+function processToolCall(toolCall: any): LanguageModelV2ToolCall {
 	// Check for OpenAI format tool calls first
 	if (toolCall.function && toolCall.id) {
 		return {
-			args:
+			input:
 				typeof toolCall.function.arguments === "string"
 					? toolCall.function.arguments
 					: JSON.stringify(toolCall.function.arguments || {}),
 			toolCallId: toolCall.id,
-			toolCallType: "function",
+			type: "tool-call",
 			toolName: toolCall.function.name,
 		};
 	}
 	return {
-		args:
+		input:
 			typeof toolCall.arguments === "string"
 				? toolCall.arguments
 				: JSON.stringify(toolCall.arguments || {}),
 		toolCallId: toolCall.name,
-		toolCallType: "function",
+		type: "tool-call",
 		toolName: toolCall.name,
 	};
 }
 
-export function processToolCalls(output: any): LanguageModelV1FunctionToolCall[] {
+export function processToolCalls(output: any): LanguageModelV2ToolCall[] {
 	if (output.tool_calls && Array.isArray(output.tool_calls)) {
 		return output.tool_calls.map((toolCall: any) => {
 			const processedToolCall = processToolCall(toolCall);

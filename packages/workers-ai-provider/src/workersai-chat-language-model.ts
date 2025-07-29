@@ -1,8 +1,7 @@
-import {
-	type LanguageModelV1,
-	type LanguageModelV1CallWarning,
-	type LanguageModelV1StreamPart,
-	UnsupportedFunctionalityError,
+import type {
+	LanguageModelV2,
+	LanguageModelV2CallWarning,
+	LanguageModelV2StreamPart,
 } from "@ai-sdk/provider";
 import { convertToWorkersAIChatMessages } from "./convert-to-workersai-chat-messages";
 import { mapWorkersAIFinishReason } from "./map-workersai-finish-reason";
@@ -16,6 +15,7 @@ import {
 } from "./utils";
 import type { WorkersAIChatSettings } from "./workersai-chat-settings";
 import type { TextGenerationModels } from "./workersai-models";
+import { generateId } from "ai";
 
 type WorkersAIChatConfig = {
 	provider: string;
@@ -23,9 +23,13 @@ type WorkersAIChatConfig = {
 	gateway?: GatewayOptions;
 };
 
-export class WorkersAIChatLanguageModel implements LanguageModelV1 {
-	readonly specificationVersion = "v1";
+export class WorkersAIChatLanguageModel implements LanguageModelV2 {
+	readonly specificationVersion = "v2";
 	readonly defaultObjectGenerationMode = "json";
+
+	readonly supportedUrls: Record<string, RegExp[]> | PromiseLike<Record<string, RegExp[]>> = {
+		// Empty
+	};
 
 	readonly modelId: TextGenerationModels;
 	readonly settings: WorkersAIChatSettings;
@@ -47,17 +51,19 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 	}
 
 	private getArgs({
-		mode,
-		maxTokens,
+		responseFormat,
+		tools,
+		toolChoice,
+		maxOutputTokens,
 		temperature,
 		topP,
 		frequencyPenalty,
 		presencePenalty,
 		seed,
-	}: Parameters<LanguageModelV1["doGenerate"]>[0]) {
-		const type = mode.type;
+	}: Parameters<LanguageModelV2["doGenerate"]>[0]) {
+		const type = responseFormat?.type ?? "text";
 
-		const warnings: LanguageModelV1CallWarning[] = [];
+		const warnings: LanguageModelV2CallWarning[] = [];
 
 		if (frequencyPenalty != null) {
 			warnings.push({
@@ -75,7 +81,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 
 		const baseArgs = {
 			// standardized settings:
-			max_tokens: maxTokens,
+			max_tokens: maxOutputTokens,
 			// model id:
 			model: this.modelId,
 			random_seed: seed,
@@ -87,44 +93,25 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 		};
 
 		switch (type) {
-			case "regular": {
+			case "text": {
 				return {
-					args: { ...baseArgs, ...prepareToolsAndToolChoice(mode) },
+					args: { ...baseArgs, ...prepareToolsAndToolChoice(tools, toolChoice) },
 					warnings,
 				};
 			}
 
-			case "object-json": {
+			case "json": {
 				return {
 					args: {
 						...baseArgs,
 						response_format: {
-							json_schema: mode.schema,
+							json_schema: responseFormat?.type === "json" && responseFormat.schema,
 							type: "json_schema",
 						},
 						tools: undefined,
 					},
 					warnings,
 				};
-			}
-
-			case "object-tool": {
-				return {
-					args: {
-						...baseArgs,
-						tool_choice: "any",
-						tools: [{ function: mode.tool, type: "function" }],
-					},
-					warnings,
-				};
-			}
-
-			// @ts-expect-error - this is unreachable code
-			// TODO: fixme
-			case "object-grammar": {
-				throw new UnsupportedFunctionalityError({
-					functionality: "object-grammar mode",
-				});
 			}
 
 			default: {
@@ -135,8 +122,8 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 	}
 
 	async doGenerate(
-		options: Parameters<LanguageModelV1["doGenerate"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV1["doGenerate"]>>> {
+		options: Parameters<LanguageModelV2["doGenerate"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV2["doGenerate"]>>> {
 		const { args, warnings } = this.getArgs(options);
 
 		// biome-ignore lint/correctness/noUnusedVariables: this needs to be destructured
@@ -175,21 +162,27 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 
 		return {
 			finishReason: mapWorkersAIFinishReason(output),
-			rawCall: { rawPrompt: messages, rawSettings: args },
-			rawResponse: { body: output },
-			text: processText(output),
-			toolCalls: processToolCalls(output),
+			// TODO DHRAVYA: rawCall and rawResponse- not sure
+			// rawCall: { rawPrompt: messages, rawSettings: args },
+			// rawResponse: { body: output },
+			content: [
+				{
+					type: "text",
+					text: processText(output) ?? "",
+				},
+				...processToolCalls(output),
+			],
 			// @ts-ignore: Missing types
-			reasoning: output?.choices?.[0]?.message?.reasoning_content,
+			reasoningText: output?.choices?.[0]?.message?.reasoning_content,
 			usage: mapWorkersAIUsage(output),
 			warnings,
 		};
 	}
 
 	async doStream(
-		options: Parameters<LanguageModelV1["doStream"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV1["doStream"]>>> {
-		const { args, warnings } = this.getArgs(options);
+		options: Parameters<LanguageModelV2["doStream"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV2["doStream"]>>> {
+		const { args } = this.getArgs(options);
 
 		// Extract image from messages if present
 		const { messages, images } = convertToWorkersAIChatMessages(options.prompt);
@@ -205,28 +198,27 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 			}
 
 			return {
-				rawCall: { rawPrompt: messages, rawSettings: args },
-				stream: new ReadableStream<LanguageModelV1StreamPart>({
+				// rawCall: { rawPrompt: messages, rawSettings: args },
+				stream: new ReadableStream<LanguageModelV2StreamPart>({
 					async start(controller) {
-						if (response.text) {
-							controller.enqueue({
-								textDelta: response.text,
-								type: "text-delta",
-							});
-						}
-						if (response.toolCalls) {
-							for (const toolCall of response.toolCalls) {
+						for (const contentPart of response.content) {
+							if (contentPart.type === "text") {
 								controller.enqueue({
-									type: "tool-call",
-									...toolCall,
+									delta: contentPart.text,
+									type: "text-delta",
+									id: generateId(),
 								});
 							}
-						}
-						if (response.reasoning && typeof response.reasoning === "string") {
-							controller.enqueue({
-								type: "reasoning",
-								textDelta: response.reasoning,
-							});
+							if (contentPart.type === "tool-call") {
+								controller.enqueue(contentPart);
+							}
+							if (contentPart.type === "reasoning") {
+								controller.enqueue({
+									type: "reasoning-delta",
+									delta: contentPart.text,
+									id: generateId(),
+								});
+							}
 						}
 						controller.enqueue({
 							finishReason: mapWorkersAIFinishReason(response),
@@ -236,7 +228,6 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 						controller.close();
 					},
 				}),
-				warnings,
 			};
 		}
 
@@ -273,9 +264,10 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 		}
 
 		return {
-			rawCall: { rawPrompt: messages, rawSettings: args },
+			// TODO DHRAVYA: not sure about rawCalls and warnings inclusino
+			// rawCall: { rawPrompt: messages, rawSettings: args },
 			stream: getMappedStream(new Response(response)),
-			warnings,
+			// warnings,
 		};
 	}
 }

@@ -1,10 +1,11 @@
-import type { ImageModelV1, ImageModelV1CallWarning } from "@ai-sdk/provider";
+import type { ImageModelV2 } from "@ai-sdk/provider";
+import type { ImageModelV2CallWarning } from "@ai-sdk/provider";
 import type { WorkersAIImageConfig } from "./workersai-image-config";
 import type { WorkersAIImageSettings } from "./workersai-image-settings";
 import type { ImageGenerationModels } from "./workersai-models";
 
-export class WorkersAIImageModel implements ImageModelV1 {
-	readonly specificationVersion = "v1";
+export class WorkersAIImageModel implements ImageModelV2 {
+	readonly specificationVersion = "v2";
 
 	get maxImagesPerCall(): number {
 		return this.settings.maxImagesPerCall ?? 1;
@@ -27,12 +28,12 @@ export class WorkersAIImageModel implements ImageModelV1 {
 		seed,
 		// headers,
 		// abortSignal,
-	}: Parameters<ImageModelV1["doGenerate"]>[0]): Promise<
-		Awaited<ReturnType<ImageModelV1["doGenerate"]>>
+	}: Parameters<ImageModelV2["doGenerate"]>[0]): Promise<
+		Awaited<ReturnType<ImageModelV2["doGenerate"]>>
 	> {
 		const { width, height } = getDimensionsFromSizeString(size);
 
-		const warnings: Array<ImageModelV1CallWarning> = [];
+		const warnings: Array<ImageModelV2CallWarning> = [];
 
 		if (aspectRatio != null) {
 			warnings.push({

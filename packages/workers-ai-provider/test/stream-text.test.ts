@@ -196,7 +196,7 @@ describe("REST API - Streaming Text Tests", () => {
 						location,
 						weather: location === "London" ? "Raining" : "Sunny",
 					}),
-					parameters: z.object({
+					inputSchema: z.object({
 						location: z.string().describe("The location to get the weather for"),
 					}),
 				},
@@ -266,7 +266,7 @@ describe("REST API - Streaming Text Tests", () => {
 						location,
 						weather: location === "London" ? "Raining" : "Sunny",
 					}),
-					parameters: z.object({
+					inputSchema: z.object({
 						location: z.string().describe("The location to get the weather for"),
 					}),
 				},
@@ -355,7 +355,7 @@ describe("REST API - Streaming Text Tests", () => {
 						location,
 						weather: location === "London" ? "Raining" : "Sunny",
 					}),
-					parameters: z.object({
+					inputSchema: z.object({
 						location: z.string().describe("The location to get the weather for"),
 					}),
 				},
@@ -421,7 +421,14 @@ describe("REST API - Streaming Text Tests", () => {
 			messages: [
 				{
 					role: "user",
-					content: "what is a cow?",
+
+					// @ts-expect-error type not updating
+					parts: [
+						{
+							type: "text",
+							text: "what is a cow?",
+						},
+					],
 				},
 			],
 		});
@@ -430,11 +437,11 @@ describe("REST API - Streaming Text Tests", () => {
 		let content = "";
 
 		for await (const chunk of result.fullStream) {
-			if (chunk.type === "reasoning") {
-				reasoning += chunk.textDelta;
+			if (chunk.type === "reasoning-delta") {
+				reasoning += chunk.text;
 			}
 			if (chunk.type === "text-delta") {
-				content += chunk.textDelta;
+				content += chunk.text;
 			}
 		}
 
@@ -541,7 +548,7 @@ describe("Binding - Streaming Text Tests", () => {
 						location,
 						weather: location === "London" ? "Raining" : "Sunny",
 					}),
-					parameters: z.object({
+					inputSchema: z.object({
 						location: z.string().describe("The location to get the weather for"),
 					}),
 				},
@@ -611,7 +618,7 @@ describe("Binding - Streaming Text Tests", () => {
 						location,
 						weather: location === "London" ? "80" : "100",
 					}),
-					parameters: z.object({
+					inputSchema: z.object({
 						location: z.string().describe("The location to get the temperature for"),
 					}),
 				},
@@ -621,7 +628,7 @@ describe("Binding - Streaming Text Tests", () => {
 						location,
 						weather: location === "London" ? "Raining" : "Sunny",
 					}),
-					parameters: z.object({
+					inputSchema: z.object({
 						location: z.string().describe("The location to get the weather for"),
 					}),
 				},
@@ -713,7 +720,7 @@ describe("Binding - Streaming Text Tests", () => {
 						location,
 						weather: location === "London" ? "80" : "100",
 					}),
-					parameters: z.object({
+					inputSchema: z.object({
 						location: z.string().describe("The location to get the temperature for"),
 					}),
 				},
@@ -723,7 +730,7 @@ describe("Binding - Streaming Text Tests", () => {
 						location,
 						weather: location === "London" ? "Raining" : "Sunny",
 					}),
-					parameters: z.object({
+					inputSchema: z.object({
 						location: z.string().describe("The location to get the weather for"),
 					}),
 				},
@@ -738,8 +745,8 @@ describe("Binding - Streaming Text Tests", () => {
 				toolCalls.push(chunk);
 			}
 
-			if (chunk.type === "reasoning") {
-				reasoning += chunk.textDelta;
+			if (chunk.type === "reasoning-delta") {
+				reasoning += chunk.text;
 			}
 		}
 
@@ -1011,7 +1018,13 @@ describe("Binding - Streaming Text Tests", () => {
 			messages: [
 				{
 					role: "user",
-					content: "what is a cow?",
+					// @ts-expect-error type not updating
+					parts: [
+						{
+							type: "text",
+							text: "what is a cow?",
+						},
+					],
 				},
 			],
 		});
@@ -1020,11 +1033,11 @@ describe("Binding - Streaming Text Tests", () => {
 		let content = "";
 
 		for await (const chunk of result.fullStream) {
-			if (chunk.type === "reasoning") {
-				reasoning += chunk.textDelta;
+			if (chunk.type === "reasoning-delta") {
+				reasoning += chunk.text;
 			}
 			if (chunk.type === "text-delta") {
-				content += chunk.textDelta;
+				content += chunk.text;
 			}
 		}
 
