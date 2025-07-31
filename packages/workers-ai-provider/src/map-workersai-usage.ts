@@ -9,7 +9,8 @@ export function mapWorkersAIUsage(output: AiTextGenerationOutput | AiTextToImage
 	};
 
 	return {
-		completionTokens: usage.completion_tokens,
-		promptTokens: usage.prompt_tokens,
+		outputTokens: usage.completion_tokens,
+		inputTokens: usage.prompt_tokens,
+		totalTokens: usage.prompt_tokens + usage.completion_tokens,
 	};
 }

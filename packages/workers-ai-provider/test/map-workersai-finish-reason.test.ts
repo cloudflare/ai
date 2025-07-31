@@ -1,6 +1,6 @@
-import type { LanguageModelV1FinishReason } from "@ai-sdk/provider";
 import { describe, expect, it } from "vitest";
 import { mapWorkersAIFinishReason } from "../src/map-workersai-finish-reason";
+import type { LanguageModelV2FinishReason } from "@ai-sdk/provider";
 
 describe("mapWorkersAIFinishReason", () => {
 	describe("direct mappings", () => {
@@ -64,7 +64,7 @@ describe("mapWorkersAIFinishReason", () => {
 
 	describe("return type validation", () => {
 		it("should return a valid LanguageModelV1FinishReason type", () => {
-			const validReasons: LanguageModelV1FinishReason[] = [
+			const validReasons: LanguageModelV2FinishReason[] = [
 				"stop",
 				"length",
 				"tool-calls",
@@ -87,7 +87,7 @@ describe("mapWorkersAIFinishReason", () => {
 
 	describe("comprehensive mapping test", () => {
 		it("should handle all expected inputs correctly", () => {
-			const testCases: Array<[string | null | undefined, LanguageModelV1FinishReason]> = [
+			const testCases: Array<[string | null | undefined, LanguageModelV2FinishReason]> = [
 				["stop", "stop"],
 				["length", "length"],
 				["model_length", "length"],

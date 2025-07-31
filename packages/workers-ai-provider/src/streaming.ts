@@ -1,14 +1,15 @@
-import type { LanguageModelV1StreamPart } from "@ai-sdk/provider";
+import type { LanguageModelV2StreamPart } from "@ai-sdk/provider";
 import { events } from "fetch-event-stream";
 import { mapWorkersAIUsage } from "./map-workersai-usage";
 import { processPartialToolCalls } from "./utils";
+import { generateId } from "ai";
 
 export function getMappedStream(response: Response) {
 	const chunkEvent = events(response);
-	let usage = { completionTokens: 0, promptTokens: 0 };
+	let usage = { outputTokens: 0, inputTokens: 0, totalTokens: 0 };
 	const partialToolCalls: any[] = [];
 
-	return new ReadableStream<LanguageModelV1StreamPart>({
+	return new ReadableStream<LanguageModelV2StreamPart>({
 		async start(controller) {
 			for await (const event of chunkEvent) {
 				if (!event.data) {
@@ -26,28 +27,28 @@ export function getMappedStream(response: Response) {
 				}
 				chunk.response?.length &&
 					controller.enqueue({
-						textDelta: chunk.response,
+						delta: chunk.response,
 						type: "text-delta",
+						id: generateId(),
 					});
 				chunk?.choices?.[0]?.delta?.reasoning_content?.length &&
 					controller.enqueue({
-						type: "reasoning",
-						textDelta: chunk.choices[0].delta.reasoning_content,
+						type: "reasoning-delta",
+						delta: chunk.choices[0].delta.reasoning_content,
+						id: generateId(),
 					});
 				chunk?.choices?.[0]?.delta?.content?.length &&
 					controller.enqueue({
 						type: "text-delta",
-						textDelta: chunk.choices[0].delta.content,
+						delta: chunk.choices[0].delta.content,
+						id: generateId(),
 					});
 			}
 
 			if (partialToolCalls.length > 0) {
 				const toolCalls = processPartialToolCalls(partialToolCalls);
 				toolCalls.map((toolCall) => {
-					controller.enqueue({
-						type: "tool-call",
-						...toolCall,
-					});
+					controller.enqueue(toolCall);
 				});
 			}
 

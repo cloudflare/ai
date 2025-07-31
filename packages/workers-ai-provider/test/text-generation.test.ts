@@ -192,12 +192,18 @@ describe("Binding - Text Generation Tests", () => {
 			messages: [
 				{
 					role: "user",
-					content: "what is a cow?",
+					// @ts-expect-error type not updating
+					parts: [
+						{
+							type: "text",
+							text: "what is a cow?",
+						},
+					],
 				},
 			],
 		});
 
-		expect(result.reasoning).toBe("Okay, the user is asking");
+		expect(result.reasoningText).toBe("Okay, the user is asking");
 		expect(result.text).toBe("A **cow** is a domesticated, herbivorous mammal");
 	});
 });
