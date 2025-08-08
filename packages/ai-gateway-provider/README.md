@@ -162,7 +162,11 @@ const {text} = await generateText({
 
 ## Supported Methods
 
-Currently only chat completions (non-streaming) is supported.
+Currently, the following methods are supported:
+
+* **Non-streaming text generation**: Using `generateText()` from the Vercel AI SDK
+* **Chat completions**: Using `generateText()` with message-based prompts
+
 More can be added, please open an issue in the GitHub repository!
 
 ## Error Handling
