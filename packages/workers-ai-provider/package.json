@@ -1,49 +1,49 @@
 {
-	"name": "workers-ai-provider",
-	"description": "Workers AI Provider for the vercel AI SDK",
-	"type": "module",
-	"version": "1.0.0",
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/cloudflare/ai.git"
-	},
-	"bugs": {
-		"url": "https://github.com/cloudflare/ai/issues"
-	},
-	"authors": "Sunil Pai <spai@cloudflare.com>",
-	"license": "MIT",
-	"scripts": {
-		"build": "rm -rf dist && tsup src/index.ts --dts --sourcemap --format esm --target es2020",
-		"prepare": "pnpm build",
-		"format": "biome format --write",
-		"test:ci": "vitest --watch=false",
-		"test": "vitest",
-		"type-check": "tsc --noEmit"
-	},
-	"files": [
-		"dist",
-		"src",
-		"README.md",
-		"package.json"
-	],
-	"keywords": [
-		"workers",
-		"cloudflare",
-		"ai",
-		"vercel",
-		"sdk",
-		"provider",
-		"chat",
-		"serverless"
-	],
-	"dependencies": {
-		"@ai-sdk/provider": "^2.0.0-beta.1",
-		"@ai-sdk/provider-utils": "^3.0.0-beta.7"
-	},
-	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20250803.0",
-		"zod": "^3.25.67"
-	}
+  "name": "workers-ai-provider",
+  "description": "Workers AI Provider for the vercel AI SDK",
+  "type": "module",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/cloudflare/ai.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cloudflare/ai/issues"
+  },
+  "authors": "Sunil Pai <spai@cloudflare.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "rm -rf dist && tsup src/index.ts --dts --sourcemap --format esm --target es2020",
+    "prepare": "pnpm build",
+    "format": "biome format --write",
+    "test:ci": "vitest --watch=false",
+    "test": "vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "package.json"
+  ],
+  "keywords": [
+    "workers",
+    "cloudflare",
+    "ai",
+    "vercel",
+    "sdk",
+    "provider",
+    "chat",
+    "serverless"
+  ],
+  "dependencies": {
+    "@ai-sdk/provider": "^2.0.0-beta.1",
+    "@ai-sdk/provider-utils": "^3.0.0-beta.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250810.0",
+    "zod": "^3.25.76"
+  }
 }
