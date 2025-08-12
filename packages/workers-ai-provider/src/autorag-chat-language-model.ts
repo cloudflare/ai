@@ -132,7 +132,7 @@ export class AutoRAGChatLanguageModel implements LanguageModelV2 {
 					type: "text" as const,
 					text: output.response,
 				},
-				...processToolCalls(output), // if these return LanguageModelV2Content items
+				...processToolCalls(output),
 			],
 			usage: mapWorkersAIUsage(output),
 			warnings,
