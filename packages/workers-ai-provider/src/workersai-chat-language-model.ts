@@ -95,7 +95,10 @@ export class WorkersAIChatLanguageModel implements LanguageModelV2 {
 		switch (type) {
 			case "text": {
 				return {
-					args: { ...baseArgs, ...prepareToolsAndToolChoice(tools, toolChoice) },
+					args: {
+						...baseArgs,
+						...prepareToolsAndToolChoice(tools, toolChoice),
+					},
 					warnings,
 				};
 			}
@@ -160,20 +163,25 @@ export class WorkersAIChatLanguageModel implements LanguageModelV2 {
 			throw new Error("This shouldn't happen");
 		}
 
+		const reasoningContent = (output as any)?.choices?.[0]?.message?.reasoning_content;
+
 		return {
 			finishReason: mapWorkersAIFinishReason(output),
 			// TODO DHRAVYA: rawCall and rawResponse- not sure
 			// rawCall: { rawPrompt: messages, rawSettings: args },
 			// rawResponse: { body: output },
 			content: [
+				...(reasoningContent
+					? [{ type: "reasoning" as const, text: reasoningContent }]
+					: []),
 				{
 					type: "text",
 					text: processText(output) ?? "",
 				},
 				...processToolCalls(output),
 			],
-			// @ts-ignore: Missing types
-			reasoningText: output?.choices?.[0]?.message?.reasoning_content,
+			// @ts-expect-error: Missing types
+			reasoningText: reasoningContent,
 			usage: mapWorkersAIUsage(output),
 			warnings,
 		};

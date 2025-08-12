@@ -214,7 +214,7 @@ describe("REST API - Streaming Text Tests", () => {
 		expect(toolCalls).toHaveLength(1);
 		expect(toolCalls).toMatchObject([
 			{
-				args: { location: "London" },
+				input: { location: "London" },
 				toolCallId: "get_weather",
 				toolName: "get_weather",
 				type: "tool-call",
@@ -284,7 +284,7 @@ describe("REST API - Streaming Text Tests", () => {
 		expect(toolCalls).toHaveLength(1);
 		expect(toolCalls).toMatchObject([
 			{
-				args: { location: "London" },
+				input: { location: "London" },
 				toolCallId: "chatcmpl-tool-b482f0e36b0c4190b9bee3fb61408a9e",
 				toolName: "get_weather",
 				type: "tool-call",
@@ -373,7 +373,7 @@ describe("REST API - Streaming Text Tests", () => {
 		expect(toolCalls).toHaveLength(1);
 		expect(toolCalls).toMatchObject([
 			{
-				args: { location: "London" },
+				input: { location: "London" },
 				toolCallId: "chatcmpl-tool-c267de54771c4833a823f423f0def197",
 				toolName: "get_weather",
 				type: "tool-call",
@@ -421,14 +421,7 @@ describe("REST API - Streaming Text Tests", () => {
 			messages: [
 				{
 					role: "user",
-
-					// @ts-expect-error type not updating
-					parts: [
-						{
-							type: "text",
-							text: "what is a cow?",
-						},
-					],
+					content: "what is a cow?",
 				},
 			],
 		});
@@ -566,7 +559,7 @@ describe("Binding - Streaming Text Tests", () => {
 		expect(toolCalls).toHaveLength(1);
 		expect(toolCalls).toMatchObject([
 			{
-				args: { location: "London" },
+				input: { location: "London" },
 				toolCallId: "get_weather",
 				toolName: "get_weather",
 				type: "tool-call",
@@ -645,13 +638,13 @@ describe("Binding - Streaming Text Tests", () => {
 
 		expect(toolCalls).toHaveLength(2);
 		expect(toolCalls[0]).toMatchObject({
-			args: { location: "London" },
+			input: { location: "London" },
 			toolCallId: "chatcmpl-tool-b482f0e36b0c4190b9bee3fb61408a9e",
 			toolName: "get_weather",
 			type: "tool-call",
 		});
 		expect(toolCalls[1]).toMatchObject({
-			args: { location: "London" },
+			input: { location: "London" },
 			toolCallId: "chatcmpl-tool-a482f0e36b0c4190b9bee3fb61408a9c",
 			toolName: "get_temperature",
 			type: "tool-call",
@@ -755,13 +748,13 @@ describe("Binding - Streaming Text Tests", () => {
 		);
 		expect(toolCalls).toHaveLength(2);
 		expect(toolCalls[0]).toMatchObject({
-			args: { location: "London" },
+			input: { location: "London" },
 			toolCallId: "chatcmpl-tool-c267de54771c4833a823f423f0def197",
 			toolName: "get_weather",
 			type: "tool-call",
 		});
 		expect(toolCalls[1]).toMatchObject({
-			args: { location: "London" },
+			input: { location: "London" },
 			toolCallId: "chatcmpl-tool-a482f0e36b0c4190b9bee3fb61408a9c",
 			toolName: "get_temperature",
 			type: "tool-call",
@@ -1018,13 +1011,7 @@ describe("Binding - Streaming Text Tests", () => {
 			messages: [
 				{
 					role: "user",
-					// @ts-expect-error type not updating
-					parts: [
-						{
-							type: "text",
-							text: "what is a cow?",
-						},
-					],
+					content: "what is a cow?",
 				},
 			],
 		});

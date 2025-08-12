@@ -192,13 +192,7 @@ describe("Binding - Text Generation Tests", () => {
 			messages: [
 				{
 					role: "user",
-					// @ts-expect-error type not updating
-					parts: [
-						{
-							type: "text",
-							text: "what is a cow?",
-						},
-					],
+					content: "what is a cow?",
 				},
 			],
 		});
