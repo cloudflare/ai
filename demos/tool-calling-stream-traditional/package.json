@@ -19,7 +19,7 @@
 		"agents": "^0.0.109",
 		"ai": "^4.3.16",
 		"hono": "^4.8.12",
-		"zod": "^3.25.67"
+		"zod": "^3.25.76"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.1.3",
