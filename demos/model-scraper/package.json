@@ -20,6 +20,7 @@
 	},
 	"dependencies": {
 		"agents": "^0.0.109",
+		"@ai-sdk/openai": "^1.3.22",
 		"ai": "^4.3.16",
 		"hono": "^4.8.12",
 		"workers-ai-provider": "0.7.2",
