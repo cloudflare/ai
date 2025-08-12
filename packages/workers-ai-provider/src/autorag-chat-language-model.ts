@@ -118,12 +118,10 @@ export class AutoRAGChatLanguageModel implements LanguageModelV2 {
 		return {
 			finishReason: "stop",
 
-			// TODO DHRAVYA
-			// @ts-expect-error Not sure the returntype here
 			content: [
 				...output.data.map(({ file_id, filename, score }) => ({
-					type: "source",
-					sourceType: "url",
+					type: "source" as const,
+					sourceType: "url" as const,
 					id: file_id,
 					url: filename,
 					providerMetadata: {
@@ -131,7 +129,7 @@ export class AutoRAGChatLanguageModel implements LanguageModelV2 {
 					},
 				})),
 				{
-					type: "text",
+					type: "text" as const,
 					text: output.response,
 				},
 				...processToolCalls(output), // if these return LanguageModelV2Content items
