@@ -1610,7 +1610,7 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1(zod@3.25.76)
       ai:
-        specifier: ^5.0.9
+        specifier: ^5.0.10
         version: 5.0.10(zod@3.25.76)
     devDependencies:
       '@biomejs/biome':

@@ -41,7 +41,7 @@
 	"dependencies": {
 		"@ai-sdk/provider": "^2.0.0",
 		"@ai-sdk/provider-utils": "^3.0.1",
-		"ai": "^5.0.9"
+		"ai": "^5.0.10"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.1.3",
