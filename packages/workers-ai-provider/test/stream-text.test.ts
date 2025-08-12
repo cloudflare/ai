@@ -3,7 +3,7 @@ import { streamText } from "ai";
 import { type DefaultBodyType, HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import z from "zod";
+import { z } from "zod/v4";
 import { createWorkersAI } from "../src/index";
 
 const TEST_ACCOUNT_ID = "test-account-id";
