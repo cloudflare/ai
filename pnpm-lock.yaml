@@ -1632,10 +1632,10 @@ importers:
   packages/workers-ai-provider:
     dependencies:
       '@ai-sdk/provider':
-        specifier: ^2.0.0-beta.1
+        specifier: ^2.0.0
         version: 2.0.0
       '@ai-sdk/provider-utils':
-        specifier: ^3.0.0-beta.7
+        specifier: ^3.0.1
         version: 3.0.1(zod@3.25.76)
     devDependencies:
       '@cloudflare/workers-types':
