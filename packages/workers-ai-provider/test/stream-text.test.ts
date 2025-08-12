@@ -186,7 +186,7 @@ describe("REST API - Streaming Text Tests", () => {
 			apiKey: TEST_API_KEY,
 		});
 
-		const result = await streamText({
+		const result = streamText({
 			model: workersai(TEST_MODEL),
 			prompt: "Get the weather information for London",
 			tools: {
@@ -256,7 +256,7 @@ describe("REST API - Streaming Text Tests", () => {
 			apiKey: TEST_API_KEY,
 		});
 
-		const result = await streamText({
+		const result = streamText({
 			model: workersai(TEST_MODEL),
 			prompt: "Get the weather information for London",
 			tools: {
@@ -345,7 +345,7 @@ describe("REST API - Streaming Text Tests", () => {
 			apiKey: TEST_API_KEY,
 		});
 
-		const result = await streamText({
+		const result = streamText({
 			model: workersai(TEST_MODEL),
 			prompt: "Get the weather information for London",
 			tools: {
@@ -531,7 +531,7 @@ describe("Binding - Streaming Text Tests", () => {
 			},
 		});
 
-		const result = await streamText({
+		const result = streamText({
 			model: workersai(TEST_MODEL),
 			prompt: "Get the weather information for London",
 			tools: {
@@ -601,7 +601,7 @@ describe("Binding - Streaming Text Tests", () => {
 			},
 		});
 
-		const result = await streamText({
+		const result = streamText({
 			model: workersai(TEST_MODEL),
 			prompt: "Get the weather information for London",
 			tools: {
@@ -703,7 +703,7 @@ describe("Binding - Streaming Text Tests", () => {
 			},
 		});
 
-		const result = await streamText({
+		const result = streamText({
 			model: workersai(TEST_MODEL),
 			prompt: "Get the weather information for London",
 			tools: {
@@ -1006,7 +1006,7 @@ describe("Binding - Streaming Text Tests", () => {
 			},
 		});
 
-		const result = await streamText({
+		const result = streamText({
 			model: workersai(TEST_MODEL),
 			messages: [
 				{
