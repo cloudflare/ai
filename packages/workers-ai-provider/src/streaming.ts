@@ -9,6 +9,10 @@ export function getMappedStream(response: Response) {
 	let usage = { outputTokens: 0, inputTokens: 0, totalTokens: 0 };
 	const partialToolCalls: any[] = [];
 
+	// Track start/delta/end IDs per v5 streaming protocol
+	let textId: string | null = null;
+	let reasoningId: string | null = null;
+
 	return new ReadableStream<LanguageModelV2StreamPart>({
 		async start(controller) {
 			for await (const event of chunkEvent) {
@@ -25,24 +29,39 @@ export function getMappedStream(response: Response) {
 				if (chunk.tool_calls) {
 					partialToolCalls.push(...chunk.tool_calls);
 				}
-				chunk.response?.length &&
-					controller.enqueue({
-						delta: chunk.response,
-						type: "text-delta",
-						id: generateId(),
-					});
-				chunk?.choices?.[0]?.delta?.reasoning_content?.length &&
+
+				// Handle top-level response text
+				if (chunk.response?.length) {
+					if (!textId) {
+						textId = generateId();
+						controller.enqueue({ type: "text-start", id: textId });
+					}
+					controller.enqueue({ type: "text-delta", id: textId, delta: chunk.response });
+				}
+
+				// Handle reasoning content
+				const reasoningDelta = chunk?.choices?.[0]?.delta?.reasoning_content;
+				if (reasoningDelta?.length) {
+					if (!reasoningId) {
+						reasoningId = generateId();
+						controller.enqueue({ type: "reasoning-start", id: reasoningId });
+					}
 					controller.enqueue({
 						type: "reasoning-delta",
-						delta: chunk.choices[0].delta.reasoning_content,
-						id: generateId(),
+						id: reasoningId,
+						delta: reasoningDelta,
 					});
-				chunk?.choices?.[0]?.delta?.content?.length &&
-					controller.enqueue({
-						type: "text-delta",
-						delta: chunk.choices[0].delta.content,
-						id: generateId(),
-					});
+				}
+
+				// Handle text content from choices
+				const textDelta = chunk?.choices?.[0]?.delta?.content;
+				if (textDelta?.length) {
+					if (!textId) {
+						textId = generateId();
+						controller.enqueue({ type: "text-start", id: textId });
+					}
+					controller.enqueue({ type: "text-delta", id: textId, delta: textDelta });
+				}
 			}
 
 			if (partialToolCalls.length > 0) {
@@ -50,6 +69,16 @@ export function getMappedStream(response: Response) {
 				toolCalls.map((toolCall) => {
 					controller.enqueue(toolCall);
 				});
+			}
+
+			// Close any open blocks
+			if (reasoningId) {
+				controller.enqueue({ type: "reasoning-end", id: reasoningId });
+				reasoningId = null;
+			}
+			if (textId) {
+				controller.enqueue({ type: "text-end", id: textId });
+				textId = null;
 			}
 
 			controller.enqueue({
