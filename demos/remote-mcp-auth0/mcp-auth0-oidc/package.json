@@ -18,7 +18,7 @@
     "just-pick": "^4.2.0",
     "oauth4webapi": "^3.6.1",
     "workers-mcp": "^0.0.13",
-    "zod": "^3.25.67"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250803.0",

@@ -21,7 +21,7 @@ describe("processPartialToolCalls", () => {
 		];
 		const result = processPartialToolCalls(partialCalls);
 		expect(result).toHaveLength(1);
-		expect(result[0].args).toBe('{"param": "value"}');
+		expect(result[0].input).toBe('{"param": "value"}');
 		expect(result[0].toolName).toBe("test_func");
 		expect(result[0].toolCallId).toBe("call_123");
 	});
@@ -54,8 +54,8 @@ describe("processPartialToolCalls", () => {
 		const call1 = result.find((call) => call.toolCallId === "call_1");
 		const call2 = result.find((call) => call.toolCallId === "call_2");
 
-		expect(call1?.args).toBe('{"a":"value1"}');
-		expect(call2?.args).toBe('{"b":"value2"}');
+		expect(call1?.input).toBe('{"a":"value1"}');
+		expect(call2?.input).toBe('{"b":"value2"}');
 	});
 });
 
@@ -77,10 +77,10 @@ describe("processToolCalls", () => {
 		const result = processToolCalls(output);
 		expect(result).toEqual([
 			{
-				args: '{"param": "value"}',
+				input: '{"param": "value"}',
 				toolCallId: "call_123",
-				toolCallType: "function",
 				toolName: "test_function",
+				type: "tool-call",
 			},
 		]);
 	});
@@ -100,7 +100,7 @@ describe("processToolCalls", () => {
 		};
 
 		const result = processToolCalls(output);
-		expect(result[0].args).toBe('{"param":"value"}');
+		expect(result[0].input).toBe('{"param":"value"}');
 	});
 
 	it("should handle tool calls without function wrapper", () => {
@@ -116,10 +116,10 @@ describe("processToolCalls", () => {
 		const result = processToolCalls(output);
 		expect(result).toEqual([
 			{
-				args: '{"param": "value"}',
+				input: '{"param": "value"}',
 				toolCallId: "test_function",
-				toolCallType: "function",
 				toolName: "test_function",
+				type: "tool-call",
 			},
 		]);
 	});
@@ -144,7 +144,7 @@ describe("processToolCalls", () => {
 		};
 
 		const result = processToolCalls(output);
-		expect(result[0].args).toBe("{}");
+		expect(result[0].input).toBe("{}");
 	});
 });
 

@@ -12,8 +12,8 @@
 		"lint-npm-lockfiles": "aicli lint-npm-lockfiles"
 	},
 	"devDependencies": {
-		"@ai-sdk/openai": "^1.3.22",
-		"@biomejs/biome": "^2.1.3",
+		"@ai-sdk/openai": "^2.0.10",
+		"@biomejs/biome": "^2.0.6",
 		"@changesets/changelog-github": "^0.5.1",
 		"@changesets/cli": "^2.29.5",
 		"@clack/prompts": "^0.11.0",
@@ -25,7 +25,7 @@
 		"@types/node": "^24.2.0",
 		"@types/wait-on": "^5.3.4",
 		"agents": "^0.0.109",
-		"ai": "^4.3.16",
+		"ai": "^5.0.10",
 		"chalk": "^5.5.0",
 		"dayjs": "^1.11.13",
 		"dotenv": "^17.2.1",
@@ -49,7 +49,7 @@
 		"vitest": "~3.2.4",
 		"wait-on": "^8.0.4",
 		"wrangler": "^4.27.0",
-		"zod": "^3.25.67"
+		"zod": "^3.25.76"
 	},
 	"packageManager": "pnpm@10.14.0",
 	"pnpm": {

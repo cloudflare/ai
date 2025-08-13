@@ -1,7 +1,7 @@
-import {
-	type LanguageModelV1,
-	type LanguageModelV1CallWarning,
-	UnsupportedFunctionalityError,
+import type {
+	LanguageModelV2,
+	LanguageModelV2CallWarning,
+	LanguageModelV2StreamPart,
 } from "@ai-sdk/provider";
 
 import type { AutoRAGChatSettings } from "./autorag-chat-settings";
@@ -17,9 +17,13 @@ type AutoRAGChatConfig = {
 	gateway?: GatewayOptions;
 };
 
-export class AutoRAGChatLanguageModel implements LanguageModelV1 {
-	readonly specificationVersion = "v1";
+export class AutoRAGChatLanguageModel implements LanguageModelV2 {
+	readonly specificationVersion = "v2";
 	readonly defaultObjectGenerationMode = "json";
+
+	readonly supportedUrls: Record<string, RegExp[]> | PromiseLike<Record<string, RegExp[]>> = {
+		// TODO: I think No Supported URLs?
+	};
 
 	readonly modelId: TextGenerationModels;
 	readonly settings: AutoRAGChatSettings;
@@ -41,14 +45,14 @@ export class AutoRAGChatLanguageModel implements LanguageModelV1 {
 	}
 
 	private getArgs({
-		mode,
+		responseFormat,
 		prompt,
+		tools,
+		toolChoice,
 		frequencyPenalty,
 		presencePenalty,
-	}: Parameters<LanguageModelV1["doGenerate"]>[0]) {
-		const type = mode.type;
-
-		const warnings: LanguageModelV1CallWarning[] = [];
+	}: Parameters<LanguageModelV2["doGenerate"]>[0]) {
+		const warnings: LanguageModelV2CallWarning[] = [];
 
 		if (frequencyPenalty != null) {
 			warnings.push({
@@ -71,45 +75,27 @@ export class AutoRAGChatLanguageModel implements LanguageModelV1 {
 			model: this.modelId,
 		};
 
+		const type = responseFormat?.type ?? "text";
 		switch (type) {
-			case "regular": {
+			case "text": {
 				return {
-					args: { ...baseArgs, ...prepareToolsAndToolChoice(mode) },
+					args: { ...baseArgs, ...prepareToolsAndToolChoice(tools, toolChoice) },
 					warnings,
 				};
 			}
 
-			case "object-json": {
+			case "json": {
 				return {
 					args: {
 						...baseArgs,
 						response_format: {
-							json_schema: mode.schema,
+							json_schema: responseFormat?.type === "json" && responseFormat.schema,
 							type: "json_schema",
 						},
 						tools: undefined,
 					},
 					warnings,
 				};
-			}
-
-			case "object-tool": {
-				return {
-					args: {
-						...baseArgs,
-						tool_choice: "any",
-						tools: [{ function: mode.tool, type: "function" }],
-					},
-					warnings,
-				};
-			}
-
-			// @ts-expect-error - this is unreachable code
-			// TODO: fixme
-			case "object-grammar": {
-				throw new UnsupportedFunctionalityError({
-					functionality: "object-grammar mode",
-				});
 			}
 
 			default: {
@@ -120,10 +106,9 @@ export class AutoRAGChatLanguageModel implements LanguageModelV1 {
 	}
 
 	async doGenerate(
-		options: Parameters<LanguageModelV1["doGenerate"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV1["doGenerate"]>>> {
-		const { args, warnings } = this.getArgs(options);
-
+		options: Parameters<LanguageModelV2["doGenerate"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV2["doGenerate"]>>> {
+		const { warnings } = this.getArgs(options);
 		const { messages } = convertToWorkersAIChatMessages(options.prompt);
 
 		const output = await this.config.binding.aiSearch({
@@ -132,40 +117,77 @@ export class AutoRAGChatLanguageModel implements LanguageModelV1 {
 
 		return {
 			finishReason: "stop",
-			rawCall: { rawPrompt: args.messages, rawSettings: args },
-			sources: output.data.map(({ file_id, filename, score }) => ({
-				id: file_id,
-				providerMetadata: {
-					attributes: { score },
+
+			content: [
+				...output.data.map(({ file_id, filename, score }) => ({
+					type: "source" as const,
+					sourceType: "url" as const,
+					id: file_id,
+					url: filename,
+					providerMetadata: {
+						attributes: { score },
+					},
+				})),
+				{
+					type: "text" as const,
+					text: output.response,
 				},
-				sourceType: "url",
-				url: filename,
-			})), // TODO: mapWorkersAIFinishReason(response.finish_reason),
-			text: output.response,
-			toolCalls: processToolCalls(output),
+				...processToolCalls(output),
+			],
 			usage: mapWorkersAIUsage(output),
 			warnings,
 		};
 	}
 
 	async doStream(
-		options: Parameters<LanguageModelV1["doStream"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV1["doStream"]>>> {
+		options: Parameters<LanguageModelV2["doStream"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV2["doStream"]>>> {
 		const { args, warnings } = this.getArgs(options);
-
 		const { messages } = convertToWorkersAIChatMessages(options.prompt);
 
 		const query = messages.map(({ content, role }) => `${role}: ${content}`).join("\n\n");
 
+		// Get the underlying streaming response (assume this returns a ReadableStream<LanguageModelV2StreamPart>)
 		const response = await this.config.binding.aiSearch({
 			query,
 			stream: true,
 		});
 
+		// Create a new stream that first emits the stream-start part with warnings,
+		// then pipes through the rest of the response stream
+		const stream = new ReadableStream<LanguageModelV2StreamPart>({
+			start(controller) {
+				// Emit the stream-start part with warnings
+				controller.enqueue({
+					type: "stream-start",
+					warnings: warnings as LanguageModelV2CallWarning[],
+				});
+
+				// Pipe the rest of the response stream
+				const reader = getMappedStream(response).getReader();
+
+				function push() {
+					reader.read().then(({ done, value }) => {
+						if (done) {
+							controller.close();
+							return;
+						}
+						controller.enqueue(value);
+						push();
+					});
+				}
+				push();
+			},
+		});
+
 		return {
-			rawCall: { rawPrompt: args.messages, rawSettings: args },
-			stream: getMappedStream(response),
-			warnings,
+			stream,
+			request: {
+				body: {
+					rawPrompt: args.messages,
+					rawSettings: args,
+				},
+			},
 		};
 	}
 }

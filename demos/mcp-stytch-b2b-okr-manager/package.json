@@ -26,7 +26,7 @@
 		"react-router-dom": "^7.7.1",
 		"stytch": "^12.26.0",
 		"workers-mcp": "^0.0.13",
-		"zod": "^3.25.67"
+		"zod": "^3.25.76"
 	},
 	"devDependencies": {
 		"@cloudflare/vite-plugin": "^1.11.0",

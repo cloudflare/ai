@@ -10,7 +10,7 @@
 		"@commander-js/extra-typings": "^14.0.0",
 		"commander": "^14.0.0",
 		"tsx": "^4.20.3",
-		"zod": "^3.25.67",
+		"zod": "^3.25.76",
 		"zx": "8.7.2"
 	},
 	"devDependencies": {

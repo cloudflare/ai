@@ -17,7 +17,7 @@
 		"agents": "^0.0.109",
 		"hono": "^4.8.12",
 		"workers-mcp": "^0.0.13",
-		"zod": "^3.25.67"
+		"zod": "^3.25.76"
 	},
 	"devDependencies": {
 		"marked": "^16.1.2",
