@@ -1,6 +1,6 @@
-import type { LanguageModelV1FinishReason } from "@ai-sdk/provider";
+import type { LanguageModelV2FinishReason } from "@ai-sdk/provider";
 
-export function mapWorkersAIFinishReason(finishReasonOrResponse: any): LanguageModelV1FinishReason {
+export function mapWorkersAIFinishReason(finishReasonOrResponse: any): LanguageModelV2FinishReason {
 	let finishReason: string | null | undefined;
 
 	// If it's a string/null/undefined, use it directly (original behavior)

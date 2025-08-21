@@ -197,7 +197,7 @@ describe("Binding - Text Generation Tests", () => {
 			],
 		});
 
-		expect(result.reasoning).toBe("Okay, the user is asking");
+		expect(result.reasoningText).toBe("Okay, the user is asking");
 		expect(result.text).toBe("A **cow** is a domesticated, herbivorous mammal");
 	});
 });

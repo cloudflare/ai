@@ -13,17 +13,30 @@ const textGenerationHandler = http.post(
 	`https://gateway.ai.cloudflare.com/v1/${TEST_ACCOUNT_ID}/${TEST_GATEWAY}`,
 	async () => {
 		return HttpResponse.json({
-			choices: [
+			id: "chatcmpl-test123",
+			created_at: Math.floor(Date.now() / 1000),
+			model: "gpt-4o-mini",
+			output: [
 				{
-					index: 0,
-					message: {
-						content: "Hello",
-						refusal: null,
-						role: "assistant",
-					},
+					type: "message",
+					role: "assistant",
+					id: "msg-test123",
+					content: [
+						{
+							type: "output_text",
+							text: "Hello",
+							annotations: [],
+						},
+					],
 				},
 			],
-			object: "chat.completion",
+			incomplete_details: null,
+			object: "response",
+			usage: {
+				input_tokens: 10,
+				output_tokens: 1,
+				total_tokens: 11,
+			},
 		});
 	},
 );

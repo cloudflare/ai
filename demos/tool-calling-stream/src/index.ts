@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { streamText, tool } from "ai";
+import { stepCountIs, streamText, tool } from "ai";
 import z from "zod";
 import { createWorkersAI } from "workers-ai-provider";
 import type { Variables } from "./types/hono";
@@ -26,7 +26,7 @@ app.post("/", async (c) => {
 		tools: {
 			weather: tool({
 				description: "Get the weather in a location",
-				parameters: z.object({
+				inputSchema: z.object({
 					location: z.string().describe("The location to get the weather for"),
 				}),
 				execute: async ({ location }) => ({
@@ -35,10 +35,10 @@ app.post("/", async (c) => {
 				}),
 			}),
 		},
-		maxSteps: 5,
+		stopWhen: stepCountIs(5),
 	});
 
-	return result.toDataStreamResponse({
+	return result.toUIMessageStreamResponse({
 		headers: {
 			"Content-Type": "text/x-unknown",
 			"content-encoding": "identity",

@@ -11,6 +11,7 @@ import { McpServers } from "./McpServers";
 import ModelSelector from "./ModelSelector";
 import { models } from "./models";
 import ViewCodeModal from "./ViewCodeModal";
+import { stepCountIs } from "ai";
 
 const finetuneTemplates = {
 	"cf-public-cnn-summarization": `You are given a news article below. Please summarize the article, including only its highlights.
@@ -83,7 +84,7 @@ const App = () => {
 			system_message: systemMessage,
 			tools: mcpTools,
 		},
-		maxSteps: 5,
+		stopWhen: stepCountIs(5),
 
 		async onToolCall({ toolCall }) {
 			try {

@@ -1,19 +1,19 @@
-import type { LanguageModelV1Prompt, LanguageModelV1ProviderMetadata } from "@ai-sdk/provider";
+import type { LanguageModelV2Prompt, SharedV2ProviderMetadata } from "@ai-sdk/provider";
 import type { WorkersAIChatPrompt } from "./workersai-chat-prompt";
 
-export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): {
+export function convertToWorkersAIChatMessages(prompt: LanguageModelV2Prompt): {
 	messages: WorkersAIChatPrompt;
 	images: {
 		mimeType: string | undefined;
 		image: Uint8Array;
-		providerMetadata: LanguageModelV1ProviderMetadata | undefined;
+		providerOptions: SharedV2ProviderMetadata | undefined;
 	}[];
 } {
 	const messages: WorkersAIChatPrompt = [];
 	const images: {
 		mimeType: string | undefined;
 		image: Uint8Array;
-		providerMetadata: LanguageModelV1ProviderMetadata | undefined;
+		providerOptions: SharedV2ProviderMetadata | undefined;
 	}[] = [];
 
 	for (const { role, content } of prompt) {
@@ -31,15 +31,15 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): {
 								case "text": {
 									return part.text;
 								}
-								case "image": {
+								case "file": {
 									// Extract image from this part
-									if (part.image instanceof Uint8Array) {
+									if (part.data instanceof Uint8Array) {
 										// Store the image data directly as Uint8Array
 										// For Llama 3.2 Vision model, which needs array of integers
 										images.push({
-											image: part.image,
-											mimeType: part.mimeType,
-											providerMetadata: part.providerMetadata,
+											image: part.data,
+											mimeType: part.mediaType,
+											providerOptions: part.providerOptions,
 										});
 									}
 									return ""; // No text for the image part
@@ -75,12 +75,12 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): {
 						case "tool-call": {
 							text = JSON.stringify({
 								name: part.toolName,
-								parameters: part.args,
+								parameters: part.input,
 							});
 
 							toolCalls.push({
 								function: {
-									arguments: JSON.stringify(part.args),
+									arguments: JSON.stringify(part.input),
 									name: part.toolName,
 								},
 								id: part.toolCallId,
@@ -114,7 +114,7 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV1Prompt): {
 			case "tool": {
 				for (const [index, toolResponse] of content.entries()) {
 					messages.push({
-						content: JSON.stringify(toolResponse.result),
+						content: JSON.stringify(toolResponse.output),
 						name: toolResponse.toolName,
 						tool_call_id: `functions.${toolResponse.toolName}:${index}`,
 						role: "tool",

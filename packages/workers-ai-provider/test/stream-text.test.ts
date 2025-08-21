@@ -3,7 +3,7 @@ import { streamText } from "ai";
 import { type DefaultBodyType, HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import z from "zod";
+import { z } from "zod/v4";
 import { createWorkersAI } from "../src/index";
 
 const TEST_ACCOUNT_ID = "test-account-id";
@@ -186,7 +186,7 @@ describe("REST API - Streaming Text Tests", () => {
 			apiKey: TEST_API_KEY,
 		});
 
-		const result = await streamText({
+		const result = streamText({
 			model: workersai(TEST_MODEL),
 			prompt: "Get the weather information for London",
 			tools: {
@@ -196,7 +196,7 @@ describe("REST API - Streaming Text Tests", () => {
 						location,
 						weather: location === "London" ? "Raining" : "Sunny",
 					}),
-					parameters: z.object({
+					inputSchema: z.object({
 						location: z.string().describe("The location to get the weather for"),
 					}),
 				},
@@ -214,7 +214,7 @@ describe("REST API - Streaming Text Tests", () => {
 		expect(toolCalls).toHaveLength(1);
 		expect(toolCalls).toMatchObject([
 			{
-				args: { location: "London" },
+				input: { location: "London" },
 				toolCallId: "get_weather",
 				toolName: "get_weather",
 				type: "tool-call",
@@ -256,7 +256,7 @@ describe("REST API - Streaming Text Tests", () => {
 			apiKey: TEST_API_KEY,
 		});
 
-		const result = await streamText({
+		const result = streamText({
 			model: workersai(TEST_MODEL),
 			prompt: "Get the weather information for London",
 			tools: {
@@ -266,7 +266,7 @@ describe("REST API - Streaming Text Tests", () => {
 						location,
 						weather: location === "London" ? "Raining" : "Sunny",
 					}),
-					parameters: z.object({
+					inputSchema: z.object({
 						location: z.string().describe("The location to get the weather for"),
 					}),
 				},
@@ -284,7 +284,7 @@ describe("REST API - Streaming Text Tests", () => {
 		expect(toolCalls).toHaveLength(1);
 		expect(toolCalls).toMatchObject([
 			{
-				args: { location: "London" },
+				input: { location: "London" },
 				toolCallId: "chatcmpl-tool-b482f0e36b0c4190b9bee3fb61408a9e",
 				toolName: "get_weather",
 				type: "tool-call",
@@ -345,7 +345,7 @@ describe("REST API - Streaming Text Tests", () => {
 			apiKey: TEST_API_KEY,
 		});
 
-		const result = await streamText({
+		const result = streamText({
 			model: workersai(TEST_MODEL),
 			prompt: "Get the weather information for London",
 			tools: {
@@ -355,7 +355,7 @@ describe("REST API - Streaming Text Tests", () => {
 						location,
 						weather: location === "London" ? "Raining" : "Sunny",
 					}),
-					parameters: z.object({
+					inputSchema: z.object({
 						location: z.string().describe("The location to get the weather for"),
 					}),
 				},
@@ -373,7 +373,7 @@ describe("REST API - Streaming Text Tests", () => {
 		expect(toolCalls).toHaveLength(1);
 		expect(toolCalls).toMatchObject([
 			{
-				args: { location: "London" },
+				input: { location: "London" },
 				toolCallId: "chatcmpl-tool-c267de54771c4833a823f423f0def197",
 				toolName: "get_weather",
 				type: "tool-call",
@@ -430,11 +430,11 @@ describe("REST API - Streaming Text Tests", () => {
 		let content = "";
 
 		for await (const chunk of result.fullStream) {
-			if (chunk.type === "reasoning") {
-				reasoning += chunk.textDelta;
+			if (chunk.type === "reasoning-delta") {
+				reasoning += chunk.text;
 			}
 			if (chunk.type === "text-delta") {
-				content += chunk.textDelta;
+				content += chunk.text;
 			}
 		}
 
@@ -531,7 +531,7 @@ describe("Binding - Streaming Text Tests", () => {
 			},
 		});
 
-		const result = await streamText({
+		const result = streamText({
 			model: workersai(TEST_MODEL),
 			prompt: "Get the weather information for London",
 			tools: {
@@ -541,7 +541,7 @@ describe("Binding - Streaming Text Tests", () => {
 						location,
 						weather: location === "London" ? "Raining" : "Sunny",
 					}),
-					parameters: z.object({
+					inputSchema: z.object({
 						location: z.string().describe("The location to get the weather for"),
 					}),
 				},
@@ -559,7 +559,7 @@ describe("Binding - Streaming Text Tests", () => {
 		expect(toolCalls).toHaveLength(1);
 		expect(toolCalls).toMatchObject([
 			{
-				args: { location: "London" },
+				input: { location: "London" },
 				toolCallId: "get_weather",
 				toolName: "get_weather",
 				type: "tool-call",
@@ -601,7 +601,7 @@ describe("Binding - Streaming Text Tests", () => {
 			},
 		});
 
-		const result = await streamText({
+		const result = streamText({
 			model: workersai(TEST_MODEL),
 			prompt: "Get the weather information for London",
 			tools: {
@@ -611,7 +611,7 @@ describe("Binding - Streaming Text Tests", () => {
 						location,
 						weather: location === "London" ? "80" : "100",
 					}),
-					parameters: z.object({
+					inputSchema: z.object({
 						location: z.string().describe("The location to get the temperature for"),
 					}),
 				},
@@ -621,7 +621,7 @@ describe("Binding - Streaming Text Tests", () => {
 						location,
 						weather: location === "London" ? "Raining" : "Sunny",
 					}),
-					parameters: z.object({
+					inputSchema: z.object({
 						location: z.string().describe("The location to get the weather for"),
 					}),
 				},
@@ -638,13 +638,13 @@ describe("Binding - Streaming Text Tests", () => {
 
 		expect(toolCalls).toHaveLength(2);
 		expect(toolCalls[0]).toMatchObject({
-			args: { location: "London" },
+			input: { location: "London" },
 			toolCallId: "chatcmpl-tool-b482f0e36b0c4190b9bee3fb61408a9e",
 			toolName: "get_weather",
 			type: "tool-call",
 		});
 		expect(toolCalls[1]).toMatchObject({
-			args: { location: "London" },
+			input: { location: "London" },
 			toolCallId: "chatcmpl-tool-a482f0e36b0c4190b9bee3fb61408a9c",
 			toolName: "get_temperature",
 			type: "tool-call",
@@ -703,7 +703,7 @@ describe("Binding - Streaming Text Tests", () => {
 			},
 		});
 
-		const result = await streamText({
+		const result = streamText({
 			model: workersai(TEST_MODEL),
 			prompt: "Get the weather information for London",
 			tools: {
@@ -713,7 +713,7 @@ describe("Binding - Streaming Text Tests", () => {
 						location,
 						weather: location === "London" ? "80" : "100",
 					}),
-					parameters: z.object({
+					inputSchema: z.object({
 						location: z.string().describe("The location to get the temperature for"),
 					}),
 				},
@@ -723,7 +723,7 @@ describe("Binding - Streaming Text Tests", () => {
 						location,
 						weather: location === "London" ? "Raining" : "Sunny",
 					}),
-					parameters: z.object({
+					inputSchema: z.object({
 						location: z.string().describe("The location to get the weather for"),
 					}),
 				},
@@ -738,8 +738,8 @@ describe("Binding - Streaming Text Tests", () => {
 				toolCalls.push(chunk);
 			}
 
-			if (chunk.type === "reasoning") {
-				reasoning += chunk.textDelta;
+			if (chunk.type === "reasoning-delta") {
+				reasoning += chunk.text;
 			}
 		}
 
@@ -748,13 +748,13 @@ describe("Binding - Streaming Text Tests", () => {
 		);
 		expect(toolCalls).toHaveLength(2);
 		expect(toolCalls[0]).toMatchObject({
-			args: { location: "London" },
+			input: { location: "London" },
 			toolCallId: "chatcmpl-tool-c267de54771c4833a823f423f0def197",
 			toolName: "get_weather",
 			type: "tool-call",
 		});
 		expect(toolCalls[1]).toMatchObject({
-			args: { location: "London" },
+			input: { location: "London" },
 			toolCallId: "chatcmpl-tool-a482f0e36b0c4190b9bee3fb61408a9c",
 			toolName: "get_temperature",
 			type: "tool-call",
@@ -1006,7 +1006,7 @@ describe("Binding - Streaming Text Tests", () => {
 			},
 		});
 
-		const result = await streamText({
+		const result = streamText({
 			model: workersai(TEST_MODEL),
 			messages: [
 				{
@@ -1020,11 +1020,11 @@ describe("Binding - Streaming Text Tests", () => {
 		let content = "";
 
 		for await (const chunk of result.fullStream) {
-			if (chunk.type === "reasoning") {
-				reasoning += chunk.textDelta;
+			if (chunk.type === "reasoning-delta") {
+				reasoning += chunk.text;
 			}
 			if (chunk.type === "text-delta") {
-				content += chunk.textDelta;
+				content += chunk.text;
 			}
 		}
 

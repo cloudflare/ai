@@ -17,7 +17,7 @@ app.post("/", async (c) => {
 		prompt,
 	});
 
-	return result.toDataStreamResponse({
+	return result.toUIMessageStreamResponse({
 		headers: {
 			"Content-Type": "text/x-unknown",
 			"content-encoding": "identity",

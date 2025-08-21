@@ -11,13 +11,13 @@
   },
   "dependencies": {
     "@faker-js/faker": "^9.9.0",
-    "hono": "^4.8.12",
+    "hono": "^4.9.2",
     "jose": "^6.0.12"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250803.0",
+    "@cloudflare/workers-types": "^4.20250821.0",
     "prettier": "^3.6.2",
-    "typescript": "5.8.3",
-    "wrangler": "^4.27.0"
+    "typescript": "5.9.2",
+    "wrangler": "^4.31.0"
   }
 }

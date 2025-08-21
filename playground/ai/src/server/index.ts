@@ -17,7 +17,11 @@ type PostInferenceBody = {
 	tools: Tool[];
 };
 
-async function replyToMessage(request: Request, env: Env, _ctx: ExecutionContext) {
+async function replyToMessage(
+	request: Request,
+	env: Env,
+	_ctx: ExecutionContext,
+) {
 	const modelNames = models.map((model) => model.name);
 
 	const {
@@ -66,8 +70,8 @@ async function replyToMessage(request: Request, env: Env, _ctx: ExecutionContext
 		tools: mcpTools,
 	});
 
-	return result.toDataStreamResponse({
-		getErrorMessage: (error: unknown) => {
+	return result.toUIMessageStreamResponse({
+		onError: (error: unknown) => {
 			console.log(error);
 			return "Error during inference";
 		},

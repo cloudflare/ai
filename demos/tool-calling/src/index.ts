@@ -1,4 +1,4 @@
-import { generateText, tool } from "ai";
+import { generateText, tool, stepCountIs } from "ai";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { createWorkersAI } from "workers-ai-provider";
@@ -22,7 +22,7 @@ app.post("/", async (c) => {
 		tools: {
 			weather: tool({
 				description: "Get the weather in a location",
-				parameters: z.object({
+				inputSchema: z.object({
 					location: z.string().describe("The location to get the weather for"),
 				}),
 				execute: async ({ location }) => ({
@@ -31,7 +31,7 @@ app.post("/", async (c) => {
 				}),
 			}),
 		},
-		maxSteps: 5,
+		stopWhen: stepCountIs(5),
 	});
 
 	return c.json(result);

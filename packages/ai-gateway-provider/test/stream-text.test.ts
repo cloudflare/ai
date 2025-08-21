@@ -14,14 +14,16 @@ const defaultStreamingHandler = http.post(
 	async () => {
 		return new Response(
 			[
-				`data: {"nonce": "c673", "id":"chatcmpl-BOlQHy37KaTjcGB9k04XEztiEI1Df","object":"chat.completion.chunk","created":1745241865,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_0392822090","choices":[{"index":0,"delta":{"role":"assistant","content":"","refusal":null},"logprobs":null,"finish_reason":null}]}\n\n`,
-				`data: {"nonce": "29", "id":"chatcmpl-BOlQHy37KaTjcGB9k04XEztiEI1Df","object":"chat.completion.chunk","created":1745241865,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_0392822090","choices":[{"index":0,"delta":{"content":"Hello"},"logprobs":null,"finish_reason":null}]}\n\n`,
-				`data: {"nonce": "4024247058da", "id":"chatcmpl-BOlQHy37KaTjcGB9k04XEztiEI1Df","object":"chat.completion.chunk","created":1745241865,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_0392822090","choices":[{"index":0,"delta":{"content":" chunk"},"logprobs":null,"finish_reason":null}]}\n\n`,
-				`data: {"nonce": "09fe25", "id":"chatcmpl-BOlQHy37KaTjcGB9k04XEztiEI1Df","object":"chat.completion.chunk","created":1745241865,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_0392822090","choices":[{"index":0,"delta":{"content":"1"},"logprobs":null,"finish_reason":null}]}\n\n`,
-				`data: {"nonce": "2e7d0f", "id":"chatcmpl-BOlQHy37KaTjcGB9k04XEztiEI1Df","object":"chat.completion.chunk","created":1745241865,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_0392822090","choices":[{"index":0,"delta":{"content":"Hello"},"logprobs":null,"finish_reason":null}]}\n\n`,
-				`data: {"nonce": "34be46e25b", "id":"chatcmpl-BOlQHy37KaTjcGB9k04XEztiEI1Df","object":"chat.completion.chunk","created":1745241865,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_0392822090","choices":[{"index":0,"delta":{"content":" chunk"},"logprobs":null,"finish_reason":null}]}\n\n`,
-				`data: {"nonce": "9d", "id":"chatcmpl-BOlQHy37KaTjcGB9k04XEztiEI1Df","object":"chat.completion.chunk","created":1745241865,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_0392822090","choices":[{"index":0,"delta":{"content":"2"},"logprobs":null,"finish_reason":null}]}\n\n`,
-				`data: {"nonce": "7751", "id":"chatcmpl-BOlQHy37KaTjcGB9k04XEztiEI1Df","object":"chat.completion.chunk","created":1745241865,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_0392822090","choices":[{"index":0,"delta":{},"logprobs":null,"finish_reason":"stop"}]}\n\n`,
+				`data: {"type": "response.created", "response": {"id": "resp-test123", "created_at": ${Math.floor(Date.now() / 1000)}, "model": "gpt-4o-mini"}}\n\n`,
+				`data: {"type": "response.output_item.added", "output_index": 0, "item": {"type": "message", "role": "assistant", "id": "msg-test123", "content": []}}\n\n`,
+				`data: {"type": "response.output_text.delta", "item_id": "msg-test123", "delta": "Hello"}\n\n`,
+				`data: {"type": "response.output_text.delta", "item_id": "msg-test123", "delta": " chunk"}\n\n`,
+				`data: {"type": "response.output_text.delta", "item_id": "msg-test123", "delta": "1"}\n\n`,
+				`data: {"type": "response.output_text.delta", "item_id": "msg-test123", "delta": "Hello"}\n\n`,
+				`data: {"type": "response.output_text.delta", "item_id": "msg-test123", "delta": " chunk"}\n\n`,
+				`data: {"type": "response.output_text.delta", "item_id": "msg-test123", "delta": "2"}\n\n`,
+				`data: {"type": "response.output_item.done", "output_index": 0, "item": {"type": "message", "role": "assistant", "id": "msg-test123", "content": [{"type": "output_text", "text": "Hello chunk1Hello chunk2", "annotations": []}]}}\n\n`,
+				`data: {"type": "response.completed", "response": {"id": "resp-test123", "created_at": ${Math.floor(Date.now() / 1000)}, "model": "gpt-4o-mini", "output": [{"type": "message", "role": "assistant", "id": "msg-test123", "content": [{"type": "output_text", "text": "Hello chunk1Hello chunk2", "annotations": []}]}], "incomplete_details": null, "object": "response", "usage": {"input_tokens": 10, "output_tokens": 8, "total_tokens": 18}}}\n\n`,
 				"data: [DONE]",
 			].join(""),
 			{
@@ -71,9 +73,12 @@ describe("Binding - Streaming Text Tests", () => {
 				run: async () => {
 					return new Response(
 						[
-							`data: {"nonce": "c673", "id":"chatcmpl-BOlQHy37KaTjcGB9k04XEztiEI1Df","object":"chat.completion.chunk","created":1745241865,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_0392822090","choices":[{"index":0,"delta":{"role":"assistant","content":"","refusal":null},"logprobs":null,"finish_reason":null}]}\n\n`,
-							`data: {"nonce": "29", "id":"chatcmpl-BOlQHy37KaTjcGB9k04XEztiEI1Df","object":"chat.completion.chunk","created":1745241865,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_0392822090","choices":[{"index":0,"delta":{"content":"Hello"},"logprobs":null,"finish_reason":null}]}\n\n`,
-							`data: {"nonce": "4024247058da", "id":"chatcmpl-BOlQHy37KaTjcGB9k04XEztiEI1Df","object":"chat.completion.chunk","created":1745241865,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_0392822090","choices":[{"index":0,"delta":{"content":" world!"},"logprobs":null,"finish_reason":null}]}\n\n`,
+							`data: {"type": "response.created", "response": {"id": "resp-test123", "created_at": ${Math.floor(Date.now() / 1000)}, "model": "gpt-4o-mini"}}\n\n`,
+							`data: {"type": "response.output_item.added", "output_index": 0, "item": {"type": "message", "role": "assistant", "id": "msg-test123", "content": []}}\n\n`,
+							`data: {"type": "response.output_text.delta", "item_id": "msg-test123", "delta": "Hello"}\n\n`,
+							`data: {"type": "response.output_text.delta", "item_id": "msg-test123", "delta": " world!"}\n\n`,
+							`data: {"type": "response.output_item.done", "output_index": 0, "item": {"type": "message", "role": "assistant", "id": "msg-test123", "content": [{"type": "output_text", "text": "Hello world!", "annotations": []}]}}\n\n`,
+							`data: {"type": "response.completed", "response": {"id": "resp-test123", "created_at": ${Math.floor(Date.now() / 1000)}, "model": "gpt-4o-mini", "output": [{"type": "message", "role": "assistant", "id": "msg-test123", "content": [{"type": "output_text", "text": "Hello world!", "annotations": []}]}], "incomplete_details": null, "object": "response", "usage": {"input_tokens": 5, "output_tokens": 2, "total_tokens": 7}}}\n\n`,
 							"data: [DONE]",
 						].join(""),
 						{
@@ -99,8 +104,7 @@ describe("Binding - Streaming Text Tests", () => {
 			finalText += chunk;
 		}
 
-		// The second chunk is missing 'response', so it is skipped
-		// The first and third chunks are appended => "Hello world!"
+		// Delta chunks are combined to produce the final text => "Hello world!"
 		expect(finalText).toBe("Hello world!");
 	});
 });
