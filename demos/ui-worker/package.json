@@ -27,7 +27,7 @@
 		"@mantine/modals": "^8.2.8",
 		"@mantine/notifications": "^8.2.8",
 		"ai": "^5.0.29",
-		"hono": "^4.9.5",
+		"hono": "^4.9.6",
 		"react": "^19.1.1",
 		"react-dom": "^19.1.1",
 		"recharts": "^3.1.2",
