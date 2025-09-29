@@ -140,8 +140,40 @@ export function McpServers({ onToolsUpdate }: { onToolsUpdate?: (tools: any[]) =
 
 	const handleConnectionUpdate = useCallback((data: ConnectionData) => {
 		setConnectionData(data);
-		if (data.state === "failed") setIsActive(false);
-	}, []);
+		if (data.state === "failed") {
+			setIsActive(false);
+
+			for (const log of data.log) {
+				if (log.level === "error" && log.message.includes('"code":-32001')) {
+					console.warn("Session expired, clearing storage and re-connecting");
+					data.clearStorage()
+					disconnect();
+					setConnectionData({
+						authenticate: () => Promise.resolve(undefined),
+						authUrl: undefined,
+						callTool: (_name: string, _args?: Record<string, unknown>) =>
+							Promise.resolve(undefined),
+						clearStorage: () => {},
+						disconnect: () => {},
+						error: undefined,
+						log: [],
+						retry: () => {},
+						state: "not-connected",
+						tools: [],
+						resources: [],
+						resourceTemplates: [],
+						prompts: [],
+						listResources: async () => {},
+						readResource: async () => ({ contents: [] }),
+						listPrompts: async () => {},
+						getPrompt: async () => ({ messages: [] }),
+					});
+				  setIsActive(true)
+					break;
+				}
+			}
+		}
+	}, [disconnect]);
 
 	// Handle authentication if popup was blocked
 	const handleManualAuth = () => {
