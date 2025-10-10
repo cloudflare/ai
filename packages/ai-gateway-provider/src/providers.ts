@@ -13,10 +13,12 @@ export const providers = [
 		name: "anthropic",
 		regex: /^https:\/\/api\.anthropic\.com\//,
 		transformEndpoint: (url: string) => url.replace(/^https:\/\/api\.anthropic\.com\//, ""),
+		headerKey: "x-api-key",
 	},
 	{
 		name: "google-ai-studio",
 		regex: /^https:\/\/generativelanguage\.googleapis\.com\//,
+		headerKey: "x-goog-api-key",
 		transformEndpoint: (url: string) =>
 			url.replace(/^https:\/\/generativelanguage\.googleapis\.com\//, ""),
 	},
@@ -60,5 +62,6 @@ export const providers = [
 			}
 			return `${resource}/${deployment}/${rest}`;
 		},
+		headerKey: "api-key",
 	},
 ];

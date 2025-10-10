@@ -1,12 +1,13 @@
 import type { LanguageModelV2 } from "@ai-sdk/provider";
 import type { FetchFunction } from "@ai-sdk/provider-utils";
 import { providers } from "./providers";
+import { CF_TEMP_TOKEN } from "./auth";
 
-export class AiGatewayInternalFetchError extends Error {}
+export class AiGatewayInternalFetchError extends Error { }
 
-export class AiGatewayDoesNotExist extends Error {}
+export class AiGatewayDoesNotExist extends Error { }
 
-export class AiGatewayUnauthorizedError extends Error {}
+export class AiGatewayUnauthorizedError extends Error { }
 
 async function streamToObject(stream: ReadableStream) {
 	const response = new Response(stream);
@@ -83,6 +84,8 @@ export class AiGatewayChatLanguageModel implements LanguageModelV2 {
 			}
 		}
 
+
+
 		// Process requests
 		const body = await Promise.all(
 			requests.map(async (req) => {
@@ -102,6 +105,20 @@ export class AiGatewayChatLanguageModel implements LanguageModelV2 {
 				if (!req.request.body) {
 					throw new Error("Ai Gateway provider received an unexpected empty body");
 				}
+
+				// For AI Gateway BYOK / unified billing requests
+				// delete the fake injected CF_TEMP_TOKEN
+
+				const authHeader = providerConfig.headerKey ?? 'authorization';
+				const authValue = 'get' in req.request.headers ? req.request.headers.get(authHeader) : req.request.headers[authHeader];
+				if (authValue?.indexOf(CF_TEMP_TOKEN) !== -1) {
+					if ("delete" in req.request.headers) {
+						req.request.headers.delete(authHeader);
+					} else {
+						delete req.request.headers[authHeader];
+					}
+				}
+
 
 				return {
 					endpoint: providerConfig.transformEndpoint(req.url),
