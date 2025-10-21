@@ -27,7 +27,7 @@
 		"@cloudflare/vite-plugin": "^1.13.10",
 		"@cloudflare/vitest-pool-workers": "^0.9.10",
 		"typescript": "5.9.3",
-		"vite": "^7.1.9",
+		"vite": "^7.1.11",
 		"vitest": "~3.2.4",
 		"wrangler": "^4.42.0"
 	}
