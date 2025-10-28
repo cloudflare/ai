@@ -1,4 +1,12 @@
-import type { User } from "@workos-inc/node";
+import type { AuthRequest } from "@cloudflare/workers-oauth-provider";
+import type { Organization, User } from "@workos-inc/node";
+
+export type AuthInteractionSession = {
+	upstreamState: string; // For upstream provider state validation
+	codeVerifier: string; // For upstream PKCE
+	codeChallenge: string; // For upstream PKCE
+	mcpAuthRequestInfo: AuthRequest;
+};
 
 export interface Props {
 	user: User;
