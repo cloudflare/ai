@@ -69,7 +69,16 @@ app.post("/authorize", async (c) => {
 
 	const { csrfToken: expectedCsrfToken, mcpAuthRequestInfo } = interactionSession;
 
-	if (expectedCsrfToken !== csrfToken) {
+	// Use a constant-time comparison to prevent timing attacks
+	const encoder = new TextEncoder();
+	const expectedTokenBuffer = encoder.encode(expectedCsrfToken);
+	const receivedTokenBuffer = encoder.encode(csrfToken);
+
+	const areTokensEqual =
+		expectedTokenBuffer.length === receivedTokenBuffer.length &&
+		crypto.subtle.timingSafeEqual(expectedTokenBuffer, receivedTokenBuffer);
+
+	if (!areTokensEqual) {
 		return c.text("Invalid CSRF token", 400);
 	}
 
