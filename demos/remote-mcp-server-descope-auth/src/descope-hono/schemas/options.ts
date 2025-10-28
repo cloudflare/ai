@@ -1,3 +1,4 @@
+import type { AuthRequest } from "@cloudflare/workers-oauth-provider";
 import { z } from "zod";
 
 /**
@@ -98,3 +99,8 @@ export type DynamicClientRegistrationOptions = z.infer<
 	typeof DynamicClientRegistrationOptionsSchema
 >;
 export type DescopeMcpProviderOptions = z.infer<typeof DescopeMcpProviderOptionsSchema>;
+
+export type AuthInteractionSession = {
+	upstreamState: string;
+	mcpAuthRequestInfo: AuthRequest;
+};

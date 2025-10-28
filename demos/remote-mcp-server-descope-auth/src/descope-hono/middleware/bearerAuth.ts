@@ -1,3 +1,4 @@
+import { deleteCookie } from "hono/cookie";
 import type { Context, MiddlewareHandler } from "hono";
 import { InsufficientScopeError, InvalidTokenError, OAuthError, ServerError } from "../errors.js";
 import { type AuthInfo, AuthInfoSchema } from "../schemas/auth.js";
@@ -168,6 +169,12 @@ export function descopeMcpBearerAuth(provider?: DescopeMcpProvider): MiddlewareH
 			const authInfo = await verifyAccessToken(token, authProvider);
 
 			c.set("auth", authInfo);
+
+			// Clear the temporary session cookie now that the flow is complete
+			deleteCookie(c, "descope-auth-session", {
+				path: "/",
+			});
+
 			await next();
 		} catch (error) {
 			console.log("Error in descopeMcpBearerAuth middleware", error);
