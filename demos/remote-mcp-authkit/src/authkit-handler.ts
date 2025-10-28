@@ -54,6 +54,14 @@ app.get("/authorize", async (c) => {
 	);
 });
 
+/**
+ * OAuth Callback Endpoint
+ *
+ * This route handles the callback from WorkOS after user authentication.
+ * It exchanges the temporary code for an access token, then stores user
+ * metadata & the auth token as part of the 'props' on the token passed
+ * down to the client. It ends by redirecting the client back to _its_ callback URL
+ */
 app.get("/callback", async (c) => {
 	const workOS = c.get("workOS");
 
