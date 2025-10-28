@@ -1,28 +1,44 @@
 import { env } from "cloudflare:workers";
 import type { AuthRequest, OAuthHelpers } from "@cloudflare/workers-oauth-provider";
 import { Hono } from "hono";
+import type { AuthInteractionSession } from "./utils";
+import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { Octokit } from "octokit";
+import { generatePKCECodes, verifyPKCE } from "./pkce";
 import { fetchUpstreamAuthToken, getUpstreamAuthorizeUrl, type Props } from "./utils";
-import {
-	clientIdAlreadyApproved,
-	parseRedirectApproval,
-	renderApprovalDialog,
-} from "./workers-oauth-utils";
+import { renderApprovalDialog } from "./workers-oauth-utils";
 
 const app = new Hono<{ Bindings: Env & { OAUTH_PROVIDER: OAuthHelpers } }>();
 
+const sessionCookieName = "github-auth-session";
+
 app.get("/authorize", async (c) => {
-	const oauthReqInfo = await c.env.OAUTH_PROVIDER.parseAuthRequest(c.req.raw);
-	const { clientId } = oauthReqInfo;
+	const mcpAuthRequestInfo = await c.env.OAUTH_PROVIDER.parseAuthRequest(c.req.raw);
+	const { clientId } = mcpAuthRequestInfo;
+
 	if (!clientId) {
 		return c.text("Invalid request", 400);
 	}
 
-	if (
-		await clientIdAlreadyApproved(c.req.raw, oauthReqInfo.clientId, env.COOKIE_ENCRYPTION_KEY)
-	) {
-		return redirectToGithub(c.req.raw, oauthReqInfo);
-	}
+	const { codeChallenge, codeVerifier } = await generatePKCECodes();
+	const csrfToken = crypto.randomUUID();
+	const upstreamState = crypto.randomUUID();
+
+	const authInteractionSession: AuthInteractionSession = {
+		csrfToken,
+		upstreamState,
+		codeVerifier,
+		codeChallenge,
+		mcpAuthRequestInfo,
+	};
+
+	setCookie(c, sessionCookieName, btoa(JSON.stringify(authInteractionSession)), {
+		path: "/",
+		httpOnly: true,
+		secure: false, // TODO: Set to true in production
+		sameSite: "lax",
+		maxAge: 60 * 60 * 1, // 1 hour
+	});
 
 	return renderApprovalDialog(c.req.raw, {
 		client: await c.env.OAUTH_PROVIDER.lookupClient(clientId),
@@ -31,33 +47,50 @@ app.get("/authorize", async (c) => {
 			logo: "https://avatars.githubusercontent.com/u/314135?s=200&v=4",
 			name: "Cloudflare GitHub MCP Server", // optional
 		},
-		state: { oauthReqInfo }, // arbitrary data that flows through the form submission below
+		csrfToken,
 	});
 });
 
 app.post("/authorize", async (c) => {
-	// Validates form submission, extracts state, and generates Set-Cookie headers to skip approval dialog next time
-	const { state, headers } = await parseRedirectApproval(c.req.raw, env.COOKIE_ENCRYPTION_KEY);
-	if (!state.oauthReqInfo) {
+	const formData = await c.req.formData();
+	const csrfToken = formData.get("csrfToken") as string;
+
+	if (!csrfToken) {
 		return c.text("Invalid request", 400);
 	}
 
-	return redirectToGithub(c.req.raw, state.oauthReqInfo, headers);
+	const interactionSessionCookie = getCookie(c, sessionCookieName);
+
+	if (!interactionSessionCookie) {
+		return c.text("Invalid request", 400);
+	}
+
+	const interactionSession = JSON.parse(atob(interactionSessionCookie)) as AuthInteractionSession;
+
+	const { csrfToken: expectedCsrfToken, mcpAuthRequestInfo } = interactionSession;
+
+	if (expectedCsrfToken !== csrfToken) {
+		return c.text("Invalid CSRF token", 400);
+	}
+
+	if (!mcpAuthRequestInfo) {
+		return c.text("Invalid request", 400);
+	}
+
+	return redirectToGithub(c.req.raw, interactionSession);
 });
 
-async function redirectToGithub(
-	request: Request,
-	oauthReqInfo: AuthRequest,
-	headers: Record<string, string> = {},
-) {
+async function redirectToGithub(request: Request, interactionSession: AuthInteractionSession) {
+	const { upstreamState, codeChallenge, mcpAuthRequestInfo } = interactionSession;
 	return new Response(null, {
 		headers: {
-			...headers,
 			location: getUpstreamAuthorizeUrl({
 				client_id: env.GITHUB_CLIENT_ID,
 				redirect_uri: new URL("/callback", request.url).href,
 				scope: "read:user",
-				state: btoa(JSON.stringify(oauthReqInfo)),
+				state: upstreamState,
+				code_challenge: codeChallenge,
+				code_challenge_method: "S256",
 				upstream_url: "https://github.com/login/oauth/authorize",
 			}),
 		},
@@ -65,49 +98,59 @@ async function redirectToGithub(
 	});
 }
 
-/**
- * OAuth Callback Endpoint
- *
- * This route handles the callback from GitHub after user authentication.
- * It exchanges the temporary code for an access token, then stores some
- * user metadata & the auth token as part of the 'props' on the token passed
- * down to the client. It ends by redirecting the client back to _its_ callback URL
- */
 app.get("/callback", async (c) => {
-	// Get the oathReqInfo out of KV
-	const oauthReqInfo = JSON.parse(atob(c.req.query("state") as string)) as AuthRequest;
-	if (!oauthReqInfo.clientId) {
+	const interactionSessionCookie = getCookie(c, sessionCookieName);
+
+	if (!interactionSessionCookie) {
+		return c.text("Invalid request", 400);
+	}
+
+	const interactionSession = JSON.parse(atob(interactionSessionCookie)) as AuthInteractionSession;
+
+	if (!interactionSession) {
+		return c.text("Invalid request", 400);
+	}
+
+	const { mcpAuthRequestInfo, upstreamState, codeVerifier } = interactionSession;
+
+	if (c.req.query("state") !== upstreamState) {
 		return c.text("Invalid state", 400);
 	}
 
-	// Exchange the code for an access token
+	if (!mcpAuthRequestInfo?.clientId) {
+		return c.text("Invalid request", 400);
+	}
+
 	const [accessToken, errResponse] = await fetchUpstreamAuthToken({
 		client_id: c.env.GITHUB_CLIENT_ID,
 		client_secret: c.env.GITHUB_CLIENT_SECRET,
 		code: c.req.query("code"),
 		redirect_uri: new URL("/callback", c.req.url).href,
 		upstream_url: "https://github.com/login/oauth/access_token",
+		code_verifier: codeVerifier,
 	});
 	if (errResponse) return errResponse;
 
-	// Fetch the user info from GitHub
 	const user = await new Octokit({ auth: accessToken }).rest.users.getAuthenticated();
 	const { login, name, email } = user.data;
 
-	// Return back to the MCP client a new token
+	// Clear the session cookie
+	deleteCookie(c, sessionCookieName, {
+		path: "/",
+	});
+
 	const { redirectTo } = await c.env.OAUTH_PROVIDER.completeAuthorization({
 		metadata: {
 			label: name,
 		},
-		// This will be available on this.props inside MyMCP
 		props: {
 			accessToken,
 			email,
 			login,
 			name,
 		} as Props,
-		request: oauthReqInfo,
-		scope: oauthReqInfo.scope,
+		request: mcpAuthRequestInfo,
+		scope: mcpAuthRequestInfo.scope,
 		userId: login,
 	});
 

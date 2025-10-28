@@ -1,3 +1,5 @@
+import type { AuthRequest } from "@cloudflare/workers-oauth-provider";
+
 /**
  * Constructs an authorization URL for an upstream service.
  *
@@ -15,18 +17,24 @@ export function getUpstreamAuthorizeUrl({
 	scope,
 	redirect_uri,
 	state,
+	code_challenge,
+	code_challenge_method,
 }: {
 	upstream_url: string;
 	client_id: string;
 	scope: string;
 	redirect_uri: string;
 	state?: string;
+	code_challenge?: string;
+	code_challenge_method?: string;
 }) {
 	const upstream = new URL(upstream_url);
 	upstream.searchParams.set("client_id", client_id);
 	upstream.searchParams.set("redirect_uri", redirect_uri);
 	upstream.searchParams.set("scope", scope);
 	if (state) upstream.searchParams.set("state", state);
+	if (code_challenge) upstream.searchParams.set("code_challenge", code_challenge);
+	if (code_challenge_method) upstream.searchParams.set("code_challenge_method", code_challenge_method);
 	upstream.searchParams.set("response_type", "code");
 	return upstream.href;
 }
@@ -49,19 +57,24 @@ export async function fetchUpstreamAuthToken({
 	code,
 	redirect_uri,
 	upstream_url,
+	code_verifier,
 }: {
 	code: string | undefined;
 	upstream_url: string;
 	client_secret: string;
 	redirect_uri: string;
 	client_id: string;
+	code_verifier?: string;
 }): Promise<[string, null] | [null, Response]> {
 	if (!code) {
 		return [null, new Response("Missing code", { status: 400 })];
 	}
 
+	const params = new URLSearchParams({ client_id, client_secret, code, redirect_uri });
+	if (code_verifier) params.set("code_verifier", code_verifier);
+
 	const resp = await fetch(upstream_url, {
-		body: new URLSearchParams({ client_id, client_secret, code, redirect_uri }).toString(),
+		body: params.toString(),
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded",
 		},
@@ -86,4 +99,12 @@ export type Props = {
 	name: string;
 	email: string;
 	accessToken: string;
+};
+
+export type AuthInteractionSession = {
+	csrfToken: string; // For consent form CSRF
+	upstreamState: string; // For upstream provider state validation
+	codeVerifier: string; // For upstream PKCE
+	codeChallenge: string; // For upstream PKCE
+	mcpAuthRequestInfo: AuthRequest;
 };

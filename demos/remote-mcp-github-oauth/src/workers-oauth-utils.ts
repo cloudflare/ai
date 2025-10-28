@@ -195,10 +195,9 @@ export interface ApprovalDialogOptions {
 		description?: string;
 	};
 	/**
-	 * Arbitrary state data to pass through the approval flow
-	 * Will be encoded in the form and returned when approval is complete
+	 * CSRF token to prevent cross-site request forgery
 	 */
-	state: Record<string, any>;
+	csrfToken: string;
 	/**
 	 * Name of the cookie to use for storing approvals
 	 * @default "mcp_approved_clients"
@@ -237,10 +236,8 @@ export interface ApprovalDialogOptions {
  * @returns A Response containing the HTML approval dialog
  */
 export function renderApprovalDialog(request: Request, options: ApprovalDialogOptions): Response {
-	const { client, server, state } = options;
+	const { client, server, csrfToken } = options;
 
-	// Encode state for form submission
-	const encodedState = btoa(JSON.stringify(state));
 
 	// Sanitize any untrusted content
 	const serverName = sanitizeHtml(server.name);
@@ -543,7 +540,7 @@ export function renderApprovalDialog(request: Request, options: ApprovalDialogOp
             <p>This MCP Client is requesting to be authorized on ${serverName}. If you approve, you will be redirected to complete authentication.</p>
             
             <form method="post" action="${new URL(request.url).pathname}">
-              <input type="hidden" name="state" value="${encodedState}">
+                            <input type="hidden" name="csrfToken" value="${csrfToken}">
               
               <div class="actions">
                 <button type="button" class="button button-secondary" onclick="window.history.back()">Cancel</button>
