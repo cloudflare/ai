@@ -1,7 +1,16 @@
 import { env } from "cloudflare:workers";
 import type { AuthRequest, OAuthHelpers } from "@cloudflare/workers-oauth-provider";
 import { Hono } from "hono";
+import { deleteCookie, getCookie, setCookie } from "hono/cookie";
+import { generatePKCECodes, verifyPKCE } from "./pkce";
 import { getUpstreamAuthorizeUrl } from "./utils";
+
+export type AuthInteractionSession = {
+	upstreamState: string; // For upstream provider state validation
+	codeVerifier: string; // For upstream PKCE
+	codeChallenge: string; // For upstream PKCE
+	mcpAuthRequestInfo: AuthRequest;
+};
 
 // Context from the auth process, encrypted & stored in the auth token
 // and provided to the DurableMCP as this.props
@@ -19,27 +28,40 @@ const app = new Hono<{
 	Bindings: Env & { OAUTH_PROVIDER: OAuthHelpers };
 }>();
 
-/**
- * OAuth Authorization Endpoint
- *
- * This route initiates the Slack OAuth flow when a user wants to log in.
- * It creates a random state parameter to prevent CSRF attacks and stores the
- * original OAuth request information in KV storage for later retrieval.
- * Then it redirects the user to Slack's authorization page with the appropriate
- * parameters so the user can authenticate and grant permissions.
- */
+const sessionCookieName = "slack-auth-session";
+
 app.get("/authorize", async (c) => {
 	const oauthReqInfo = await c.env.OAUTH_PROVIDER.parseAuthRequest(c.req.raw);
 	if (!oauthReqInfo.clientId) {
 		return c.text("Invalid request", 400);
 	}
 
+	const { codeChallenge, codeVerifier } = await generatePKCECodes();
+	const upstreamState = crypto.randomUUID();
+
+	const authInteractionSession: AuthInteractionSession = {
+		upstreamState,
+		codeVerifier,
+		codeChallenge,
+		mcpAuthRequestInfo: oauthReqInfo,
+	};
+
+	setCookie(c, sessionCookieName, btoa(JSON.stringify(authInteractionSession)), {
+		path: "/",
+		httpOnly: true,
+		secure: false, // TODO: Set to true in production
+		sameSite: "lax",
+		maxAge: 60 * 60 * 1, // 1 hour
+	});
+
 	return Response.redirect(
 		getUpstreamAuthorizeUrl({
 			client_id: c.env.SLACK_CLIENT_ID,
 			redirect_uri: new URL("/callback", c.req.url).href,
 			scope: "channels:history,channels:read,users:read",
-			state: btoa(JSON.stringify(oauthReqInfo)),
+			state: upstreamState,
+			code_challenge: codeChallenge,
+			code_challenge_method: "S256",
 			upstream_url: "https://slack.com/oauth/v2/authorize",
 		}),
 		302,
@@ -75,15 +97,21 @@ type SlackOauthTokenResponse =
 app.get("/callback", async (c) => {
 	const code = c.req.query("code") as string;
 
-	// Get the oauthReqInfo directly from the state parameter
-	const state = c.req.query("state");
-	if (!state) {
-		return c.text("Missing state", 400);
+	const interactionSessionCookie = getCookie(c, sessionCookieName);
+
+	if (!interactionSessionCookie) {
+		return c.text("Invalid request", 400);
 	}
 
-	// Parse the state to get the original OAuth request info
-	const oauthReqInfo = JSON.parse(atob(state)) as AuthRequest;
+	const { codeVerifier, mcpAuthRequestInfo: oauthReqInfo, upstreamState } = JSON.parse(
+		atob(interactionSessionCookie),
+	) as AuthInteractionSession;
+
 	if (!oauthReqInfo.clientId) {
+		return c.text("Invalid request", 400);
+	}
+
+	if (c.req.query("state") !== upstreamState) {
 		return c.text("Invalid state", 400);
 	}
 
@@ -99,6 +127,7 @@ app.get("/callback", async (c) => {
 			client_secret: c.env.SLACK_CLIENT_SECRET,
 			code,
 			redirect_uri: new URL("/callback", c.req.url).href,
+			code_verifier: codeVerifier,
 		}).toString(),
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded",
@@ -129,6 +158,11 @@ app.get("/callback", async (c) => {
 	const teamId = data.team?.id || "unknown";
 	const teamName = data.team?.name || "unknown";
 	const scope = data.scope || "";
+
+	// Clear the session cookie
+	deleteCookie(c, sessionCookieName, {
+		path: "/",
+	});
 
 	console.log("Completing authorization with user:", userId);
 
