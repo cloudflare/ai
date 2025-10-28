@@ -158,26 +158,26 @@ export function renderApprovalDialog(request: Request, options: ApprovalDialogOp
 	const encodedState = Buffer.from(JSON.stringify(state)).toString("base64url");
 
 	// Sanitize any untrusted content
-	const serverName = sanitizeHtml(server.name);
-	const clientName = client?.clientName ? sanitizeHtml(client.clientName) : "Unknown MCP Client";
-	const serverDescription = server.description ? sanitizeHtml(server.description) : "";
+	const serverName = sanitizeText(server.name);
+	const clientName = client?.clientName ? sanitizeText(client.clientName) : "Unknown MCP Client";
+	const serverDescription = server.description ? sanitizeText(server.description) : "";
 
 	// Safe URLs
-	const logoUrl = server.logo ? sanitizeHtml(server.logo) : "";
-	const clientUri = client?.clientUri ? sanitizeHtml(client.clientUri) : "";
-	const policyUri = client?.policyUri ? sanitizeHtml(client.policyUri) : "";
-	const tosUri = client?.tosUri ? sanitizeHtml(client.tosUri) : "";
+	const logoUrl = server.logo ? sanitizeUrl(server.logo) : "";
+	const clientUri = client?.clientUri ? sanitizeUrl(client.clientUri) : "";
+	const policyUri = client?.policyUri ? sanitizeUrl(client.policyUri) : "";
+	const tosUri = client?.tosUri ? sanitizeUrl(client.tosUri) : "";
 
 	// Client contacts
 	const contacts =
 		client?.contacts && client.contacts.length > 0
-			? sanitizeHtml(client.contacts.join(", "))
+			? sanitizeText(client.contacts.join(", "))
 			: "";
 
 	// Get redirect URIs
 	const redirectUris =
 		client?.redirectUris && client.redirectUris.length > 0
-			? client.redirectUris.map((uri) => sanitizeHtml(uri))
+			? client.redirectUris.map((uri) => sanitizeUrl(uri))
 			: [];
 
 	// Generate HTML for the approval dialog
@@ -630,15 +630,48 @@ export async function fetchUpstreamAuthToken({
 }
 
 /**
- * Sanitizes HTML content to prevent XSS attacks
+ * Sanitizes text to prevent XSS attacks by escaping HTML characters.
  */
-function sanitizeHtml(unsafe: string): string {
+function sanitizeText(unsafe: string): string {
 	return unsafe
 		.replace(/&/g, "&amp;")
 		.replace(/</g, "&lt;")
 		.replace(/>/g, "&gt;")
 		.replace(/"/g, "&quot;")
 		.replace(/'/g, "&#039;");
+}
+
+export function sanitizeUrl(raw: string): string {
+	const abort = () => {
+		throw new Error(`Invalid url to pass to open(): ${raw}`);
+	};
+	let url!: URL;
+	try {
+		url = new URL(raw);
+	} catch (_) {
+		abort();
+	}
+
+	// Don't allow any other scheme than http(s)
+	if (url.protocol !== "https:" && url.protocol !== "http:") abort();
+	// Hostnames can't be updated, but let's reject if they contain anything suspicious
+	if (url.hostname !== encodeURIComponent(url.hostname)) abort();
+
+	// Forcibly sanitise all the pieces of the URL
+	if (url.username) url.username = encodeURIComponent(url.username);
+	if (url.password) url.password = encodeURIComponent(url.password);
+	url.pathname =
+		url.pathname.slice(0, 1) +
+		encodeURIComponent(url.pathname.slice(1)).replace(/%2f/gi, "/");
+	url.search =
+		url.search.slice(0, 1) +
+		Array.from(url.searchParams.entries()).map(sanitizeParam).join("&");
+	url.hash = url.hash.slice(0, 1) + encodeURIComponent(url.hash.slice(1));
+	return url.href;
+}
+
+function sanitizeParam([k, v]: [string, string]): string {
+	return `${encodeURIComponent(k)}${v.length > 0 ? `=${encodeURIComponent(v)}` : ""}`;
 }
 
 // Context from the auth process, encrypted & stored in the auth token
