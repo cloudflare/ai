@@ -1,12 +1,15 @@
 import { env } from "cloudflare:workers";
-import type { AuthRequest, OAuthHelpers } from "@cloudflare/workers-oauth-provider";
+import type { OAuthHelpers } from "@cloudflare/workers-oauth-provider";
 import { Hono } from "hono";
 import { Octokit } from "octokit";
 import { fetchUpstreamAuthToken, getUpstreamAuthorizeUrl, type Props } from "./utils";
 import {
 	clientIdAlreadyApproved,
+	createOAuthState,
+	generateCSRFProtection,
 	parseRedirectApproval,
 	renderApprovalDialog,
+	validateOAuthState,
 } from "./workers-oauth-utils";
 
 const app = new Hono<{ Bindings: Env & { OAUTH_PROVIDER: OAuthHelpers } }>();
@@ -21,16 +24,21 @@ app.get("/authorize", async (c) => {
 	if (
 		await clientIdAlreadyApproved(c.req.raw, oauthReqInfo.clientId, env.COOKIE_ENCRYPTION_KEY)
 	) {
-		return redirectToGithub(c.req.raw, oauthReqInfo);
+		const stateToken = await createOAuthState(oauthReqInfo, c.env.OAUTH_KV);
+		return redirectToGithub(c.req.raw, stateToken);
 	}
+
+	const { token: csrfToken, setCookie } = generateCSRFProtection();
 
 	return renderApprovalDialog(c.req.raw, {
 		client: await c.env.OAUTH_PROVIDER.lookupClient(clientId),
+		csrfToken,
 		server: {
 			description: "This is a demo MCP Remote Server using GitHub for authentication.",
 			logo: "https://avatars.githubusercontent.com/u/314135?s=200&v=4",
 			name: "Cloudflare GitHub MCP Server", // optional
 		},
+		setCookie,
 		state: { oauthReqInfo }, // arbitrary data that flows through the form submission below
 	});
 });
@@ -42,12 +50,13 @@ app.post("/authorize", async (c) => {
 		return c.text("Invalid request", 400);
 	}
 
-	return redirectToGithub(c.req.raw, state.oauthReqInfo, headers);
+	const stateToken = await createOAuthState(state.oauthReqInfo, c.env.OAUTH_KV);
+	return redirectToGithub(c.req.raw, stateToken, headers);
 });
 
 async function redirectToGithub(
 	request: Request,
-	oauthReqInfo: AuthRequest,
+	stateToken: string,
 	headers: Record<string, string> = {},
 ) {
 	return new Response(null, {
@@ -57,7 +66,7 @@ async function redirectToGithub(
 				client_id: env.GITHUB_CLIENT_ID,
 				redirect_uri: new URL("/callback", request.url).href,
 				scope: "read:user",
-				state: btoa(JSON.stringify(oauthReqInfo)),
+				state: stateToken,
 				upstream_url: "https://github.com/login/oauth/authorize",
 			}),
 		},
@@ -75,7 +84,7 @@ async function redirectToGithub(
  */
 app.get("/callback", async (c) => {
 	// Get the oathReqInfo out of KV
-	const oauthReqInfo = JSON.parse(atob(c.req.query("state") as string)) as AuthRequest;
+	const oauthReqInfo = await validateOAuthState(c.req.raw, c.env.OAUTH_KV);
 	if (!oauthReqInfo.clientId) {
 		return c.text("Invalid state", 400);
 	}
