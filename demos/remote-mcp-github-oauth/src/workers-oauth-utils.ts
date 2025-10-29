@@ -1,43 +1,12 @@
 // workers-oauth-utils.ts
 
-import type { AuthRequest, ClientInfo } from "@cloudflare/workers-oauth-provider"; // Adjust path if necessary
+import type { AuthRequest, ClientInfo } from "@cloudflare/workers-oauth-provider";
 
-const COOKIE_NAME = "mcp-approved-clients";
+const COOKIE_NAME = "__Host-MCP_APPROVED_CLIENTS";
 const ONE_YEAR_IN_SECONDS = 31536000;
 
 // --- Helper Functions ---
 
-/**
- * Encodes arbitrary data to a URL-safe base64 string.
- * @param data - The data to encode (will be stringified).
- * @returns A URL-safe base64 encoded string.
- */
-function _encodeState(data: any): string {
-	try {
-		const jsonString = JSON.stringify(data);
-		// Use btoa for simplicity, assuming Worker environment supports it well enough
-		// For complex binary data, a Buffer/Uint8Array approach might be better
-		return btoa(jsonString);
-	} catch (e) {
-		console.error("Error encoding state:", e);
-		throw new Error("Could not encode state");
-	}
-}
-
-/**
- * Decodes a URL-safe base64 string back to its original data.
- * @param encoded - The URL-safe base64 encoded string.
- * @returns The original data.
- */
-function decodeState<T = any>(encoded: string): T {
-	try {
-		const jsonString = atob(encoded);
-		return JSON.parse(jsonString);
-	} catch (e) {
-		console.error("Error decoding state:", e);
-		throw new Error("Could not decode state");
-	}
-}
 
 /**
  * Imports a secret key string for HMAC-SHA256 signing.
@@ -200,31 +169,13 @@ export interface ApprovalDialogOptions {
 	 */
 	state: Record<string, any>;
 	/**
-	 * Name of the cookie to use for storing approvals
-	 * @default "mcp_approved_clients"
+	 * CSRF token to include in the approval form
 	 */
-	cookieName?: string;
+	csrfToken: string;
 	/**
-	 * Secret used to sign cookies for verification
-	 * Can be a string or Uint8Array
-	 * @default Built-in Uint8Array key
+	 * Set-Cookie header to include in the approval response
 	 */
-	cookieSecret?: string | Uint8Array;
-	/**
-	 * Cookie domain
-	 * @default current domain
-	 */
-	cookieDomain?: string;
-	/**
-	 * Cookie path
-	 * @default "/"
-	 */
-	cookiePath?: string;
-	/**
-	 * Cookie max age in seconds
-	 * @default 30 days
-	 */
-	cookieMaxAge?: number;
+	setCookie: string;
 }
 
 /**
@@ -237,9 +188,7 @@ export interface ApprovalDialogOptions {
  * @returns A Response containing the HTML approval dialog
  */
 export function renderApprovalDialog(request: Request, options: ApprovalDialogOptions): Response {
-	const { client, server, state } = options;
-
-	// Encode state for form submission
+	const { client, server, state, csrfToken, setCookie } = options;
 	const encodedState = btoa(JSON.stringify(state));
 
 	// Sanitize any untrusted content
@@ -262,7 +211,7 @@ export function renderApprovalDialog(request: Request, options: ApprovalDialogOp
 	// Get redirect URIs
 	const redirectUris =
 		client?.redirectUris && client.redirectUris.length > 0
-			? client.redirectUris.map((uri) => sanitizeHtml(uri))
+			? client.redirectUris.map((uri) => sanitizeHtml(uri)).filter((uri) => uri !== "")
 			: [];
 
 	// Generate HTML for the approval dialog
@@ -544,7 +493,8 @@ export function renderApprovalDialog(request: Request, options: ApprovalDialogOp
             
             <form method="post" action="${new URL(request.url).pathname}">
               <input type="hidden" name="state" value="${encodedState}">
-              
+              <input type="hidden" name="csrf_token" value="${csrfToken}">
+
               <div class="actions">
                 <button type="button" class="button button-secondary" onclick="window.history.back()">Cancel</button>
                 <button type="submit" class="button button-primary">Approve</button>
@@ -558,7 +508,10 @@ export function renderApprovalDialog(request: Request, options: ApprovalDialogOp
 
 	return new Response(htmlContent, {
 		headers: {
+			"Content-Security-Policy": "frame-ancestors 'none'",
 			"Content-Type": "text/html; charset=utf-8",
+			"Set-Cookie": setCookie,
+			"X-Frame-Options": "DENY",
 		},
 	});
 }
@@ -567,8 +520,8 @@ export function renderApprovalDialog(request: Request, options: ApprovalDialogOp
  * Result of parsing the approval form submission.
  */
 export interface ParsedApprovalResult {
-	/** The original state object passed through the form. */
-	state: any;
+	/** The original state object containing the OAuth request information. */
+	state: { oauthReqInfo?: AuthRequest };
 	/** Headers to set on the redirect response, including the Set-Cookie header. */
 	headers: Record<string, string>;
 }
@@ -589,39 +542,40 @@ export async function parseRedirectApproval(
 	if (request.method !== "POST") {
 		throw new Error("Invalid request method. Expected POST.");
 	}
+	
+	const formData = await request.formData();
 
-	let state: any;
-	let clientId: string | undefined;
-
-	try {
-		const formData = await request.formData();
-		const encodedState = formData.get("state");
-
-		if (typeof encodedState !== "string" || !encodedState) {
-			throw new Error("Missing or invalid 'state' in form data.");
-		}
-
-		state = decodeState<{ oauthReqInfo?: AuthRequest }>(encodedState); // Decode the state
-		clientId = state?.oauthReqInfo?.clientId; // Extract clientId from within the state
-
-		if (!clientId) {
-			throw new Error("Could not extract clientId from state object.");
-		}
-	} catch (e) {
-		console.error("Error processing form submission:", e);
-		// Rethrow or handle as appropriate, maybe return a specific error response
-		throw new Error(
-			`Failed to parse approval form: ${e instanceof Error ? e.message : String(e)}`,
-		);
+	// Validate CSRF token
+	const tokenFromForm = formData.get("csrf_token");
+	if (!tokenFromForm || typeof tokenFromForm !== "string") {
+		throw new Error("Missing CSRF token in form data");
 	}
 
-	// Get existing approved clients
-	const cookieHeader = request.headers.get("Cookie");
-	const existingApprovedClients =
-		(await getApprovedClientsFromCookie(cookieHeader, cookieSecret)) || [];
+	const cookieHeader = request.headers.get("Cookie") || "";
+	const cookies = cookieHeader.split(";").map((c) => c.trim());
+	const csrfCookie = cookies.find((c) => c.startsWith("__Host-CSRF_TOKEN="));
+	const tokenFromCookie = csrfCookie ? csrfCookie.substring("__Host-CSRF_TOKEN=".length) : null;
 
-	// Add the newly approved client ID (avoid duplicates)
-	const updatedApprovedClients = Array.from(new Set([...existingApprovedClients, clientId]));
+	if (!tokenFromCookie || tokenFromForm !== tokenFromCookie) {
+		throw new Error("CSRF token mismatch");
+	}
+
+	const encodedState = formData.get("state");
+	if (!encodedState || typeof encodedState !== "string") {
+		throw new Error("Missing state in form data");
+	}
+
+	const state = JSON.parse(atob(encodedState));
+	if (!state.oauthReqInfo || !state.oauthReqInfo.clientId) {
+		throw new Error("Invalid state data");
+	}
+
+	// Add client to approved list
+	const existingApprovedClients =
+		(await getApprovedClientsFromCookie(request.headers.get("Cookie"), cookieSecret)) || [];
+	const updatedApprovedClients = Array.from(
+		new Set([...existingApprovedClients, state.oauthReqInfo.clientId]),
+	);
 
 	// Sign the updated list
 	const payload = JSON.stringify(updatedApprovedClients);
@@ -636,6 +590,43 @@ export async function parseRedirectApproval(
 
 	return { headers, state };
 }
+
+// --- New security functions for KV state storage ---
+
+export function generateCSRFProtection(): { token: string; setCookie: string } {
+	const token = crypto.randomUUID();
+	const setCookie = `__Host-CSRF_TOKEN=${token}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=600`;
+	return { token, setCookie };
+}
+
+export async function createOAuthState(
+	oauthReqInfo: AuthRequest,
+	kv: KVNamespace,
+): Promise<string> {
+	const stateToken = crypto.randomUUID();
+	await kv.put(`oauth:state:${stateToken}`, JSON.stringify(oauthReqInfo), {
+		expirationTtl: 600,
+	});
+	return stateToken;
+}
+
+export async function validateOAuthState(request: Request, kv: KVNamespace): Promise<AuthRequest> {
+	const url = new URL(request.url);
+	const stateFromQuery = url.searchParams.get("state");
+	if (!stateFromQuery) {
+		throw new Error("Missing state parameter");
+	}
+
+	const storedDataJson = await kv.get(`oauth:state:${stateFromQuery}`);
+	if (!storedDataJson) {
+		throw new Error("Invalid or expired state");
+	}
+
+	const oauthReqInfo = JSON.parse(storedDataJson) as AuthRequest;
+	await kv.delete(`oauth:state:${stateFromQuery}`);
+	return oauthReqInfo;
+}
+
 
 /**
  * Sanitizes HTML content to prevent XSS attacks
