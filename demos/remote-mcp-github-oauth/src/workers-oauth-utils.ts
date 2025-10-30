@@ -1,12 +1,7 @@
-// workers-oauth-utils.ts
-
 import type { AuthRequest, ClientInfo } from "@cloudflare/workers-oauth-provider";
 
 const COOKIE_NAME = "__Host-MCP_APPROVED_CLIENTS";
 const ONE_YEAR_IN_SECONDS = 31536000;
-
-// --- Helper Functions ---
-
 
 /**
  * Imports a secret key string for HMAC-SHA256 signing.
@@ -58,13 +53,11 @@ async function verifySignature(
 ): Promise<boolean> {
 	const enc = new TextEncoder();
 	try {
-		// Convert hex signature back to ArrayBuffer
 		const signatureBytes = new Uint8Array(
 			signatureHex.match(/.{1,2}/g)!.map((byte) => Number.parseInt(byte, 16)),
 		);
 		return await crypto.subtle.verify("HMAC", key, signatureBytes.buffer, enc.encode(data));
 	} catch (e) {
-		// Handle errors during hex parsing or verification
 		console.error("Error verifying signature:", e);
 		return false;
 	}
@@ -123,8 +116,6 @@ async function getApprovedClientsFromCookie(
 		return null; // JSON parsing failed
 	}
 }
-
-// --- Exported Functions ---
 
 /**
  * Checks if a given client ID has already been approved by the user,
@@ -191,30 +182,25 @@ export function renderApprovalDialog(request: Request, options: ApprovalDialogOp
 	const { client, server, state, csrfToken, setCookie } = options;
 	const encodedState = btoa(JSON.stringify(state));
 
-	// Sanitize any untrusted content
 	const serverName = sanitizeHtml(server.name);
 	const clientName = client?.clientName ? sanitizeHtml(client.clientName) : "Unknown MCP Client";
 	const serverDescription = server.description ? sanitizeHtml(server.description) : "";
 
-	// Safe URLs
 	const logoUrl = server.logo ? sanitizeHtml(server.logo) : "";
 	const clientUri = client?.clientUri ? sanitizeHtml(client.clientUri) : "";
 	const policyUri = client?.policyUri ? sanitizeHtml(client.policyUri) : "";
 	const tosUri = client?.tosUri ? sanitizeHtml(client.tosUri) : "";
 
-	// Client contacts
 	const contacts =
 		client?.contacts && client.contacts.length > 0
 			? sanitizeHtml(client.contacts.join(", "))
 			: "";
 
-	// Get redirect URIs
 	const redirectUris =
 		client?.redirectUris && client.redirectUris.length > 0
 			? client.redirectUris.map((uri) => sanitizeHtml(uri)).filter((uri) => uri !== "")
 			: [];
 
-	// Generate HTML for the approval dialog
 	const htmlContent = `
     <!DOCTYPE html>
     <html lang="en">
@@ -545,7 +531,6 @@ export async function parseRedirectApproval(
 	
 	const formData = await request.formData();
 
-	// Validate CSRF token
 	const tokenFromForm = formData.get("csrf_token");
 	if (!tokenFromForm || typeof tokenFromForm !== "string") {
 		throw new Error("Missing CSRF token in form data");
@@ -570,28 +555,23 @@ export async function parseRedirectApproval(
 		throw new Error("Invalid state data");
 	}
 
-	// Add client to approved list
 	const existingApprovedClients =
 		(await getApprovedClientsFromCookie(request.headers.get("Cookie"), cookieSecret)) || [];
 	const updatedApprovedClients = Array.from(
 		new Set([...existingApprovedClients, state.oauthReqInfo.clientId]),
 	);
 
-	// Sign the updated list
 	const payload = JSON.stringify(updatedApprovedClients);
 	const key = await importKey(cookieSecret);
 	const signature = await signData(key, payload);
 	const newCookieValue = `${signature}.${btoa(payload)}`; // signature.base64(payload)
 
-	// Generate Set-Cookie header
 	const headers: Record<string, string> = {
 		"Set-Cookie": `${COOKIE_NAME}=${newCookieValue}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=${ONE_YEAR_IN_SECONDS}`,
 	};
 
 	return { headers, state };
 }
-
-// --- New security functions for KV state storage ---
 
 /**
  * Result from bindStateToSession containing the cookie to set
@@ -637,15 +617,6 @@ export async function createOAuthState(
 
 /**
  * Binds an OAuth state token to the user's browser session using a secure cookie.
- * This prevents CSRF attacks where an attacker's state token is used by a victim.
- *
- * SECURITY: This cookie proves that the browser completing the OAuth callback
- * is the same browser that consented to the authorization request.
- *
- * We hash the state token rather than storing it directly for defense-in-depth:
- * - Even if the state parameter leaks (URL logs, referrer headers), the cookie value cannot be derived
- * - The cookie serves as cryptographic proof of consent, not just a copy of the state
- * - Provides an additional layer of security beyond HttpOnly/Secure flags
  *
  * @param stateToken - The state token to bind to the session
  * @returns Object containing the Set-Cookie header to send to the client
@@ -690,14 +661,11 @@ export async function validateOAuthState(
 		throw new Error("Missing state parameter");
 	}
 
-	// Validate state exists in KV (secure, one-time use, with TTL)
 	const storedDataJson = await kv.get(`oauth:state:${stateFromQuery}`);
 	if (!storedDataJson) {
 		throw new Error("Invalid or expired state");
 	}
 
-	// SECURITY FIX: Validate that this state token belongs to this browser session
-	// by checking that the state hash matches the session cookie
 	const cookieHeader = request.headers.get("Cookie") || "";
 	const cookies = cookieHeader.split(";").map((c) => c.trim());
 	const consentedStateCookie = cookies.find((c) => c.startsWith(`${consentedStateCookieName}=`));
@@ -709,7 +677,6 @@ export async function validateOAuthState(
 		throw new Error("Missing session binding cookie - authorization flow must be restarted");
 	}
 
-	// Hash the state from query and compare with cookie
 	const encoder = new TextEncoder();
 	const data = encoder.encode(stateFromQuery);
 	const hashBuffer = await crypto.subtle.digest("SHA-256", data);
@@ -722,10 +689,7 @@ export async function validateOAuthState(
 
 	const oauthReqInfo = JSON.parse(storedDataJson) as AuthRequest;
 
-	// Delete state from KV (one-time use)
 	await kv.delete(`oauth:state:${stateFromQuery}`);
-
-	// Clear the session binding cookie (one-time use per OAuth flow)
 	const clearCookie = `${consentedStateCookieName}=; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=0`;
 
 	return { oauthReqInfo, clearCookie };
