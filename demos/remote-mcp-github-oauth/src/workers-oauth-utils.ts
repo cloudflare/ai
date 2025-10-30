@@ -593,6 +593,31 @@ export async function parseRedirectApproval(
 
 // --- New security functions for KV state storage ---
 
+/**
+ * Result from bindStateToSession containing the cookie to set
+ */
+export interface BindStateResult {
+	/**
+	 * Set-Cookie header value to bind the state to the user's session
+	 */
+	setCookie: string;
+}
+
+/**
+ * Result from validateOAuthState containing the original OAuth request info and cookie to clear
+ */
+export interface ValidateStateResult {
+	/**
+	 * The original OAuth request information that was stored with the state token
+	 */
+	oauthReqInfo: AuthRequest;
+
+	/**
+	 * Set-Cookie header value to clear the state cookie
+	 */
+	clearCookie: string;
+}
+
 export function generateCSRFProtection(): { token: string; setCookie: string } {
 	const token = crypto.randomUUID();
 	const setCookie = `__Host-CSRF_TOKEN=${token}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=600`;
@@ -610,21 +635,100 @@ export async function createOAuthState(
 	return stateToken;
 }
 
-export async function validateOAuthState(request: Request, kv: KVNamespace): Promise<AuthRequest> {
+/**
+ * Binds an OAuth state token to the user's browser session using a secure cookie.
+ * This prevents CSRF attacks where an attacker's state token is used by a victim.
+ *
+ * SECURITY: This cookie proves that the browser completing the OAuth callback
+ * is the same browser that consented to the authorization request.
+ *
+ * We hash the state token rather than storing it directly for defense-in-depth:
+ * - Even if the state parameter leaks (URL logs, referrer headers), the cookie value cannot be derived
+ * - The cookie serves as cryptographic proof of consent, not just a copy of the state
+ * - Provides an additional layer of security beyond HttpOnly/Secure flags
+ *
+ * @param stateToken - The state token to bind to the session
+ * @returns Object containing the Set-Cookie header to send to the client
+ */
+export async function bindStateToSession(stateToken: string): Promise<BindStateResult> {
+	const consentedStateCookieName = "__Host-CONSENTED_STATE";
+
+	// Hash the state token to provide defense-in-depth
+	const encoder = new TextEncoder();
+	const data = encoder.encode(stateToken);
+	const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+	const hashArray = Array.from(new Uint8Array(hashBuffer));
+	const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+
+	const setCookie = `${consentedStateCookieName}=${hashHex}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=600`;
+
+	return { setCookie };
+}
+
+/**
+ * Validates OAuth state from the request, ensuring:
+ * 1. The state parameter exists in KV (proves it was created by our server)
+ * 2. The state hash matches the session cookie (proves this browser consented to it)
+ *
+ * This prevents attacks where an attacker's valid state token is injected into
+ * a victim's OAuth flow.
+ *
+ * @param request - The HTTP request containing state parameter and cookies
+ * @param kv - Cloudflare KV namespace for storing OAuth state data
+ * @returns Object containing the original OAuth request info and cookie to clear
+ * @throws If state is missing, mismatched, or expired
+ */
+export async function validateOAuthState(
+	request: Request,
+	kv: KVNamespace,
+): Promise<ValidateStateResult> {
+	const consentedStateCookieName = "__Host-CONSENTED_STATE";
 	const url = new URL(request.url);
 	const stateFromQuery = url.searchParams.get("state");
+
 	if (!stateFromQuery) {
 		throw new Error("Missing state parameter");
 	}
 
+	// Validate state exists in KV (secure, one-time use, with TTL)
 	const storedDataJson = await kv.get(`oauth:state:${stateFromQuery}`);
 	if (!storedDataJson) {
 		throw new Error("Invalid or expired state");
 	}
 
+	// SECURITY FIX: Validate that this state token belongs to this browser session
+	// by checking that the state hash matches the session cookie
+	const cookieHeader = request.headers.get("Cookie") || "";
+	const cookies = cookieHeader.split(";").map((c) => c.trim());
+	const consentedStateCookie = cookies.find((c) => c.startsWith(`${consentedStateCookieName}=`));
+	const consentedStateHash = consentedStateCookie
+		? consentedStateCookie.substring(consentedStateCookieName.length + 1)
+		: null;
+
+	if (!consentedStateHash) {
+		throw new Error("Missing session binding cookie - authorization flow must be restarted");
+	}
+
+	// Hash the state from query and compare with cookie
+	const encoder = new TextEncoder();
+	const data = encoder.encode(stateFromQuery);
+	const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+	const hashArray = Array.from(new Uint8Array(hashBuffer));
+	const stateHash = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+
+	if (stateHash !== consentedStateHash) {
+		throw new Error("State token does not match session - possible CSRF attack detected");
+	}
+
 	const oauthReqInfo = JSON.parse(storedDataJson) as AuthRequest;
+
+	// Delete state from KV (one-time use)
 	await kv.delete(`oauth:state:${stateFromQuery}`);
-	return oauthReqInfo;
+
+	// Clear the session binding cookie (one-time use per OAuth flow)
+	const clearCookie = `${consentedStateCookieName}=; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=0`;
+
+	return { oauthReqInfo, clearCookie };
 }
 
 

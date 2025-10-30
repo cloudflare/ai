@@ -4,6 +4,7 @@ import { Hono } from "hono";
 import { Octokit } from "octokit";
 import { fetchUpstreamAuthToken, getUpstreamAuthorizeUrl, type Props } from "./utils";
 import {
+	bindStateToSession,
 	clientIdAlreadyApproved,
 	createOAuthState,
 	generateCSRFProtection,
@@ -24,8 +25,10 @@ app.get("/authorize", async (c) => {
 	if (
 		await clientIdAlreadyApproved(c.req.raw, oauthReqInfo.clientId, env.COOKIE_ENCRYPTION_KEY)
 	) {
+		// Skip approval dialog but still create secure state and bind to session
 		const stateToken = await createOAuthState(oauthReqInfo, c.env.OAUTH_KV);
-		return redirectToGithub(c.req.raw, stateToken);
+		const { setCookie: sessionBindingCookie } = await bindStateToSession(stateToken);
+		return redirectToGithub(c.req.raw, stateToken, { "Set-Cookie": sessionBindingCookie });
 	}
 
 	const { token: csrfToken, setCookie } = generateCSRFProtection();
@@ -50,8 +53,18 @@ app.post("/authorize", async (c) => {
 		return c.text("Invalid request", 400);
 	}
 
+	// Create OAuth state and bind it to this user's session
 	const stateToken = await createOAuthState(state.oauthReqInfo, c.env.OAUTH_KV);
-	return redirectToGithub(c.req.raw, stateToken, headers);
+	const { setCookie: sessionBindingCookie } = await bindStateToSession(stateToken);
+
+	// Set both cookies: approved client list + session binding
+	const allHeaders = new Headers();
+	for (const [key, value] of Object.entries(headers)) {
+		allHeaders.append(key, value);
+	}
+	allHeaders.append("Set-Cookie", sessionBindingCookie);
+
+	return redirectToGithub(c.req.raw, stateToken, Object.fromEntries(allHeaders));
 });
 
 async function redirectToGithub(
@@ -78,13 +91,22 @@ async function redirectToGithub(
  * OAuth Callback Endpoint
  *
  * This route handles the callback from GitHub after user authentication.
- * It exchanges the temporary code for an access token, then stores some
- * user metadata & the auth token as part of the 'props' on the token passed
+ * It validates the state parameter, exchanges the temporary code for an access token,
+ * then stores user metadata & the auth token as part of the 'props' on the token passed
  * down to the client. It ends by redirecting the client back to _its_ callback URL
+ *
+ * SECURITY: This endpoint validates that the state parameter from GitHub
+ * matches both:
+ * 1. A valid state token in KV (proves it was created by our server)
+ * 2. The __Host-CONSENTED_STATE cookie (proves THIS browser consented to it)
+ *
+ * This prevents CSRF attacks where an attacker's state token is injected
+ * into a victim's OAuth flow.
  */
 app.get("/callback", async (c) => {
-	// Get the oathReqInfo out of KV
-	const oauthReqInfo = await validateOAuthState(c.req.raw, c.env.OAUTH_KV);
+	// Validate OAuth state with session binding
+	// This checks both KV storage AND the session cookie
+	const { oauthReqInfo, clearCookie } = await validateOAuthState(c.req.raw, c.env.OAUTH_KV);
 	if (!oauthReqInfo.clientId) {
 		return c.text("Invalid state", 400);
 	}
@@ -120,7 +142,16 @@ app.get("/callback", async (c) => {
 		userId: login,
 	});
 
-	return Response.redirect(redirectTo);
+	// Clear the session binding cookie (one-time use) by creating response with headers
+	const headers = new Headers({ Location: redirectTo });
+	if (clearCookie) {
+		headers.set("Set-Cookie", clearCookie);
+	}
+
+	return new Response(null, {
+		status: 302,
+		headers,
+	});
 });
 
 export { app as GitHubHandler };
