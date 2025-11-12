@@ -43,6 +43,19 @@ export function getMappedStream(response: Response) {
 					});
 				}
 
+				// Handling number responses for models like Llama4
+				if (typeof chunk.response === "number") {
+					if (!textId) {
+						textId = generateId();
+						controller.enqueue({ type: "text-start", id: textId });
+					}
+					controller.enqueue({
+						type: "text-delta",
+						id: textId,
+						delta: String(chunk.response),
+					});
+				}
+
 				// Handle reasoning content
 				const reasoningDelta = chunk?.choices?.[0]?.delta?.reasoning_content;
 				if (reasoningDelta?.length) {
