@@ -1,0 +1,10 @@
+**/node_modules
+**/dist
+**/build
+**/lib
+**/coverage
+**/*.tsbuildinfo
+**/package-lock.json
+.wrangler
+worker-configuration.d.ts
+.dev.vars
