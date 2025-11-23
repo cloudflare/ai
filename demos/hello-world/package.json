@@ -1,0 +1,19 @@
+{
+	"name": "@cloudflare/agents-hello-world-example",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"start": "wrangler dev",
+		"cf-typegen": "wrangler types",
+		"type-check": "tsc --noEmit"
+	},
+	"keywords": [],
+	"dependencies": {
+		"agents": "^0.2.19"
+	},
+	"devDependencies": {
+		"typescript": "5.9.3",
+		"wrangler": "^4.45.2"
+	}
+}

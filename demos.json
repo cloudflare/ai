@@ -104,6 +104,9 @@
     },
     "./demos/use-mcp-inspector": {
       "package_json_hash": "d1d084f1aa9a752ead5250e0a070f97a9114dcea"
+    },
+    "./demos/hello-world": {
+      "package_json_hash": "a9a9d9823108a0d2a884f11f1a5de1d7448c704c"
     }
   }
 }

@@ -1,0 +1,23 @@
+{
+	"name": "hello-world",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-11-04",
+	"compatibility_flags": ["nodejs_compat"],
+	"observability": {
+		"enabled": true
+	},
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "HelloAgent",
+				"class_name": "HelloAgent"
+			}
+		]
+	},
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": ["HelloAgent"]
+		}
+	]
+}
