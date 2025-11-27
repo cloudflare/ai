@@ -44,18 +44,14 @@ export class WorkersAIImageModel implements ImageModelV2 {
 		}
 
 		const generateImage = async () => {
-			const outputStream: ReadableStream<Uint8Array> = await this.config.binding.run(
-				this.modelId,
-				{
-					height,
-					prompt,
-					seed,
-					width,
-				},
-			);
+			const output = await this.config.binding.run(this.modelId, {
+				height,
+				prompt,
+				seed,
+				width,
+			});
 
-			// Convert the output stream to a Uint8Array.
-			return streamToUint8Array(outputStream);
+			return toUint8Array(output as ReadableStream<Uint8Array> | Uint8Array | ArrayBuffer | { image: string });
 		};
 
 		const images: Uint8Array[] = await Promise.all(
@@ -91,25 +87,50 @@ function parseInteger(value?: string) {
 	return Number.isInteger(number) ? number : undefined;
 }
 
-async function streamToUint8Array(stream: ReadableStream<Uint8Array>): Promise<Uint8Array> {
-	const reader = stream.getReader();
-	const chunks: Uint8Array[] = [];
-	let totalLength = 0;
-
-	// Read the stream until it is finished.
-	while (true) {
-		const { done, value } = await reader.read();
-		if (done) break;
-		chunks.push(value);
-		totalLength += value.length;
+async function toUint8Array(
+	output: ReadableStream<Uint8Array> | Uint8Array | ArrayBuffer | { image: string },
+): Promise<Uint8Array> {
+	// Already a Uint8Array
+	if (output instanceof Uint8Array) {
+		return output;
 	}
 
-	// Allocate a new Uint8Array to hold all the data.
-	const result = new Uint8Array(totalLength);
-	let offset = 0;
-	for (const chunk of chunks) {
-		result.set(chunk, offset);
-		offset += chunk.length;
+	// ArrayBuffer - wrap it
+	if (output instanceof ArrayBuffer) {
+		return new Uint8Array(output);
 	}
-	return result;
+
+	// REST API response with base64 image
+	if (output && typeof output === "object" && "image" in output && typeof output.image === "string") {
+		const binaryString = atob(output.image);
+		const bytes = new Uint8Array(binaryString.length);
+		for (let i = 0; i < binaryString.length; i++) {
+			bytes[i] = binaryString.charCodeAt(i);
+		}
+		return bytes;
+	}
+
+	// ReadableStream - read all chunks
+	if (output && typeof (output as ReadableStream).getReader === "function") {
+		const reader = (output as ReadableStream<Uint8Array>).getReader();
+		const chunks: Uint8Array[] = [];
+		let totalLength = 0;
+
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) break;
+			chunks.push(value);
+			totalLength += value.length;
+		}
+
+		const result = new Uint8Array(totalLength);
+		let offset = 0;
+		for (const chunk of chunks) {
+			result.set(chunk, offset);
+			offset += chunk.length;
+		}
+		return result;
+	}
+
+	throw new Error(`Unexpected output type from image model: ${typeof output}`);
 }
