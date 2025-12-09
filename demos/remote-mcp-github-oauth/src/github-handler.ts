@@ -112,7 +112,7 @@ app.get("/callback", async (c) => {
 	}
 
 	// Exchange the code for an access token
-	const [accessToken, errResponse] = await fetchUpstreamAuthToken({
+	const [tokenResponse, errResponse] = await fetchUpstreamAuthToken({
 		client_id: c.env.GITHUB_CLIENT_ID,
 		client_secret: c.env.GITHUB_CLIENT_SECRET,
 		code: c.req.query("code"),
@@ -122,8 +122,15 @@ app.get("/callback", async (c) => {
 	if (errResponse) return errResponse;
 
 	// Fetch the user info from GitHub
-	const user = await new Octokit({ auth: accessToken }).rest.users.getAuthenticated();
+	const user = await new Octokit({ auth: tokenResponse.access_token }).rest.users.getAuthenticated();
 	const { login, name, email } = user.data;
+
+	// Calculate expiration timestamps if GitHub returned them
+	const now = Math.floor(Date.now() / 1000);
+	const expiresAt = tokenResponse.expires_in ? now + tokenResponse.expires_in : undefined;
+	const refreshTokenExpiresAt = tokenResponse.refresh_token_expires_in
+		? now + tokenResponse.refresh_token_expires_in
+		: undefined;
 
 	// Return back to the MCP client a new token
 	const { redirectTo } = await c.env.OAUTH_PROVIDER.completeAuthorization({
@@ -132,10 +139,13 @@ app.get("/callback", async (c) => {
 		},
 		// This will be available on this.props inside MyMCP
 		props: {
-			accessToken,
+			accessToken: tokenResponse.access_token,
 			email,
 			login,
 			name,
+			refreshToken: tokenResponse.refresh_token,
+			expiresAt,
+			refreshTokenExpiresAt,
 		} as Props,
 		request: oauthReqInfo,
 		scope: oauthReqInfo.scope,

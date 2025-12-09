@@ -1,22 +1,16 @@
+import { env } from "cloudflare:workers";
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { McpAgent } from "agents/mcp";
 import { Octokit } from "octokit";
 import { z } from "zod";
 import { GitHubHandler } from "./github-handler";
-
-// Context from the auth process, encrypted & stored in the auth token
-// and provided to the DurableMCP as this.props
-type Props = {
-	login: string;
-	name: string;
-	email: string;
-	accessToken: string;
-};
+import { isTokenExpiringSoon, refreshUpstreamToken, type Props } from "./utils";
 
 const ALLOWED_USERNAMES = new Set<string>([
 	// Add GitHub usernames of users who should have access to the image generation tool
 	// For example: 'yourusername', 'coworkerusername'
+	"mattzcarey",
 ]);
 
 export class MyMCP extends McpAgent<Env, Record<string, never>, Props> {
@@ -88,6 +82,9 @@ export class MyMCP extends McpAgent<Env, Record<string, never>, Props> {
 	}
 }
 
+// Token refresh buffer: refresh upstream GitHub token if it expires within 5 minutes
+const TOKEN_REFRESH_BUFFER_SECONDS = 300;
+
 export default new OAuthProvider({
 	// NOTE - during the summer 2025, the SSE protocol was deprecated and replaced by the Streamable-HTTP protocol
 	// https://developers.cloudflare.com/agents/model-context-protocol/transport/#mcp-server-with-authentication
@@ -99,4 +96,59 @@ export default new OAuthProvider({
 	clientRegistrationEndpoint: "/register",
 	defaultHandler: GitHubHandler as any,
 	tokenEndpoint: "/token",
+
+	// Intercept token exchanges to refresh upstream GitHub tokens when needed
+	tokenExchangeCallback: async (options) => {
+		const props = options.props as Props;
+		const now = Math.floor(Date.now() / 1000);
+
+		// Handle initial authorization code exchange
+		if (options.grantType === "authorization_code") {
+			// If GitHub returned expiration info, sync our token TTL with it
+			if (props.expiresAt) {
+				return {
+					accessTokenTTL: props.expiresAt - now,
+					refreshTokenTTL: props.refreshTokenExpiresAt
+						? props.refreshTokenExpiresAt - now
+						: undefined,
+					newProps: props,
+				};
+			}
+			// No expiration info - GitHub OAuth App doesn't have expiration enabled
+			return { newProps: props };
+		}
+
+		// Handle refresh token exchange
+		if (options.grantType === "refresh_token") {
+			// No refresh token = GitHub OAuth App without expiration (graceful fallback)
+			if (!props.refreshToken) {
+				return;
+			}
+
+			// Token still valid = no need to refresh upstream
+			if (!isTokenExpiringSoon(props.expiresAt, TOKEN_REFRESH_BUFFER_SECONDS)) {
+				return { accessTokenProps: props };
+			}
+
+			// Refresh upstream GitHub token
+			const refreshed = await refreshUpstreamToken(
+				props.refreshToken,
+				env.GITHUB_CLIENT_ID,
+				env.GITHUB_CLIENT_SECRET,
+			);
+
+			return {
+				accessTokenTTL: refreshed.expires_in,
+				newProps: {
+					...props,
+					accessToken: refreshed.access_token,
+					refreshToken: refreshed.refresh_token ?? props.refreshToken,
+					expiresAt: refreshed.expires_in ? now + refreshed.expires_in : undefined,
+					refreshTokenExpiresAt: refreshed.refresh_token_expires_in
+						? now + refreshed.refresh_token_expires_in
+						: props.refreshTokenExpiresAt,
+				},
+			};
+		}
+	},
 });
