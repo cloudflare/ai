@@ -1,0 +1,62 @@
+{
+  "name": "tanstack-cf-ai-adapter",
+  "version": "0.0.1",
+  "description": "Cloudflare AI Gateway adapter for TanStack AI - route requests through Cloudflare's AI Gateway with caching, rate limiting, and observability",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsup --config tsup.config.ts",
+    "format": "biome format --write",
+    "type-check": "tsc --noEmit"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "tanstack",
+    "ai",
+    "cloudflare",
+    "ai-gateway",
+    "adapter",
+    "workers"
+  ],
+  "author": "Harshil Agrawal",
+  "license": "MIT",
+  "homepage": "https://github.com/cloudflare/ai/tree/main/packages/tanstack-cf-ai-adapter",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/cloudflare/ai.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cloudflare/ai/issues"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
+    "@cloudflare/workers-types": "^4.20251205.0",
+    "@tanstack/ai": "^0.0.2",
+    "@tanstack/ai-anthropic": "^0.0.2",
+    "@tanstack/ai-openai": "^0.0.2",
+    "openai": "^6.10.0"
+  },
+  "peerDependencies": {
+    "@tanstack/ai": "^0.0.2"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.8",
+    "tsup": "^8.5.1",
+    "typescript": "5.9.3"
+  }
+}
