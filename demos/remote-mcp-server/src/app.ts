@@ -1,14 +1,14 @@
+import type { OAuthHelpers } from "@cloudflare/workers-oauth-provider";
 import { Hono } from "hono";
 import {
-	layout,
 	homeContent,
+	layout,
 	parseApproveFormBody,
-	renderAuthorizationRejectedContent,
 	renderAuthorizationApprovedContent,
+	renderAuthorizationRejectedContent,
 	renderLoggedInAuthorizeScreen,
 	renderLoggedOutAuthorizeScreen,
 } from "./utils";
-import type { OAuthHelpers } from "@cloudflare/workers-oauth-provider";
 
 export type Bindings = Env & {
 	OAUTH_PROVIDER: OAuthHelpers;

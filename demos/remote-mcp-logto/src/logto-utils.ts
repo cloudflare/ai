@@ -3,8 +3,8 @@
  * This file integrates the Logto SDK with KV-based session storage.
  */
 
+import type { PersistKey, Storage } from "@logto/node";
 import LogtoClient, { type LogtoConfig } from "@logto/node";
-import type { Storage, PersistKey } from "@logto/node";
 
 /**
  * KV-based storage implementation for Logto authentication flow.

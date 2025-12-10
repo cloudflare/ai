@@ -1,8 +1,8 @@
+import { stepCountIs, streamText, tool } from "ai";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { stepCountIs, streamText, tool } from "ai";
-import z from "zod";
 import { createWorkersAI } from "workers-ai-provider";
+import z from "zod";
 import type { Variables } from "./types/hono";
 
 const app = new Hono<{ Bindings: Env; Variables: Variables }>();

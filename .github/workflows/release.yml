@@ -8,6 +8,7 @@ on:
 jobs:
   release:
     permissions:
+      id-token: write # Required for OIDC
       contents: write
 
     if: ${{ github.repository_owner == 'cloudflare' }}
@@ -21,6 +22,10 @@ jobs:
 
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile --child-concurrency=10
@@ -37,5 +42,4 @@ jobs:
           publish: pnpm changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.CLOUDFLARE_AI_GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          NPM_PUBLISH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true

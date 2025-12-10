@@ -1,6 +1,6 @@
+import { streamText } from "ai";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { streamText } from "ai";
 import { createWorkersAI } from "workers-ai-provider";
 import type { Variables } from "./types/hono";
 

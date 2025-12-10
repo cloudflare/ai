@@ -1,6 +1,6 @@
+import type { LanguageModelV2FinishReason } from "@ai-sdk/provider";
 import { describe, expect, it } from "vitest";
 import { mapWorkersAIFinishReason } from "../src/map-workersai-finish-reason";
-import type { LanguageModelV2FinishReason } from "@ai-sdk/provider";
 
 describe("mapWorkersAIFinishReason", () => {
 	describe("direct mappings", () => {

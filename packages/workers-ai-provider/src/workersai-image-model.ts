@@ -1,5 +1,4 @@
-import type { ImageModelV2 } from "@ai-sdk/provider";
-import type { ImageModelV2CallWarning } from "@ai-sdk/provider";
+import type { ImageModelV2, ImageModelV2CallWarning } from "@ai-sdk/provider";
 import type { WorkersAIImageConfig } from "./workersai-image-config";
 import type { WorkersAIImageSettings } from "./workersai-image-settings";
 import type { ImageGenerationModels } from "./workersai-models";

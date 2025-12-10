@@ -1,6 +1,6 @@
 import { generateObject } from "ai";
-import z from "zod";
 import { createWorkersAI } from "workers-ai-provider";
+import z from "zod";
 
 if (!process.env.CLOUDFLARE_API_TOKEN) {
 	throw new Error("CLOUDFLARE_API_TOKEN is not set");

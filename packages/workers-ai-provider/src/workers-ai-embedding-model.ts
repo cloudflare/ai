@@ -1,4 +1,4 @@
-import { TooManyEmbeddingValuesForCallError, type EmbeddingModelV2 } from "@ai-sdk/provider";
+import { type EmbeddingModelV2, TooManyEmbeddingValuesForCallError } from "@ai-sdk/provider";
 import type { StringLike } from "./utils";
 import type { EmbeddingModels } from "./workersai-models";
 
@@ -77,7 +77,11 @@ export class WorkersAIEmbeddingModel implements EmbeddingModelV2<string> {
 			{
 				text: values,
 			},
-			{ gateway: this.config.gateway ?? gateway, ...passthroughOptions },
+			{
+				gateway: this.config.gateway ?? gateway,
+				...passthroughOptions,
+				tags: [],
+			},
 		);
 
 		return {

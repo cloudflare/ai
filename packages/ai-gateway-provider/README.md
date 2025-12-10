@@ -8,10 +8,6 @@ This library provides an AI Gateway Provider for the [Vercel AI SDK](https://sdk
 
 * **Runtime Agnostic:** Works in all JavaScript runtimes supported by the Vercel AI SDK including Node.js, Edge Runtime, and more.
 * **Automatic Provider Fallback:** ✨ Define an array of models and the provider will **automatically fallback** to the next available provider if one fails, ensuring high availability and resilience for your AI applications.
-* **Multi-Provider Support:** Easily switch between and combine models from various providers like OpenAI, Anthropic, DeepSeek, Google AI Studio, Grok, Mistral, Perplexity AI, Replicate and Groq.
-* **AI Gateway Integration:** Utilizes Cloudflare's AI Gateway for advanced features like request management, caching, and rate limiting.
-* **Simplified Model Management:** Abstracts away the complexities of interacting with different AI provider APIs.
-* **Easy Configuration:** Simple and intuitive setup process.
 
 ## Installation
 
@@ -24,30 +20,59 @@ npm install ai-gateway-provider
 ### Basic Example with API Key
 
 ```typescript
-import {createOpenAI} from '@ai-sdk/openai';
-import {createAiGateway} from 'ai-gateway-provider';
-import {generateText} from "ai";
-import {createAnthropic} from "@ai-sdk/anthropic";
+import { createAiGateway } from 'ai-gateway-provider';
+import { createOpenAI } from 'ai-gateway-provider/providers/openai';
+import { generateText } from "ai";
 
 const aigateway = createAiGateway({
-  accountId: "my-cloudflare-account-id",
-  gateway: 'my-gateway-name',
-  apiKey: 'optionally my cloudflare api key',
-  options: {  // Optional per-request override
-    skipCache: true
-  }
+  accountId: "{CLOUDFLARE_ACCOUNT_ID}",
+  gateway: '{GATEWAY_NAME}',
+  apiKey: '{CF_AIG_TOKEN}', // If your AI Gateway has authentication enabled
 });
-const openai = createOpenAI({apiKey: 'openai api key'});
-const anthropic = createAnthropic({apiKey: 'anthropic api key'});
 
+const openai = createOpenAI({ apiKey: '{OPENAI_API_KEY}' });
+
+const { text } = await generateText({
+  model: aigateway(openai.chat("gpt-5.1")),
+  prompt: 'Write a vegetarian lasagna recipe for 4 people.',
+});
+```
+
+### Basic Examples with BYOK / Unified Billing
+
+```typescript
+import { createAiGateway } from 'ai-gateway-provider';
+import { createOpenAI } from 'ai-gateway-provider/providers/openai';
+import { generateText } from "ai";
+
+const aigateway = createAiGateway({
+  accountId: "{CLOUDFLARE_ACCOUNT_ID}",
+  gateway: '{GATEWAY_NAME}',
+  apiKey: '{CF_AIG_TOKEN}',
+});
+
+const openai = createOpenAI();
+
+const { text } = await generateText({
+  model: aigateway(openai.chat("gpt-5.1")),
+  prompt: 'Write a vegetarian lasagna recipe for 4 people.',
+});
+```
+
+## Automatic Fallback Example
+
+```typescript
+// Define multiple provider options with fallback priority
 const model = aigateway([
   anthropic('claude-3-5-haiku-20241022'),  // Primary choice
-  openai("gpt-4o-mini"),                   // Fallback if first fails
+  openai.chat("gpt-4o-mini"),                   // First fallback
+  mistral("mistral-large-latest"),         // Second fallback
 ]);
 
+// The system will automatically try the next model if previous ones fail
 const {text} = await generateText({
-  model: model,
-  prompt: 'Write a vegetarian lasagna recipe for 4 people.',
+  model,
+  prompt: 'Suggest three names for my tech startup.',
 });
 ```
 
@@ -56,7 +81,7 @@ const {text} = await generateText({
 Binding Benefits:
 - Faster Requests: Saves milliseconds by avoiding open internet routing.
 - Enhanced Security: Uses a special pre-authenticated pipeline.
-- No API Key Required: Authentication is handled by the binding.
+- No Cloudflare API Token Required: Authentication is handled by the binding.
 
 ```typescript
 const aigateway = createAiGateway({
@@ -70,10 +95,10 @@ const anthropic = createAnthropic({apiKey: 'anthropic api key'});
 
 const model = aigateway([
   anthropic('claude-3-5-haiku-20241022'),  // Primary choice
-  openai("gpt-4o-mini"),                   // Fallback if first fails
+  openai.chat("gpt-4o-mini"),                   // Fallback if first fails
 ]);
 
-const {text} = await generateText({
+const { text } = await generateText({
   model: model,
   prompt: 'Write a vegetarian lasagna recipe for 4 people.',
 });
@@ -131,22 +156,6 @@ const aigateway = createAiGateway({
   * `retryDelayMs`: Delay between retries
   * `backoff`: Retry backoff strategy ('constant', 'linear', 'exponential')
 
-## Automatic Fallback Example
-
-```typescript
-// Define multiple provider options with fallback priority
-const model = aigateway([
-  anthropic('claude-3-5-haiku-20241022'),  // Primary choice
-  openai("gpt-4o-mini"),                   // First fallback
-  mistral("mistral-large-latest"),         // Second fallback
-]);
-
-// The system will automatically try the next model if previous ones fail
-const {text} = await generateText({
-  model: model,
-  prompt: 'Suggest three names for my tech startup.',
-});
-```
 
 ## Supported Providers
 

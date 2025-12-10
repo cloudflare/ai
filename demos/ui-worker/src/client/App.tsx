@@ -1,5 +1,5 @@
 import { useChat } from "@ai-sdk/react";
-import { Center, Paper, Text, TextInput, Button, Group, ScrollArea, Stack } from "@mantine/core";
+import { Button, Center, Group, Paper, ScrollArea, Stack, Text, TextInput } from "@mantine/core";
 import { DefaultChatTransport } from "ai";
 import { useState } from "react";
 

@@ -1,5 +1,35 @@
 # ai-gateway-provider
 
+## 2.1.0
+
+### Minor Changes
+
+- [#323](https://github.com/cloudflare/ai/pull/323) [`7c15672`](https://github.com/cloudflare/ai/commit/7c15672f62b77785c85a1d8700b7724dafd57ab8) Thanks [@palashgo](https://github.com/palashgo)! - Fix Google Vertex support
+
+## 2.0.5
+
+### Patch Changes
+
+- [`f170bc9`](https://github.com/cloudflare/ai/commit/f170bc9e6f5bdc6ac3d8162a6d521289c6ab3c60) Thanks [@threepointone](https://github.com/threepointone)! - trigger a release
+
+## 2.0.4
+
+### Patch Changes
+
+- [`a4b85d1`](https://github.com/cloudflare/ai/commit/a4b85d1366c9cefc8da1d08f610bef0915cb0702) Thanks [@threepointone](https://github.com/threepointone)! - trigger a release
+
+## 2.0.3
+
+### Patch Changes
+
+- [#319](https://github.com/cloudflare/ai/pull/319) [`40f0f05`](https://github.com/cloudflare/ai/commit/40f0f05db7f2a3cca539ae8920a0a466a2893b3a) Thanks [@threepointone](https://github.com/threepointone)! - trigger a release
+
+## 2.0.2
+
+### Patch Changes
+
+- [#316](https://github.com/cloudflare/ai/pull/316) [`8eece24`](https://github.com/cloudflare/ai/commit/8eece24e111bdb43276d650cfef9a1518482bd15) Thanks [@Dhravya](https://github.com/Dhravya)! - fix: support google vertex provider
+
 ## 2.0.1
 
 ### Patch Changes

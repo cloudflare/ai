@@ -23,6 +23,12 @@ export const providers = [
 			url.replace(/^https:\/\/generativelanguage\.googleapis\.com\//, ""),
 	},
 	{
+		name: "google-vertex-ai",
+		regex: /aiplatform\.googleapis\.com/,
+		transformEndpoint: (url: string) =>
+			url.replace(/https:\/\/(.*)[-]?aiplatform\.googleapis\.com\//, ""),
+	},
+	{
 		name: "grok",
 		regex: /^https:\/\/api\.x\.ai\//,
 		transformEndpoint: (url: string) => url.replace(/^https:\/\/api\.x\.ai\//, ""),
@@ -47,6 +53,13 @@ export const providers = [
 		regex: /^https:\/\/api\.groq\.com\/openai\/v1\//,
 		transformEndpoint: (url: string) =>
 			url.replace(/^https:\/\/api\.groq\.com\/openai\/v1\//, ""),
+	},
+	{
+		name: "google-vertex-ai",
+		regex: /^https:\/\/(?:[a-z0-9]+-)*aiplatform\.googleapis\.com\//,
+		transformEndpoint: (url: string) =>
+			url.replace(/^https:\/\/(?:[a-z0-9]+-)*aiplatform\.googleapis\.com\//, ""),
+		headerKey: "authorization",
 	},
 	{
 		name: "azure-openai",

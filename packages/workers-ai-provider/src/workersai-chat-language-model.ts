@@ -3,6 +3,7 @@ import type {
 	LanguageModelV2CallWarning,
 	LanguageModelV2StreamPart,
 } from "@ai-sdk/provider";
+import { generateId } from "ai";
 import { convertToWorkersAIChatMessages } from "./convert-to-workersai-chat-messages";
 import { mapWorkersAIFinishReason } from "./map-workersai-finish-reason";
 import { mapWorkersAIUsage } from "./map-workersai-usage";
@@ -15,7 +16,6 @@ import {
 } from "./utils";
 import type { WorkersAIChatSettings } from "./workersai-chat-settings";
 import type { TextGenerationModels } from "./workersai-models";
-import { generateId } from "ai";
 
 type WorkersAIChatConfig = {
 	provider: string;
@@ -156,7 +156,11 @@ export class WorkersAIChatLanguageModel implements LanguageModelV2 {
 				// @ts-expect-error response_format not yet added to types
 				response_format: args.response_format,
 			},
-			{ gateway: this.config.gateway ?? gateway, ...passthroughOptions },
+			{
+				gateway: this.config.gateway ?? gateway,
+				...passthroughOptions,
+				tags: [],
+			},
 		);
 
 		if (output instanceof ReadableStream) {
@@ -300,7 +304,11 @@ export class WorkersAIChatLanguageModel implements LanguageModelV2 {
 				// @ts-expect-error response_format not yet added to types
 				response_format: args.response_format,
 			},
-			{ gateway: this.config.gateway ?? gateway, ...passthroughOptions },
+			{
+				gateway: this.config.gateway ?? gateway,
+				...passthroughOptions,
+				tags: [],
+			},
 		);
 
 		if (!(response instanceof ReadableStream)) {

@@ -1,6 +1,6 @@
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
-import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpAgent } from "agents/mcp";
 import { z } from "zod";
 import { AuthkitHandler } from "./authkit-handler";
 import type { Props } from "./props";

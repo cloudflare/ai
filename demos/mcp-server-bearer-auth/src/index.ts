@@ -1,8 +1,8 @@
-import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
+import { McpAgent } from "agents/mcp";
 import { Hono } from "hono";
-import { layout, homeContent } from "./utils";
+import { z } from "zod";
+import { homeContent, layout } from "./utils";
 
 const app = new Hono<{
 	Bindings: Env;

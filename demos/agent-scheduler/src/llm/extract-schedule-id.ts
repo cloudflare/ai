@@ -1,6 +1,6 @@
+import type { Schedule } from "agents";
 import { generateObject, type LanguageModel } from "ai";
 import z from "zod";
-import type { Schedule } from "agents";
 
 export async function extractScheduleId(
 	model: LanguageModel,

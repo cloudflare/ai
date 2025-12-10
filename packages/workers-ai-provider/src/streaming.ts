@@ -1,8 +1,8 @@
 import type { LanguageModelV2StreamPart } from "@ai-sdk/provider";
+import { generateId } from "ai";
 import { events } from "fetch-event-stream";
 import { mapWorkersAIUsage } from "./map-workersai-usage";
 import { processPartialToolCalls } from "./utils";
-import { generateId } from "ai";
 
 export function getMappedStream(response: Response) {
 	const chunkEvent = events(response);

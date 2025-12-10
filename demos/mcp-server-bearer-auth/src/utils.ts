@@ -1,9 +1,10 @@
 // Helper to generate the layout
+
+import { env } from "cloudflare:workers";
+import type { AuthRequest } from "@cloudflare/workers-oauth-provider";
 import { html, raw } from "hono/html";
 import type { HtmlEscapedString } from "hono/utils/html";
 import { marked } from "marked";
-import type { AuthRequest } from "@cloudflare/workers-oauth-provider";
-import { env } from "cloudflare:workers";
 
 // This file mainly exists as a dumping ground for uninteresting html and CSS
 // to remove clutter and noise from the auth logic. You likely do not need

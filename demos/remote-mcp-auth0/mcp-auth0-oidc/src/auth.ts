@@ -6,8 +6,6 @@ import type {
 	TokenExchangeCallbackResult,
 } from "@cloudflare/workers-oauth-provider";
 import type { Context } from "hono";
-import { getCookie, setCookie } from "hono/cookie";
-import { html, raw } from "hono/html";
 import * as oauth from "oauth4webapi";
 
 import type { UserProps } from "./types";
@@ -123,7 +121,7 @@ export async function authorize(c: Context<{ Bindings: Env & { OAUTH_PROVIDER: O
 		return new Response(null, {
 			status: 302,
 			headers: {
-				"Location": authorizationUrl.href,
+				Location: authorizationUrl.href,
 				"Set-Cookie": sessionBindingCookie,
 			},
 		});
@@ -173,7 +171,7 @@ export async function confirmConsent(
 		const formData = await c.req.formData();
 
 		// Validate CSRF token (throws OAuthError on failure)
-		const { clearCookie: clearCsrfCookie } = validateCSRFToken(formData, c.req.raw);
+		validateCSRFToken(formData, c.req.raw);
 
 		// Extract state from form data
 		const encodedState = formData.get("state");

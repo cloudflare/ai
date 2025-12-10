@@ -1,7 +1,7 @@
 import { env } from "cloudflare:workers";
 import type { AuthRequest, OAuthHelpers } from "@cloudflare/workers-oauth-provider";
-import { Hono } from "hono";
 import type { LogtoConfig } from "@logto/node";
+import { Hono } from "hono";
 import { LogtoHonoClient, type LogtoUserProps } from "./logto-utils";
 import {
 	addApprovedClient,

@@ -16,17 +16,17 @@
 		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
-		"ai": "^5.0.82",
-		"hono": "^4.10.4",
+		"ai": "^5.0.106",
+		"hono": "^4.10.7",
 		"workers-ai-provider": "^2.0.0",
 		"zod": "^3.25.76"
 	},
 	"devDependencies": {
-		"@cloudflare/vite-plugin": "^1.13.17",
-		"@cloudflare/vitest-pool-workers": "^0.10.2",
+		"@cloudflare/vite-plugin": "^1.16.1",
+		"@cloudflare/vitest-pool-workers": "^0.10.13",
 		"typescript": "5.9.3",
-		"vite": "^7.1.12",
+		"vite": "^7.2.6",
 		"vitest": "~3.2.4",
-		"wrangler": "^4.45.2"
+		"wrangler": "^4.52.1"
 	}
 }

@@ -9,12 +9,12 @@
 	"dependencies": {
 		"@commander-js/extra-typings": "^14.0.0",
 		"commander": "^14.0.2",
-		"tsx": "^4.20.6",
+		"tsx": "^4.21.0",
 		"zod": "^3.25.76",
 		"zx": "8.8.5"
 	},
 	"devDependencies": {
-		"@types/node": "^24.9.2",
+		"@types/node": "^24.10.1",
 		"typescript": "5.9.3"
 	},
 	"scripts": {

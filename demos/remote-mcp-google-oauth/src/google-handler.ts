@@ -27,7 +27,9 @@ app.get("/authorize", async (c) => {
 		// Skip approval dialog but still create secure state and bind to session
 		const { stateToken } = await createOAuthState(oauthReqInfo, c.env.OAUTH_KV);
 		const { setCookie: sessionBindingCookie } = await bindStateToSession(stateToken);
-		return redirectToGoogle(c.req.raw, c.env, stateToken, { "Set-Cookie": sessionBindingCookie });
+		return redirectToGoogle(c.req.raw, c.env, stateToken, {
+			"Set-Cookie": sessionBindingCookie,
+		});
 	}
 
 	// Generate CSRF protection for the approval form

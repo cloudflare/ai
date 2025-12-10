@@ -1,8 +1,8 @@
-import app from "./app";
-import { McpAgent } from "agents/mcp";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpAgent } from "agents/mcp";
+import { z } from "zod";
+import app from "./app";
 
 export class MyMCP extends McpAgent {
 	server = new McpServer({
