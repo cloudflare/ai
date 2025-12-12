@@ -97,6 +97,11 @@
 			"types": "./dist/providers/fireworks.d.ts",
 			"import": "./dist/providers/fireworks.mjs",
 			"require": "./dist/providers/fireworks.js"
+		},
+		"./providers/google-vertex": {
+			"types": "./dist/providers/google-vertex.d.ts",
+			"import": "./dist/providers/google-vertex.mjs",
+			"require": "./dist/providers/google-vertex.js"
 		}
 	},
 	"publishConfig": {
@@ -140,7 +145,8 @@
 		"@ai-sdk/mistral": "^2.0.25",
 		"@ai-sdk/openai": "^2.0.77",
 		"@ai-sdk/perplexity": "^2.0.21",
-		"@ai-sdk/xai": "^2.0.39"
+		"@ai-sdk/xai": "^2.0.39",
+		"@ai-sdk/google-vertex": "3.0.90"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.8",

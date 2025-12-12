@@ -1,0 +1,50 @@
+diff --git a/dist/edge/index.d.mts b/dist/edge/index.d.mts
+index a8fea73f05364d1b67b91d547bf76007275bea57..a4496464e0dc05eb514a6085c2e1d79849271886 100644
+--- a/dist/edge/index.d.mts
++++ b/dist/edge/index.d.mts
+@@ -100,7 +100,7 @@ interface GoogleVertexProviderSettings extends GoogleVertexProviderSettings$1 {
+      * not provided, the Google Vertex provider will use environment variables to
+      * load the credentials.
+      */
+-    googleCredentials?: GoogleCredentials;
++    googleCredentials?: GoogleCredentials | { apiKey: string };
+ }
+ declare function createVertex(options?: GoogleVertexProviderSettings): GoogleVertexProvider;
+ /**
+diff --git a/dist/edge/index.d.ts b/dist/edge/index.d.ts
+index a8fea73f05364d1b67b91d547bf76007275bea57..a4496464e0dc05eb514a6085c2e1d79849271886 100644
+--- a/dist/edge/index.d.ts
++++ b/dist/edge/index.d.ts
+@@ -100,7 +100,7 @@ interface GoogleVertexProviderSettings extends GoogleVertexProviderSettings$1 {
+      * not provided, the Google Vertex provider will use environment variables to
+      * load the credentials.
+      */
+-    googleCredentials?: GoogleCredentials;
++    googleCredentials?: GoogleCredentials | { apiKey: string };
+ }
+ declare function createVertex(options?: GoogleVertexProviderSettings): GoogleVertexProvider;
+ /**
+diff --git a/dist/edge/index.js b/dist/edge/index.js
+index 8d155c95c62b177e232811dab69e78ba02f406d0..988ad94b9fcf4cd1123f1bec1700b83d3e7e3e32 100644
+--- a/dist/edge/index.js
++++ b/dist/edge/index.js
+@@ -457,6 +457,7 @@ var buildJwt = async (credentials) => {
+ };
+ async function generateAuthToken(credentials) {
+   try {
++    if(credentials.apiKey) return credentials.apiKey;
+     const creds = credentials || await loadCredentials();
+     const jwt = await buildJwt(creds);
+     const response = await fetch("https://oauth2.googleapis.com/token", {
+diff --git a/dist/edge/index.mjs b/dist/edge/index.mjs
+index 330c98783ca74cb3b87e22370889a21b7a11f5dd..0fe244acc9a7381eb1c78610f17f68f12d08881a 100644
+--- a/dist/edge/index.mjs
++++ b/dist/edge/index.mjs
+@@ -455,6 +455,7 @@ var buildJwt = async (credentials) => {
+ };
+ async function generateAuthToken(credentials) {
+   try {
++    if(credentials.apiKey) return credentials.apiKey;
+     const creds = credentials || await loadCredentials();
+     const jwt = await buildJwt(creds);
+     const response = await fetch("https://oauth2.googleapis.com/token", {
