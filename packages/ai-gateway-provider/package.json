@@ -120,10 +120,10 @@
 	"bugs": {
 		"url": "https://github.com/cloudflare/ai/issues"
 	},
-	"dependencies": {
+	"peerDependencies": {
 		"@ai-sdk/provider": "^2.0.0",
-		"@ai-sdk/provider-utils": "^3.0.18",
-		"ai": "^5.0.106"
+		"@ai-sdk/provider-utils": "^3.0.0",
+		"ai": "^5.0.0 || ^6.0.0"
 	},
 	"optionalDependencies": {
 		"@ai-sdk/amazon-bedrock": "^3.0.67",

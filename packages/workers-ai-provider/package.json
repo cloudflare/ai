@@ -38,9 +38,9 @@
 		"chat",
 		"serverless"
 	],
-	"dependencies": {
+	"peerDependencies": {
 		"@ai-sdk/provider": "^2.0.0",
-		"@ai-sdk/provider-utils": "^3.0.18"
+		"@ai-sdk/provider-utils": "^3.0.0"
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20251202.0",
