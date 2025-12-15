@@ -14,20 +14,18 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "todo-api",
+	"name": "todo-api-pingone",
 	"main": "dist/index.js",
 	"compatibility_date": "2025-11-01",
-	"observability": {
-		"enabled": true
-	},
+	"compatibility_flags": ["nodejs_compat"],
 	"kv_namespaces": [
 		{
-			"binding": "TODO_KV_NAMESPACE",
+			"binding": "TODO_KV_PINGONE",
 			// TODO: Replace placeholder with real ID from Cloudflare before deploying
-			"id": "TODO_KV_NAMESPACE_ID_PLACEHOLDER"
+			"id": "<PLACEHOLDER>"
 		},
 	],
-	"dev": {
-		"port": 8787
-	}
+  "observability": {
+		"enabled": true
+	},
 }

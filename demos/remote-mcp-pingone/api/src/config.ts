@@ -2,9 +2,9 @@
  * External resources (bindings) available to the worker at runtime.
  */
 export type Env = {
-  TODO_KV_NAMESPACE: KVNamespace;
-  PINGONE_DOMAIN: string;
-  PINGONE_AUDIENCE: string;
+  TODO_KV_PINGONE: KVNamespace;
+  API_ISSUER: string;
+  API_AUDIENCE: string;
 };
 
 /**
@@ -12,5 +12,8 @@ export type Env = {
  */
 export type APIVariables = {
   USER_ID: string;
-  USER_SCOPES: string;
+  USER_SCOPES: string[];
 };
+
+export const TODO_READ_SCOPE = 'todo_api:read';
+export const TODO_WRITE_SCOPE = 'todo_api:write';

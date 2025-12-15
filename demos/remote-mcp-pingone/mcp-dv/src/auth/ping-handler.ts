@@ -1,19 +1,8 @@
 import { Context } from 'hono';
 import * as oauth from 'oauth4webapi';
-import {
-  generateCSRFProtection,
-  validateOAuthState,
-  validateCSRFToken,
-  isClientApproved,
-  addApprovedClient,
-  renderApprovalDialog,
-  createOAuthState,
-  bindStateToSession,
-  OAuthError,
-} from './workers-oauth-utils';
+import { validateOAuthState, createOAuthState, bindStateToSession, OAuthError } from './workers-oauth-utils';
 import {
   generatePkceAndNonce,
-  recoverAuthRequestFromForm,
   redirectToPingOne,
   initPingOneOidcClient,
   fetchPingOneTokenSet,
@@ -24,11 +13,14 @@ import type { ExtendedAuthRequest } from './ping-types';
 import type { Env } from '../config';
 
 /**
- * GET '/authorize' : OAuth entry point for incoming MCP Clients. Either displays
- * a Cloudflare consent dialog or redirects to PingOne.
+ * GET '/authorize' : OAuth entry point for incoming MCP Clients. Immedietely redirect to PingOne
+ * DaVinci for authorization / authentication. This bypasses the Cloudflare consent screen (trust any
+ * client to initiate a login flow, as long as their client ID is in KV) and therefore relies on the
+ * DaVinci policy to handle consent. Note that the client ID will be added to KV internally by the
+ * cloudflare oauth proider when the client first connects.
  *
  * @param c - Hono context
- * @returns A 200 consent dialog render or a 302 PingOne redirect
+ * @returns A 302 PingOne DaVinci redirect
  */
 export const handleAuthorize = async (c: Context<{ Bindings: Env & { OAUTH_PROVIDER: OAuthHelpers } }>) => {
   try {
@@ -40,54 +32,6 @@ export const handleAuthorize = async (c: Context<{ Bindings: Env & { OAUTH_PROVI
     const client = await c.env.OAUTH_PROVIDER.lookupClient(clientId);
     if (!client) throw new OAuthError('invalid_request', 'Client ID not registered in KV.', 400);
 
-    // Check cookie for prior consent. If found, redirect to PingOne.
-    const isClientApprovedCloudflare = await isClientApproved(c.req.raw, clientId, c.env.COOKIE_ENCRYPTION_KEY);
-    if (isClientApprovedCloudflare) {
-      // Generate single-use OAuth state for upcoming redirect.
-      const pkceAndNonce = await generatePkceAndNonce();
-      const extendedRequest: ExtendedAuthRequest = {...mcpClientAuthReq, pkceAndNonce };
-      // Store single-use OAuth State in KV and bind single-use state token to cookie.
-      const { stateToken } = await createOAuthState(extendedRequest, c.env.OAUTH_KV);
-      const { setCookie: stateCookie } = await bindStateToSession(stateToken);
-      return redirectToPingOne(c.env, extendedRequest, c.req.raw.url, stateToken, stateCookie);
-    };
-
-    // Else, render Cloudflare consent dialog with CSRF protection.
-    const { token: csrfToken, setCookie: csrfCookie } = generateCSRFProtection();
-    return renderApprovalDialog(c.req.raw, {
-      client,
-      csrfToken,
-      server: {
-        name: 'Cloudflare MCP Authorization Server',
-        description: 'Secure authorization service that manages MCP clients and delegates authentication to PingOne.',
-      },
-      setCookie: csrfCookie,
-      state: { oauthReqInfo: mcpClientAuthReq },
-    });
-
-  } catch (error: any) {
-    console.error('GET /authorize error:', error);
-    return (error instanceof OAuthError) ? error.toResponse() : c.text('Internal server error.', 500);
-  };
-};
-
-/**
- * POST '/authorize' : Cloudflare consent dialog approval. Validates the
- * CSRF token, sets a long-term consent cookie, and redirects to PingOne.
- *
- * @param c - Hono context
- * @returns 302 redirect to PingOne
- */
-export const handleConsentApproval = async (c: Context<{ Bindings: Env & { OAUTH_PROVIDER: OAuthHelpers } }>) => {
-  try {
-    const formData = await c.req.raw.formData();
-    validateCSRFToken(formData, c.req.raw);
-
-    // Extract original request embedded in form and verify client ID.
-    const mcpClientAuthReq = recoverAuthRequestFromForm(formData);
-    const client = await c.env.OAUTH_PROVIDER.lookupClient(mcpClientAuthReq.clientId);
-    if (!client) throw new OAuthError('invalid_request', 'Client ID not registered in KV.', 400);
-
     // Generate single-use OAuth state for upcoming redirect.
     const pkceAndNonce = await generatePkceAndNonce();
     const extendedRequest: ExtendedAuthRequest = {...mcpClientAuthReq, pkceAndNonce };
@@ -96,12 +40,11 @@ export const handleConsentApproval = async (c: Context<{ Bindings: Env & { OAUTH
     const { stateToken } = await createOAuthState(extendedRequest, c.env.OAUTH_KV);
     const { setCookie: stateCookie } = await bindStateToSession(stateToken);
 
-    // Bind consent-approval to cookie and redirect to PingOne.
-    const consentCookie = await addApprovedClient(c.req.raw, mcpClientAuthReq.clientId, c.env.COOKIE_ENCRYPTION_KEY);
-    return redirectToPingOne(c.env, extendedRequest, c.req.raw.url, stateToken, stateCookie, consentCookie);
+    // Perform the redirect.
+    return redirectToPingOne(c.env, extendedRequest, c.req.raw.url, stateToken, stateCookie);
 
   } catch (error: any) {
-    console.error('POST /authorize error:', error);
+    console.error('GET /authorize error:', error);
     return (error instanceof OAuthError) ? error.toResponse() : c.text('Internal server error.', 500);
   };
 };

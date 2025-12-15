@@ -1,6 +1,6 @@
 {
-	"name": "remote-mcp-pingone",
-	"description": "OIDC MCP server secured with PingOne",
+	"name": "remote-mcp-pingone-dv",
+	"description": "OIDC MCP server secured with PingOne DaVinci",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {

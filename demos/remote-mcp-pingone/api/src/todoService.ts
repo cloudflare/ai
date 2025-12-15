@@ -1,4 +1,4 @@
-import { env } from 'cloudflare:workers';
+import type { Env } from './config';
 
 interface Todo {
   id: string;
@@ -10,45 +10,45 @@ class TodoService {
   constructor(private userID: string) {};
 
   // Persists data to KV, sorted for consistency
-  #set = async (todos: Todo[]): Promise<Todo[]> => {
+  #set = async (env: Env, todos: Todo[]): Promise<Todo[]> => {
     const sorted = todos.sort((t1, t2) => {
       if (t1.completed === t2.completed) {
         return t1.id.localeCompare(t2.id);
       };
       return t1.completed ? 1 : -1;
     });
-    await env.TODO_KV_NAMESPACE.put(this.userID, JSON.stringify(sorted));
+    await env.TODO_KV_PINGONE.put(this.userID, JSON.stringify(sorted));
     return sorted;
   };
 
-  get = async (): Promise<Todo[]> => {
-    const todos = await env.TODO_KV_NAMESPACE.get<Todo[]>(this.userID, 'json');
+  get = async (env: Env): Promise<Todo[]> => {
+    const todos = await env.TODO_KV_PINGONE.get<Todo[]>(this.userID, 'json');
     return todos || [];
   };
 
-  add = async (todoText: string): Promise<Todo[]> => {
-    const todos = await this.get();
+  add = async (env: Env, todoText: string): Promise<Todo[]> => {
+    const todos = await this.get(env);
     const newTodo: Todo = {
       id: Date.now().toString(),
       text: todoText,
       completed: false
     };
     todos.push(newTodo);
-    return this.#set(todos);
+    return this.#set(env, todos);
   };
 
-  delete = async (todoID: string): Promise<Todo[]> => {
-    const todos = await this.get();
+  delete = async (env: Env, todoID: string): Promise<Todo[]> => {
+    const todos = await this.get(env);
     const cleaned = todos.filter(t => t.id !== todoID);
-    return this.#set(cleaned);
+    return this.#set(env, cleaned);
   };
 
-  toggle = async (todoID: string, completed: boolean): Promise<Todo[]> => {
-    const todos = await this.get();
+  toggle = async (env: Env, todoID: string, completed: boolean): Promise<Todo[]> => {
+    const todos = await this.get(env);
     const todoToUpdate = todos.find(t => t.id === todoID);
     if (todoToUpdate) {
       todoToUpdate.completed = completed;
-      return this.#set(todos);
+      return this.#set(env, todos);
     };
     return todos;
   };

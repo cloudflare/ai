@@ -14,7 +14,7 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "remote-mcp-pingone",
+	"name": "remote-mcp-pingone-dv",
 	"main": "dist/index.js",
 	"compatibility_date": "2025-03-10",
 	"compatibility_flags": ["nodejs_compat"],

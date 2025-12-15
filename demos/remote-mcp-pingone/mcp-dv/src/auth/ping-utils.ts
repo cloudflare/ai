@@ -1,6 +1,5 @@
 import * as oauth from 'oauth4webapi';
 import { OAuthError } from './workers-oauth-utils';
-import type { AuthRequest } from '@cloudflare/workers-oauth-provider';
 import type {
   PkceAndNonce,
   ExtendedAuthRequest,
@@ -8,7 +7,7 @@ import type {
   PingOneTokenSet,
   PingOneUserClaims
 } from './ping-types';
-import { type Env, MCP_SERVER_SCOPES } from '../config';
+import { type Env,  MCP_SERVER_SCOPES} from '../config';
 
 /**
  * Generate PKCE components (`code_verifier`, `code_challenge`) and `nonce`.
@@ -37,14 +36,13 @@ export const initPingOneOidcClient = async (env: Env): Promise<PingOneOidcConfig
 };
 
 /**
- * Construct PingOne authorization URL and issue a redirect.
+ * Construct PingOne DaVinci authorization URL and issue a redirect.
  *
  * @param env - Worker environment bindings
  * @param mcpClientAuthReq - Incoming authorization request from MCP client
  * @param mcpClientAuthReqUrl - Incoming authorization request URL from MCP client
  * @param stateToken - Single-use state token stored in kv
  * @param stateCookie - Single-use state cookie for the browser
- * @param consentApprovalCookie - Optional consent approval cookie for the browser
  * @returns 302 redirect to PingOne
  */
 export const redirectToPingOne = async (
@@ -52,8 +50,7 @@ export const redirectToPingOne = async (
   mcpClientAuthReq: ExtendedAuthRequest,
   mcpClientAuthReqUrl: string,
   stateToken: string,
-  stateCookie: string,
-  consentApprovalCookie?: string
+  stateCookie: string
 ): Promise<Response> => {
   // Construct the Authorization URL.
   const mcpServerRedirectUrl = new URL('/callback', mcpClientAuthReqUrl).href;
@@ -67,13 +64,11 @@ export const redirectToPingOne = async (
   pingAuthorizeUrl.searchParams.set('code_challenge', mcpClientAuthReq.pkceAndNonce.code_challenge);
   pingAuthorizeUrl.searchParams.set('code_challenge_method', 'S256');
   pingAuthorizeUrl.searchParams.set('nonce', mcpClientAuthReq.pkceAndNonce.nonce);
+  pingAuthorizeUrl.searchParams.set('acr_values', env.PINGONE_DV_POLICY_ID);
   const headers = new Headers();
 
-  // Always append single-use state cookie, conditionally append consent approval cookie.
+  // Always append single-use state cookie.
   headers.append('Set-Cookie', stateCookie);
-  if (consentApprovalCookie) {
-    headers.append('Set-Cookie', consentApprovalCookie);
-  };
 
   // Issue the 302 redirect.
   headers.set('Location', pingAuthorizeUrl.toString());
@@ -146,32 +141,4 @@ export const fetchPingOneUserClaims = async (env: Env, access_token: string): Pr
     throw new OAuthError('server error', `Error fetching user claims. ${response.statusText}.`, response.status);
   };
   return response.json();
-};
-
-/**
- * Decode and validate the embedded state parameters from the CF consent form.
- *
- * @param formData - Form data submitted by the user
- * @returns Object containing the original OAuth request info
- */
-export function recoverAuthRequestFromForm(formData: FormData): AuthRequest {
-  const base64State = formData.get('state');
-  
-  if (typeof base64State !== 'string' || !base64State) {
-    throw new OAuthError('invalid_request', 'Missing "state" parameter in CF consent form.', 400);
-  };
-
-  let decodedState;
-  try {
-    decodedState = JSON.parse(atob(base64State));
-  } catch (e) {
-    throw new OAuthError('invalid_request', 'Invalid state data format in CF consent form.', 400);
-  };
-  const mcpClientAuthReq = decodedState.oauthReqInfo;
-
-  if (!mcpClientAuthReq || !mcpClientAuthReq.clientId) {
-    throw new OAuthError('invalid_request', 'Invalid state data recovered from CF consent form.', 400);
-  };
-
-  return mcpClientAuthReq;
 };

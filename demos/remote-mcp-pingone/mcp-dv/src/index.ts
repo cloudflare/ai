@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { OAuthProvider, OAuthHelpers } from '@cloudflare/workers-oauth-provider';
 import { TodoMcpServer } from './mcp';
-import { handleAuthorize, handlePingOneCallback, handleConsentApproval } from './auth/ping-handler';
+import { handleAuthorize, handlePingOneCallback } from './auth/ping-handler';
 import type { Env } from './config';
 
 /**
@@ -28,10 +28,9 @@ export default new OAuthProvider({
   tokenEndpoint: '/token',
   defaultHandler: new Hono<{ Bindings: Env & { OAUTH_PROVIDER: OAuthHelpers } }>()
     .get('/authorize', handleAuthorize)
-    .post('/authorize', handleConsentApproval)
     .get('/callback', handlePingOneCallback) as any,
   apiHandlers: {
     "/sse": TodoMcpServer.serveSSE("/sse"), // Legacy SSE transport
     '/mcp': TodoMcpServer.serve('/mcp'), // Streamable HTTP transport
-	},
+  },
 });

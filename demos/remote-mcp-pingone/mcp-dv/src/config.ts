@@ -9,6 +9,7 @@ export type Env = {
   OAUTH_KV: KVNamespace;
   COOKIE_ENCRYPTION_KEY: string;
   PINGONE_ISSUER: string;
+  PINGONE_DV_POLICY_ID: string;
   MCP_SERVER_CLIENT_ID: string;
   MCP_SERVER_CLIENT_SECRET: string;
   API_IDENTIFIER: string;
