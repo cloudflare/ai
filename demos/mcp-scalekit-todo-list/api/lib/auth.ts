@@ -1,6 +1,7 @@
 import {createMiddleware} from "hono/factory";
 import {HTTPException} from "hono/http-exception";
 import {getCookie} from "hono/cookie";
+import { createRemoteJWKSet, jwtVerify } from "jose";
 
 /**
  * scalekitSessionAuthMiddleware is a Hono middleware that validates that the user is logged in
@@ -19,7 +20,7 @@ export const scalekitSessionAuthMiddleware = createMiddleware<{
     }
 
     try {
-        const verifyResult = await validateScalekitToken(sessionCookie, c.env)
+        const verifyResult = await validateScalekitToken(sessionCookie, c.env);
         c.set('userID', verifyResult.sub);
     } catch (error) {
         console.error('Token validation error:', error);
@@ -51,14 +52,14 @@ export const scalekitBearerTokenAuthMiddleware = createMiddleware<{
     const accessToken = authHeader.substring(7);
 
     try {
-        const verifyResult = await validateScalekitToken(accessToken, c.env)
+        const verifyResult = await validateScalekitToken(accessToken, c.env);
         
         // Store auth context for MCP server
         // @ts-expect-error Props go brr
         c.executionCtx.props = {
             claims: verifyResult,
             accessToken,
-        }
+        };
     } catch (error) {
         console.error('Token validation error:', error);
         throw new HTTPException(401, {message: 'Unauthenticated'})
@@ -67,8 +68,10 @@ export const scalekitBearerTokenAuthMiddleware = createMiddleware<{
     await next()
 })
 
+let jwks: ReturnType<typeof createRemoteJWKSet> | null = null;
+
 /**
- * Validates a Scalekit token using Scalekit's API
+ * Validates a Scalekit token using JWT verification
  * Scalekit Full-Stack Auth returns JWT tokens (id_token and access_token)
  */
 async function validateScalekitToken(token: string, env: Env): Promise<{ sub: string; [key: string]: any }> {
@@ -115,67 +118,30 @@ async function validateScalekitToken(token: string, env: Env): Promise<{ sub: st
         }
     }
     
-    // If it's a JWT token (id_token or access_token), decode it
-    // Scalekit returns JWT tokens that we can decode to get user info
+    // If it's a JWT token, verify it using JWKS
     try {
-        const parts = token.split('.');
-        if (parts.length === 3) {
-            // Decode JWT payload (without verification for now - in production you should verify)
-            const payload = JSON.parse(atob(parts[1]));
-            
-            // Check if token is expired
-            if (payload.exp && payload.exp < Date.now() / 1000) {
-                throw new Error('Token has expired');
-            }
-            
-            // Extract user ID from JWT payload
-            const userId = payload.sub || payload.user_id || payload.userId || payload.email;
-            if (!userId) {
-                throw new Error('JWT token does not contain user identifier');
-            }
-            
-            console.log('JWT token decoded successfully');
-            return {
-                sub: userId,
-                ...payload,
-            };
+        if (!jwks) {
+            const jwksUrl = `${env.SCALEKIT_ENVIRONMENT_URL}/.well-known/jwks.json`;
+            jwks = createRemoteJWKSet(new URL(jwksUrl));
         }
-    } catch (error) {
-        if (error instanceof Error && error.message.includes('expired')) {
-            throw error;
-        }
-        // If JWT decode fails, try API validation
-        console.warn('JWT decode failed, trying API validation:', error);
-    }
-    
-    // Fallback: Try Scalekit's userinfo endpoint with access_token
-    try {
-        const userinfoUrl = `${env.SCALEKIT_ENVIRONMENT_URL}/oauth/userinfo`;
-        console.log(`Trying userinfo endpoint with token`);
         
-        const response = await fetch(userinfoUrl, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
+        const result = await jwtVerify(token, jwks, {
+            algorithms: ["RS256"],
+            issuer: env.SCALEKIT_ENVIRONMENT_URL,
         });
         
-        if (response.ok) {
-            const data = await response.json() as Record<string, any>;
-            const userId = data.sub || data.user_id || data.id || data.email;
-            if (userId) {
-                console.log('Userinfo endpoint successful');
-                return {
-                    sub: userId,
-                    ...data,
-                };
-            }
+        if (!result.payload.sub) {
+            throw new Error('JWT token does not contain user identifier');
         }
+        
+        return {
+            sub: result.payload.sub,
+            ...result.payload,
+        };
     } catch (error) {
-        console.warn('Userinfo endpoint failed:', error);
+        console.error('JWT verification error:', error);
+        throw error;
     }
-    
-    throw new Error(`Token validation failed: Could not validate token. Token appears to be neither a session ID nor a valid JWT.`);
 }
 
 /**
