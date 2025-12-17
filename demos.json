@@ -30,6 +30,9 @@
     "./demos/mcp-stytch-consumer-todo-list": {
       "package_json_hash": "428d6caecb4991a0847a8a77aaf791a6885fe72e"
     },
+    "./demos/mcp-scalekit-todo-list": {
+      "package_json_hash": "b334e7d46f47cd6e9e0ddb4d8b15dc51a98ceab8"
+    },
     "./demos/model-scraper": {
       "package_json_hash": "361b037f96d7eefd23df44059d8313ade0bd28fc"
     },
