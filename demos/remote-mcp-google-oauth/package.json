@@ -12,6 +12,7 @@
   "dependencies": {
     "@cloudflare/workers-oauth-provider": "^0.2.2",
     "agents": "^0.3.0",
+    "ai": "^6.0.3",
     "hono": "^4.11.1",
     "just-pick": "^4.2.0",
     "zod": "^4.1.8"

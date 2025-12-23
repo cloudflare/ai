@@ -13,6 +13,7 @@
 	},
 	"dependencies": {
 		"agents": "^0.3.0",
+		"ai": "^6.0.3",
 		"zod": "^4.1.8"
 	},
 	"devDependencies": {
