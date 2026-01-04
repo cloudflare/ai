@@ -1,0 +1,28 @@
+{
+  "name": "remote-mcp-github-oauth",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "cf-typegen": "wrangler types",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@clerk/backend": "^2.21.0",
+    "@cloudflare/workers-oauth-provider": "^0.0.13",
+    "@modelcontextprotocol/sdk": "1.20.2",
+    "agents": "^0.2.19",
+    "hono": "^4.10.4",
+    "just-pick": "^4.2.0",
+    "workers-mcp": "^0.0.13",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20251014.0",
+    "prettier": "^3.6.2",
+    "typescript": "5.9.3",
+    "wrangler": "^4.45.2"
+  }
+}
