@@ -2,11 +2,13 @@ import { createVertex as createVertexOriginal } from "@ai-sdk/google-vertex/edge
 import { CF_TEMP_TOKEN } from "../auth";
 
 export const createVertex = (...args: Parameters<typeof createVertexOriginal>) => {
-	const [config] = args;
-	// In v6, apiKey is a top-level property for express mode authentication
-	const configWithApiKey = {
-		...config,
-		apiKey: config?.apiKey ?? CF_TEMP_TOKEN,
-	};
-	return createVertexOriginal(configWithApiKey);
-};
+    let [config] = args;
+    if (config === undefined) {
+        config = { googleCredentials: { cfApiKey: CF_TEMP_TOKEN } } as any;
+    }
+	// no google credentials and no express mode apikey
+    else if (config.googleCredentials === undefined && config.apiKey === undefined) {
+        config.googleCredentials = { cfApiKey: CF_TEMP_TOKEN } as any;
+    }
+    return createVertexOriginal(config);
+}

@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   '@ai-sdk/google-vertex':
-    hash: 271963aef1bb8d69c1fbba83342f6bdf1b39f53c660e9b34659e6ce279c0a100
+    hash: 5015d8c7ff40e99b6b6d204430f0750dda43beda4beda4e6817b38cd2b057184
     path: patches/@ai-sdk__google-vertex.patch
 
 importers:
@@ -1536,7 +1536,7 @@ importers:
         version: 3.0.1(zod@4.2.1)
       '@ai-sdk/google-vertex':
         specifier: ^4.0.1
-        version: 4.0.1(patch_hash=271963aef1bb8d69c1fbba83342f6bdf1b39f53c660e9b34659e6ce279c0a100)(zod@4.2.1)
+        version: 4.0.1(patch_hash=5015d8c7ff40e99b6b6d204430f0750dda43beda4beda4e6817b38cd2b057184)(zod@4.2.1)
       '@ai-sdk/groq':
         specifier: ^3.0.1
         version: 3.0.1(zod@4.2.1)
@@ -6525,7 +6525,7 @@ snapshots:
       '@vercel/oidc': 3.0.5
       zod: 4.2.1
 
-  '@ai-sdk/google-vertex@4.0.1(patch_hash=271963aef1bb8d69c1fbba83342f6bdf1b39f53c660e9b34659e6ce279c0a100)(zod@4.2.1)':
+  '@ai-sdk/google-vertex@4.0.1(patch_hash=5015d8c7ff40e99b6b6d204430f0750dda43beda4beda4e6817b38cd2b057184)(zod@4.2.1)':
     dependencies:
       '@ai-sdk/anthropic': 3.0.1(zod@4.2.1)
       '@ai-sdk/google': 3.0.1(zod@4.2.1)
