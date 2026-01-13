@@ -15,7 +15,7 @@
 	},
 	"dependencies": {
 		"ai": "^6.0.3",
-		"hono": "^4.11.3",
+		"hono": "^4.11.4",
 		"react": "^19.2.3",
 		"react-dom": "^19.2.3",
 		"workers-ai-provider": "^3.0.2",
