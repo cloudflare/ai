@@ -1,50 +1,24 @@
-import type { EmbeddingModelV3, LanguageModelV3 } from "@ai-sdk/provider";
+import type { EmbeddingModelV3 } from "@ai-sdk/provider";
 import type { FetchFunction } from "@ai-sdk/provider-utils";
 import { CF_TEMP_TOKEN } from "./auth";
 import { providers } from "./providers";
-import { AiGatewayEmbeddingModel } from "./ai-gateway-embedding-model";
 import {
 	AiGatewayDoesNotExist,
 	AiGatewayInternalFetchError,
 	AiGatewayUnauthorizedError,
 	parseAiGatewayOptions,
 	streamToObject,
-	type AiGatewayAPISettings,
-	type AiGatewayBindingSettings,
-	type AiGatewayOptions,
-	type AiGatewayRetries,
 	type AiGatewaySettings,
 } from "./shared";
 
-// Re-export errors and types from shared
-export {
-	AiGatewayDoesNotExist,
-	AiGatewayInternalFetchError,
-	AiGatewayUnauthorizedError,
-	parseAiGatewayOptions,
-	type AiGatewayAPISettings,
-	type AiGatewayBindingSettings,
-	type AiGatewayOptions,
-	type AiGatewayRetries,
-	type AiGatewaySettings,
-};
-
-// Re-export embedding model
-export { AiGatewayEmbeddingModel };
-
-type InternalLanguageModelV3 = LanguageModelV3 & {
+type InternalEmbeddingModelV3 = EmbeddingModelV3 & {
 	config?: { fetch?: FetchFunction | undefined };
 };
 
-export class AiGatewayChatLanguageModel implements LanguageModelV3 {
+export class AiGatewayEmbeddingModel implements EmbeddingModelV3 {
 	readonly specificationVersion = "v3";
-	readonly defaultObjectGenerationMode = "json";
 
-	readonly supportedUrls: Record<string, RegExp[]> | PromiseLike<Record<string, RegExp[]>> = {
-		// No URLS are supported for this language model
-	};
-
-	readonly models: InternalLanguageModelV3[];
+	readonly models: InternalEmbeddingModelV3[];
 	readonly config: AiGatewaySettings;
 
 	get modelId(): string {
@@ -63,24 +37,37 @@ export class AiGatewayChatLanguageModel implements LanguageModelV3 {
 		return this.models[0].provider;
 	}
 
-	constructor(models: LanguageModelV3[], config: AiGatewaySettings) {
+	get maxEmbeddingsPerCall(): PromiseLike<number | undefined> | number | undefined {
+		if (!this.models[0]) {
+			throw new Error("models cannot be empty array");
+		}
+
+		return this.models[0].maxEmbeddingsPerCall;
+	}
+
+	get supportsParallelCalls(): PromiseLike<boolean> | boolean {
+		if (!this.models[0]) {
+			throw new Error("models cannot be empty array");
+		}
+
+		return this.models[0].supportsParallelCalls;
+	}
+
+	constructor(models: EmbeddingModelV3[], config: AiGatewaySettings) {
 		this.models = models;
 		this.config = config;
 	}
 
-	async processModelRequest<
-		T extends LanguageModelV3["doStream"] | LanguageModelV3["doGenerate"],
-	>(
-		options: Parameters<T>[0],
-		modelMethod: "doStream" | "doGenerate",
-	): Promise<Awaited<ReturnType<T>>> {
+	async doEmbed(
+		options: Parameters<EmbeddingModelV3["doEmbed"]>[0],
+	): Promise<Awaited<ReturnType<EmbeddingModelV3["doEmbed"]>>> {
 		const requests: { url: string; request: Request; modelProvider: string }[] = [];
 
 		// Model configuration and request collection
 		for (const model of this.models) {
 			if (!model.config || !Object.keys(model.config).includes("fetch")) {
 				throw new Error(
-					`Sorry, but provider "${model.provider}" is currently not supported, please open a issue in the github repo!`,
+					`Sorry, but provider "${model.provider}" is currently not supported for embeddings, please open an issue in the github repo!`,
 				);
 			}
 
@@ -94,7 +81,7 @@ export class AiGatewayChatLanguageModel implements LanguageModelV3 {
 			};
 
 			try {
-				await model[modelMethod](options);
+				await model.doEmbed(options);
 			} catch (e) {
 				if (!(e instanceof AiGatewayInternalFetchError)) {
 					throw e;
@@ -114,17 +101,16 @@ export class AiGatewayChatLanguageModel implements LanguageModelV3 {
 
 				if (!providerConfig) {
 					throw new Error(
-						`Sorry, but provider "${req.modelProvider}" is currently not supported, please open a issue in the github repo!`,
+						`Sorry, but provider "${req.modelProvider}" is currently not supported for embeddings, please open an issue in the github repo!`,
 					);
 				}
 
 				if (!req.request.body) {
-					throw new Error("Ai Gateway provider received an unexpected empty body");
+					throw new Error("AI Gateway provider received an unexpected empty body");
 				}
 
 				// For AI Gateway BYOK / unified billing requests
 				// delete the fake injected CF_TEMP_TOKEN
-
 				const authHeader = providerConfig.headerKey ?? "authorization";
 				const authValue =
 					"get" in req.request.headers
@@ -216,54 +202,6 @@ export class AiGatewayChatLanguageModel implements LanguageModelV3 {
 			fetch: (_url, _req) => resp as unknown as Promise<Response>,
 		};
 
-		return this.models[step][modelMethod](options) as Promise<Awaited<ReturnType<T>>>;
+		return this.models[step].doEmbed(options);
 	}
-
-	async doStream(
-		options: Parameters<LanguageModelV3["doStream"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV3["doStream"]>>> {
-		return this.processModelRequest<LanguageModelV3["doStream"]>(options, "doStream");
-	}
-
-	async doGenerate(
-		options: Parameters<LanguageModelV3["doGenerate"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV3["doGenerate"]>>> {
-		return this.processModelRequest<LanguageModelV3["doGenerate"]>(options, "doGenerate");
-	}
-}
-
-export interface AiGateway {
-	(models: LanguageModelV3 | LanguageModelV3[]): LanguageModelV3;
-
-	chat(models: LanguageModelV3 | LanguageModelV3[]): LanguageModelV3;
-
-	embedding(models: EmbeddingModelV3 | EmbeddingModelV3[]): EmbeddingModelV3;
-
-	textEmbedding(models: EmbeddingModelV3 | EmbeddingModelV3[]): EmbeddingModelV3;
-
-	textEmbeddingModel(models: EmbeddingModelV3 | EmbeddingModelV3[]): EmbeddingModelV3;
-}
-
-/**
- * @deprecated Use `AiGatewayRetries` instead
- */
-export type AiGatewayReties = AiGatewayRetries;
-
-export function createAiGateway(options: AiGatewaySettings): AiGateway {
-	const createChatModel = (models: LanguageModelV3 | LanguageModelV3[]) => {
-		return new AiGatewayChatLanguageModel(Array.isArray(models) ? models : [models], options);
-	};
-
-	const createEmbeddingModel = (models: EmbeddingModelV3 | EmbeddingModelV3[]) => {
-		return new AiGatewayEmbeddingModel(Array.isArray(models) ? models : [models], options);
-	};
-
-	const provider = (models: LanguageModelV3 | LanguageModelV3[]) => createChatModel(models);
-
-	provider.chat = createChatModel;
-	provider.embedding = createEmbeddingModel;
-	provider.textEmbedding = createEmbeddingModel;
-	provider.textEmbeddingModel = createEmbeddingModel;
-
-	return provider;
 }
