@@ -3,7 +3,7 @@ import { embed, embedMany } from "ai";
 import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import { createAiGateway } from "../src";
+import { AiGatewayDoesNotExist, AiGatewayUnauthorizedError, createAiGateway } from "../src";
 
 const TEST_ACCOUNT_ID = "test-account-id";
 const TEST_API_KEY = "test-api-key";
@@ -219,5 +219,73 @@ describe("Embedding with Binding", () => {
 			value: "Hello, world!",
 		});
 		expect(result.embedding).toEqual(embedResponse);
+	});
+});
+
+describe("Embedding Error Handling", () => {
+	beforeAll(() => server.listen());
+	afterEach(() => server.resetHandlers());
+	afterAll(() => server.close());
+
+	it("should throw AiGatewayDoesNotExist for 400 status with code 2001", async () => {
+		server.use(
+			http.post(
+				`https://gateway.ai.cloudflare.com/v1/${TEST_ACCOUNT_ID}/${TEST_GATEWAY}`,
+				async () => {
+					return HttpResponse.json(
+						{
+							success: false,
+							error: [{ code: 2001, message: "Gateway not found" }],
+						},
+						{ status: 400 },
+					);
+				},
+			),
+		);
+
+		const aigateway = createAiGateway({
+			accountId: TEST_ACCOUNT_ID,
+			apiKey: TEST_API_KEY,
+			gateway: TEST_GATEWAY,
+		});
+		const openai = createOpenAI({ apiKey: TEST_API_KEY });
+
+		await expect(
+			embed({
+				model: aigateway.embedding(openai.embedding("text-embedding-3-small")),
+				value: "Hello, world!",
+			}),
+		).rejects.toThrow(AiGatewayDoesNotExist);
+	});
+
+	it("should throw AiGatewayUnauthorizedError for 401 status with code 2009", async () => {
+		server.use(
+			http.post(
+				`https://gateway.ai.cloudflare.com/v1/${TEST_ACCOUNT_ID}/${TEST_GATEWAY}`,
+				async () => {
+					return HttpResponse.json(
+						{
+							success: false,
+							error: [{ code: 2009, message: "Unauthorized" }],
+						},
+						{ status: 401 },
+					);
+				},
+			),
+		);
+
+		const aigateway = createAiGateway({
+			accountId: TEST_ACCOUNT_ID,
+			apiKey: TEST_API_KEY,
+			gateway: TEST_GATEWAY,
+		});
+		const openai = createOpenAI({ apiKey: TEST_API_KEY });
+
+		await expect(
+			embed({
+				model: aigateway.embedding(openai.embedding("text-embedding-3-small")),
+				value: "Hello, world!",
+			}),
+		).rejects.toThrow(AiGatewayUnauthorizedError);
 	});
 });
