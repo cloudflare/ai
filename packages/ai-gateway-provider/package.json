@@ -1,6 +1,6 @@
 {
 	"name": "ai-gateway-provider",
-	"version": "2.0.1",
+	"version": "3.0.0",
 	"description": "AI Gateway Provider for AI-SDK",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
@@ -126,27 +126,27 @@
 		"url": "https://github.com/cloudflare/ai/issues"
 	},
 	"dependencies": {
-		"@ai-sdk/provider": "^2.0.0",
+		"@ai-sdk/provider": "^3.0.0",
 		"@ai-sdk/provider-utils": "^3.0.18",
-		"ai": "^5.0.106"
+		"ai": "^6.0.0"
 	},
 	"optionalDependencies": {
-		"@ai-sdk/amazon-bedrock": "^3.0.67",
-		"@ai-sdk/anthropic": "^2.0.53",
-		"@ai-sdk/azure": "^2.0.79",
-		"@ai-sdk/cerebras": "^1.0.32",
-		"@ai-sdk/cohere": "^2.0.20",
-		"@ai-sdk/deepgram": "^1.0.20",
-		"@ai-sdk/deepseek": "^1.0.31",
-		"@ai-sdk/elevenlabs": "^1.0.20",
-		"@ai-sdk/fireworks": "^1.0.29",
-		"@ai-sdk/google": "^2.0.44",
-		"@ai-sdk/google-vertex": "^3.0.86",
-		"@ai-sdk/groq": "^2.0.32",
-		"@ai-sdk/mistral": "^2.0.25",
-		"@ai-sdk/openai": "^2.0.77",
-		"@ai-sdk/perplexity": "^2.0.21",
-		"@ai-sdk/xai": "^2.0.39"
+		"@ai-sdk/amazon-bedrock": "^4.0.21",
+		"@ai-sdk/anthropic": "^3.0.17",
+		"@ai-sdk/azure": "^3.0.13",
+		"@ai-sdk/cerebras": "^2.0.17",
+		"@ai-sdk/cohere": "^3.0.8",
+		"@ai-sdk/deepgram": "^2.0.8",
+		"@ai-sdk/deepseek": "^2.0.8",
+		"@ai-sdk/elevenlabs": "^2.0.8",
+		"@ai-sdk/fireworks": "^2.0.16",
+		"@ai-sdk/google": "^3.0.10",
+		"@ai-sdk/google-vertex": "^4.0.21",
+		"@ai-sdk/groq": "^3.0.11",
+		"@ai-sdk/mistral": "^3.0.9",
+		"@ai-sdk/openai": "^3.0.13",
+		"@ai-sdk/perplexity": "^3.0.8",
+		"@ai-sdk/xai": "^3.0.29"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.8",
