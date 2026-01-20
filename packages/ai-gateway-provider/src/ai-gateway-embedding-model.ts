@@ -202,6 +202,15 @@ export class AiGatewayEmbeddingModel implements EmbeddingModelV3 {
 			fetch: (_url, _req) => resp as unknown as Promise<Response>,
 		};
 
-		return this.models[step].doEmbed(options);
+		const result = await this.models[step].doEmbed(options);
+
+		// Ensure V3 compliance: warnings field is required
+		return {
+			embeddings: result.embeddings,
+			usage: result.usage,
+			providerMetadata: result.providerMetadata,
+			response: result.response,
+			warnings: result.warnings ?? [],
+		};
 	}
 }
