@@ -1,19 +1,19 @@
-import type { LanguageModelV2Prompt, SharedV2ProviderMetadata } from "@ai-sdk/provider";
+import type { LanguageModelV3Prompt, SharedV3ProviderOptions } from "@ai-sdk/provider";
 import type { WorkersAIChatPrompt } from "./workersai-chat-prompt";
 
-export function convertToWorkersAIChatMessages(prompt: LanguageModelV2Prompt): {
+export function convertToWorkersAIChatMessages(prompt: LanguageModelV3Prompt): {
 	messages: WorkersAIChatPrompt;
 	images: {
 		mimeType: string | undefined;
 		image: Uint8Array;
-		providerOptions: SharedV2ProviderMetadata | undefined;
+		providerOptions: SharedV3ProviderOptions | undefined;
 	}[];
 } {
 	const messages: WorkersAIChatPrompt = [];
 	const images: {
 		mimeType: string | undefined;
 		image: Uint8Array;
-		providerOptions: SharedV2ProviderMetadata | undefined;
+		providerOptions: SharedV3ProviderOptions | undefined;
 	}[] = [];
 
 	for (const { role, content } of prompt) {
@@ -90,9 +90,10 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV2Prompt): {
 							});
 							break;
 						}
-						default: {
-							const exhaustiveCheck = part;
-							throw new Error(`Unsupported part type: ${exhaustiveCheck.type}`);
+						case "file":
+						case "tool-result": {
+							// Skip file and tool-result parts in assistant messages
+							break;
 						}
 					}
 				}
@@ -114,13 +115,18 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV2Prompt): {
 			}
 
 			case "tool": {
-				for (const [index, toolResponse] of content.entries()) {
-					messages.push({
-						content: JSON.stringify(toolResponse.output),
-						name: toolResponse.toolName,
-						tool_call_id: `functions.${toolResponse.toolName}:${index}`,
-						role: "tool",
-					});
+				let toolResultIndex = 0;
+				for (const toolResponse of content) {
+					// Only process tool-result parts, skip tool-approval-response
+					if (toolResponse.type === "tool-result") {
+						messages.push({
+							content: JSON.stringify(toolResponse.output),
+							name: toolResponse.toolName,
+							tool_call_id: `functions.${toolResponse.toolName}:${toolResultIndex}`,
+							role: "tool",
+						});
+						toolResultIndex++;
+					}
 				}
 				break;
 			}

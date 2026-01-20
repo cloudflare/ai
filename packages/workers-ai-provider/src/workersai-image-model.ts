@@ -1,10 +1,10 @@
-import type { ImageModelV2, ImageModelV2CallWarning } from "@ai-sdk/provider";
+import type { ImageModelV3, SharedV3Warning } from "@ai-sdk/provider";
 import type { WorkersAIImageConfig } from "./workersai-image-config";
 import type { WorkersAIImageSettings } from "./workersai-image-settings";
 import type { ImageGenerationModels } from "./workersai-models";
 
-export class WorkersAIImageModel implements ImageModelV2 {
-	readonly specificationVersion = "v2";
+export class WorkersAIImageModel implements ImageModelV3 {
+	readonly specificationVersion = "v3";
 
 	get maxImagesPerCall(): number {
 		return this.settings.maxImagesPerCall ?? 1;
@@ -27,18 +27,18 @@ export class WorkersAIImageModel implements ImageModelV2 {
 		seed,
 		// headers,
 		// abortSignal,
-	}: Parameters<ImageModelV2["doGenerate"]>[0]): Promise<
-		Awaited<ReturnType<ImageModelV2["doGenerate"]>>
+	}: Parameters<ImageModelV3["doGenerate"]>[0]): Promise<
+		Awaited<ReturnType<ImageModelV3["doGenerate"]>>
 	> {
 		const { width, height } = getDimensionsFromSizeString(size);
 
-		const warnings: Array<ImageModelV2CallWarning> = [];
+		const warnings: Array<SharedV3Warning> = [];
 
 		if (aspectRatio != null) {
 			warnings.push({
 				details: "This model does not support aspect ratio. Use `size` instead.",
-				setting: "aspectRatio",
-				type: "unsupported-setting",
+				feature: "aspectRatio",
+				type: "unsupported",
 			});
 		}
 
@@ -47,7 +47,7 @@ export class WorkersAIImageModel implements ImageModelV2 {
 				this.modelId,
 				{
 					height,
-					prompt,
+					prompt: prompt ?? "",
 					seed,
 					width,
 				},

@@ -1,4 +1,6 @@
-export function mapWorkersAIUsage(output: AiTextGenerationOutput | AiTextToImageOutput) {
+import type { LanguageModelV3Usage } from "@ai-sdk/provider";
+
+export function mapWorkersAIUsage(output: AiTextGenerationOutput | AiTextToImageOutput): LanguageModelV3Usage {
 	const usage = (
 		output as {
 			usage: { prompt_tokens: number; completion_tokens: number };
@@ -9,8 +11,16 @@ export function mapWorkersAIUsage(output: AiTextGenerationOutput | AiTextToImage
 	};
 
 	return {
-		outputTokens: usage.completion_tokens,
-		inputTokens: usage.prompt_tokens,
-		totalTokens: usage.prompt_tokens + usage.completion_tokens,
+		inputTokens: {
+			total: usage.prompt_tokens,
+			noCache: undefined,
+			cacheRead: undefined,
+			cacheWrite: undefined,
+		},
+		outputTokens: {
+			total: usage.completion_tokens,
+			text: undefined,
+			reasoning: undefined,
+		},
 	};
 }

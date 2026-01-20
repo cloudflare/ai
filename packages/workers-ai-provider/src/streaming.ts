@@ -1,4 +1,4 @@
-import type { LanguageModelV2StreamPart } from "@ai-sdk/provider";
+import type { LanguageModelV3StreamPart, LanguageModelV3Usage } from "@ai-sdk/provider";
 import { generateId } from "ai";
 import { events } from "fetch-event-stream";
 import { mapWorkersAIUsage } from "./map-workersai-usage";
@@ -6,14 +6,17 @@ import { processPartialToolCalls } from "./utils";
 
 export function getMappedStream(response: Response) {
 	const chunkEvent = events(response);
-	let usage = { outputTokens: 0, inputTokens: 0, totalTokens: 0 };
+	let usage: LanguageModelV3Usage = {
+		inputTokens: { total: 0, noCache: undefined, cacheRead: undefined, cacheWrite: undefined },
+		outputTokens: { total: 0, text: undefined, reasoning: undefined },
+	};
 	const partialToolCalls: any[] = [];
 
 	// Track start/delta/end IDs per v5 streaming protocol
 	let textId: string | null = null;
 	let reasoningId: string | null = null;
 
-	return new ReadableStream<LanguageModelV2StreamPart>({
+	return new ReadableStream<LanguageModelV3StreamPart>({
 		async start(controller) {
 			for await (const event of chunkEvent) {
 				if (!event.data) {
@@ -90,7 +93,7 @@ export function getMappedStream(response: Response) {
 			}
 
 			controller.enqueue({
-				finishReason: "stop",
+				finishReason: { unified: "stop", raw: "stop" },
 				type: "finish",
 				usage: usage,
 			});

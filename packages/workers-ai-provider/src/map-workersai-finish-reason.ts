@@ -1,6 +1,6 @@
-import type { LanguageModelV2FinishReason } from "@ai-sdk/provider";
+import type { LanguageModelV3FinishReason } from "@ai-sdk/provider";
 
-export function mapWorkersAIFinishReason(finishReasonOrResponse: any): LanguageModelV2FinishReason {
+export function mapWorkersAIFinishReason(finishReasonOrResponse: any): LanguageModelV3FinishReason {
 	let finishReason: string | null | undefined;
 
 	// If it's a string/null/undefined, use it directly (original behavior)
@@ -28,20 +28,21 @@ export function mapWorkersAIFinishReason(finishReasonOrResponse: any): LanguageM
 
 	switch (finishReason) {
 		case "stop":
-			return "stop";
+			return { unified: "stop", raw: finishReason };
 		case "length":
 		case "model_length":
-			return "length";
+			return { unified: "length", raw: finishReason };
 		case "tool_calls":
-			return "tool-calls";
+			return { unified: "tool-calls", raw: finishReason };
+		case "content_filter":
+			return { unified: "content-filter", raw: finishReason };
 		case "error":
-			return "error";
+			return { unified: "error", raw: finishReason };
 		case "other":
-			return "other";
 		case "unknown":
-			return "unknown";
+			return { unified: "other", raw: finishReason };
 		default:
 			// Default to `stop` for backwards compatibility
-			return "stop";
+			return { unified: "stop", raw: finishReason ?? undefined };
 	}
 }

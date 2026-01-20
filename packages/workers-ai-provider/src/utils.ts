@@ -1,4 +1,4 @@
-import type { LanguageModelV2, LanguageModelV2ToolCall } from "@ai-sdk/provider";
+import type { LanguageModelV3, LanguageModelV3ToolCall } from "@ai-sdk/provider";
 import { generateId } from "ai";
 
 /**
@@ -128,8 +128,8 @@ export function createRun(config: CreateRunConfig): AiRun {
 }
 
 export function prepareToolsAndToolChoice(
-	tools: Parameters<LanguageModelV2["doGenerate"]>[0]["tools"],
-	toolChoice: Parameters<LanguageModelV2["doGenerate"]>[0]["toolChoice"],
+	tools: Parameters<LanguageModelV3["doGenerate"]>[0]["tools"],
+	toolChoice: Parameters<LanguageModelV3["doGenerate"]>[0]["toolChoice"],
 ) {
 	if (tools == null) {
 		return { tool_choice: undefined, tools: undefined };
@@ -213,7 +213,7 @@ function mergePartialToolCalls(partialCalls: any[]) {
 	return Object.values(mergedCallsByIndex);
 }
 
-function processToolCall(toolCall: any): LanguageModelV2ToolCall {
+function processToolCall(toolCall: any): LanguageModelV3ToolCall {
 	// Check for OpenAI format tool calls first
 	if (toolCall.function && toolCall.id) {
 		return {
@@ -237,7 +237,7 @@ function processToolCall(toolCall: any): LanguageModelV2ToolCall {
 	};
 }
 
-export function processToolCalls(output: any): LanguageModelV2ToolCall[] {
+export function processToolCalls(output: any): LanguageModelV3ToolCall[] {
 	if (output.tool_calls && Array.isArray(output.tool_calls)) {
 		return output.tool_calls.map((toolCall: any) => {
 			const processedToolCall = processToolCall(toolCall);
