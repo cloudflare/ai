@@ -1,6 +1,6 @@
 {
 	"name": "ai-gateway-provider",
-	"version": "3.0.2",
+	"version": "3.1.0",
 	"description": "AI Gateway Provider for AI-SDK",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
@@ -158,7 +158,7 @@
 		"@ai-sdk/openai": "^3.0.1",
 		"@ai-sdk/perplexity": "^3.0.1",
 		"@ai-sdk/xai": "^3.0.1",
-		"@openrouter/ai-sdk-provider": "^1.5.4"
+		"@openrouter/ai-sdk-provider": "^2.0.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.10",

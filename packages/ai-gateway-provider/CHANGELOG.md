@@ -1,5 +1,17 @@
 # ai-gateway-provider
 
+## 3.1.0
+
+### Minor Changes
+
+- [#378](https://github.com/cloudflare/ai/pull/378) [`51a4dfc`](https://github.com/cloudflare/ai/commit/51a4dfcdefe0da4e4da2f839f2e1afb307d5accf) Thanks [@palashgo](https://github.com/palashgo)! - Update openrouter provider to 2.0.0 with AI SDK v6 support
+
+## 3.0.3
+
+### Patch Changes
+
+- [#353](https://github.com/cloudflare/ai/pull/353) [`06c90eb`](https://github.com/cloudflare/ai/commit/06c90ebdf59bc90f29fcd74a90691cfd80b2a873) Thanks [@palashgo](https://github.com/palashgo)! - Fix google-vertex BYOK/Unified Billing support
+
 ## 3.0.2
 
 ### Patch Changes
