@@ -285,6 +285,19 @@ importers:
         specifier: ^4.56.0
         version: 4.56.0(@cloudflare/workers-types@4.20251229.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
 
+  demos/hello-world:
+    dependencies:
+      agents:
+        specifier: ^0.3.1
+        version: 0.3.1(@ai-sdk/openai@3.0.1(zod@4.2.1))(@ai-sdk/react@3.0.3(react@19.2.3)(zod@4.2.1))(@cloudflare/workers-types@4.20251229.0)(ai@6.0.3(zod@4.2.1))(react@19.2.3)(typescript@5.9.3)(viem@2.37.8(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.2.1))(zod@4.2.1)
+    devDependencies:
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      wrangler:
+        specifier: ^4.56.0
+        version: 4.56.0(@cloudflare/workers-types@4.20251229.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+
   demos/image-generation:
     dependencies:
       ai:
