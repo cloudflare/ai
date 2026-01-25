@@ -1,0 +1,30 @@
+{
+	"name": "tanstack-ai-chat",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc -b && vite build",
+		"lint": "eslint .",
+		"preview": "pnpm run build && vite preview",
+		"deploy": "pnpm run build && wrangler deploy",
+		"cf-typegen": "wrangler types"
+	},
+	"dependencies": {
+		"@cloudflare/tanstack-ai-adapters": "workspace:*",
+		"@tanstack/ai": "^0.2.2",
+		"@tanstack/ai-react": "^0.2.2",
+		"react": "^19.1.1",
+		"react-dom": "^19.1.1"
+	},
+	"devDependencies": {
+		"@cloudflare/vite-plugin": "^1.19.0",
+		"@types/react": "^19.1.10",
+		"@types/react-dom": "^19.1.7",
+		"@vitejs/plugin-react": "^5.0.0",
+		"typescript": "~5.8.3",
+		"vite": "^7.1.2",
+		"wrangler": "^4.58.0"
+	}
+}

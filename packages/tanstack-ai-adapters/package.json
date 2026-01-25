@@ -1,0 +1,57 @@
+{
+	"name": "@cloudflare/tanstack-ai-adapters",
+	"private": true,
+	"version": "0.0.1",
+	"description": "AI Gateway Adapters for TanStack AI",
+	"main": "dist/index.js",
+	"module": "dist/index.mjs",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.js"
+		},
+		"./adapters/openai": {
+			"types": "./dist/adapters/openai.d.ts",
+			"import": "./dist/adapters/openai.mjs",
+			"require": "./dist/adapters/openai.js"
+		},
+		"./adapters/anthropic": {
+			"types": "./dist/adapters/anthropic.d.ts",
+			"import": "./dist/adapters/anthropic.mjs",
+			"require": "./dist/adapters/anthropic.js"
+		},
+		"./adapters/gemini": {
+			"types": "./dist/adapters/gemini.d.ts",
+			"import": "./dist/adapters/gemini.mjs",
+			"require": "./dist/adapters/gemini.js"
+		},
+		"./adapters/grok": {
+			"types": "./dist/adapters/grok.d.ts",
+			"import": "./dist/adapters/grok.mjs",
+			"require": "./dist/adapters/grok.js"
+		}
+	},
+	"scripts": {
+		"build": "rm -rf dist && tsup --config tsup.config.ts",
+		"format": "biome format --write",
+		"type-check": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@tanstack/ai": "^0.2.2"
+	},
+	"peerDependencies": {
+		"@tanstack/ai": "^0.2.2"
+	},
+	"optionalDependencies": {
+		"@anthropic-ai/sdk": "^0.71.2",
+		"@google/genai": "^1.35.0",
+		"@tanstack/ai-anthropic": "^0.2.0",
+		"@tanstack/ai-gemini": "^0.3.2",
+		"@tanstack/ai-grok": "^0.1.0",
+		"@tanstack/ai-openai": "^0.2.1",
+		"openai": "^6.16.0"
+	},
+	"packageManager": "pnpm@10.26.2"
+}
