@@ -80,11 +80,6 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV3Prompt): {
 						}
 
 						case "tool-call": {
-							text = JSON.stringify({
-								name: part.toolName,
-								parameters: part.input,
-							});
-
 							toolCalls.push({
 								function: {
 									arguments: JSON.stringify(part.input),
