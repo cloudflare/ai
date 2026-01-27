@@ -27,7 +27,7 @@
 		"@mantine/modals": "^8.3.10",
 		"@mantine/notifications": "^8.3.10",
 		"ai": "^6.0.3",
-		"hono": "^4.11.3",
+		"hono": "^4.11.4",
 		"react": "^19.2.3",
 		"react-dom": "^19.2.3",
 		"recharts": "^3.6.0",
@@ -35,8 +35,8 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.10",
-		"@cloudflare/vite-plugin": "^1.19.0",
-		"@cloudflare/vitest-pool-workers": "^0.11.1",
+		"@cloudflare/vite-plugin": "^1.21.1",
+		"@cloudflare/vitest-pool-workers": "^0.12.5",
 		"@types/react": "^19.2.7",
 		"@types/react-dom": "^19.2.3",
 		"@vitejs/plugin-react": "^5.1.2",
@@ -46,6 +46,6 @@
 		"typescript": "5.9.3",
 		"vite": "^7.3.0",
 		"vitest": "~3.2.4",
-		"wrangler": "^4.56.0"
+		"wrangler": "^4.59.3"
 	}
 }

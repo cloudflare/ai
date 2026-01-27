@@ -35,7 +35,7 @@
 		"get-port": "^7.1.0",
 		"globals": "^16.5.0",
 		"handlebars": "^4.7.8",
-		"hono": "^4.11.3",
+		"hono": "^4.11.4",
 		"husky": "^9.1.7",
 		"langchain": "^1.2.3",
 		"marked": "^17.0.1",
@@ -47,7 +47,7 @@
 		"vite": "^7.3.0",
 		"vitest": "~3.2.4",
 		"wait-on": "^9.0.3",
-		"wrangler": "^4.56.0",
+		"wrangler": "^4.59.1",
 		"zod": "^4.2.1"
 	},
 	"packageManager": "pnpm@10.26.2",
