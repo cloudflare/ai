@@ -80,11 +80,6 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV3Prompt): {
 						}
 
 						case "tool-call": {
-							text = JSON.stringify({
-								name: part.toolName,
-								parameters: part.input,
-							});
-
 							toolCalls.push({
 								function: {
 									arguments: JSON.stringify(part.input),
@@ -115,9 +110,9 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV3Prompt): {
 					role: "assistant",
 					tool_calls:
 						toolCalls.length > 0
-							? toolCalls.map(({ function: { name, arguments: args } }, index) => ({
+							? toolCalls.map(({ function: { name, arguments: args }, id }) => ({
 									function: { arguments: args, name },
-									id: `functions.${name}:${index}`,
+									id: id, // Preserve original ID instead of regenerating
 									type: "function",
 								}))
 							: undefined,
@@ -127,12 +122,12 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV3Prompt): {
 			}
 
 			case "tool": {
-				for (const [index, toolResponse] of content.entries()) {
+				for (const toolResponse of content) {
 					if (toolResponse.type === "tool-result") {
 						messages.push({
 							content: JSON.stringify(toolResponse.output),
 							name: toolResponse.toolName,
-							tool_call_id: `functions.${toolResponse.toolName}:${index}`,
+							tool_call_id: toolResponse.toolCallId, // Use original ID to match tool call
 							role: "tool",
 						});
 					}

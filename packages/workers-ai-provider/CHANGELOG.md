@@ -1,5 +1,11 @@
 # workers-ai-provider
 
+## 3.0.3
+
+### Patch Changes
+
+- [#384](https://github.com/cloudflare/ai/pull/384) [`0947ea2`](https://github.com/cloudflare/ai/commit/0947ea224400b17af7cc12854c7a0ec6cb6f5d3e) Thanks [@mchenco](https://github.com/mchenco)! - fix(workers-ai-provider): preserve tool call IDs in conversation history
+
 ## 3.0.2
 
 ### Patch Changes
