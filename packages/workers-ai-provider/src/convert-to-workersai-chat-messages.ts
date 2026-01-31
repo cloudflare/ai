@@ -42,6 +42,17 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV3Prompt): {
 											providerOptions: part.providerOptions,
 										});
 									}
+									// For Llama 4, images are expected to be in the input messages array in base64
+									if (typeof part.data === "string" && part.mediaType.startsWith('image/')) {
+										return {
+											image_url: {
+												url: `data:${part.mediaType};base64,${part.data}`,
+											},
+											type: "image_url",
+											mimeType: part.mediaType,
+											providerOptions: part.providerOptions,
+										}
+									}
 									return ""; // No text for the image part
 								}
 							}
