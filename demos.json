@@ -107,6 +107,9 @@
     },
     "./demos/hello-world": {
       "package_json_hash": "cf9bfe348964ef4129e7a8f20f855d256b77df21"
+    },
+    "./demos/tanstack-ai-chat-react": {
+      "package_json_hash": "55730f8f45e3887464d4334edd3947f6e34d9cb0"
     }
   }
 }
