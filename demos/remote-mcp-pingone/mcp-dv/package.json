@@ -1,0 +1,26 @@
+{
+	"name": "remote-mcp-pingone-dv",
+	"description": "OIDC MCP server secured with PingOne DaVinci",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"clean": "rm -rf dist .wrangler node_modules tsconfig.tsbuildinfo worker-configuration.d.ts || true",
+		"build": "wrangler types && tsc --build",
+		"dev": "wrangler dev",
+		"deploy": "npm run build && wrangler deploy"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "^0.1.0",
+		"@modelcontextprotocol/sdk": "1.24.0",
+		"agents": "^0.2.23",
+		"hono": "^4.10.6",
+		"oauth4webapi": "^3.8.2",
+		"workers-mcp": "^0.0.13",
+		"zod": "^3.23.3"
+	},
+	"devDependencies": {
+		"@types/node": "^24.10.1",
+		"typescript": "5.9.3",
+		"wrangler": "^4.47.0"
+	}
+}
