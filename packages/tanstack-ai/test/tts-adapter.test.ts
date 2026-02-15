@@ -349,4 +349,28 @@ describe("WorkersAiTTSAdapter", () => {
 		expect(adapter.kind).toBe("tts");
 		expect(adapter.model).toBe("@cf/deepgram/aura-1");
 	});
+
+	// -----------------------------------------------------------------------
+	// Config validation
+	// -----------------------------------------------------------------------
+
+	it("throws for empty config (no binding, no credentials)", async () => {
+		const { WorkersAiTTSAdapter } = await import("../src/adapters/workers-ai-tts");
+		expect(() => new WorkersAiTTSAdapter({} as any, "@cf/deepgram/aura-1")).toThrow(
+			/Invalid Workers AI configuration/,
+		);
+	});
+
+	it("accepts an arbitrary model string", async () => {
+		const { WorkersAiTTSAdapter } = await import("../src/adapters/workers-ai-tts");
+		const mockBinding = {
+			run: vi.fn().mockResolvedValue(new Uint8Array([0])),
+			gateway: () => ({ run: () => Promise.resolve(new Response("ok")) }),
+		};
+		const adapter = new WorkersAiTTSAdapter(
+			{ binding: mockBinding },
+			"@cf/my-org/custom-tts-model",
+		);
+		expect(adapter).toBeDefined();
+	});
 });

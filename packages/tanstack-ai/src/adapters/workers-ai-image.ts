@@ -8,6 +8,7 @@ import {
 	createGatewayFetch,
 	isDirectBindingConfig,
 	isDirectCredentialsConfig,
+	validateWorkersAiConfig,
 } from "../utils/create-fetcher";
 import { workersAiRestFetch } from "../utils/workers-ai-rest";
 import { binaryToBase64, uint8ArrayToBase64 } from "../utils/binary";
@@ -17,9 +18,9 @@ import type { WorkersAiDirectCredentialsConfig } from "../utils/create-fetcher";
 // Model type derived from @cloudflare/workers-types
 // ---------------------------------------------------------------------------
 
-export type WorkersAiImageModel = {
-	[K in keyof AiModels]: AiModels[K] extends BaseAiTextToImage ? K : never;
-}[keyof AiModels];
+export type WorkersAiImageModel =
+	| { [K in keyof AiModels]: AiModels[K] extends BaseAiTextToImage ? K : never }[keyof AiModels]
+	| (string & {});
 
 // ---------------------------------------------------------------------------
 // WorkersAiImageAdapter: image generation via Workers AI
@@ -32,6 +33,7 @@ export class WorkersAiImageAdapter extends BaseImageAdapter<WorkersAiImageModel>
 
 	constructor(config: WorkersAiAdapterConfig, model: WorkersAiImageModel) {
 		super({}, model);
+		validateWorkersAiConfig(config);
 		this.adapterConfig = config;
 	}
 

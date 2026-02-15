@@ -327,4 +327,32 @@ describe("WorkersAiImageAdapter", () => {
 		expect(callArgs.num_steps).toBe(4);
 		expect(callArgs.guidance).toBe(7.5);
 	});
+
+	// -----------------------------------------------------------------------
+	// Config validation
+	// -----------------------------------------------------------------------
+
+	it("throws for empty config (no binding, no credentials)", async () => {
+		const { WorkersAiImageAdapter } = await import("../src/adapters/workers-ai-image");
+		expect(
+			() =>
+				new WorkersAiImageAdapter(
+					{} as any,
+					"@cf/stabilityai/stable-diffusion-xl-base-1.0" as any,
+				),
+		).toThrow(/Invalid Workers AI configuration/);
+	});
+
+	it("accepts an arbitrary model string", async () => {
+		const { WorkersAiImageAdapter } = await import("../src/adapters/workers-ai-image");
+		const mockBinding = {
+			run: vi.fn().mockResolvedValue(new Uint8Array([0])),
+			gateway: () => ({ run: () => Promise.resolve(new Response("ok")) }),
+		};
+		const adapter = new WorkersAiImageAdapter(
+			{ binding: mockBinding },
+			"@cf/my-org/custom-image-model",
+		);
+		expect(adapter).toBeDefined();
+	});
 });

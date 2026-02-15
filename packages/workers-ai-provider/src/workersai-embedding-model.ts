@@ -70,7 +70,7 @@ export class WorkersAIEmbeddingModel implements EmbeddingModelV3 {
 		} = this.settings;
 
 		const response = await this.config.binding.run(
-			this.modelId,
+			this.modelId as keyof AiModels,
 			{
 				text: values,
 			},
@@ -81,7 +81,7 @@ export class WorkersAIEmbeddingModel implements EmbeddingModelV3 {
 		);
 
 		return {
-			embeddings: response.data,
+			embeddings: (response as { data: number[][] }).data,
 			warnings: [],
 		};
 	}

@@ -292,4 +292,28 @@ describe("WorkersAiSummarizeAdapter", () => {
 		expect(adapter.kind).toBe("summarize");
 		expect(adapter.model).toBe("@cf/facebook/bart-large-cnn");
 	});
+
+	// -----------------------------------------------------------------------
+	// Config validation
+	// -----------------------------------------------------------------------
+
+	it("throws for empty config (no binding, no credentials)", async () => {
+		const { WorkersAiSummarizeAdapter } = await import("../src/adapters/workers-ai-summarize");
+		expect(
+			() => new WorkersAiSummarizeAdapter({} as any, "@cf/facebook/bart-large-cnn"),
+		).toThrow(/Invalid Workers AI configuration/);
+	});
+
+	it("accepts an arbitrary model string", async () => {
+		const { WorkersAiSummarizeAdapter } = await import("../src/adapters/workers-ai-summarize");
+		const mockBinding = {
+			run: vi.fn().mockResolvedValue({ summary: "ok" }),
+			gateway: () => ({ run: () => Promise.resolve(new Response("ok")) }),
+		};
+		const adapter = new WorkersAiSummarizeAdapter(
+			{ binding: mockBinding },
+			"@cf/my-org/custom-summarizer",
+		);
+		expect(adapter).toBeDefined();
+	});
 });

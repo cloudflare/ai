@@ -13,21 +13,26 @@ import {
 	createWorkersAiBindingFetch,
 	isDirectBindingConfig,
 	isDirectCredentialsConfig,
+	validateWorkersAiConfig,
 } from "../utils/create-fetcher";
 
 // ---------------------------------------------------------------------------
 // Model types derived from @cloudflare/workers-types
 // ---------------------------------------------------------------------------
 
-export type WorkersAiTextModel = {
-	[K in keyof AiModels]: AiModels[K] extends BaseAiTextGeneration ? K : never;
-}[keyof AiModels];
+export type WorkersAiTextModel =
+	| {
+			[K in keyof AiModels]: AiModels[K] extends BaseAiTextGeneration ? K : never;
+	  }[keyof AiModels]
+	| (string & {});
 
 // ---------------------------------------------------------------------------
 // Helpers: build the right OpenAI client depending on config mode
 // ---------------------------------------------------------------------------
 
 function buildWorkersAiClient(config: WorkersAiAdapterConfig): OpenAI {
+	validateWorkersAiConfig(config);
+
 	if (isDirectBindingConfig(config)) {
 		// Plain binding mode: shim translates OpenAI fetch calls to env.AI.run()
 		return new OpenAI({

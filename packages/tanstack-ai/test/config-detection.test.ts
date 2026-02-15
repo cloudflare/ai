@@ -3,6 +3,7 @@ import {
 	isDirectBindingConfig,
 	isDirectCredentialsConfig,
 	isGatewayConfig,
+	validateWorkersAiConfig,
 	type WorkersAiAdapterConfig,
 } from "../src/utils/create-fetcher";
 
@@ -88,5 +89,73 @@ describe("config detection", () => {
 			apiKey: "key",
 		};
 		expect(isGatewayConfig(config)).toBe(false);
+	});
+});
+
+// ---------------------------------------------------------------------------
+// validateWorkersAiConfig
+// ---------------------------------------------------------------------------
+
+describe("validateWorkersAiConfig", () => {
+	it("accepts plain Workers AI binding config", () => {
+		const binding = {
+			run: (_model: string, _inputs: Record<string, unknown>) => Promise.resolve({}),
+			gateway: (_id: string) => ({
+				run: (_req: unknown) => Promise.resolve(new Response("ok")),
+			}),
+		};
+		expect(() => validateWorkersAiConfig({ binding })).not.toThrow();
+	});
+
+	it("accepts plain REST credentials config", () => {
+		expect(() => validateWorkersAiConfig({ accountId: "abc", apiKey: "key" })).not.toThrow();
+	});
+
+	it("accepts gateway binding config", () => {
+		const binding = {
+			run: (_request: unknown) => Promise.resolve(new Response("ok")),
+		};
+		expect(() => validateWorkersAiConfig({ binding })).not.toThrow();
+	});
+
+	it("accepts gateway credentials config", () => {
+		const config = {
+			accountId: "abc",
+			gatewayId: "gw-1",
+		} as WorkersAiAdapterConfig;
+		expect(() => validateWorkersAiConfig(config)).not.toThrow();
+	});
+
+	it("throws for empty config", () => {
+		expect(() => validateWorkersAiConfig({} as WorkersAiAdapterConfig)).toThrow(
+			/Invalid Workers AI configuration/,
+		);
+	});
+
+	it("throws for config with only unrelated properties", () => {
+		expect(() =>
+			validateWorkersAiConfig({ foo: "bar" } as unknown as WorkersAiAdapterConfig),
+		).toThrow(/Invalid Workers AI configuration/);
+	});
+
+	it("throws for config with only accountId (missing apiKey)", () => {
+		expect(() =>
+			validateWorkersAiConfig({ accountId: "abc" } as unknown as WorkersAiAdapterConfig),
+		).toThrow(/Invalid Workers AI configuration/);
+	});
+
+	it("throws for config with only apiKey (missing accountId)", () => {
+		expect(() =>
+			validateWorkersAiConfig({ apiKey: "key" } as unknown as WorkersAiAdapterConfig),
+		).toThrow(/Invalid Workers AI configuration/);
+	});
+
+	it("error message mentions binding and credentials", () => {
+		try {
+			validateWorkersAiConfig({} as WorkersAiAdapterConfig);
+		} catch (e) {
+			expect((e as Error).message).toContain("binding");
+			expect((e as Error).message).toContain("credentials");
+		}
 	});
 });

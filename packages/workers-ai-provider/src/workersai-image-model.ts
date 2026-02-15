@@ -47,7 +47,7 @@ export class WorkersAIImageModel implements ImageModelV3 {
 		}
 
 		const generateImage = async () => {
-			const output = (await this.config.binding.run(this.modelId, {
+			const output = (await this.config.binding.run(this.modelId as keyof AiModels, {
 				height,
 				prompt: prompt ?? "",
 				seed,

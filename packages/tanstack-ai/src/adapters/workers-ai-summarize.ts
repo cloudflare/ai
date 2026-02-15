@@ -8,6 +8,7 @@ import {
 	createGatewayFetch,
 	isDirectBindingConfig,
 	isDirectCredentialsConfig,
+	validateWorkersAiConfig,
 } from "../utils/create-fetcher";
 import { workersAiRestFetch } from "../utils/workers-ai-rest";
 
@@ -18,7 +19,7 @@ import { workersAiRestFetch } from "../utils/workers-ai-rest";
 /**
  * Workers AI models that support summarization.
  */
-export type WorkersAiSummarizeModel = "@cf/facebook/bart-large-cnn";
+export type WorkersAiSummarizeModel = "@cf/facebook/bart-large-cnn" | (string & {});
 
 // ---------------------------------------------------------------------------
 // WorkersAiSummarizeAdapter
@@ -30,6 +31,7 @@ export class WorkersAiSummarizeAdapter extends BaseSummarizeAdapter<WorkersAiSum
 
 	constructor(config: WorkersAiAdapterConfig, model: WorkersAiSummarizeModel) {
 		super({}, model);
+		validateWorkersAiConfig(config);
 		this.adapterConfig = config;
 	}
 

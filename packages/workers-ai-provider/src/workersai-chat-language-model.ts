@@ -167,7 +167,11 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 		const inputs = this.buildRunInputs(args, messages, images);
 		const runOptions = this.getRunOptions();
 
-		const output = await this.config.binding.run(args.model, inputs, runOptions);
+		const output = await this.config.binding.run(
+			args.model as keyof AiModels,
+			inputs,
+			runOptions,
+		);
 
 		if (output instanceof ReadableStream) {
 			throw new Error(
@@ -193,7 +197,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 				},
 				...processToolCalls(outputRecord),
 			],
-			usage: mapWorkersAIUsage(output),
+			usage: mapWorkersAIUsage(output as Record<string, unknown>),
 			warnings,
 		};
 	}
@@ -207,7 +211,11 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 		const inputs = this.buildRunInputs(args, messages, images, { stream: true });
 		const runOptions = this.getRunOptions();
 
-		const response = await this.config.binding.run(args.model, inputs, runOptions);
+		const response = await this.config.binding.run(
+			args.model as keyof AiModels,
+			inputs,
+			runOptions,
+		);
 
 		// If the binding returned a stream, pipe it through the SSE mapper
 		if (response instanceof ReadableStream) {
@@ -261,7 +269,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 					controller.enqueue({
 						type: "finish",
 						finishReason: mapWorkersAIFinishReason(outputRecord),
-						usage: mapWorkersAIUsage(response),
+						usage: mapWorkersAIUsage(response as Record<string, unknown>),
 					});
 					controller.close();
 				},

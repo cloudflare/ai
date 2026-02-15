@@ -8,6 +8,7 @@ import {
 	createGatewayFetch,
 	isDirectBindingConfig,
 	isDirectCredentialsConfig,
+	validateWorkersAiConfig,
 } from "../utils/create-fetcher";
 import { workersAiRestFetch } from "../utils/workers-ai-rest";
 import { binaryToBase64, uint8ArrayToBase64 } from "../utils/binary";
@@ -26,7 +27,8 @@ import { binaryToBase64, uint8ArrayToBase64 } from "../utils/binary";
 export type WorkersAiTTSModel =
 	| "@cf/deepgram/aura-1"
 	| "@cf/deepgram/aura-2-en"
-	| "@cf/deepgram/aura-2-es";
+	| "@cf/deepgram/aura-2-es"
+	| (string & {});
 
 // ---------------------------------------------------------------------------
 // WorkersAiTTSAdapter
@@ -38,6 +40,7 @@ export class WorkersAiTTSAdapter extends BaseTTSAdapter<WorkersAiTTSModel> {
 
 	constructor(config: WorkersAiAdapterConfig, model: WorkersAiTTSModel) {
 		super({}, model);
+		validateWorkersAiConfig(config);
 		this.adapterConfig = config;
 	}
 

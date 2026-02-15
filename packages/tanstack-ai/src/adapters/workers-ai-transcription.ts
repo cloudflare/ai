@@ -8,6 +8,7 @@ import {
 	createGatewayFetch,
 	isDirectBindingConfig,
 	isDirectCredentialsConfig,
+	validateWorkersAiConfig,
 } from "../utils/create-fetcher";
 import { workersAiRestFetch, workersAiRestFetchBinary } from "../utils/workers-ai-rest";
 import { uint8ArrayToBase64 } from "../utils/binary";
@@ -31,7 +32,8 @@ export type WorkersAiTranscriptionModel =
 	| "@cf/openai/whisper"
 	| "@cf/openai/whisper-tiny-en"
 	| "@cf/openai/whisper-large-v3-turbo"
-	| "@cf/deepgram/nova-3";
+	| "@cf/deepgram/nova-3"
+	| (string & {});
 
 // ---------------------------------------------------------------------------
 // WorkersAiTranscriptionAdapter
@@ -43,6 +45,7 @@ export class WorkersAiTranscriptionAdapter extends BaseTranscriptionAdapter<Work
 
 	constructor(config: WorkersAiAdapterConfig, model: WorkersAiTranscriptionModel) {
 		super({}, model);
+		validateWorkersAiConfig(config);
 		this.adapterConfig = config;
 	}
 

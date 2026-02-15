@@ -354,4 +354,30 @@ describe("WorkersAiTranscriptionAdapter", () => {
 		expect(adapter.kind).toBe("transcription");
 		expect(adapter.model).toBe("@cf/deepgram/nova-3");
 	});
+
+	// -----------------------------------------------------------------------
+	// Config validation
+	// -----------------------------------------------------------------------
+
+	it("throws for empty config (no binding, no credentials)", async () => {
+		const { WorkersAiTranscriptionAdapter } =
+			await import("../src/adapters/workers-ai-transcription");
+		expect(() => new WorkersAiTranscriptionAdapter({} as any, "@cf/openai/whisper")).toThrow(
+			/Invalid Workers AI configuration/,
+		);
+	});
+
+	it("accepts an arbitrary model string", async () => {
+		const { WorkersAiTranscriptionAdapter } =
+			await import("../src/adapters/workers-ai-transcription");
+		const mockBinding = {
+			run: vi.fn().mockResolvedValue({ text: "hello" }),
+			gateway: () => ({ run: () => Promise.resolve(new Response("ok")) }),
+		};
+		const adapter = new WorkersAiTranscriptionAdapter(
+			{ binding: mockBinding },
+			"@cf/my-org/custom-whisper",
+		);
+		expect(adapter).toBeDefined();
+	});
 });
