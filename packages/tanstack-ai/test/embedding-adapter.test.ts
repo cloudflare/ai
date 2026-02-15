@@ -72,4 +72,28 @@ describe("WorkersAiEmbeddingAdapter", () => {
 			globalThis.fetch = originalFetch;
 		}
 	});
+
+	// -----------------------------------------------------------------------
+	// Config validation
+	// -----------------------------------------------------------------------
+
+	it("throws for empty config (no binding, no credentials)", async () => {
+		const { WorkersAiEmbeddingAdapter } = await import("../src/adapters/workers-ai-embedding");
+		expect(
+			() => new WorkersAiEmbeddingAdapter({} as any, "@cf/baai/bge-base-en-v1.5" as any),
+		).toThrow(/Invalid Workers AI configuration/);
+	});
+
+	it("accepts an arbitrary model string", async () => {
+		const { WorkersAiEmbeddingAdapter } = await import("../src/adapters/workers-ai-embedding");
+		const mockBinding = {
+			run: vi.fn().mockResolvedValue({ shape: [1, 768], data: [[0.1]] }),
+			gateway: () => ({ run: () => Promise.resolve(new Response("ok")) }),
+		};
+		const adapter = new WorkersAiEmbeddingAdapter(
+			{ binding: mockBinding },
+			"@cf/my-org/custom-embedding-model",
+		);
+		expect(adapter).toBeDefined();
+	});
 });

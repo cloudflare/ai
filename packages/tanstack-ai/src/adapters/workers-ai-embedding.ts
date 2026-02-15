@@ -11,6 +11,7 @@ import {
 	createGatewayFetch,
 	isDirectBindingConfig,
 	isDirectCredentialsConfig,
+	validateWorkersAiConfig,
 } from "../utils/create-fetcher";
 import { workersAiRestFetch } from "../utils/workers-ai-rest";
 
@@ -18,9 +19,11 @@ import { workersAiRestFetch } from "../utils/workers-ai-rest";
 // Model type derived from @cloudflare/workers-types
 // ---------------------------------------------------------------------------
 
-export type WorkersAiEmbeddingModel = {
-	[K in keyof AiModels]: AiModels[K] extends BaseAiTextEmbeddings ? K : never;
-}[keyof AiModels];
+export type WorkersAiEmbeddingModel =
+	| {
+			[K in keyof AiModels]: AiModels[K] extends BaseAiTextEmbeddings ? K : never;
+	  }[keyof AiModels]
+	| (string & {});
 
 // ---------------------------------------------------------------------------
 // WorkersAiEmbeddingAdapter: embeddings via Workers AI
@@ -36,6 +39,7 @@ export class WorkersAiEmbeddingAdapter {
 	private config: WorkersAiAdapterConfig;
 
 	constructor(config: WorkersAiAdapterConfig, model: WorkersAiEmbeddingModel) {
+		validateWorkersAiConfig(config);
 		this.model = model;
 		this.config = config;
 	}

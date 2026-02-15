@@ -137,6 +137,29 @@ export function isGatewayConfig(config: WorkersAiAdapterConfig): config is AiGat
 }
 
 // ---------------------------------------------------------------------------
+// Config validation
+// ---------------------------------------------------------------------------
+
+/**
+ * Validates that a WorkersAiAdapterConfig contains a valid configuration.
+ * Throws an error if neither a binding, credentials (accountId + apiKey),
+ * nor a gateway configuration is provided.
+ */
+export function validateWorkersAiConfig(config: WorkersAiAdapterConfig): void {
+	if (
+		!isDirectBindingConfig(config) &&
+		!isDirectCredentialsConfig(config) &&
+		!isGatewayConfig(config)
+	) {
+		throw new Error(
+			"Invalid Workers AI configuration: you must provide either a binding (e.g. { binding: env.AI }), " +
+				"credentials ({ accountId, apiKey }), or a gateway configuration ({ binding: env.AI.gateway(id) } " +
+				"or { accountId, gatewayId }).",
+		);
+	}
+}
+
+// ---------------------------------------------------------------------------
 // createGatewayFetch -- for routing through AI Gateway
 // ---------------------------------------------------------------------------
 

@@ -901,4 +901,22 @@ describe("WorkersAiTextAdapter config modes", () => {
 
 		expect(adapter).toBeDefined();
 	});
+
+	it("should throw for empty config (no binding, no credentials)", () => {
+		expect(() => new WorkersAiTextAdapter(MODEL, {} as any)).toThrow(
+			/Invalid Workers AI configuration/,
+		);
+	});
+
+	it("should throw for config with only accountId (missing apiKey)", () => {
+		expect(() => new WorkersAiTextAdapter(MODEL, { accountId: "abc" } as any)).toThrow(
+			/Invalid Workers AI configuration/,
+		);
+	});
+
+	it("should accept an arbitrary model string", () => {
+		const binding = createMockBinding({ response: "ok" });
+		const adapter = new WorkersAiTextAdapter("@cf/my-org/custom-model-v1", { binding });
+		expect(adapter).toBeDefined();
+	});
 });

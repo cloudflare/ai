@@ -144,7 +144,14 @@ export interface WorkersAI {
  * Create a Workers AI provider instance.
  */
 export function createWorkersAI(options: WorkersAISettings): WorkersAI {
-	let binding: Ai | undefined;
+	if (!options.binding && !("accountId" in options && "apiKey" in options)) {
+		throw new Error(
+			"Invalid Workers AI configuration: you must provide either a binding (e.g. { binding: env.AI }) " +
+				"or credentials ({ accountId, apiKey }).",
+		);
+	}
+
+	let binding: Ai;
 	const isBinding = !!options.binding;
 
 	if (options.binding) {
@@ -154,10 +161,6 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 		binding = {
 			run: createRun({ accountId, apiKey }),
 		} as Ai;
-	}
-
-	if (!binding) {
-		throw new Error("Either a binding or credentials must be provided.");
 	}
 
 	const createChatModel = (modelId: TextGenerationModels, settings: WorkersAIChatSettings = {}) =>
@@ -272,15 +275,10 @@ export function createAISearch(
 	const binding = options.binding;
 
 	const createChatModel = (settings: AISearchChatSettings = {}) =>
-		new AISearchChatLanguageModel(
-			// @ts-expect-error Needs fix from @cloudflare/workers-types for custom types
-			"@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-			settings,
-			{
-				binding,
-				provider: providerName,
-			},
-		);
+		new AISearchChatLanguageModel("@cf/meta/llama-3.3-70b-instruct-fp8-fast", settings, {
+			binding,
+			provider: providerName,
+		});
 
 	const provider = (settings?: AISearchChatSettings) => {
 		if (new.target) {
