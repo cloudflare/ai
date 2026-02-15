@@ -332,7 +332,7 @@ describe("createGatewayFetch", () => {
 
 			const request = mockBinding.run.mock.calls[0]![0];
 			expect(request.provider).toBe("workers-ai");
-			expect(request.endpoint).toBe("@cf/meta/llama-3.3-70b-instruct-fp8-fast");
+			expect(request.endpoint).toBe("run/@cf/meta/llama-3.3-70b-instruct-fp8-fast");
 			expect(request.query.model).toBeUndefined();
 			expect(request.query.messages).toEqual([{ role: "user", content: "Hello" }]);
 		});
