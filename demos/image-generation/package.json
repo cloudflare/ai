@@ -18,7 +18,7 @@
 	"dependencies": {
 		"ai": "^6.0.82",
 		"hono": "^4.11.9",
-		"workers-ai-provider": "^3.1.1",
+		"workers-ai-provider": "^3.1.2",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
