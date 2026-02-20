@@ -11,7 +11,7 @@
 	},
 	"dependencies": {
 		"@faker-js/faker": "^10.3.0",
-		"hono": "^4.11.9",
+		"hono": "^4.11.10",
 		"jose": "^6.1.3"
 	},
 	"devDependencies": {

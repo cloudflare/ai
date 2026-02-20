@@ -12,7 +12,7 @@
 	"dependencies": {
 		"@cloudflare/workers-oauth-provider": "^0.2.3",
 		"@slack/web-api": "^7.14.0",
-		"hono": "^4.11.9",
+		"hono": "^4.11.10",
 		"just-pick": "^4.2.0",
 		"octokit": "^5.0.5"
 	},

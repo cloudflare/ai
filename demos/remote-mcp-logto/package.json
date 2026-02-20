@@ -15,7 +15,7 @@
 		"@cloudflare/workers-oauth-provider": "^0.2.3",
 		"@logto/node": "^3.1.8",
 		"agents": "^0.4.1",
-		"hono": "^4.11.9",
+		"hono": "^4.12.0",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
