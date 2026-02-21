@@ -1,0 +1,31 @@
+/**
+ * Wrangler Configuration
+ * Details: https://developers.cloudflare.com/workers/wrangler/configuration
+ *
+ * 1. Environment Variables
+ *      - Docs: https://developers.cloudflare.com/workers/configuration/secrets
+ *      - For local development, use the '.dev.vars' file
+ *      - For remote deployment, run this command: 'wrangler secret put <SECRET>'
+ *
+ * 2. Persistent Storage
+ *      - Docs: https://developers.cloudflare.com/kv/get-started
+ *      - For local development, KV storage is automatically simulated in-memory by wrangler
+ *      - For remote deployment, run this command: 'wrangler kv namespace create <NAMESPACE>'
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "todo-api-ping-federate",
+	"main": "dist/index.js",
+	"compatibility_date": "2025-11-01",
+	"compatibility_flags": ["nodejs_compat"],
+	"kv_namespaces": [
+		{
+			"binding": "TODO_KV_PING_FEDERATE",
+			// TODO: Replace placeholder with real ID from cloudflare before deploying
+			"id": "<PLACEHOLDER>"
+		}
+	],
+  "observability": {
+		"enabled": true
+	}
+}
