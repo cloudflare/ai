@@ -2,6 +2,7 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useConfig } from "../config";
+import { useUniqueId } from "../utils/useUniqueId";
 import { chatModels } from "./models";
 
 export function Chat() {
@@ -30,6 +31,7 @@ export function Chat() {
 
 function ChatSession({ model }: { model: string }) {
 	const { headers } = useConfig();
+	const chatId = useUniqueId({ model, headers }, "chat");
 
 	const transport = useMemo(
 		() =>
@@ -41,7 +43,7 @@ function ChatSession({ model }: { model: string }) {
 		[model, headers],
 	);
 
-	const { messages, sendMessage, status, error } = useChat({ transport });
+	const { messages, sendMessage, status, error } = useChat({ id: chatId, transport });
 	const [input, setInput] = useState("");
 	const isLoading = status === "streaming" || status === "submitted";
 

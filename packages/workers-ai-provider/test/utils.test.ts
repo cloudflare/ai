@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import {
 	processPartialToolCalls,
 	processToolCalls,
@@ -6,6 +6,7 @@ import {
 	sanitizeToolCallId,
 	normalizeMessagesForBinding,
 	prepareToolsAndToolChoice,
+	createRun,
 } from "../src/utils";
 
 // ---------------------------------------------------------------------------
@@ -402,5 +403,190 @@ describe("processText", () => {
 				response: "From native",
 			}),
 		).toBe("From choices");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// createRun - gateway support
+// ---------------------------------------------------------------------------
+
+describe("createRun", () => {
+	const originalFetch = globalThis.fetch;
+
+	beforeEach(() => {
+		globalThis.fetch = vi.fn();
+	});
+
+	afterEach(() => {
+		globalThis.fetch = originalFetch;
+		vi.restoreAllMocks();
+	});
+
+	it("should use direct API URL when no gateway is provided", async () => {
+		const mockResponse = {
+			ok: true,
+			json: vi.fn().mockResolvedValue({ result: { response: "Hello" } }),
+			headers: new Headers({ "content-type": "application/json" }),
+		};
+		vi.mocked(globalThis.fetch).mockResolvedValue(mockResponse as unknown as Response);
+
+		const run = createRun({ accountId: "test-account", apiKey: "test-key" });
+		await run("@cf/meta/llama-3.1-8b-instruct" as any, { prompt: "Hi" });
+
+		expect(globalThis.fetch).toHaveBeenCalledWith(
+			"https://api.cloudflare.com/client/v4/accounts/test-account/ai/run/@cf/meta/llama-3.1-8b-instruct",
+			expect.objectContaining({
+				method: "POST",
+				headers: {
+					Authorization: "Bearer test-key",
+					"Content-Type": "application/json",
+				},
+			}),
+		);
+	});
+
+	it("should use gateway URL when gateway.id is provided", async () => {
+		const mockResponse = {
+			ok: true,
+			json: vi.fn().mockResolvedValue({ result: { response: "Hello" } }),
+			headers: new Headers({ "content-type": "application/json" }),
+		};
+		vi.mocked(globalThis.fetch).mockResolvedValue(mockResponse as unknown as Response);
+
+		const run = createRun({ accountId: "test-account", apiKey: "test-key" });
+		await run("@cf/meta/llama-3.1-8b-instruct" as any, { prompt: "Hi" }, { gateway: { id: "my-gateway" } });
+
+		expect(globalThis.fetch).toHaveBeenCalledWith(
+			"https://gateway.ai.cloudflare.com/v1/test-account/my-gateway/workers-ai/run/@cf/meta/llama-3.1-8b-instruct",
+			expect.objectContaining({
+				method: "POST",
+				headers: {
+					Authorization: "Bearer test-key",
+					"Content-Type": "application/json",
+				},
+			}),
+		);
+	});
+
+	it("should add cf-aig-skip-cache header when skipCache is true", async () => {
+		const mockResponse = {
+			ok: true,
+			json: vi.fn().mockResolvedValue({ result: { response: "Hello" } }),
+			headers: new Headers({ "content-type": "application/json" }),
+		};
+		vi.mocked(globalThis.fetch).mockResolvedValue(mockResponse as unknown as Response);
+
+		const run = createRun({ accountId: "test-account", apiKey: "test-key" });
+		await run("@cf/meta/llama-3.1-8b-instruct" as any, { prompt: "Hi" }, { gateway: { id: "my-gateway", skipCache: true } });
+
+		expect(globalThis.fetch).toHaveBeenCalledWith(
+			expect.any(String),
+			expect.objectContaining({
+				headers: expect.objectContaining({
+					"cf-aig-skip-cache": "true",
+				}),
+			}),
+		);
+	});
+
+	it("should add cf-aig-cache-ttl header when cacheTtl is provided", async () => {
+		const mockResponse = {
+			ok: true,
+			json: vi.fn().mockResolvedValue({ result: { response: "Hello" } }),
+			headers: new Headers({ "content-type": "application/json" }),
+		};
+		vi.mocked(globalThis.fetch).mockResolvedValue(mockResponse as unknown as Response);
+
+		const run = createRun({ accountId: "test-account", apiKey: "test-key" });
+		await run("@cf/meta/llama-3.1-8b-instruct" as any, { prompt: "Hi" }, { gateway: { id: "my-gateway", cacheTtl: 3600 } });
+
+		expect(globalThis.fetch).toHaveBeenCalledWith(
+			expect.any(String),
+			expect.objectContaining({
+				headers: expect.objectContaining({
+					"cf-aig-cache-ttl": "3600",
+				}),
+			}),
+		);
+	});
+
+	it("should add cf-aig-cache-key header when cacheKey is provided", async () => {
+		const mockResponse = {
+			ok: true,
+			json: vi.fn().mockResolvedValue({ result: { response: "Hello" } }),
+			headers: new Headers({ "content-type": "application/json" }),
+		};
+		vi.mocked(globalThis.fetch).mockResolvedValue(mockResponse as unknown as Response);
+
+		const run = createRun({ accountId: "test-account", apiKey: "test-key" });
+		await run("@cf/meta/llama-3.1-8b-instruct" as any, { prompt: "Hi" }, { gateway: { id: "my-gateway", cacheKey: "my-custom-key" } });
+
+		expect(globalThis.fetch).toHaveBeenCalledWith(
+			expect.any(String),
+			expect.objectContaining({
+				headers: expect.objectContaining({
+					"cf-aig-cache-key": "my-custom-key",
+				}),
+			}),
+		);
+	});
+
+	it("should add cf-aig-metadata header when metadata is provided", async () => {
+		const mockResponse = {
+			ok: true,
+			json: vi.fn().mockResolvedValue({ result: { response: "Hello" } }),
+			headers: new Headers({ "content-type": "application/json" }),
+		};
+		vi.mocked(globalThis.fetch).mockResolvedValue(mockResponse as unknown as Response);
+
+		const run = createRun({ accountId: "test-account", apiKey: "test-key" });
+		await run("@cf/meta/llama-3.1-8b-instruct" as any, { prompt: "Hi" }, { gateway: { id: "my-gateway", metadata: { user: "test", session: 123 } } });
+
+		expect(globalThis.fetch).toHaveBeenCalledWith(
+			expect.any(String),
+			expect.objectContaining({
+				headers: expect.objectContaining({
+					"cf-aig-metadata": '{"user":"test","session":123}',
+				}),
+			}),
+		);
+	});
+
+	it("should add all gateway cache headers when all options are provided", async () => {
+		const mockResponse = {
+			ok: true,
+			json: vi.fn().mockResolvedValue({ result: { response: "Hello" } }),
+			headers: new Headers({ "content-type": "application/json" }),
+		};
+		vi.mocked(globalThis.fetch).mockResolvedValue(mockResponse as unknown as Response);
+
+		const run = createRun({ accountId: "test-account", apiKey: "test-key" });
+		await run(
+			"@cf/meta/llama-3.1-8b-instruct" as any,
+			{ prompt: "Hi" },
+			{
+				gateway: {
+					id: "my-gateway",
+					skipCache: true,
+					cacheTtl: 7200,
+					cacheKey: "custom-key",
+					metadata: { env: "prod" },
+				},
+			},
+		);
+
+		expect(globalThis.fetch).toHaveBeenCalledWith(
+			"https://gateway.ai.cloudflare.com/v1/test-account/my-gateway/workers-ai/run/@cf/meta/llama-3.1-8b-instruct",
+			expect.objectContaining({
+				headers: {
+					Authorization: "Bearer test-key",
+					"Content-Type": "application/json",
+					"cf-aig-skip-cache": "true",
+					"cf-aig-cache-ttl": "7200",
+					"cf-aig-cache-key": "custom-key",
+					"cf-aig-metadata": '{"env":"prod"}',
+				},
+			}),
+		);
 	});
 });
