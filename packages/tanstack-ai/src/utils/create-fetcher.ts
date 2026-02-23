@@ -226,7 +226,9 @@ export function createGatewayFetch(
 		};
 
 		if (provider === "workers-ai") {
-			request.endpoint = query.model as string;
+			if (!request.endpoint.startsWith("run/")) {
+				request.endpoint = `run/${query.model}`;
+			}
 			delete query.model;
 			delete query.instructions;
 		}

@@ -155,13 +155,12 @@ function workersAiGatewayConfig(creds: RequestCredentials) {
 	if (creds.useBinding) {
 		return {
 			binding: env.AI.gateway(resolveGatewayId(creds)),
-			apiKey: env.CLOUDFLARE_API_TOKEN,
 		};
 	}
 	if (creds.cloudflare) {
-		return { ...gwRestConfig(creds), apiKey: creds.cloudflare.apiToken };
+		return gwRestConfig(creds);
 	}
-	return { binding: env.AI.gateway(resolveGatewayId(creds)), apiKey: env.CLOUDFLARE_API_TOKEN };
+	return { binding: env.AI.gateway(resolveGatewayId(creds)) };
 }
 
 // ---------------------------------------------------------------------------

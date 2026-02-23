@@ -61,7 +61,7 @@ describe("Workers AI gateway URL verification", () => {
 		const body = JSON.parse((init as any).body as string);
 		expect(body.provider).toBe("workers-ai");
 		// createGatewayFetch moves model from query to endpoint for workers-ai
-		expect(body.endpoint).toBe("@cf/stabilityai/stable-diffusion-xl-base-1.0");
+		expect(body.endpoint).toBe("run/@cf/stabilityai/stable-diffusion-xl-base-1.0");
 		expect(body.query.prompt).toBe("test prompt");
 	});
 
@@ -89,7 +89,7 @@ describe("Workers AI gateway URL verification", () => {
 
 		const body = JSON.parse((init as any).body as string);
 		expect(body.provider).toBe("workers-ai");
-		expect(body.endpoint).toBe("@cf/openai/whisper");
+		expect(body.endpoint).toBe("run/@cf/openai/whisper");
 	});
 
 	it("TTS adapter sends model name in body and hits gateway URL", async () => {
@@ -107,7 +107,7 @@ describe("Workers AI gateway URL verification", () => {
 
 		const body = JSON.parse((init as any).body as string);
 		expect(body.provider).toBe("workers-ai");
-		expect(body.endpoint).toBe("@cf/deepgram/aura-1");
+		expect(body.endpoint).toBe("run/@cf/deepgram/aura-1");
 		expect(body.query.text).toBe("Hello world");
 	});
 
@@ -137,7 +137,7 @@ describe("Workers AI gateway URL verification", () => {
 
 		const body = JSON.parse((init as any).body as string);
 		expect(body.provider).toBe("workers-ai");
-		expect(body.endpoint).toBe("@cf/facebook/bart-large-cnn");
+		expect(body.endpoint).toBe("run/@cf/facebook/bart-large-cnn");
 		expect(body.query.input_text).toBe("A long article...");
 	});
 
