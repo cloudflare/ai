@@ -108,7 +108,7 @@ export function createRun(config: CreateRunConfig): AiRun {
 		options?: AiOptions & Record<string, unknown>,
 	): Promise<Response | ReadableStream<Uint8Array> | AiModels[Name]["postProcessedOutputs"]> {
 		const {
-			gateway: _gateway,
+			gateway,
 			prefix: _prefix,
 			extraHeaders: _extraHeaders,
 			returnRawResponse,
@@ -137,14 +137,36 @@ export function createRun(config: CreateRunConfig): AiRun {
 		}
 
 		const queryString = urlParams.toString();
-		const url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}${
-			queryString ? `?${queryString}` : ""
-		}`;
 
-		const headers = {
+		// Build URL: use AI Gateway if gateway option is provided, otherwise direct API
+		const url = gateway?.id
+			? `https://gateway.ai.cloudflare.com/v1/${accountId}/${gateway.id}/workers-ai/run/${model}${
+					queryString ? `?${queryString}` : ""
+				}`
+			: `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}${
+					queryString ? `?${queryString}` : ""
+				}`;
+
+		// Build headers with optional gateway cache headers
+		const headers: Record<string, string> = {
 			Authorization: `Bearer ${apiKey}`,
 			"Content-Type": "application/json",
 		};
+
+		if (gateway) {
+			if (gateway.skipCache) {
+				headers["cf-aig-skip-cache"] = "true";
+			}
+			if (typeof gateway.cacheTtl === "number") {
+				headers["cf-aig-cache-ttl"] = String(gateway.cacheTtl);
+			}
+			if (gateway.cacheKey) {
+				headers["cf-aig-cache-key"] = gateway.cacheKey;
+			}
+			if (gateway.metadata) {
+				headers["cf-aig-metadata"] = JSON.stringify(gateway.metadata);
+			}
+		}
 
 		const body = JSON.stringify(inputs);
 
@@ -186,8 +208,12 @@ export function createRun(config: CreateRunConfig): AiRun {
 			// endpoint and return a JSON response with empty result instead of SSE.
 			// Retry without streaming so doStream's graceful degradation path can
 			// wrap the complete response as a synthetic stream.
+			// Use the same URL (gateway or direct) as the original request.
 			const retryResponse = await fetch(url, {
-				body: JSON.stringify({ ...(inputs as Record<string, unknown>), stream: false }),
+				body: JSON.stringify({
+					...(inputs as Record<string, unknown>),
+					stream: false,
+				}),
 				headers,
 				method: "POST",
 				signal: signal as AbortSignal | undefined,
