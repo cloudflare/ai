@@ -4,7 +4,6 @@ import {
 	ANTHROPIC_MODELS,
 	type AnthropicChatModel,
 } from "@tanstack/ai-anthropic";
-import type { AnyTextAdapter } from "@tanstack/ai";
 import { createGatewayFetch, type AiGatewayAdapterConfig } from "../utils/create-fetcher";
 
 export type AnthropicGatewayConfig = AiGatewayAdapterConfig & { anthropicVersion?: string };
@@ -28,7 +27,7 @@ function buildAnthropicConfig(config: AnthropicGatewayConfig) {
 export function createAnthropicChat(
 	model: AnthropicChatModel,
 	config: AnthropicGatewayConfig,
-): AnyTextAdapter {
+): AnthropicTextAdapter<AnthropicChatModel> {
 	return new AnthropicTextAdapter(buildAnthropicConfig(config), model);
 }
 
