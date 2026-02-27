@@ -2,6 +2,104 @@ import { fetchHttpStream, useChat } from "@tanstack/ai-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useConfig } from "../config";
 import type { ProviderDef } from "../providers";
+import type { ToolCallPart, ToolResultPart } from "@tanstack/ai";
+
+function ToolCallDisplay({
+	toolName,
+	args,
+	result,
+	isUserMessage,
+}: {
+	toolName: string;
+	args?: string;
+	result?: string;
+	isUserMessage: boolean;
+}) {
+	const [isExpanded, setIsExpanded] = useState(false);
+
+	const argsStr = args ? formatJson(args) : null;
+	const resultStr = result ? formatJson(result) : null;
+
+	return (
+		<div
+			className={`text-xs rounded-lg px-2.5 py-1.5 font-mono ${
+				isUserMessage
+					? "bg-gray-800 text-gray-300"
+					: "bg-gray-50 text-gray-500 border border-gray-100"
+			}`}
+		>
+			<div className="flex items-center justify-between gap-2">
+				<div className="flex items-center min-w-0">
+					<span className="font-semibold">{toolName}</span>
+					{!isExpanded && resultStr && (
+						<span className="ml-1.5 opacity-75 truncate">
+							{resultStr.length > 50 ? `${resultStr.slice(0, 50)}...` : resultStr}
+						</span>
+					)}
+				</div>
+				<button
+					type="button"
+					onClick={() => setIsExpanded(!isExpanded)}
+					className={`shrink-0 p-0.5 rounded hover:bg-gray-200 transition-colors ${
+						isUserMessage ? "hover:bg-gray-700" : ""
+					}`}
+					title={isExpanded ? "Collapse" : "Expand"}
+				>
+					<svg
+						className={`w-3.5 h-3.5 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						strokeWidth={2}
+					>
+						<title>{isExpanded ? "Collapse" : "Expand"}</title>
+						<path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+					</svg>
+				</button>
+			</div>
+			{isExpanded && (
+				<div className="mt-2 space-y-2">
+					{argsStr && (
+						<div>
+							<p className="text-[10px] font-medium opacity-60 uppercase tracking-wide mb-1">
+								Request
+							</p>
+							<pre
+								className={`p-2 rounded text-[10px] whitespace-pre-wrap overflow-x-auto max-h-48 overflow-y-auto ${
+									isUserMessage ? "bg-gray-700" : "bg-gray-100 text-gray-700"
+								}`}
+							>
+								{argsStr}
+							</pre>
+						</div>
+					)}
+					{resultStr && (
+						<div>
+							<p className="text-[10px] font-medium opacity-60 uppercase tracking-wide mb-1">
+								Result
+							</p>
+							<pre
+								className={`p-2 rounded text-[10px] whitespace-pre-wrap overflow-x-auto max-h-48 overflow-y-auto ${
+									isUserMessage ? "bg-gray-700" : "bg-gray-100 text-gray-700"
+								}`}
+							>
+								{resultStr}
+							</pre>
+						</div>
+					)}
+				</div>
+			)}
+		</div>
+	);
+}
+
+function formatJson(str: string): string {
+	try {
+		return JSON.stringify(JSON.parse(str), null, 2);
+	} catch {
+		return str;
+	}
+}
 
 export function ChatPanel({ provider }: { provider: ProviderDef }) {
 	const [workersAiModel, setWorkersAiModel] = useState(provider.chatModels?.[0]?.id ?? "");
@@ -76,6 +174,8 @@ function ChatView({ provider, workersAiModel }: { provider: ProviderDef; workers
 			setInput("");
 		}
 	};
+
+	console.log(messages);
 
 	return (
 		<>
@@ -180,38 +280,26 @@ function ChatView({ provider, workersAiModel }: { provider: ProviderDef; workers
 														</div>
 													);
 												}
-												if (
-													part.type === "tool-call" ||
-													part.type === "tool-result"
-												) {
-													return (
-														<div
-															key={key}
-															className={`text-xs rounded-lg px-2.5 py-1.5 font-mono ${
-																message.role === "user"
-																	? "bg-gray-800 text-gray-300"
-																	: "bg-gray-50 text-gray-500 border border-gray-100"
-															}`}
-														>
-															<span className="font-semibold">
-																{"toolName" in part
-																	? (part as { toolName: string })
-																			.toolName
-																	: "tool"}
-															</span>
-															{"result" in part && (
-																<span className="ml-1.5 opacity-75">
-																	{JSON.stringify(
-																		(
-																			part as {
-																				result?: unknown;
-																			}
-																		).result,
-																	)}
-																</span>
-															)}
-														</div>
+												if (part.type === "tool-call") {
+													const toolCall = part as ToolCallPart;
+													const toolResult = message.parts.find(
+														(p): p is ToolResultPart =>
+															p.type === "tool-result" &&
+															(p as ToolResultPart).toolCallId ===
+																toolCall.id,
 													);
+													return (
+														<ToolCallDisplay
+															key={key}
+															toolName={toolCall.name ?? "tool"}
+															args={toolCall.arguments}
+															result={toolResult?.content}
+															isUserMessage={message.role === "user"}
+														/>
+													);
+												}
+												if (part.type === "tool-result") {
+													return null;
 												}
 												return null;
 											})}

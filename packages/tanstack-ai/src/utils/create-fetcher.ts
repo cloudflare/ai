@@ -463,9 +463,9 @@ function transformWorkersAiStream(
 	// like Qwen3, Kimi K2.5 stream OpenAI-compatible SSE through the binding).
 	// In that case, flush() should only emit [DONE] and skip the finish chunk.
 	let isOpenAiFormat = false;
-	// Track which tool call indices we've already emitted an `id` for,
-	// so subsequent argument deltas don't duplicate the id/type/name fields.
-	const emittedToolCallStart = new Set<number>();
+	// Track tool call state per index: store the generated/assigned ID so that
+	// subsequent argument deltas use the same ID (matching the working streaming.ts pattern).
+	const toolCallState = new Map<number, { id: string; name: string }>();
 
 	return source.pipeThrough(
 		new TransformStream<Uint8Array, Uint8Array>({
@@ -489,15 +489,24 @@ function transformWorkersAiStream(
 						// directly through the binding, with `choices[].delta.content` and
 						// optional `reasoning_content`. Detect this and pass through as-is.
 						if (parsed.choices !== undefined) {
-							// Already OpenAI format — pass through with only tool_call_id
-							// sanitization for any tool calls present.
+							// Already OpenAI format — pass through but ensure each tool call
+							// index gets a unique, stable ID across all chunks.
 							isOpenAiFormat = true;
 							const choice = parsed.choices?.[0];
 							if (choice?.delta?.tool_calls) {
 								hasToolCalls = true;
 								for (const tc of choice.delta.tool_calls) {
-									if (tc.id && typeof tc.id === "string") {
-										tc.id = sanitizeToolCallId(tc.id);
+									const tcIndex = tc.index ?? 0;
+									if (!toolCallState.has(tcIndex)) {
+										// First chunk for this index — generate/store unique ID
+										const rawId = tc.id || `call${streamId}${tcIndex}`;
+										const id = sanitizeToolCallId(rawId);
+										toolCallState.set(tcIndex, { id, name: tc.function?.name || "" });
+										tc.id = id;
+									} else {
+										// Subsequent chunk — reuse stored ID, remove id from delta
+										// (OpenAI format only sends id in first chunk)
+										delete tc.id;
 									}
 								}
 							}
@@ -556,13 +565,14 @@ function transformWorkersAiStream(
 									index: tcIndex,
 								};
 
-								if (!emittedToolCallStart.has(tcIndex)) {
+								if (!toolCallState.has(tcIndex)) {
 									// First chunk for this tool call index — emit id, type, name.
 									// Use sanitizeToolCallId so the ID survives round-trip through
 									// the binding's strict `[a-zA-Z0-9]{9}` validation.
-									emittedToolCallStart.add(tcIndex);
 									const rawId = tcId || `call${streamId}${tcIndex}`;
-									toolCallDelta.id = sanitizeToolCallId(rawId);
+									const id = sanitizeToolCallId(rawId);
+									toolCallState.set(tcIndex, { id, name: tcName || "" });
+									toolCallDelta.id = id;
 									toolCallDelta.type = "function";
 									toolCallDelta.function = {
 										name: tcName || "",
