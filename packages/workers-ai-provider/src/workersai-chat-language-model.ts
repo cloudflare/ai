@@ -102,6 +102,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 								responseFormat?.type === "json" ? responseFormat.schema : undefined,
 						},
 						tools: undefined,
+						tool_choice: undefined,
 					},
 					warnings,
 				};
@@ -139,6 +140,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 			messages: finalMessages,
 			temperature: args.temperature,
 			tools: args.tools,
+			...(args.tool_choice ? { tool_choice: args.tool_choice } : {}),
 			top_p: args.top_p,
 			...(imagePart ? { image: Array.from(imagePart.image) } : {}),
 			// Only include response_format when actually set

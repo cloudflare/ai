@@ -2,6 +2,7 @@ import { generateText } from "ai";
 import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { z } from "zod/v4";
 import { createWorkersAI } from "../src/index";
 
 const TEST_ACCOUNT_ID = "test-account-id";
@@ -223,6 +224,66 @@ describe("Binding - Text Generation Tests", () => {
 		expect(capturedOptions).toHaveProperty("aString", "a");
 		expect(capturedOptions).toHaveProperty("aBool", true);
 		expect(capturedOptions).toHaveProperty("aNumber", 1);
+	});
+
+	it("should pass tool_choice to binding.run()", async () => {
+		let capturedInputs: any = null;
+
+		const workersai = createWorkersAI({
+			binding: {
+				run: async (_modelName: string, inputs: any, _options?: any) => {
+					capturedInputs = inputs;
+					return {
+						response: null,
+						tool_calls: [{ name: "get_weather", arguments: '{"city":"SF"}' }],
+					};
+				},
+			},
+		});
+
+		await generateText({
+			model: workersai(TEST_MODEL),
+			prompt: "What's the weather?",
+			tools: {
+				get_weather: {
+					description: "Get weather",
+					inputSchema: z.object({ city: z.string() }),
+				},
+			},
+			toolChoice: "auto",
+		});
+
+		expect(capturedInputs).toHaveProperty("tool_choice", "auto");
+	});
+
+	it("should pass tool_choice 'any' for toolChoice 'required'", async () => {
+		let capturedInputs: any = null;
+
+		const workersai = createWorkersAI({
+			binding: {
+				run: async (_modelName: string, inputs: any, _options?: any) => {
+					capturedInputs = inputs;
+					return {
+						response: null,
+						tool_calls: [{ name: "draw_shape", arguments: '{"shape":"circle"}' }],
+					};
+				},
+			},
+		});
+
+		await generateText({
+			model: workersai(TEST_MODEL),
+			prompt: "Draw a circle",
+			tools: {
+				draw_shape: {
+					description: "Draw a shape",
+					inputSchema: z.object({ shape: z.string() }),
+				},
+			},
+			toolChoice: "required",
+		});
+
+		expect(capturedInputs).toHaveProperty("tool_choice", "any");
 	});
 
 	it("should handle content and reasoning_content", async () => {
