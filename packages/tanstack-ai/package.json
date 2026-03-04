@@ -103,21 +103,21 @@
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20260227.0",
 		"@microsoft/api-extractor": "^7.57.1",
-		"@tanstack/ai": "^0.5.1",
+		"@tanstack/ai": "^0.6.0",
 		"dotenv": "^17.3.1"
 	},
 	"peerDependencies": {
-		"@tanstack/ai": "^0.5.0"
+		"@tanstack/ai": "^0.6.0"
 	},
 	"optionalDependencies": {
 		"@anthropic-ai/sdk": "^0.78.0",
 		"@google/genai": "^1.42.0",
 		"@openrouter/sdk": "^0.8.0",
-		"@tanstack/ai-anthropic": "^0.5.0",
-		"@tanstack/ai-gemini": "^0.5.0",
-		"@tanstack/ai-grok": "^0.5.0",
-		"@tanstack/ai-openai": "^0.5.0",
-		"@tanstack/ai-openrouter": "^0.5.1"
+		"@tanstack/ai-anthropic": "^0.6.0",
+		"@tanstack/ai-gemini": "^0.7.0",
+		"@tanstack/ai-grok": "^0.6.0",
+		"@tanstack/ai-openai": "^0.6.0",
+		"@tanstack/ai-openrouter": "^0.6.0"
 	},
 	"packageManager": "pnpm@10.30.1"
 }
