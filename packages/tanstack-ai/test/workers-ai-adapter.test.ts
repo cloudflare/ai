@@ -289,7 +289,7 @@ describe("WorkersAiTextAdapter.chatStream", () => {
 		expect(inputs.messages[0].content).toBe("Hello world");
 	});
 
-	it("should preserve image parts in multi-part content", async () => {
+	it("should convert image parts with URL source to OpenAI format", async () => {
 		const binding = createStreamingBinding(['data: {"response":"ok"}\n\n']);
 		const adapter = new WorkersAiTextAdapter(MODEL, { binding });
 
@@ -301,7 +301,10 @@ describe("WorkersAiTextAdapter.chatStream", () => {
 						role: "user",
 						content: [
 							{ type: "text", content: "Describe this: " },
-							{ type: "image_url", content: "data:image/png;base64,abc123" },
+							{
+								type: "image",
+								source: { type: "url", value: "https://example.com/photo.jpg" },
+							},
 						],
 					},
 				],
@@ -309,7 +312,35 @@ describe("WorkersAiTextAdapter.chatStream", () => {
 		);
 
 		const [, inputs] = binding.run.mock.calls[0]!;
-		// Should preserve image parts as OpenAI multi-modal content array
+		expect(inputs.messages[0].content).toEqual([
+			{ type: "text", text: "Describe this: " },
+			{ type: "image_url", image_url: { url: "https://example.com/photo.jpg" } },
+		]);
+	});
+
+	it("should convert image parts with data source to data URI", async () => {
+		const binding = createStreamingBinding(['data: {"response":"ok"}\n\n']);
+		const adapter = new WorkersAiTextAdapter(MODEL, { binding });
+
+		await collectChunks(
+			adapter.chatStream({
+				model: MODEL,
+				messages: [
+					{
+						role: "user",
+						content: [
+							{ type: "text", content: "Describe this: " },
+							{
+								type: "image",
+								source: { type: "data", value: "abc123", mimeType: "image/png" },
+							},
+						],
+					},
+				],
+			} as any),
+		);
+
+		const [, inputs] = binding.run.mock.calls[0]!;
 		expect(inputs.messages[0].content).toEqual([
 			{ type: "text", text: "Describe this: " },
 			{ type: "image_url", image_url: { url: "data:image/png;base64,abc123" } },

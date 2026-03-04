@@ -1,5 +1,5 @@
 import type { AiModels, BaseAiTextGeneration } from "@cloudflare/workers-types";
-import type { StreamChunk, TextOptions } from "@tanstack/ai";
+import type { ContentPart, ModelMessage, StreamChunk, TextOptions } from "@tanstack/ai";
 import {
 	BaseTextAdapter,
 	type StructuredOutputOptions,
@@ -61,64 +61,68 @@ function buildWorkersAiClient(config: WorkersAiAdapterConfig): OpenAI {
 // Shared message-building helpers
 // ---------------------------------------------------------------------------
 
-interface MessageLike {
-	role: string;
-	content: string | null | Array<{ type: string; content?: string }>;
-	toolCalls?: Array<{
-		id: string;
-		function: { name: string; arguments: string };
-	}>;
-	toolCallId?: string;
-}
-
-function extractTextContent(
-	content: string | null | Array<{ type: string; content?: string }>,
-): string {
+function extractTextContent(content: ModelMessage["content"]): string {
 	if (content === null) return "";
 	if (typeof content === "string") return content;
-	return content
-		.filter((p) => p.type === "text")
-		.map((p) => p.content || "")
-		.join("");
+	return content.flatMap((p) => (p.type === "text" ? [p.content] : [])).join("");
 }
 
 /**
- * Build OpenAI-compatible user message content, preserving image parts.
+ * Convert a single TanStack AI {@link ContentPart} to the OpenAI Chat
+ * Completions multi-modal format.
+ *
+ * TODO: handle other content types (audio, video, document)
+ */
+function convertContentPart(part: ContentPart): OpenAI.Chat.ChatCompletionContentPart | undefined {
+	switch (part.type) {
+		case "text":
+			if (part.content) {
+				return { type: "text", text: part.content };
+			}
+			return undefined;
+		case "image": {
+			let url: string;
+			if (part.source.type === "data") {
+				url = part.source.value.startsWith("data:")
+					? part.source.value
+					: `data:${part.source.mimeType};base64,${part.source.value}`;
+			} else {
+				url = part.source.value;
+			}
+			return { type: "image_url", image_url: { url } };
+		}
+		default:
+			// audio, video, document — not supported for now
+			console.warn(
+				`[@cloudflare/tanstack-ai] Unsupported content part type "${part.type}" — skipping`,
+			);
+			return undefined;
+	}
+}
+
+/**
+ * Build OpenAI-compatible user message content from TanStack AI content.
  *
  * If the content has only text parts, returns a plain string.
  * If it includes image parts, returns an array of content parts in
  * OpenAI's multi-modal format (text + image_url).
  */
 function buildUserContent(
-	content: string | null | Array<{ type: string; content?: string; image_url?: unknown }>,
+	content: ModelMessage["content"],
 ): string | OpenAI.Chat.ChatCompletionContentPart[] {
 	if (content === null) return "";
 	if (typeof content === "string") return content;
 
-	const hasImages = content.some((p) => p.type === "image_url" || p.type === "image");
+	const hasImages = content.some((p) => p.type === "image");
 	if (!hasImages) {
-		// No images — return plain text for simpler messages
-		return content
-			.filter((p) => p.type === "text")
-			.map((p) => p.content || "")
-			.join("");
+		return content.flatMap((p) => (p.type === "text" ? [p.content] : [])).join("");
 	}
 
-	// Multi-modal: build array of text + image_url parts
 	const parts: OpenAI.Chat.ChatCompletionContentPart[] = [];
 	for (const part of content) {
-		if (part.type === "text" && part.content) {
-			parts.push({ type: "text", text: part.content });
-		} else if (part.type === "image_url" && part.content) {
-			parts.push({
-				type: "image_url",
-				image_url: { url: part.content },
-			});
-		} else if (part.type === "image_url" && part.image_url) {
-			parts.push({
-				type: "image_url",
-				image_url: part.image_url as OpenAI.Chat.ChatCompletionContentPartImage.ImageURL,
-			});
+		const converted = convertContentPart(part);
+		if (converted) {
+			parts.push(converted);
 		}
 	}
 	return parts;
@@ -126,7 +130,7 @@ function buildUserContent(
 
 function buildOpenAIMessages(
 	systemPrompts: string[] | undefined,
-	messages: MessageLike[],
+	messages: ModelMessage[],
 	options?: { includeToolMessages?: boolean },
 ): OpenAI.Chat.ChatCompletionMessageParam[] {
 	const includeTools = options?.includeToolMessages ?? true;
