@@ -120,7 +120,7 @@ describe("message building (via chatStream)", () => {
 		expect(messages[0]).toEqual({ role: "user", content: "Hello there" });
 	});
 
-	it("should extract text from multi-part content arrays", async () => {
+	it("should convert image URL source to OpenAI image_url format", async () => {
 		const binding = createBinding();
 		const adapter = new WorkersAiTextAdapter(MODEL, { binding });
 
@@ -133,7 +133,10 @@ describe("message building (via chatStream)", () => {
 						role: "user",
 						content: [
 							{ type: "text", content: "Part 1" },
-							{ type: "image_url", content: "http://..." },
+							{
+								type: "image",
+								source: { type: "url", value: "https://example.com/img.png" },
+							},
 							{ type: "text", content: " Part 2" },
 						],
 					},
@@ -142,15 +145,15 @@ describe("message building (via chatStream)", () => {
 			binding,
 		);
 
-		// Should preserve image parts as multi-modal content array
+		// Should preserve image parts as OpenAI multi-modal content array
 		expect(messages[0].content).toEqual([
 			{ type: "text", text: "Part 1" },
-			{ type: "image_url", image_url: { url: "http://..." } },
+			{ type: "image_url", image_url: { url: "https://example.com/img.png" } },
 			{ type: "text", text: " Part 2" },
 		]);
 	});
 
-	it("should handle content parts with missing content field", async () => {
+	it("should convert image data source to data URI in OpenAI format", async () => {
 		const binding = createBinding();
 		const adapter = new WorkersAiTextAdapter(MODEL, { binding });
 
@@ -162,8 +165,15 @@ describe("message building (via chatStream)", () => {
 					{
 						role: "user",
 						content: [
-							{ type: "text" }, // no content field
-							{ type: "text", content: "Hello" },
+							{ type: "text", content: "Describe this" },
+							{
+								type: "image",
+								source: {
+									type: "data",
+									value: "abc123",
+									mimeType: "image/png",
+								},
+							},
 						],
 					},
 				],
@@ -171,7 +181,34 @@ describe("message building (via chatStream)", () => {
 			binding,
 		);
 
-		expect(messages[0].content).toBe("Hello");
+		expect(messages[0].content).toEqual([
+			{ type: "text", text: "Describe this" },
+			{ type: "image_url", image_url: { url: "data:image/png;base64,abc123" } },
+		]);
+	});
+
+	it("should return plain string for text-only multi-part content", async () => {
+		const binding = createBinding();
+		const adapter = new WorkersAiTextAdapter(MODEL, { binding });
+
+		const messages = await getMessages(
+			adapter,
+			{
+				model: MODEL,
+				messages: [
+					{
+						role: "user",
+						content: [
+							{ type: "text", content: "Hello" },
+							{ type: "text", content: " world" },
+						],
+					},
+				],
+			},
+			binding,
+		);
+
+		expect(messages[0].content).toBe("Hello world");
 	});
 
 	it("should handle null content as empty string", async () => {
