@@ -13,4 +13,5 @@ export { createGroq } from "./groq";
 export { createMistral } from "./mistral";
 export { createOpenAI } from "./openai";
 export { createPerplexity } from "./perplexity";
+export { createProviderRouter, type ProviderRouterConfig } from "./router";
 export { createXai } from "./xai";
