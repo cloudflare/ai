@@ -45,7 +45,10 @@ export default {
 		const body = (await request.json()) as { model?: string };
 		const model = body.model || "@cf/meta/llama-4-scout-17b-16e-instruct";
 
-		const provider = createWorkersAI({ binding: env.AI });
+		const gatewayId = url.searchParams.get("gateway") || undefined;
+		const provider = gatewayId
+			? createWorkersAI({ binding: env.AI, gateway: { id: gatewayId } })
+			: createWorkersAI({ binding: env.AI });
 
 		try {
 			switch (url.pathname) {
