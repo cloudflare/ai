@@ -119,6 +119,11 @@
 			"import": "./dist/providers/openrouter.mjs",
 			"require": "./dist/providers/openrouter.js"
 		},
+		"./providers/router": {
+			"types": "./dist/providers/router.d.ts",
+			"import": "./dist/providers/router.mjs",
+			"require": "./dist/providers/router.js"
+		},
 		"./providers/unified": {
 			"types": "./dist/providers/unified.d.ts",
 			"import": "./dist/providers/unified.mjs",
