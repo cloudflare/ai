@@ -19,6 +19,6 @@
 		"oxfmt": "^0.34.0",
 		"oxlint": "^1.49.0",
 		"typescript": "5.9.3",
-		"wrangler": "^4.67.0"
+		"wrangler": "^4.75.0"
 	}
 }
