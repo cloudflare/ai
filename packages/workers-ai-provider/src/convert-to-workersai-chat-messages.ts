@@ -106,71 +106,77 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV3Prompt): {
 				break;
 			}
 
-			case "assistant": {
-				let text = "";
-				const toolCalls: Array<{
-					id: string;
-					type: "function";
-					function: { name: string; arguments: string };
-				}> = [];
+		case "assistant": {
+			let text = "";
+			let reasoning = "";
+			const toolCalls: Array<{
+				id: string;
+				type: "function";
+				function: { name: string; arguments: string };
+			}> = [];
 
-				for (const part of content) {
-					switch (part.type) {
-						case "text": {
-							text += part.text;
-							break;
-						}
+			for (const part of content) {
+				switch (part.type) {
+					case "text": {
+						text += part.text;
+						break;
+					}
 
-						case "reasoning": {
-							// Reasoning is passed through to text for the message conversion,
-							// since Workers AI doesn't have a separate reasoning field in messages
-							text += part.text;
-							break;
-						}
+					case "reasoning": {
+						// Reasoning is accumulated separately and sent as the `reasoning`
+						// field on the message object. This is the field name vLLM expects
+						// on input for reasoning models (kimi-k2.5, glm-4.7-flash).
+						// Concatenating it into `content` corrupts the conversation history
+						// and causes models to produce empty or garbled responses on the
+						// next turn.
+						reasoning += part.text;
+						break;
+					}
 
-						case "file": {
-							// File parts in assistant messages - no action needed
-							break;
-						}
+					case "file": {
+						// File parts in assistant messages - no action needed
+						break;
+					}
 
-						case "tool-call": {
-							toolCalls.push({
-								function: {
-									arguments: JSON.stringify(part.input),
-									name: part.toolName,
-								},
-								id: part.toolCallId,
-								type: "function",
-							});
-							break;
-						}
+					case "tool-call": {
+						toolCalls.push({
+							function: {
+								arguments: JSON.stringify(part.input),
+								name: part.toolName,
+							},
+							id: part.toolCallId,
+							type: "function",
+						});
+						break;
+					}
 
-						case "tool-result": {
-							// Tool results in assistant messages - no action needed
-							break;
-						}
+					case "tool-result": {
+						// Tool results in assistant messages - no action needed
+						break;
+					}
 
-						default: {
-							const exhaustiveCheck = part satisfies never;
-							throw new Error(
-								`Unsupported part type: ${(exhaustiveCheck as { type: string }).type}`,
-							);
-						}
+					default: {
+						const exhaustiveCheck = part satisfies never;
+						throw new Error(
+							`Unsupported part type: ${(exhaustiveCheck as { type: string }).type}`,
+						);
 					}
 				}
+			}
 
-				messages.push({
-					content: text,
-					role: "assistant",
-					tool_calls:
-						toolCalls.length > 0
-							? toolCalls.map(({ function: { name, arguments: args }, id }) => ({
-									function: { arguments: args, name },
-									id,
-									type: "function" as const,
-								}))
-							: undefined,
-				});
+			messages.push({
+				content: text,
+				role: "assistant",
+				...(reasoning ? { reasoning } : {}),
+				tool_calls:
+					toolCalls.length > 0
+						? toolCalls.map(({ function: { name, arguments: args }, id }) => ({
+								function: { arguments: args, name },
+								id,
+								type: "function" as const,
+							}))
+						: undefined,
+			});
 
 				break;
 			}

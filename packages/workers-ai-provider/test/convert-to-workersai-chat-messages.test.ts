@@ -416,12 +416,12 @@ describe("convertToWorkersAIChatMessages", () => {
 	});
 
 	describe("reasoning content", () => {
-		it("should concatenate reasoning text into assistant content", () => {
+		it("should send reasoning as the `reasoning` field, not concatenated into content", () => {
 			const prompt = [
 				{
 					role: "assistant" as const,
 					content: [
-						{ type: "reasoning" as const, text: "Let me think..." },
+						{ type: "reasoning" as const, text: "Let me think about this carefully." },
 						{ type: "text" as const, text: "The answer is 42." },
 					],
 				},
@@ -429,7 +429,84 @@ describe("convertToWorkersAIChatMessages", () => {
 
 			const { messages } = convertToWorkersAIChatMessages(prompt);
 
-			expect(messages[0].content).toBe("Let me think...The answer is 42.");
+			// reasoning goes into its own field, not smeared into content
+			expect(messages[0].content).toBe("The answer is 42.");
+			expect((messages[0] as any).reasoning).toBe("Let me think about this carefully.");
+		});
+
+		it("should omit the reasoning field when there is no reasoning content", () => {
+			const prompt = [
+				{
+					role: "assistant" as const,
+					content: [
+						{ type: "text" as const, text: "The answer is 42." },
+					],
+				},
+			];
+
+			const { messages } = convertToWorkersAIChatMessages(prompt);
+
+			expect(messages[0].content).toBe("The answer is 42.");
+			expect((messages[0] as any).reasoning).toBeUndefined();
+		});
+
+		it("should accumulate multiple reasoning parts into a single reasoning field", () => {
+			const prompt = [
+				{
+					role: "assistant" as const,
+					content: [
+						{ type: "reasoning" as const, text: "First thought. " },
+						{ type: "reasoning" as const, text: "Second thought." },
+						{ type: "text" as const, text: "Done." },
+					],
+				},
+			];
+
+			const { messages } = convertToWorkersAIChatMessages(prompt);
+
+			expect(messages[0].content).toBe("Done.");
+			expect((messages[0] as any).reasoning).toBe("First thought. Second thought.");
+		});
+
+		it("should preserve tool calls alongside reasoning in multi-turn conversations", () => {
+			const prompt = [
+				{
+					role: "assistant" as const,
+					content: [
+						{ type: "reasoning" as const, text: "I should search for this." },
+						{ type: "text" as const, text: "Let me look that up." },
+						{
+							type: "tool-call" as const,
+							toolCallId: "call-1",
+							toolName: "search",
+							input: { query: "workers ai" },
+						},
+					],
+				},
+				{
+					role: "tool" as const,
+					content: [
+						{
+							type: "tool-result" as const,
+							toolCallId: "call-1",
+							toolName: "search",
+							output: { results: ["result1"] },
+						},
+					],
+				},
+			];
+
+			const { messages } = convertToWorkersAIChatMessages(prompt);
+
+			const assistantMsg = messages[0] as any;
+			expect(assistantMsg.role).toBe("assistant");
+			expect(assistantMsg.content).toBe("Let me look that up.");
+			expect(assistantMsg.reasoning).toBe("I should search for this.");
+			expect(assistantMsg.tool_calls).toHaveLength(1);
+			expect(assistantMsg.tool_calls[0].id).toBe("call-1");
+			// tool result message is unaffected
+			expect(messages[1].role).toBe("tool");
+			expect(messages[1].tool_call_id).toBe("call-1");
 		});
 	});
 });
