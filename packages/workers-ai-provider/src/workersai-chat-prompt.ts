@@ -23,6 +23,7 @@ export interface WorkersAIUserMessage {
 export interface WorkersAIAssistantMessage {
 	role: "assistant";
 	content: string;
+	reasoning?: string;
 	tool_calls?: Array<{
 		id: string;
 		type: "function";

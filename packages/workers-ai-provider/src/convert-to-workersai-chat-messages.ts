@@ -108,6 +108,7 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV3Prompt): {
 
 			case "assistant": {
 				let text = "";
+				let reasoning = "";
 				const toolCalls: Array<{
 					id: string;
 					type: "function";
@@ -122,9 +123,13 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV3Prompt): {
 						}
 
 						case "reasoning": {
-							// Reasoning is passed through to text for the message conversion,
-							// since Workers AI doesn't have a separate reasoning field in messages
-							text += part.text;
+							// Reasoning is accumulated separately and sent as the `reasoning`
+							// field on the message object. This is the field name vLLM expects
+							// on input for reasoning models (kimi-k2.5, glm-4.7-flash).
+							// Concatenating it into `content` corrupts the conversation history
+							// and causes models to produce empty or garbled responses on the
+							// next turn.
+							reasoning += part.text;
 							break;
 						}
 
@@ -162,6 +167,7 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV3Prompt): {
 				messages.push({
 					content: text,
 					role: "assistant",
+					...(reasoning ? { reasoning } : {}),
 					tool_calls:
 						toolCalls.length > 0
 							? toolCalls.map(({ function: { name, arguments: args }, id }) => ({
