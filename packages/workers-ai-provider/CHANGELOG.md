@@ -1,5 +1,15 @@
 # workers-ai-provider
 
+## 3.1.5
+
+### Patch Changes
+
+- [#451](https://github.com/cloudflare/ai/pull/451) [`2a62e23`](https://github.com/cloudflare/ai/commit/2a62e23c7159df5ba69348f15da7a44eef73e83d) Thanks [@mchenco](https://github.com/mchenco)! - Fix reasoning content being concatenated into assistant message content in multi-turn conversations
+
+    Previously, reasoning parts in assistant messages were concatenated into the `content` string when building message history. This caused models like `kimi-k2.5` and `deepseek-r1` to receive their own internal reasoning as if it were spoken text, corrupting the conversation history and resulting in empty text responses or leaked special tokens on subsequent turns.
+
+    Reasoning parts are now sent as the `reasoning` field on the assistant message object, which is the field name vLLM expects on input for reasoning models (kimi-k2.5, glm-4.7-flash).
+
 ## 3.1.4
 
 ### Patch Changes
