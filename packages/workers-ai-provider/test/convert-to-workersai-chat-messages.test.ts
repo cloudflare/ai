@@ -438,9 +438,7 @@ describe("convertToWorkersAIChatMessages", () => {
 			const prompt = [
 				{
 					role: "assistant" as const,
-					content: [
-						{ type: "text" as const, text: "The answer is 42." },
-					],
+					content: [{ type: "text" as const, text: "The answer is 42." }],
 				},
 			];
 
