@@ -23,7 +23,7 @@
 	},
 	"devDependencies": {
 		"@cloudflare/vite-plugin": "^1.25.2",
-		"@cloudflare/vitest-pool-workers": "^0.12.14",
+		"@cloudflare/vitest-pool-workers": "^0.13.3",
 		"oxfmt": "^0.34.0",
 		"oxlint": "^1.49.0",
 		"typescript": "5.9.3",
