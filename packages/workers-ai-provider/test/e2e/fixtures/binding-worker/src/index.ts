@@ -348,8 +348,8 @@ export default {
 					}
 				}
 
-			default:
-				return jsonResponse({ error: `Unknown path: ${url.pathname}` }, 404);
+				default:
+					return jsonResponse({ error: `Unknown path: ${url.pathname}` }, 404);
 			}
 		} catch (err: unknown) {
 			return jsonResponse(

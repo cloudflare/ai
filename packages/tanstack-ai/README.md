@@ -86,7 +86,10 @@ const response = chat({
 			role: "user",
 			content: [
 				{ type: "text", content: "What's in this image?" },
-				{ type: "image", source: { type: "data", value: base64String, mimeType: "image/png" } },
+				{
+					type: "image",
+					source: { type: "data", value: base64String, mimeType: "image/png" },
+				},
 			],
 		},
 	],

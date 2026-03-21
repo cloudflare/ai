@@ -1,7 +1,4 @@
-import type {
-	LanguageModelV3DataContent,
-	LanguageModelV3Prompt,
-} from "@ai-sdk/provider";
+import type { LanguageModelV3DataContent, LanguageModelV3Prompt } from "@ai-sdk/provider";
 import type { WorkersAIContentPart, WorkersAIChatPrompt } from "./workersai-chat-prompt";
 
 /**

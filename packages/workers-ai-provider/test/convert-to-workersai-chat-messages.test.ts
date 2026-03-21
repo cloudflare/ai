@@ -226,7 +226,11 @@ describe("convertToWorkersAIChatMessages", () => {
 			expect(messages).toHaveLength(1);
 			const content = messages[0].content;
 			expect(Array.isArray(content)).toBe(true);
-			const parts = content as Array<{ type: string; text?: string; image_url?: { url: string } }>;
+			const parts = content as Array<{
+				type: string;
+				text?: string;
+				image_url?: { url: string };
+			}>;
 			expect(parts).toHaveLength(2);
 			expect(parts[0]).toEqual({ type: "text", text: "What's in this image?" });
 			expect(parts[1].type).toBe("image_url");
@@ -367,9 +371,7 @@ describe("convertToWorkersAIChatMessages", () => {
 			const prompt = [
 				{
 					role: "user" as const,
-					content: [
-						{ type: "text" as const, text: "Just text, no images" },
-					],
+					content: [{ type: "text" as const, text: "Just text, no images" }],
 				},
 			];
 

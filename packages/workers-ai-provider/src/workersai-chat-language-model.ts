@@ -131,9 +131,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 	) {
 		return {
 			max_tokens: args.max_tokens,
-			messages: this.config.isBinding
-				? normalizeMessagesForBinding(messages)
-				: messages,
+			messages: this.config.isBinding ? normalizeMessagesForBinding(messages) : messages,
 			temperature: args.temperature,
 			tools: args.tools,
 			...(args.tool_choice ? { tool_choice: args.tool_choice } : {}),

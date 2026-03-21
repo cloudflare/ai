@@ -408,9 +408,7 @@ describe.skipIf(skip())("Workers AI REST E2E", () => {
 				// The model should describe what it sees, not say "I don't see an image"
 				expect(result.text.toLowerCase()).not.toContain("don't see an image");
 				expect(result.text.toLowerCase()).not.toContain("no image attached");
-				console.log(
-					`  [vision] ${model.label} OK — "${result.text.slice(0, 100)}"`,
-				);
+				console.log(`  [vision] ${model.label} OK — "${result.text.slice(0, 100)}"`);
 			});
 		}
 	});
