@@ -1,6 +1,6 @@
 {
 	"name": "ai-gateway-provider",
-	"version": "3.1.1",
+	"version": "3.1.2",
 	"description": "AI Gateway Provider for AI-SDK",
 	"keywords": [
 		"agents",
