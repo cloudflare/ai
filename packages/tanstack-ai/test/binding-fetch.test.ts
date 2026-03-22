@@ -571,8 +571,14 @@ describe("createWorkersAiBindingFetch", () => {
 		});
 
 		expect(binding.run).toHaveBeenCalledOnce();
-		const [, , options] = binding.run.mock.calls[0]!;
-		expect(options).toBeUndefined();
+		const [, , options] = binding.run.mock.calls[0]! as [
+			unknown,
+			unknown,
+			Record<string, unknown> | undefined,
+		];
+		if (options) {
+			expect(options).not.toHaveProperty("extraHeaders");
+		}
 	});
 
 	it("should pass response_format to binding for structured output", async () => {

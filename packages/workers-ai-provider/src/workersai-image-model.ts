@@ -31,6 +31,7 @@ export class WorkersAIImageModel implements ImageModelV3 {
 		size,
 		aspectRatio,
 		seed,
+		abortSignal,
 	}: Parameters<ImageModelV3["doGenerate"]>[0]): Promise<
 		Awaited<ReturnType<ImageModelV3["doGenerate"]>>
 	> {
@@ -47,12 +48,19 @@ export class WorkersAIImageModel implements ImageModelV3 {
 		}
 
 		const generateImage = async () => {
-			const output = (await this.config.binding.run(this.modelId as keyof AiModels, {
-				height,
-				prompt: prompt ?? "",
-				seed,
-				width,
-			})) as unknown;
+			const output = (await this.config.binding.run(
+				this.modelId as keyof AiModels,
+				{
+					height,
+					prompt: prompt ?? "",
+					seed,
+					width,
+				},
+				{
+					gateway: this.config.gateway,
+					signal: abortSignal,
+				} as AiOptions,
+			)) as unknown;
 
 			return toUint8Array(output);
 		};

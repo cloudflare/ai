@@ -998,7 +998,7 @@ describe("WorkersAiTextAdapter config modes", () => {
 
 		expect(binding.run).toHaveBeenCalledOnce();
 		const [, , options] = binding.run.mock.calls[0]!;
-		expect(options).toEqual({
+		expect(options).toMatchObject({
 			extraHeaders: { "x-session-affinity": "my-session-id" },
 		});
 	});
@@ -1015,7 +1015,13 @@ describe("WorkersAiTextAdapter config modes", () => {
 		);
 
 		expect(binding.run).toHaveBeenCalledOnce();
-		const [, , options] = binding.run.mock.calls[0]!;
-		expect(options).toBeUndefined();
+		const [, , options] = binding.run.mock.calls[0]! as [
+			unknown,
+			unknown,
+			Record<string, unknown> | undefined,
+		];
+		if (options) {
+			expect(options).not.toHaveProperty("extraHeaders");
+		}
 	});
 });

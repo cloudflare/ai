@@ -141,7 +141,9 @@ export class AiGatewayChatLanguageModel implements LanguageModelV3 {
 					...Object.fromEntries(headers.entries()),
 				},
 			}));
-			resp = await this.config.binding.run(updatedBody);
+			resp = await this.config.binding.run(updatedBody, {
+				signal: options.abortSignal,
+			});
 		} else {
 			headers.set("Content-Type", "application/json");
 			headers.set("cf-aig-authorization", `Bearer ${this.config.apiKey}`);
@@ -151,6 +153,7 @@ export class AiGatewayChatLanguageModel implements LanguageModelV3 {
 					body: JSON.stringify(body),
 					headers: headers,
 					method: "POST",
+					signal: options.abortSignal,
 				},
 			);
 		}
@@ -243,7 +246,7 @@ export type AiGatewayAPISettings = {
 };
 export type AiGatewayBindingSettings = {
 	binding: {
-		run(data: unknown): Promise<Response>;
+		run(data: unknown, options?: { signal?: AbortSignal }): Promise<Response>;
 	};
 	options?: AiGatewayOptions;
 };

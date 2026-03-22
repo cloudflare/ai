@@ -52,7 +52,10 @@ export class WorkersAIEmbeddingModel implements EmbeddingModelV3 {
 		this.config = config;
 	}
 
-	async doEmbed({ values }: EmbeddingModelV3CallOptions): Promise<EmbeddingModelV3Result> {
+	async doEmbed({
+		values,
+		abortSignal,
+	}: EmbeddingModelV3CallOptions): Promise<EmbeddingModelV3Result> {
 		if (values.length > this.maxEmbeddingsPerCall) {
 			throw new TooManyEmbeddingValuesForCallError({
 				maxEmbeddingsPerCall: this.maxEmbeddingsPerCall,
@@ -76,8 +79,9 @@ export class WorkersAIEmbeddingModel implements EmbeddingModelV3 {
 			},
 			{
 				gateway: this.config.gateway ?? gateway,
+				signal: abortSignal,
 				...passthroughOptions,
-			},
+			} as AiOptions,
 		);
 
 		return {
