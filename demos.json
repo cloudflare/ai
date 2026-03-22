@@ -1,19 +1,19 @@
 {
 	"demos": {
 		"./demos/agent-scheduler": {
-			"package_json_hash": "e6861be95b36fbb7a378df64f0718a8fcfb2f9d3"
+			"package_json_hash": "0856f313789740fff60f269f83a68a75b514941b"
 		},
 		"./demos/agent-task-manager": {
-			"package_json_hash": "617f0d03f926cb7d66ae023a7f6c9ee785b08083"
+			"package_json_hash": "4a0fbeaf852ab1f96f7be665de82aed98126d4c8"
 		},
 		"./demos/agent-task-manager-human-in-the-loop": {
-			"package_json_hash": "defe118759aae719d0e69329e9ef36db9aad885e"
+			"package_json_hash": "1dcdf9c3f12738f8fe2f1369d25accafd8282eef"
 		},
 		"./demos/evaluator-optimiser": {
-			"package_json_hash": "c9167c592812cf5416d4ed3b48cf394c9958d6d0"
+			"package_json_hash": "c2ab48d157ad2fbb127265af47cede68937d6247"
 		},
 		"./demos/image-generation": {
-			"package_json_hash": "2613121568f27db89f1588f556ebf115b5646c93"
+			"package_json_hash": "963e927b60afc29a371dbcfb10872c238808ec56"
 		},
 		"./demos/mcp-client": {
 			"package_json_hash": "5129c9edfcdd03c8625615c85329d85138fb9773"
@@ -31,16 +31,16 @@
 			"package_json_hash": "f53fe23dcebec62f51f9a6e332d2c192b8598cf6"
 		},
 		"./demos/model-scraper": {
-			"package_json_hash": "bf05d15954c2a05c1d781062fa18725891e1c31a"
+			"package_json_hash": "384ab9c92d409e32d23fb2d8c5329e62a15f2b8c"
 		},
 		"./demos/orchestrator-workers": {
-			"package_json_hash": "56ca311bcbf7458049eaec238e26e351a75fa5e4"
+			"package_json_hash": "ce69189725fac24d5fb00ee4c9d304f57da70b1d"
 		},
 		"./demos/parallelisation": {
-			"package_json_hash": "a966dd37d06c357990d393b29ce7d8732faae087"
+			"package_json_hash": "7e212d4a1dd95e4db230f722f3de00c87ec3d687"
 		},
 		"./demos/prompt-chaining": {
-			"package_json_hash": "c5858c84d565de26b21b2a5a49cd6f7c323a472e"
+			"package_json_hash": "74a2444ab05280dc004431f2c9b76f5c7d362859"
 		},
 		"./demos/remote-mcp-authkit": {
 			"package_json_hash": "d3a0122c45d27140db96df6859e191aa7d2f8ac1"
@@ -52,25 +52,25 @@
 			"package_json_hash": "6240672fd54010c3b03a8af553b420306e11bc78"
 		},
 		"./demos/routing": {
-			"package_json_hash": "fb685d16191e68d8739c7be2ee4de1e3e0b6693c"
+			"package_json_hash": "cc7dca9104ddeb7692c9f7473a7e39ea8532fc3f"
 		},
 		"./demos/structured-output": {
-			"package_json_hash": "faaf6fed2a7e27656059aaea1f01a408b6e518cf"
+			"package_json_hash": "1e9cfb3f22789b8639311306443412a17e048280"
 		},
 		"./demos/structured-output-node": {
-			"package_json_hash": "3753b58c745bd87fd7239f3855d6b2aa39efcaf7"
+			"package_json_hash": "4798a97e496db82495b08896c308a0814e7832a3"
 		},
 		"./demos/text-generation": {
-			"package_json_hash": "029750a88ce94121ba013ce522ec3027e8e0c55e"
+			"package_json_hash": "ac55842e6156483433a1d5e4dcb00a3aee69e0f9"
 		},
 		"./demos/text-generation-stream": {
-			"package_json_hash": "5134df0a51a7f23c57a9d6a54e9a80fd044189e3"
+			"package_json_hash": "83ae545aa23cfcdf1ecb12d561571fcbc74c153e"
 		},
 		"./demos/tool-calling": {
-			"package_json_hash": "4461d85c8a8b0c2048da91abf2b4624cd64c5422"
+			"package_json_hash": "22d3143b847a488004319ad2abd87efe28ead86e"
 		},
 		"./demos/tool-calling-stream": {
-			"package_json_hash": "039907657db43efaad8ec35b4729658e3b64c2ad"
+			"package_json_hash": "41de1c15e5d4a5b7c78b418cb562e194c2f36637"
 		},
 		"./demos/tool-calling-stream-traditional": {
 			"package_json_hash": "c610c334d5f53a6e399bddddf68098ca0dec96d7"
@@ -88,7 +88,7 @@
 			"package_json_hash": "0e710d7b27bb34edba396dc2b3365db230c076cb"
 		},
 		"./demos/vision": {
-			"package_json_hash": "7d12d727b3096f58f86c903b3150f8d3cc4a051a"
+			"package_json_hash": "7d954b261b5be3540f41512a4caf0c778e2f66b9"
 		},
 		"./demos/remote-mcp-google-oauth": {
 			"package_json_hash": "21bdab2ebbbe336c5fe6fb032fde804373f1b489"
