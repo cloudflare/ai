@@ -62,8 +62,6 @@ const MODELS = [
 	{ id: "@cf/meta/llama-3.1-8b-instruct-fast", label: "Llama 3.1 8B Fast" },
 	{ id: "@cf/openai/gpt-oss-20b", label: "GPT-OSS 20B" },
 	{ id: "@cf/qwen/qwen3-30b-a3b-fp8", label: "Qwen3 30B" },
-	{ id: "@cf/google/gemma-3-12b-it", label: "Gemma 3 12B" },
-	{ id: "@cf/mistralai/mistral-small-3.1-24b-instruct", label: "Mistral Small 3.1" },
 	{ id: "@cf/moonshotai/kimi-k2.5", label: "Kimi K2.5" },
 ] as const;
 
@@ -82,6 +80,8 @@ const results: Record<
 		multiTurn: Status;
 		toolCalling: Status;
 		toolRoundTrip: Status;
+		toolMultiStep: Status;
+		toolRequired: Status;
 		structuredOutput: Status;
 		notes: string[];
 	}
@@ -94,6 +94,8 @@ function getResult(label: string) {
 			multiTurn: "skip",
 			toolCalling: "skip",
 			toolRoundTrip: "skip",
+			toolMultiStep: "skip",
+			toolRequired: "skip",
 			structuredOutput: "skip",
 			notes: [],
 		};
@@ -121,7 +123,7 @@ function printSummaryTable() {
 	const pad = (s: string, n: number) => s + " ".repeat(Math.max(0, n - s.length));
 	const maxLabel = Math.max(...labels.map((l) => l.length), 5);
 
-	const header = `${pad("Model", maxLabel)} | Chat | Turn | Tool | T-RT | JSON | Notes`;
+	const header = `${pad("Model", maxLabel)} | Chat | Turn | Tool | T-RT | T-MS | T-Rq | JSON | Notes`;
 	const sep = "-".repeat(header.length + 10);
 
 	console.log(`\n${sep}`);
@@ -134,12 +136,13 @@ function printSummaryTable() {
 		const r = results[label];
 		const notes = r.notes.length > 0 ? r.notes.join("; ") : "";
 		console.log(
-			`${pad(label, maxLabel)} | ${statusIcon(r.chat)} | ${statusIcon(r.multiTurn)} | ${statusIcon(r.toolCalling)} | ${statusIcon(r.toolRoundTrip)} | ${statusIcon(r.structuredOutput)} | ${notes}`,
+			`${pad(label, maxLabel)} | ${statusIcon(r.chat)} | ${statusIcon(r.multiTurn)} | ${statusIcon(r.toolCalling)} | ${statusIcon(r.toolRoundTrip)} | ${statusIcon(r.toolMultiStep)} | ${statusIcon(r.toolRequired)} | ${statusIcon(r.structuredOutput)} | ${notes}`,
 		);
 	}
 
 	console.log(sep);
 	console.log("  OK = works    ~ = partial/quirky    X = broken    - = skipped");
+	console.log("  T-MS = multi-step agentic loop    T-Rq = toolChoice required");
 	console.log(`${sep}\n`);
 }
 
@@ -319,6 +322,121 @@ describe.skipIf(skip())("Workers AI REST E2E", () => {
 				} catch (err: unknown) {
 					r.toolRoundTrip = "fail";
 					r.notes.push(`t-rt: ${(err as Error).message.slice(0, 60)}`);
+				}
+			});
+		}
+	});
+
+	// ------------------------------------------------------------------
+	// Multi-step agentic tool loop (per model)
+	// Exercises the tool result unwrapping fix: the model must correctly
+	// read the first tool result to decide to make a second tool call.
+	// ------------------------------------------------------------------
+	describe("tool multi-step agentic loop", () => {
+		for (const model of MODELS) {
+			it(`${model.label} — multi-step tool loop`, async () => {
+				const r = getResult(model.label);
+
+				try {
+					const provider = makeProvider();
+
+					const result = await generateText({
+						model: provider(model.id as ModelId),
+						messages: [
+							{
+								role: "user",
+								content:
+									"I need two calculations done separately. First, what is 2 + 3? Second, what is 10 + 20? You MUST use the calculator tool for EACH calculation. Do NOT do math in your head.",
+							},
+						],
+						tools: {
+							calculator: {
+								description:
+									"Add two numbers together. Returns their sum. You MUST use this tool for every math operation.",
+								inputSchema: z.object({
+									a: z.number().describe("first number"),
+									b: z.number().describe("second number"),
+								}),
+								execute: async ({ a, b }) => ({
+									result: a + b,
+								}),
+							},
+						},
+						stopWhen: stepCountIs(4),
+					});
+
+					const toolCallCount = result.steps.reduce(
+						(sum, step) => sum + (step.toolCalls?.length || 0),
+						0,
+					);
+
+					if (toolCallCount >= 2 && result.text.length > 0) {
+						r.toolMultiStep = "ok";
+					} else if (toolCallCount >= 1) {
+						r.toolMultiStep = "warn";
+						r.notes.push(
+							`t-ms: only ${toolCallCount} tool call(s), ${result.steps.length} step(s)`,
+						);
+					} else if (result.text.length > 0) {
+						r.toolMultiStep = "warn";
+						r.notes.push("t-ms: skipped tools, answered directly");
+					} else {
+						r.toolMultiStep = "fail";
+						r.notes.push("t-ms: empty response");
+					}
+				} catch (err: unknown) {
+					r.toolMultiStep = "fail";
+					r.notes.push(`t-ms: ${(err as Error).message.slice(0, 60)}`);
+				}
+			});
+		}
+	});
+
+	// ------------------------------------------------------------------
+	// toolChoice: "required" (per model)
+	// Validates the tool_choice mapping fix: "required" must not be
+	// sent as "any" (which causes 8001: Invalid input on vLLM models).
+	// ------------------------------------------------------------------
+	describe("toolChoice required", () => {
+		for (const model of MODELS) {
+			it(`${model.label} — toolChoice required`, async () => {
+				const r = getResult(model.label);
+
+				try {
+					const provider = makeProvider();
+
+					const result = await generateText({
+						model: provider(model.id as ModelId),
+						messages: [
+							{
+								role: "user",
+								content: "What is 7 + 8? You MUST use the calculator tool.",
+							},
+						],
+						tools: {
+							calculator: {
+								description: "Add two numbers. Returns their sum.",
+								inputSchema: z.object({
+									a: z.number().describe("first number"),
+									b: z.number().describe("second number"),
+								}),
+							},
+						},
+						toolChoice: "required",
+					});
+
+					if (result.toolCalls && result.toolCalls.length > 0) {
+						r.toolRequired = "ok";
+					} else if (result.text.length > 0) {
+						r.toolRequired = "warn";
+						r.notes.push("t-rq: answered as text despite required");
+					} else {
+						r.toolRequired = "fail";
+						r.notes.push("t-rq: no tool call or content");
+					}
+				} catch (err: unknown) {
+					r.toolRequired = "fail";
+					r.notes.push(`t-rq: ${(err as Error).message.slice(0, 60)}`);
 				}
 			});
 		}

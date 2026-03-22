@@ -184,17 +184,35 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV3Prompt): {
 			case "tool": {
 				for (const toolResponse of content) {
 					if (toolResponse.type === "tool-result") {
-						// toolResponse.output is LanguageModelV3ToolResultOutput — a tagged
-						// union. We must extract the value rather than stringifying the
-						// wrapper object, which would send e.g. {"type":"text","value":"..."}
-						// to the model instead of the actual tool result.
 						const output = toolResponse.output;
-						const content =
-							output.type === "text"
-								? output.value
-								: "value" in output
-									? JSON.stringify(output.value)
-									: "";
+						let content: string;
+						switch (output.type) {
+							case "text":
+							case "error-text":
+								content = output.value;
+								break;
+							case "json":
+							case "error-json":
+								content = JSON.stringify(output.value);
+								break;
+							case "execution-denied":
+								content = output.reason
+									? `Tool execution denied: ${output.reason}`
+									: "Tool execution was denied.";
+								break;
+							case "content":
+								content = output.value
+									.filter(
+										(p): p is { type: "text"; text: string } =>
+											p.type === "text",
+									)
+									.map((p) => p.text)
+									.join("\n");
+								break;
+							default:
+								content = "";
+								break;
+						}
 						messages.push({
 							content,
 							name: toolResponse.toolName,

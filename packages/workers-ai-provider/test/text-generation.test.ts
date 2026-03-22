@@ -423,7 +423,7 @@ describe("Binding - Text Generation Tests", () => {
 		expect(capturedInputs).toHaveProperty("tool_choice", "auto");
 	});
 
-	it("should pass tool_choice 'any' for toolChoice 'required'", async () => {
+	it("should map toolChoice 'required' to tool_choice 'required'", async () => {
 		let capturedInputs: any = null;
 
 		const workersai = createWorkersAI({
