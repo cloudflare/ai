@@ -382,6 +382,60 @@ Auto-detected from URL (no `providerName` needed):
 
 Any other provider works with `providerName` set explicitly.
 
+## Migrating from the old API
+
+If you're upgrading from the previous version (`createAiGateway` + `ai-gateway-provider/providers/*`), your existing code still works — you'll see deprecation warnings in the console guiding you to the new API. No changes are required immediately.
+
+### What changed
+
+**Before:**
+
+```typescript
+import { createAiGateway } from "ai-gateway-provider";
+import { createOpenAI } from "ai-gateway-provider/providers/openai"; // ← deprecated
+
+const aigateway = createAiGateway({ accountId, gateway, apiKey });
+const openai = createOpenAI({ apiKey });
+generateText({ model: aigateway([openai.chat("gpt-4o")]), prompt: "..." });
+```
+
+**After:**
+
+```typescript
+import { createAIGateway } from "ai-gateway-provider";
+import { createOpenAI } from "@ai-sdk/openai"; // ← import directly
+
+const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const gateway = createAIGateway({
+	provider: openai,
+	accountId: "...",
+	gateway: "my-gateway",
+});
+generateText({ model: gateway("gpt-4o"), prompt: "..." });
+```
+
+### Step by step
+
+1. **Replace provider imports** — change `from "ai-gateway-provider/providers/openai"` to `from "@ai-sdk/openai"` (and so on for each provider). Install the `@ai-sdk/*` package directly if you haven't already.
+
+2. **Replace `createAiGateway`** — use `createAIGateway` (capital `I`) with a `provider` field instead of wrapping model arrays.
+
+3. **Replace fallback** — if you passed an array to `createAiGateway(config)([model1, model2])`, use `createAIGatewayFallback({ models: [...], ...config })` instead.
+
+4. **Update BYOK** — if you relied on the old provider wrappers injecting a dummy API key (the `CF_TEMP_TOKEN` mechanism), set `byok: true` on `createAIGateway` and pass any string as the provider's API key (e.g., `createOpenAI({ apiKey: "unused" })`).
+
+### Deprecated APIs
+
+All of the following still work but emit a one-time console warning. They will be removed in the next major version.
+
+| Deprecated | Replacement |
+|---|---|
+| `createAiGateway()` | `createAIGateway()` / `createAIGatewayFallback()` |
+| `import { createOpenAI } from "ai-gateway-provider/providers/openai"` | `import { createOpenAI } from "@ai-sdk/openai"` |
+| `AiGatewaySettings` type | `AiGatewayConfig` |
+| `AiGatewayAPISettings` type | `AiGatewayAPIConfig` |
+| `AiGatewayBindingSettings` type | `AiGatewayBindingConfig` |
+
 ## Testing
 
 ### Unit tests

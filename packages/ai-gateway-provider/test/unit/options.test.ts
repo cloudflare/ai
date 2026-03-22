@@ -22,6 +22,11 @@ describe("parseAiGatewayOptions", () => {
 		expect(headers.get("cf-aig-cache-ttl")).toBe("3600");
 	});
 
+	it("should set cf-aig-cache-ttl to 0", () => {
+		const headers = parseAiGatewayOptions({ cacheTtl: 0 });
+		expect(headers.get("cf-aig-cache-ttl")).toBe("0");
+	});
+
 	it("should set cf-aig-cache-key", () => {
 		const headers = parseAiGatewayOptions({ cacheKey: "my-key" });
 		expect(headers.get("cf-aig-cache-key")).toBe("my-key");

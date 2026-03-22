@@ -1,8 +1,8 @@
 ---
-"ai-gateway-provider": major
+"ai-gateway-provider": minor
 ---
 
-Rewrote the AI Gateway provider with a new API. `createAIGateway` now wraps any standard AI SDK provider as a drop-in replacement — no more importing wrapped providers from `ai-gateway-provider/providers/*`.
+Rewrote the AI Gateway provider with a new API. `createAIGateway` now wraps any standard AI SDK provider — import directly from `@ai-sdk/*` instead of `ai-gateway-provider/providers/*`.
 
 **New features:**
 
@@ -17,14 +17,16 @@ Rewrote the AI Gateway provider with a new API. `createAIGateway` now wraps any 
 **Bug fixes:**
 
 - Updated stale cache header names (`cf-skip-cache` → `cf-aig-skip-cache`, `cf-cache-ttl` → `cf-aig-cache-ttl`)
+- Fixed BYOK leaking dummy API keys (`Authorization: Bearer unused` was forwarded to the provider)
 - Fixed fetch mutation not being restored after gateway calls
 - Removed unanchored Google Vertex regex that could match unintended URLs
 - Fixed query parameter loss for custom URLs with `providerName`
+- Propagate abort signals to binding and fetch calls
 
-**Breaking changes:**
+**Deprecated (all still work, with a one-time console warning):**
 
-- `createAiGateway` → `createAIGateway` (new API shape — takes `provider` instead of model arrays)
-- Removed all `ai-gateway-provider/providers/*` subpath exports
-- Removed `@ai-sdk/openai-compatible` from peer dependencies
-- Removed all `optionalDependencies`
-- Fallback is now a separate `createAIGatewayFallback` function
+- `createAiGateway()` — use `createAIGateway()` (wraps a provider) or `createAIGatewayFallback()` (cross-provider fallback) instead
+- `ai-gateway-provider/providers/*` subpath imports — import directly from `@ai-sdk/*` and use `createAIGateway()` instead
+- Old type names: `AiGatewaySettings` → `AiGatewayConfig`, `AiGatewayAPISettings` → `AiGatewayAPIConfig`, `AiGatewayBindingSettings` → `AiGatewayBindingConfig`, `AiGatewayReties` → `AiGatewayRetries`
+
+All deprecated APIs will be removed in the next major version.

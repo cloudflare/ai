@@ -54,17 +54,13 @@ export const providers = [
 	},
 	{
 		name: "azure-openai",
-		regex: /^https:\/\/(?<resource>[^.]+)\.openai\.azure\.com\/openai\/deployments\/(?<deployment>[^/]+)\/(?<rest>.*)$/,
+		regex: /^https:\/\/([^.]+)\.openai\.azure\.com\/openai\/deployments\/([^/]+)\/(.*)/,
 		transformEndpoint: (url: string) => {
 			const match = url.match(
-				/^https:\/\/(?<resource>[^.]+)\.openai\.azure\.com\/openai\/deployments\/(?<deployment>[^/]+)\/(?<rest>.*)$/,
+				/^https:\/\/([^.]+)\.openai\.azure\.com\/openai\/deployments\/([^/]+)\/(.*)/,
 			);
-			if (!match || !match.groups) return url;
-			const { resource, deployment, rest } = match.groups;
-			if (!resource || !deployment || !rest) {
-				throw new Error("Failed to parse Azure OpenAI endpoint URL.");
-			}
-			return `${resource}/${deployment}/${rest}`;
+			if (!match) return url;
+			return `${match[1]}/${match[2]}/${match[3]}`;
 		},
 	},
 	{
@@ -76,7 +72,9 @@ export const providers = [
 		name: "aws-bedrock",
 		regex: /^https:\/\/bedrock-runtime\.([^.]+)\.amazonaws\.com\//,
 		transformEndpoint: (url: string) => {
-			const match = url.match(/^https:\/\/bedrock-runtime\.([^.]+)\.amazonaws\.com\/(.*)/);
+			const match = url.match(
+				/^https:\/\/bedrock-runtime\.([^.]+)\.amazonaws\.com\/(.*)/,
+			);
 			if (!match) return url;
 			return `bedrock-runtime/${match[1]}/${match[2]}`;
 		},

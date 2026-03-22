@@ -2,7 +2,8 @@ import type { LanguageModelV3 } from "@ai-sdk/provider";
 import type { FetchFunction } from "@ai-sdk/provider-utils";
 import { providers as providerRegistry } from "./providers";
 
-class AiGatewayInternalFetchError extends Error {}
+/** @deprecated Internal implementation detail — do not use. */
+export class AiGatewayInternalFetchError extends Error {}
 
 export class AiGatewayDoesNotExist extends Error {}
 
@@ -18,9 +19,17 @@ function normalizeHeaders(headers: HeadersInit | undefined): Record<string, stri
 		return Object.fromEntries(headers.entries());
 	}
 	if (Array.isArray(headers)) {
-		return Object.fromEntries(headers);
+		const result: Record<string, string> = {};
+		for (const [k, v] of headers) {
+			result[k.toLowerCase()] = v;
+		}
+		return result;
 	}
-	return headers as Record<string, string>;
+	const result: Record<string, string> = {};
+	for (const [k, v] of Object.entries(headers as Record<string, string>)) {
+		result[k.toLowerCase()] = v;
+	}
+	return result;
 }
 
 export function resolveProvider(
@@ -68,7 +77,7 @@ export type AiGatewayOptions = {
 	cacheKey?: string;
 	cacheTtl?: number;
 	skipCache?: boolean;
-	metadata?: Record<string, number | string | boolean | null | bigint>;
+	metadata?: Record<string, number | string | boolean | null>;
 	collectLog?: boolean;
 	eventId?: string;
 	requestTimeoutMs?: number;
@@ -208,23 +217,27 @@ async function dispatchToGateway(
 		);
 	}
 
-	if (resp.status === 400) {
-		const result = (await resp.clone().json()) as {
-			success?: boolean;
-			error?: { code: number; message: string }[];
-		};
-		if (result.success === false && result.error?.length && result.error[0]?.code === 2001) {
-			throw new AiGatewayDoesNotExist("This AI gateway does not exist");
-		}
-	} else if (resp.status === 401) {
-		const result = (await resp.clone().json()) as {
-			success?: boolean;
-			error?: { code: number; message: string }[];
-		};
-		if (result.success === false && result.error?.length && result.error[0]?.code === 2009) {
-			throw new AiGatewayUnauthorizedError(
-				"Your AI Gateway has authentication active, but you didn't provide a valid apiKey",
-			);
+	if (resp.status === 400 || resp.status === 401) {
+		try {
+			const result = (await resp.clone().json()) as {
+				success?: boolean;
+				error?: { code: number; message: string }[];
+			};
+			if (result.success === false && result.error?.length) {
+				const code = result.error[0]?.code;
+				if (code === 2001) {
+					throw new AiGatewayDoesNotExist("This AI gateway does not exist");
+				}
+				if (code === 2009) {
+					throw new AiGatewayUnauthorizedError(
+						"Your AI Gateway has authentication active, but you didn't provide a valid apiKey",
+					);
+				}
+			}
+		} catch (e) {
+			if (e instanceof AiGatewayDoesNotExist || e instanceof AiGatewayUnauthorizedError) {
+				throw e;
+			}
 		}
 	}
 
@@ -234,7 +247,7 @@ async function dispatchToGateway(
 function feedResponseToModel(model: InternalLanguageModelV3, resp: Response): void {
 	model.config = {
 		...model.config,
-		fetch: () => Promise.resolve(resp),
+		fetch: () => Promise.resolve(resp.clone()),
 	};
 }
 
@@ -291,12 +304,14 @@ export class AiGatewayChatLanguageModel implements LanguageModelV3 {
 		method: "doStream" | "doGenerate",
 	): Promise<Awaited<ReturnType<T>>> {
 		const captured = await captureModelRequest(this.innerModel, options, method);
-		const entry = buildGatewayEntry(captured, this.providerName, this.byok);
-		const resp = await dispatchToGateway([entry], this.gatewayConfig, options.abortSignal);
-		feedResponseToModel(this.innerModel, resp);
-		const result = await (this.innerModel[method](options) as Promise<Awaited<ReturnType<T>>>);
-		this.innerModel.config!.fetch = captured.originalFetch;
-		return result;
+		try {
+			const entry = buildGatewayEntry(captured, this.providerName, this.byok);
+			const resp = await dispatchToGateway([entry], this.gatewayConfig, options.abortSignal);
+			feedResponseToModel(this.innerModel, resp);
+			return await (this.innerModel[method](options) as Promise<Awaited<ReturnType<T>>>);
+		} finally {
+			this.innerModel.config!.fetch = captured.originalFetch;
+		}
 	}
 }
 
@@ -348,28 +363,28 @@ class AiGatewayFallbackModel implements LanguageModelV3 {
 		const entries: GatewayRequestEntry[] = [];
 		const originalFetches: (FetchFunction | undefined)[] = [];
 
-		for (const model of this.models) {
-			const captured = await captureModelRequest(model, options, method);
-			entries.push(buildGatewayEntry(captured, undefined, this.byok));
-			originalFetches.push(captured.originalFetch);
+		try {
+			for (const model of this.models) {
+				const captured = await captureModelRequest(model, options, method);
+				entries.push(buildGatewayEntry(captured, undefined, this.byok));
+				originalFetches.push(captured.originalFetch);
+			}
+
+			const resp = await dispatchToGateway(entries, this.gatewayConfig, options.abortSignal);
+
+			const step = Number.parseInt(resp.headers.get("cf-aig-step") ?? "0", 10);
+			const selectedModel = this.models[step];
+			if (!selectedModel) {
+				throw new Error("Unexpected AI Gateway fallback step");
+			}
+
+			feedResponseToModel(selectedModel, resp);
+			return await (selectedModel[method](options) as Promise<Awaited<ReturnType<T>>>);
+		} finally {
+			for (let i = 0; i < originalFetches.length; i++) {
+				this.models[i]!.config!.fetch = originalFetches[i];
+			}
 		}
-
-		const resp = await dispatchToGateway(entries, this.gatewayConfig, options.abortSignal);
-
-		const step = Number.parseInt(resp.headers.get("cf-aig-step") ?? "0", 10);
-		const selectedModel = this.models[step];
-		if (!selectedModel) {
-			throw new Error("Unexpected AI Gateway fallback step");
-		}
-
-		feedResponseToModel(selectedModel, resp);
-		const result = await (selectedModel[method](options) as Promise<Awaited<ReturnType<T>>>);
-
-		for (let i = 0; i < this.models.length; i++) {
-			this.models[i]!.config!.fetch = originalFetches[i];
-		}
-
-		return result;
 	}
 }
 
@@ -404,6 +419,55 @@ export function createAIGatewayFallback(
 	return new AiGatewayFallbackModel(models, gatewayConfig as AiGatewayConfig, byok);
 }
 
+// ─── Deprecated compat: old createAiGateway API ─────────────────
+
+/** @deprecated Use `AiGatewayConfig` instead. */
+export type AiGatewaySettings = AiGatewayConfig;
+/** @deprecated Use `AiGatewayAPIConfig` instead. */
+export type AiGatewayAPISettings = AiGatewayAPIConfig;
+/** @deprecated Use `AiGatewayBindingConfig` instead. */
+export type AiGatewayBindingSettings = AiGatewayBindingConfig;
+/** @deprecated Use `AiGatewayRetries` instead. */
+export type AiGatewayReties = AiGatewayRetries;
+
+/** @deprecated Use `createAIGateway` instead. */
+export interface AiGateway {
+	(models: LanguageModelV3 | LanguageModelV3[]): LanguageModelV3;
+	chat(models: LanguageModelV3 | LanguageModelV3[]): LanguageModelV3;
+}
+
+let warnedCreateAiGateway = false;
+
+/**
+ * @deprecated Use `createAIGateway` (wraps a provider) or `createAIGatewayFallback` (cross-provider fallback) instead.
+ */
+export function createAiGateway(options: AiGatewayConfig): AiGateway {
+	if (!warnedCreateAiGateway) {
+		warnedCreateAiGateway = true;
+		console.warn(
+			"[ai-gateway-provider] createAiGateway() is deprecated. " +
+				"Use createAIGateway() to wrap a provider, or createAIGatewayFallback() for cross-provider fallback. " +
+				"See https://github.com/cloudflare/ai for the migration guide.",
+		);
+	}
+
+	const createChatModel = (models: LanguageModelV3 | LanguageModelV3[]) => {
+		const arr = Array.isArray(models) ? models : [models];
+		if (arr.length === 1) {
+			return new AiGatewayChatLanguageModel(arr[0]!, options);
+		}
+		return new AiGatewayFallbackModel(arr, options);
+	};
+
+	const provider = ((models: LanguageModelV3 | LanguageModelV3[]) =>
+		createChatModel(models)) as unknown as AiGateway;
+	provider.chat = createChatModel;
+
+	return provider;
+}
+
+// ─── Options ─────────────────────────────────────────────────────
+
 export function parseAiGatewayOptions(options: AiGatewayOptions): Headers {
 	const headers = new Headers();
 
@@ -411,7 +475,7 @@ export function parseAiGatewayOptions(options: AiGatewayOptions): Headers {
 		headers.set("cf-aig-skip-cache", "true");
 	}
 
-	if (options.cacheTtl) {
+	if (options.cacheTtl !== undefined) {
 		headers.set("cf-aig-cache-ttl", options.cacheTtl.toString());
 	}
 
