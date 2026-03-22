@@ -277,9 +277,9 @@ export function prepareToolsAndToolChoice(
 
 	const mappedTools = tools.map((tool) => ({
 		function: {
-			description: tool.type === "function" && tool.description,
+			description: tool.type === "function" ? tool.description : undefined,
 			name: tool.name,
-			parameters: tool.type === "function" && tool.inputSchema,
+			parameters: tool.type === "function" ? tool.inputSchema : undefined,
 		},
 		type: "function",
 	}));
@@ -296,13 +296,13 @@ export function prepareToolsAndToolChoice(
 		case "none":
 			return { tool_choice: type, tools: mappedTools };
 		case "required":
-			return { tool_choice: "any", tools: mappedTools };
+			return { tool_choice: "required", tools: mappedTools };
 
 		// Workers AI does not support tool mode directly,
-		// so we filter the tools and force the tool choice through 'any'
+		// so we filter the tools and force the tool choice through 'required'
 		case "tool":
 			return {
-				tool_choice: "any",
+				tool_choice: "required",
 				tools: mappedTools.filter((tool) => tool.function.name === toolChoice.toolName),
 			};
 		default: {

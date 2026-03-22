@@ -507,4 +507,79 @@ describe("convertToWorkersAIChatMessages", () => {
 			expect(messages[1].tool_call_id).toBe("call-1");
 		});
 	});
+
+	describe("tool result output unwrapping", () => {
+		it("should unwrap text output — not stringify the wrapper object", () => {
+			// LanguageModelV3ToolResultOutput is { type: 'text', value: string }
+			// The value must be sent to the API, not the wrapper object itself.
+			const { messages } = convertToWorkersAIChatMessages([
+				{
+					role: "tool" as const,
+					content: [
+						{
+							type: "tool-result" as const,
+							toolCallId: "call-1",
+							toolName: "getWeather",
+							output: { type: "text", value: "Tokyo: 22°C, sunny" } as any,
+						},
+					],
+				},
+			]);
+
+			expect(messages[0].content).toBe("Tokyo: 22°C, sunny");
+			// Must NOT be the stringified wrapper
+			expect(messages[0].content).not.toContain('"type":"text"');
+			expect(messages[0].content).not.toContain('"value"');
+		});
+
+		it("should unwrap json output — serialize only the value", () => {
+			const { messages } = convertToWorkersAIChatMessages([
+				{
+					role: "tool" as const,
+					content: [
+						{
+							type: "tool-result" as const,
+							toolCallId: "call-1",
+							toolName: "getWeather",
+							output: {
+								type: "json",
+								value: { city: "Tokyo", temp: 22, condition: "sunny" },
+							} as any,
+						},
+					],
+				},
+			]);
+
+			expect(messages[0].content).toBe(
+				JSON.stringify({ city: "Tokyo", temp: 22, condition: "sunny" })
+			);
+			expect(messages[0].content).not.toContain('"type":"json"');
+		});
+
+		it("should handle multiple tool results with correct unwrapping", () => {
+			const { messages } = convertToWorkersAIChatMessages([
+				{
+					role: "tool" as const,
+					content: [
+						{
+							type: "tool-result" as const,
+							toolCallId: "call-1",
+							toolName: "getUserInfo",
+							output: { type: "text", value: '{"id":"u123","username":"alice"}' } as any,
+						},
+						{
+							type: "tool-result" as const,
+							toolCallId: "call-2",
+							toolName: "getBalance",
+							output: { type: "json", value: { balance: 1234.56 } } as any,
+						},
+					],
+				},
+			]);
+
+			expect(messages).toHaveLength(2);
+			expect(messages[0].content).toBe('{"id":"u123","username":"alice"}');
+			expect(messages[1].content).toBe(JSON.stringify({ balance: 1234.56 }));
+		});
+	});
 });

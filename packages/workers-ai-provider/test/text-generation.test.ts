@@ -450,7 +450,7 @@ describe("Binding - Text Generation Tests", () => {
 			toolChoice: "required",
 		});
 
-		expect(capturedInputs).toHaveProperty("tool_choice", "any");
+		expect(capturedInputs).toHaveProperty("tool_choice", "required");
 	});
 
 	it("should handle content and reasoning_content", async () => {
