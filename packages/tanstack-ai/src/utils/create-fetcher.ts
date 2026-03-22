@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------------
 
 export interface CloudflareAiGateway {
-	run(request: unknown, options?: { signal?: AbortSignal }): Promise<Response>;
+	run(request: unknown): Promise<Response>;
 }
 
 export interface AiGatewayBindingConfig {
@@ -245,9 +245,8 @@ export function createGatewayFetch(
 		}
 
 		if ("binding" in config) {
-			return config.binding.run(request, {
-				signal: init?.signal ?? undefined,
-			});
+			return (config.binding as { run(req: unknown, opts?: { signal?: AbortSignal }): Promise<Response> })
+				.run(request, { signal: init?.signal ?? undefined });
 		}
 
 		return fetch(
