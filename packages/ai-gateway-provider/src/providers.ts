@@ -13,20 +13,12 @@ export const providers = [
 		name: "anthropic",
 		regex: /^https:\/\/api\.anthropic\.com\//,
 		transformEndpoint: (url: string) => url.replace(/^https:\/\/api\.anthropic\.com\//, ""),
-		headerKey: "x-api-key",
 	},
 	{
 		name: "google-ai-studio",
 		regex: /^https:\/\/generativelanguage\.googleapis\.com\//,
-		headerKey: "x-goog-api-key",
 		transformEndpoint: (url: string) =>
 			url.replace(/^https:\/\/generativelanguage\.googleapis\.com\//, ""),
-	},
-	{
-		name: "google-vertex-ai",
-		regex: /aiplatform\.googleapis\.com/,
-		transformEndpoint: (url: string) =>
-			url.replace(/https:\/\/(.*)[-]?aiplatform\.googleapis\.com\//, ""),
 	},
 	{
 		name: "grok",
@@ -59,28 +51,80 @@ export const providers = [
 		regex: /^https:\/\/(?:[a-z0-9]+-)*aiplatform\.googleapis\.com\//,
 		transformEndpoint: (url: string) =>
 			url.replace(/^https:\/\/(?:[a-z0-9]+-)*aiplatform\.googleapis\.com\//, ""),
-		headerKey: "authorization",
 	},
 	{
 		name: "azure-openai",
-		regex: /^https:\/\/(?<resource>[^.]+)\.openai\.azure\.com\/openai\/deployments\/(?<deployment>[^/]+)\/(?<rest>.*)$/,
+		regex: /^https:\/\/([^.]+)\.openai\.azure\.com\/openai\/deployments\/([^/]+)\/(.*)/,
 		transformEndpoint: (url: string) => {
 			const match = url.match(
-				/^https:\/\/(?<resource>[^.]+)\.openai\.azure\.com\/openai\/deployments\/(?<deployment>[^/]+)\/(?<rest>.*)$/,
+				/^https:\/\/([^.]+)\.openai\.azure\.com\/openai\/deployments\/([^/]+)\/(.*)/,
 			);
-			if (!match || !match.groups) return url;
-			const { resource, deployment, rest } = match.groups;
-			if (!resource || !deployment || !rest) {
-				throw new Error("Failed to parse Azure OpenAI endpoint URL.");
-			}
-			return `${resource}/${deployment}/${rest}`;
+			if (!match) return url;
+			return `${match[1]}/${match[2]}/${match[3]}`;
 		},
-		headerKey: "api-key",
 	},
 	{
 		name: "openrouter",
 		regex: /^https:\/\/openrouter\.ai\/api\//,
 		transformEndpoint: (url: string) => url.replace(/^https:\/\/openrouter\.ai\/api\//, ""),
+	},
+	{
+		name: "aws-bedrock",
+		regex: /^https:\/\/bedrock-runtime\.([^.]+)\.amazonaws\.com\//,
+		transformEndpoint: (url: string) => {
+			const match = url.match(
+				/^https:\/\/bedrock-runtime\.([^.]+)\.amazonaws\.com\/(.*)/,
+			);
+			if (!match) return url;
+			return `bedrock-runtime/${match[1]}/${match[2]}`;
+		},
+	},
+	{
+		name: "cerebras",
+		regex: /^https:\/\/api\.cerebras\.ai\/v1\//,
+		transformEndpoint: (url: string) => url.replace(/^https:\/\/api\.cerebras\.ai\/v1\//, ""),
+	},
+	{
+		name: "cohere",
+		regex: /^https:\/\/api\.cohere\.(com|ai)\//,
+		transformEndpoint: (url: string) => url.replace(/^https:\/\/api\.cohere\.(com|ai)\//, ""),
+	},
+	{
+		name: "deepgram",
+		regex: /^https:\/\/api\.deepgram\.com\//,
+		transformEndpoint: (url: string) => url.replace(/^https:\/\/api\.deepgram\.com\//, ""),
+	},
+	{
+		name: "elevenlabs",
+		regex: /^https:\/\/api\.elevenlabs\.io\//,
+		transformEndpoint: (url: string) => url.replace(/^https:\/\/api\.elevenlabs\.io\//, ""),
+	},
+	{
+		name: "fireworks",
+		regex: /^https:\/\/api\.fireworks\.ai\/inference\/v1\//,
+		transformEndpoint: (url: string) =>
+			url.replace(/^https:\/\/api\.fireworks\.ai\/inference\/v1\//, ""),
+	},
+	{
+		name: "huggingface",
+		regex: /^https:\/\/api-inference\.huggingface\.co\/models\//,
+		transformEndpoint: (url: string) =>
+			url.replace(/^https:\/\/api-inference\.huggingface\.co\/models\//, ""),
+	},
+	{
+		name: "cartesia",
+		regex: /^https:\/\/api\.cartesia\.ai\//,
+		transformEndpoint: (url: string) => url.replace(/^https:\/\/api\.cartesia\.ai\//, ""),
+	},
+	{
+		name: "fal",
+		regex: /^https:\/\/fal\.run\//,
+		transformEndpoint: (url: string) => url.replace(/^https:\/\/fal\.run\//, ""),
+	},
+	{
+		name: "ideogram",
+		regex: /^https:\/\/api\.ideogram\.ai\//,
+		transformEndpoint: (url: string) => url.replace(/^https:\/\/api\.ideogram\.ai\//, ""),
 	},
 	{
 		name: "compat",

@@ -56,7 +56,9 @@ const workersai = createWorkersAI({
 
 ### AI Gateway
 
-Route requests through [AI Gateway](https://developers.cloudflare.com/ai-gateway/) for caching, rate limiting, and observability:
+Route requests through [AI Gateway](https://developers.cloudflare.com/ai-gateway/) for caching, rate limiting, and observability.
+
+**With a binding (recommended):**
 
 ```ts
 const workersai = createWorkersAI({
@@ -64,6 +66,30 @@ const workersai = createWorkersAI({
 	gateway: { id: "my-gateway" },
 });
 ```
+
+The `gateway` option is passed to the binding's `run()` call natively — all gateway features (caching, logging, analytics, rate limiting) apply automatically.
+
+**With the REST API:**
+
+The `gateway` option is not supported in REST mode. Instead, point the REST URL at the AI Gateway's Workers AI endpoint directly using [`ai-gateway-provider`](https://www.npmjs.com/package/ai-gateway-provider) with `providerName`:
+
+```ts
+import { createWorkersAI } from "workers-ai-provider";
+import { createAIGateway } from "ai-gateway-provider";
+
+const workersai = createWorkersAI({
+	accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
+	apiKey: process.env.CLOUDFLARE_API_TOKEN,
+});
+
+// This won't work — Workers AI doesn't use config.fetch
+// createAIGateway({ provider: workersai, ... })
+
+// For REST + Gateway, use the AI Gateway's Workers AI endpoint directly:
+// https://gateway.ai.cloudflare.com/v1/{account_id}/{gateway_id}/workers-ai
+```
+
+For the REST path, we recommend using the binding approach in a Cloudflare Worker instead, which gives you native gateway support without extra configuration.
 
 ## Models
 

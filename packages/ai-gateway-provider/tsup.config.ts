@@ -1,15 +1,32 @@
 import { defineConfig } from "tsup";
-import pkg from "./package.json";
 
 export default defineConfig({
-	entry: ["src/index.ts", "src/providers/*"],
+	entry: {
+		index: "src/index.ts",
+		"providers/amazon-bedrock": "src/compat/amazon-bedrock.ts",
+		"providers/anthropic": "src/compat/anthropic.ts",
+		"providers/azure": "src/compat/azure.ts",
+		"providers/cerebras": "src/compat/cerebras.ts",
+		"providers/cohere": "src/compat/cohere.ts",
+		"providers/deepgram": "src/compat/deepgram.ts",
+		"providers/deepseek": "src/compat/deepseek.ts",
+		"providers/elevenlabs": "src/compat/elevenlabs.ts",
+		"providers/fireworks": "src/compat/fireworks.ts",
+		"providers/google": "src/compat/google.ts",
+		"providers/google-vertex": "src/compat/google-vertex.ts",
+		"providers/groq": "src/compat/groq.ts",
+		"providers/mistral": "src/compat/mistral.ts",
+		"providers/openai": "src/compat/openai.ts",
+		"providers/openrouter": "src/compat/openrouter.ts",
+		"providers/perplexity": "src/compat/perplexity.ts",
+		"providers/unified": "src/compat/unified.ts",
+		"providers/xai": "src/compat/xai.ts",
+	},
+	external: [/^@ai-sdk\//, /^@openrouter\//],
 	splitting: false,
 	sourcemap: true,
 	clean: true,
 	dts: true,
 	format: ["cjs", "esm"],
-	external: Object.keys(pkg.optionalDependencies ?? {}).filter(
-		(dep) => dep !== "@ai-sdk/google-vertex",
-	),
 	target: "es2020",
 });

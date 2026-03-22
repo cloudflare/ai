@@ -19,7 +19,8 @@
 		"no-await-in-loop": "off",
 		"react/react-in-jsx-scope": "off",
 		"@typescript-eslint/no-non-null-assertion": "off",
-		"@typescript-eslint/no-explicit-any": "off"
+		"@typescript-eslint/no-explicit-any": "off",
+		"eslint(no-shadow)": "off"
 	},
 	"ignorePatterns": ["**/worker-configuration.d.ts", "types/workerd.d.ts"]
 }

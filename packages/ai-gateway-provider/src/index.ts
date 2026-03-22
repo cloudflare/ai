@@ -1,278 +1,482 @@
 import type { LanguageModelV3 } from "@ai-sdk/provider";
 import type { FetchFunction } from "@ai-sdk/provider-utils";
-import { CF_TEMP_TOKEN } from "./auth";
-import { providers } from "./providers";
+import { providers as providerRegistry } from "./providers";
 
+/** @deprecated Internal implementation detail — do not use. */
 export class AiGatewayInternalFetchError extends Error {}
 
 export class AiGatewayDoesNotExist extends Error {}
 
 export class AiGatewayUnauthorizedError extends Error {}
 
-async function streamToObject(stream: ReadableStream) {
-	const response = new Response(stream);
-	return await response.json();
+async function parseBody(body: BodyInit): Promise<unknown> {
+	return new Response(body).json();
+}
+
+function normalizeHeaders(headers: HeadersInit | undefined): Record<string, string> {
+	if (!headers) return {};
+	if (headers instanceof Headers) {
+		return Object.fromEntries(headers.entries());
+	}
+	if (Array.isArray(headers)) {
+		const result: Record<string, string> = {};
+		for (const [k, v] of headers) {
+			result[k.toLowerCase()] = v;
+		}
+		return result;
+	}
+	const result: Record<string, string> = {};
+	for (const [k, v] of Object.entries(headers as Record<string, string>)) {
+		result[k.toLowerCase()] = v;
+	}
+	return result;
+}
+
+export function resolveProvider(
+	url: string,
+	explicitName?: string,
+): { name: string; endpoint: string } {
+	let registryMatch = null;
+	for (const p of providerRegistry) {
+		if (p.regex.test(url)) {
+			registryMatch = p;
+		}
+	}
+
+	if (registryMatch) {
+		return {
+			name: explicitName ?? registryMatch.name,
+			endpoint: registryMatch.transformEndpoint(url),
+		};
+	}
+
+	if (explicitName) {
+		const parsed = new URL(url);
+		return {
+			name: explicitName,
+			endpoint: parsed.pathname.slice(1) + parsed.search,
+		};
+	}
+
+	throw new Error(
+		`URL "${url}" did not match any known provider. Set providerName to use a custom base URL.`,
+	);
 }
 
 type InternalLanguageModelV3 = LanguageModelV3 & {
 	config?: { fetch?: FetchFunction | undefined };
 };
 
-export class AiGatewayChatLanguageModel implements LanguageModelV3 {
-	readonly specificationVersion = "v3";
-	readonly defaultObjectGenerationMode = "json";
-
-	readonly supportedUrls: Record<string, RegExp[]> | PromiseLike<Record<string, RegExp[]>> = {
-		// No URLS are supported for this language model
-	};
-
-	readonly models: InternalLanguageModelV3[];
-	readonly config: AiGatewaySettings;
-
-	get modelId(): string {
-		if (!this.models[0]) {
-			throw new Error("models cannot be empty array");
-		}
-
-		return this.models[0].modelId;
-	}
-
-	get provider(): string {
-		if (!this.models[0]) {
-			throw new Error("models cannot be empty array");
-		}
-
-		return this.models[0].provider;
-	}
-
-	constructor(models: LanguageModelV3[], config: AiGatewaySettings) {
-		this.models = models;
-		this.config = config;
-	}
-
-	async processModelRequest<
-		T extends LanguageModelV3["doStream"] | LanguageModelV3["doGenerate"],
-	>(
-		options: Parameters<T>[0],
-		modelMethod: "doStream" | "doGenerate",
-	): Promise<Awaited<ReturnType<T>>> {
-		const requests: { url: string; request: Request; modelProvider: string }[] = [];
-
-		// Model configuration and request collection
-		for (const model of this.models) {
-			if (!model.config || !Object.keys(model.config).includes("fetch")) {
-				throw new Error(
-					`Sorry, but provider "${model.provider}" is currently not supported, please open a issue in the github repo!`,
-				);
-			}
-
-			model.config.fetch = (url, request) => {
-				requests.push({
-					modelProvider: model.provider,
-					request: request as Request,
-					url: url as string,
-				});
-				throw new AiGatewayInternalFetchError("Stopping provider execution...");
-			};
-
-			try {
-				await model[modelMethod](options);
-			} catch (e) {
-				if (!(e instanceof AiGatewayInternalFetchError)) {
-					throw e;
-				}
-			}
-		}
-
-		// Process requests
-		const body = await Promise.all(
-			requests.map(async (req) => {
-				let providerConfig = null;
-				for (const provider of providers) {
-					if (provider.regex.test(req.url)) {
-						providerConfig = provider;
-					}
-				}
-
-				if (!providerConfig) {
-					throw new Error(
-						`Sorry, but provider "${req.modelProvider}" is currently not supported, please open a issue in the github repo!`,
-					);
-				}
-
-				if (!req.request.body) {
-					throw new Error("Ai Gateway provider received an unexpected empty body");
-				}
-
-				// For AI Gateway BYOK / unified billing requests
-				// delete the fake injected CF_TEMP_TOKEN
-
-				const authHeader = providerConfig.headerKey ?? "authorization";
-				const authValue =
-					"get" in req.request.headers
-						? req.request.headers.get(authHeader)
-						: req.request.headers[authHeader];
-				if (authValue?.indexOf(CF_TEMP_TOKEN) !== -1) {
-					if ("delete" in req.request.headers) {
-						req.request.headers.delete(authHeader);
-					} else {
-						delete req.request.headers[authHeader];
-					}
-				}
-
-				return {
-					endpoint: providerConfig.transformEndpoint(req.url),
-					headers: req.request.headers,
-					provider: providerConfig.name,
-					query: await streamToObject(req.request.body),
-				};
-			}),
-		);
-
-		// Handle response
-		const headers = parseAiGatewayOptions(this.config.options ?? {});
-		let resp: Response;
-
-		if ("binding" in this.config) {
-			const updatedBody = body.map((obj) => ({
-				...obj,
-				headers: {
-					...(obj.headers ?? {}),
-					...Object.fromEntries(headers.entries()),
-				},
-			}));
-			resp = await this.config.binding.run(updatedBody, {
-				signal: options.abortSignal,
-			});
-		} else {
-			headers.set("Content-Type", "application/json");
-			headers.set("cf-aig-authorization", `Bearer ${this.config.apiKey}`);
-			resp = await fetch(
-				`https://gateway.ai.cloudflare.com/v1/${this.config.accountId}/${this.config.gateway}`,
-				{
-					body: JSON.stringify(body),
-					headers: headers,
-					method: "POST",
-					signal: options.abortSignal,
-				},
-			);
-		}
-
-		// Error handling
-		if (resp.status === 400) {
-			const cloneResp = resp.clone();
-			const result: {
-				success?: boolean;
-				error?: { code: number; message: string }[];
-			} = await cloneResp.json();
-			if (
-				result.success === false &&
-				result.error &&
-				result.error.length > 0 &&
-				result.error[0]?.code === 2001
-			) {
-				throw new AiGatewayDoesNotExist("This AI gateway does not exist");
-			}
-		} else if (resp.status === 401) {
-			const cloneResp = resp.clone();
-			const result: {
-				success?: boolean;
-				error?: { code: number; message: string }[];
-			} = await cloneResp.json();
-			if (
-				result.success === false &&
-				result.error &&
-				result.error.length > 0 &&
-				result.error[0]?.code === 2009
-			) {
-				throw new AiGatewayUnauthorizedError(
-					"Your AI Gateway has authentication active, but you didn't provide a valid apiKey",
-				);
-			}
-		}
-
-		const step = Number.parseInt(resp.headers.get("cf-aig-step") ?? "0", 10);
-		if (!this.models[step]) {
-			throw new Error("Unexpected AI Gateway Error");
-		}
-
-		this.models[step].config = {
-			...this.models[step].config,
-			fetch: (_url, _req) => resp as unknown as Promise<Response>,
-		};
-
-		return this.models[step][modelMethod](options) as Promise<Awaited<ReturnType<T>>>;
-	}
-
-	async doStream(
-		options: Parameters<LanguageModelV3["doStream"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV3["doStream"]>>> {
-		return this.processModelRequest<LanguageModelV3["doStream"]>(options, "doStream");
-	}
-
-	async doGenerate(
-		options: Parameters<LanguageModelV3["doGenerate"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV3["doGenerate"]>>> {
-		return this.processModelRequest<LanguageModelV3["doGenerate"]>(options, "doGenerate");
-	}
-}
-
-export interface AiGateway {
-	(models: LanguageModelV3 | LanguageModelV3[]): LanguageModelV3;
-
-	chat(models: LanguageModelV3 | LanguageModelV3[]): LanguageModelV3;
-}
-
-export type AiGatewayReties = {
+export type AiGatewayRetries = {
 	maxAttempts?: 1 | 2 | 3 | 4 | 5;
 	retryDelayMs?: number;
 	backoff?: "constant" | "linear" | "exponential";
 };
+
 export type AiGatewayOptions = {
 	cacheKey?: string;
 	cacheTtl?: number;
 	skipCache?: boolean;
-	metadata?: Record<string, number | string | boolean | null | bigint>;
+	metadata?: Record<string, number | string | boolean | null>;
 	collectLog?: boolean;
 	eventId?: string;
 	requestTimeoutMs?: number;
-	retries?: AiGatewayReties;
+	retries?: AiGatewayRetries;
+	byokAlias?: string;
+	zdr?: boolean;
 };
-export type AiGatewayAPISettings = {
+
+export type AiGatewayAPIConfig = {
 	gateway: string;
 	accountId: string;
 	apiKey?: string;
 	options?: AiGatewayOptions;
 };
-export type AiGatewayBindingSettings = {
+
+export type AiGatewayBindingConfig = {
 	binding: {
 		run(data: unknown, options?: { signal?: AbortSignal }): Promise<Response>;
 	};
 	options?: AiGatewayOptions;
 };
-export type AiGatewaySettings = AiGatewayAPISettings | AiGatewayBindingSettings;
 
-export function createAiGateway(options: AiGatewaySettings): AiGateway {
-	const createChatModel = (models: LanguageModelV3 | LanguageModelV3[]) => {
-		return new AiGatewayChatLanguageModel(Array.isArray(models) ? models : [models], options);
+export type AiGatewayConfig = AiGatewayAPIConfig | AiGatewayBindingConfig;
+
+// ─── Shared helpers ──────────────────────────────────────────────
+
+type CapturedRequest = {
+	url: string;
+	headers: Record<string, string>;
+	body: unknown;
+	originalFetch: FetchFunction | undefined;
+};
+
+async function captureModelRequest(
+	model: InternalLanguageModelV3,
+	options: Parameters<LanguageModelV3["doGenerate"]>[0],
+	method: "doStream" | "doGenerate",
+): Promise<CapturedRequest> {
+	if (!model.config || !Object.keys(model.config).includes("fetch")) {
+		throw new Error(
+			`Provider "${model.provider}" is not supported — it does not expose a configurable fetch`,
+		);
+	}
+
+	const originalFetch = model.config.fetch;
+	let captured: Omit<CapturedRequest, "originalFetch"> | undefined;
+
+	model.config.fetch = async (input, init) => {
+		const url =
+			typeof input === "string"
+				? input
+				: input instanceof URL
+					? input.toString()
+					: (input as Request).url;
+		captured = {
+			url,
+			headers: normalizeHeaders(init?.headers),
+			body: init?.body ? await parseBody(init.body as BodyInit) : {},
+		};
+		throw new AiGatewayInternalFetchError();
 	};
 
-	const provider = (models: LanguageModelV3 | LanguageModelV3[]) => createChatModel(models);
+	try {
+		await model[method](options);
+	} catch (e) {
+		if (!(e instanceof AiGatewayInternalFetchError)) throw e;
+	}
 
+	if (!captured) {
+		model.config.fetch = originalFetch;
+		throw new Error("Failed to capture request from provider");
+	}
+	return { ...captured, originalFetch };
+}
+
+type GatewayRequestEntry = {
+	provider: string;
+	endpoint: string;
+	headers: Record<string, string>;
+	query: unknown;
+};
+
+const AUTH_HEADERS = ["authorization", "x-api-key", "api-key", "x-goog-api-key"];
+
+function stripAuthHeaders(headers: Record<string, string>): Record<string, string> {
+	const result = { ...headers };
+	for (const key of AUTH_HEADERS) {
+		delete result[key];
+	}
+	return result;
+}
+
+function buildGatewayEntry(
+	captured: CapturedRequest,
+	providerName?: string,
+	byok?: boolean,
+): GatewayRequestEntry {
+	const resolved = resolveProvider(captured.url, providerName);
+	return {
+		provider: resolved.name,
+		endpoint: resolved.endpoint,
+		headers: byok ? stripAuthHeaders(captured.headers) : captured.headers,
+		query: captured.body,
+	};
+}
+
+async function dispatchToGateway(
+	requestBody: GatewayRequestEntry[],
+	config: AiGatewayConfig,
+	signal?: AbortSignal,
+): Promise<Response> {
+	const gatewayHeaders = parseAiGatewayOptions(config.options ?? {});
+	let resp: Response;
+
+	if ("binding" in config) {
+		const updatedBody = requestBody.map((obj) => ({
+			...obj,
+			headers: {
+				...obj.headers,
+				...Object.fromEntries(gatewayHeaders.entries()),
+			},
+		}));
+		resp = await config.binding.run(updatedBody, { signal });
+	} else {
+		gatewayHeaders.set("Content-Type", "application/json");
+		if (config.apiKey) {
+			gatewayHeaders.set("cf-aig-authorization", `Bearer ${config.apiKey}`);
+		}
+		resp = await fetch(
+			`https://gateway.ai.cloudflare.com/v1/${config.accountId}/${config.gateway}`,
+			{
+				body: JSON.stringify(requestBody),
+				headers: gatewayHeaders,
+				method: "POST",
+				signal,
+			},
+		);
+	}
+
+	if (resp.status === 400 || resp.status === 401) {
+		try {
+			const result = (await resp.clone().json()) as {
+				success?: boolean;
+				error?: { code: number; message: string }[];
+			};
+			if (result.success === false && result.error?.length) {
+				const code = result.error[0]?.code;
+				if (code === 2001) {
+					throw new AiGatewayDoesNotExist("This AI gateway does not exist");
+				}
+				if (code === 2009) {
+					throw new AiGatewayUnauthorizedError(
+						"Your AI Gateway has authentication active, but you didn't provide a valid apiKey",
+					);
+				}
+			}
+		} catch (e) {
+			if (e instanceof AiGatewayDoesNotExist || e instanceof AiGatewayUnauthorizedError) {
+				throw e;
+			}
+		}
+	}
+
+	return resp;
+}
+
+function feedResponseToModel(model: InternalLanguageModelV3, resp: Response): void {
+	model.config = {
+		...model.config,
+		fetch: () => Promise.resolve(resp.clone()),
+	};
+}
+
+// ─── Single-model gateway ────────────────────────────────────────
+
+export class AiGatewayChatLanguageModel implements LanguageModelV3 {
+	readonly specificationVersion = "v3";
+
+	private readonly innerModel: InternalLanguageModelV3;
+	private readonly gatewayConfig: AiGatewayConfig;
+	private readonly providerName?: string;
+	private readonly byok: boolean;
+
+	get modelId() {
+		return this.innerModel.modelId;
+	}
+
+	get provider() {
+		return this.innerModel.provider;
+	}
+
+	get supportedUrls() {
+		return this.innerModel.supportedUrls;
+	}
+
+	constructor(
+		model: LanguageModelV3,
+		config: AiGatewayConfig,
+		providerName?: string,
+		byok?: boolean,
+	) {
+		this.innerModel = model as InternalLanguageModelV3;
+		this.gatewayConfig = config;
+		this.providerName = providerName;
+		this.byok = byok ?? false;
+	}
+
+	async doGenerate(
+		options: Parameters<LanguageModelV3["doGenerate"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV3["doGenerate"]>>> {
+		return this.processRequest<LanguageModelV3["doGenerate"]>(options, "doGenerate");
+	}
+
+	async doStream(
+		options: Parameters<LanguageModelV3["doStream"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV3["doStream"]>>> {
+		return this.processRequest<LanguageModelV3["doStream"]>(options, "doStream");
+	}
+
+	private async processRequest<
+		T extends LanguageModelV3["doStream"] | LanguageModelV3["doGenerate"],
+	>(
+		options: Parameters<T>[0],
+		method: "doStream" | "doGenerate",
+	): Promise<Awaited<ReturnType<T>>> {
+		const captured = await captureModelRequest(this.innerModel, options, method);
+		try {
+			const entry = buildGatewayEntry(captured, this.providerName, this.byok);
+			const resp = await dispatchToGateway([entry], this.gatewayConfig, options.abortSignal);
+			feedResponseToModel(this.innerModel, resp);
+			return await (this.innerModel[method](options) as Promise<Awaited<ReturnType<T>>>);
+		} finally {
+			this.innerModel.config!.fetch = captured.originalFetch;
+		}
+	}
+}
+
+// ─── Fallback model ──────────────────────────────────────────────
+
+class AiGatewayFallbackModel implements LanguageModelV3 {
+	readonly specificationVersion = "v3";
+
+	private readonly models: InternalLanguageModelV3[];
+	private readonly gatewayConfig: AiGatewayConfig;
+	private readonly byok: boolean;
+
+	get modelId() {
+		return this.models[0]!.modelId;
+	}
+
+	get provider() {
+		return this.models[0]!.provider;
+	}
+
+	get supportedUrls() {
+		return this.models[0]!.supportedUrls;
+	}
+
+	constructor(models: LanguageModelV3[], config: AiGatewayConfig, byok?: boolean) {
+		this.models = models as InternalLanguageModelV3[];
+		this.gatewayConfig = config;
+		this.byok = byok ?? false;
+	}
+
+	async doGenerate(
+		options: Parameters<LanguageModelV3["doGenerate"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV3["doGenerate"]>>> {
+		return this.processRequest<LanguageModelV3["doGenerate"]>(options, "doGenerate");
+	}
+
+	async doStream(
+		options: Parameters<LanguageModelV3["doStream"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV3["doStream"]>>> {
+		return this.processRequest<LanguageModelV3["doStream"]>(options, "doStream");
+	}
+
+	private async processRequest<
+		T extends LanguageModelV3["doStream"] | LanguageModelV3["doGenerate"],
+	>(
+		options: Parameters<T>[0],
+		method: "doStream" | "doGenerate",
+	): Promise<Awaited<ReturnType<T>>> {
+		const entries: GatewayRequestEntry[] = [];
+		const originalFetches: (FetchFunction | undefined)[] = [];
+
+		try {
+			for (const model of this.models) {
+				const captured = await captureModelRequest(model, options, method);
+				entries.push(buildGatewayEntry(captured, undefined, this.byok));
+				originalFetches.push(captured.originalFetch);
+			}
+
+			const resp = await dispatchToGateway(entries, this.gatewayConfig, options.abortSignal);
+
+			const step = Number.parseInt(resp.headers.get("cf-aig-step") ?? "0", 10);
+			const selectedModel = this.models[step];
+			if (!selectedModel) {
+				throw new Error("Unexpected AI Gateway fallback step");
+			}
+
+			feedResponseToModel(selectedModel, resp);
+			return await (selectedModel[method](options) as Promise<Awaited<ReturnType<T>>>);
+		} finally {
+			for (let i = 0; i < originalFetches.length; i++) {
+				this.models[i]!.config!.fetch = originalFetches[i];
+			}
+		}
+	}
+}
+
+// ─── Public API ──────────────────────────────────────────────────
+
+export function createAIGateway<P extends (...args: any[]) => LanguageModelV3>(
+	config: AiGatewayConfig & {
+		provider: P;
+		providerName?: string;
+		byok?: boolean;
+	},
+): (...args: Parameters<P>) => LanguageModelV3 {
+	const { provider, providerName, byok, ...gatewayConfig } = config;
+	return (...args: Parameters<P>) => {
+		const model = provider(...args);
+		return new AiGatewayChatLanguageModel(
+			model,
+			gatewayConfig as AiGatewayConfig,
+			providerName,
+			byok,
+		);
+	};
+}
+
+export function createAIGatewayFallback(
+	config: AiGatewayConfig & { models: LanguageModelV3[]; byok?: boolean },
+): LanguageModelV3 {
+	const { models, byok, ...gatewayConfig } = config;
+	if (models.length === 0) {
+		throw new Error("createAIGatewayFallback requires at least one model");
+	}
+	return new AiGatewayFallbackModel(models, gatewayConfig as AiGatewayConfig, byok);
+}
+
+// ─── Deprecated compat: old createAiGateway API ─────────────────
+
+/** @deprecated Use `AiGatewayConfig` instead. */
+export type AiGatewaySettings = AiGatewayConfig;
+/** @deprecated Use `AiGatewayAPIConfig` instead. */
+export type AiGatewayAPISettings = AiGatewayAPIConfig;
+/** @deprecated Use `AiGatewayBindingConfig` instead. */
+export type AiGatewayBindingSettings = AiGatewayBindingConfig;
+/** @deprecated Use `AiGatewayRetries` instead. */
+export type AiGatewayReties = AiGatewayRetries;
+
+/** @deprecated Use `createAIGateway` instead. */
+export interface AiGateway {
+	(models: LanguageModelV3 | LanguageModelV3[]): LanguageModelV3;
+	chat(models: LanguageModelV3 | LanguageModelV3[]): LanguageModelV3;
+}
+
+let warnedCreateAiGateway = false;
+
+/**
+ * @deprecated Use `createAIGateway` (wraps a provider) or `createAIGatewayFallback` (cross-provider fallback) instead.
+ */
+export function createAiGateway(options: AiGatewayConfig): AiGateway {
+	if (!warnedCreateAiGateway) {
+		warnedCreateAiGateway = true;
+		console.warn(
+			"[ai-gateway-provider] createAiGateway() is deprecated. " +
+				"Use createAIGateway() to wrap a provider, or createAIGatewayFallback() for cross-provider fallback. " +
+				"See https://github.com/cloudflare/ai for the migration guide.",
+		);
+	}
+
+	const createChatModel = (models: LanguageModelV3 | LanguageModelV3[]) => {
+		const arr = Array.isArray(models) ? models : [models];
+		if (arr.length === 1) {
+			return new AiGatewayChatLanguageModel(arr[0]!, options);
+		}
+		return new AiGatewayFallbackModel(arr, options);
+	};
+
+	const provider = ((models: LanguageModelV3 | LanguageModelV3[]) =>
+		createChatModel(models)) as unknown as AiGateway;
 	provider.chat = createChatModel;
 
 	return provider;
 }
 
+// ─── Options ─────────────────────────────────────────────────────
+
 export function parseAiGatewayOptions(options: AiGatewayOptions): Headers {
 	const headers = new Headers();
 
 	if (options.skipCache === true) {
-		headers.set("cf-skip-cache", "true");
+		headers.set("cf-aig-skip-cache", "true");
 	}
 
-	if (options.cacheTtl) {
-		headers.set("cf-cache-ttl", options.cacheTtl.toString());
+	if (options.cacheTtl !== undefined) {
+		headers.set("cf-aig-cache-ttl", options.cacheTtl.toString());
 	}
 
 	if (options.metadata) {
@@ -305,6 +509,14 @@ export function parseAiGatewayOptions(options: AiGatewayOptions): Headers {
 		if (options.retries.backoff !== undefined) {
 			headers.set("cf-aig-backoff", options.retries.backoff);
 		}
+	}
+
+	if (options.byokAlias !== undefined) {
+		headers.set("cf-aig-byok-alias", options.byokAlias);
+	}
+
+	if (options.zdr !== undefined) {
+		headers.set("cf-aig-zdr", options.zdr ? "true" : "false");
 	}
 
 	return headers;

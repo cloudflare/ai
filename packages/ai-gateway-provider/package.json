@@ -39,36 +39,6 @@
 			"import": "./dist/providers/amazon-bedrock.mjs",
 			"require": "./dist/providers/amazon-bedrock.js"
 		},
-		"./providers/openai": {
-			"types": "./dist/providers/openai.d.ts",
-			"import": "./dist/providers/openai.mjs",
-			"require": "./dist/providers/openai.js"
-		},
-		"./providers/xai": {
-			"types": "./dist/providers/xai.d.ts",
-			"import": "./dist/providers/xai.mjs",
-			"require": "./dist/providers/xai.js"
-		},
-		"./providers/google": {
-			"types": "./dist/providers/google.d.ts",
-			"import": "./dist/providers/google.mjs",
-			"require": "./dist/providers/google.js"
-		},
-		"./providers/groq": {
-			"types": "./dist/providers/groq.d.ts",
-			"import": "./dist/providers/groq.mjs",
-			"require": "./dist/providers/groq.js"
-		},
-		"./providers/mistral": {
-			"types": "./dist/providers/mistral.d.ts",
-			"import": "./dist/providers/mistral.mjs",
-			"require": "./dist/providers/mistral.js"
-		},
-		"./providers/perplexity": {
-			"types": "./dist/providers/perplexity.d.ts",
-			"import": "./dist/providers/perplexity.mjs",
-			"require": "./dist/providers/perplexity.js"
-		},
 		"./providers/anthropic": {
 			"types": "./dist/providers/anthropic.d.ts",
 			"import": "./dist/providers/anthropic.mjs",
@@ -109,20 +79,50 @@
 			"import": "./dist/providers/fireworks.mjs",
 			"require": "./dist/providers/fireworks.js"
 		},
+		"./providers/google": {
+			"types": "./dist/providers/google.d.ts",
+			"import": "./dist/providers/google.mjs",
+			"require": "./dist/providers/google.js"
+		},
 		"./providers/google-vertex": {
 			"types": "./dist/providers/google-vertex.d.ts",
 			"import": "./dist/providers/google-vertex.mjs",
 			"require": "./dist/providers/google-vertex.js"
+		},
+		"./providers/groq": {
+			"types": "./dist/providers/groq.d.ts",
+			"import": "./dist/providers/groq.mjs",
+			"require": "./dist/providers/groq.js"
+		},
+		"./providers/mistral": {
+			"types": "./dist/providers/mistral.d.ts",
+			"import": "./dist/providers/mistral.mjs",
+			"require": "./dist/providers/mistral.js"
+		},
+		"./providers/openai": {
+			"types": "./dist/providers/openai.d.ts",
+			"import": "./dist/providers/openai.mjs",
+			"require": "./dist/providers/openai.js"
 		},
 		"./providers/openrouter": {
 			"types": "./dist/providers/openrouter.d.ts",
 			"import": "./dist/providers/openrouter.mjs",
 			"require": "./dist/providers/openrouter.js"
 		},
+		"./providers/perplexity": {
+			"types": "./dist/providers/perplexity.d.ts",
+			"import": "./dist/providers/perplexity.mjs",
+			"require": "./dist/providers/perplexity.js"
+		},
 		"./providers/unified": {
 			"types": "./dist/providers/unified.d.ts",
 			"import": "./dist/providers/unified.mjs",
 			"require": "./dist/providers/unified.js"
+		},
+		"./providers/xai": {
+			"types": "./dist/providers/xai.d.ts",
+			"import": "./dist/providers/xai.mjs",
+			"require": "./dist/providers/xai.js"
 		}
 	},
 	"publishConfig": {
@@ -131,8 +131,10 @@
 	"scripts": {
 		"build": "rm -rf dist && tsup --config tsup.config.ts",
 		"format": "oxfmt --write .",
-		"test:ci": "vitest --watch=false",
 		"test": "vitest",
+		"test:unit": "vitest run test/unit",
+		"test:integration": "vitest run --config test/integration/vitest.integration.config.ts",
+		"test:ci": "vitest run test/unit",
 		"type-check": "tsc --noEmit"
 	},
 	"devDependencies": {
@@ -140,10 +142,8 @@
 		"typescript": "5.9.3"
 	},
 	"peerDependencies": {
-		"@ai-sdk/openai-compatible": "^2.0.0",
 		"@ai-sdk/provider": "^3.0.0",
-		"@ai-sdk/provider-utils": "^4.0.0",
-		"ai": "^6.0.0"
+		"@ai-sdk/provider-utils": "^4.0.0"
 	},
 	"optionalDependencies": {
 		"@ai-sdk/amazon-bedrock": "^4.0.62",
@@ -160,6 +160,7 @@
 		"@ai-sdk/groq": "^3.0.24",
 		"@ai-sdk/mistral": "^3.0.20",
 		"@ai-sdk/openai": "^3.0.30",
+		"@ai-sdk/openai-compatible": "^2.0.0",
 		"@ai-sdk/perplexity": "^3.0.19",
 		"@ai-sdk/xai": "^3.0.57",
 		"@openrouter/ai-sdk-provider": "^2.2.3"
