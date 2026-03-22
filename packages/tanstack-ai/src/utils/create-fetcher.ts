@@ -245,8 +245,11 @@ export function createGatewayFetch(
 		}
 
 		if ("binding" in config) {
-			return (config.binding as { run(req: unknown, opts?: { signal?: AbortSignal }): Promise<Response> })
-				.run(request, { signal: init?.signal ?? undefined });
+			return (
+				config.binding as {
+					run(req: unknown, opts?: { signal?: AbortSignal }): Promise<Response>;
+				}
+			).run(request, { signal: init?.signal ?? undefined });
 		}
 
 		return fetch(
