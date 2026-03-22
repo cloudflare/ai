@@ -86,7 +86,7 @@ export type AiGatewayAPIConfig = {
 
 export type AiGatewayBindingConfig = {
 	binding: {
-		run(data: unknown): Promise<Response>;
+		run(data: unknown, options?: { signal?: AbortSignal }): Promise<Response>;
 	};
 	options?: AiGatewayOptions;
 };
@@ -178,6 +178,7 @@ function buildGatewayEntry(
 async function dispatchToGateway(
 	requestBody: GatewayRequestEntry[],
 	config: AiGatewayConfig,
+	signal?: AbortSignal,
 ): Promise<Response> {
 	const gatewayHeaders = parseAiGatewayOptions(config.options ?? {});
 	let resp: Response;
@@ -190,7 +191,7 @@ async function dispatchToGateway(
 				...Object.fromEntries(gatewayHeaders.entries()),
 			},
 		}));
-		resp = await config.binding.run(updatedBody);
+		resp = await config.binding.run(updatedBody, { signal });
 	} else {
 		gatewayHeaders.set("Content-Type", "application/json");
 		if (config.apiKey) {
@@ -202,6 +203,7 @@ async function dispatchToGateway(
 				body: JSON.stringify(requestBody),
 				headers: gatewayHeaders,
 				method: "POST",
+				signal,
 			},
 		);
 	}
@@ -290,7 +292,7 @@ export class AiGatewayChatLanguageModel implements LanguageModelV3 {
 	): Promise<Awaited<ReturnType<T>>> {
 		const captured = await captureModelRequest(this.innerModel, options, method);
 		const entry = buildGatewayEntry(captured, this.providerName, this.byok);
-		const resp = await dispatchToGateway([entry], this.gatewayConfig);
+		const resp = await dispatchToGateway([entry], this.gatewayConfig, options.abortSignal);
 		feedResponseToModel(this.innerModel, resp);
 		const result = await (this.innerModel[method](options) as Promise<Awaited<ReturnType<T>>>);
 		this.innerModel.config!.fetch = captured.originalFetch;
@@ -352,7 +354,7 @@ class AiGatewayFallbackModel implements LanguageModelV3 {
 			originalFetches.push(captured.originalFetch);
 		}
 
-		const resp = await dispatchToGateway(entries, this.gatewayConfig);
+		const resp = await dispatchToGateway(entries, this.gatewayConfig, options.abortSignal);
 
 		const step = Number.parseInt(resp.headers.get("cf-aig-step") ?? "0", 10);
 		const selectedModel = this.models[step];
