@@ -1,5 +1,17 @@
 # workers-ai-provider
 
+## 3.1.7
+
+### Patch Changes
+
+- [#457](https://github.com/cloudflare/ai/pull/457) [`cc94a06`](https://github.com/cloudflare/ai/commit/cc94a06ca85603e473f41cc12ed83f53cbe9e136) Thanks [@threepointone](https://github.com/threepointone)! - Fix request cancellation by propagating `abortSignal` to outbound network calls.
+
+    **ai-gateway-provider**: Pass `abortSignal` to the `fetch` call (API path) and to `binding.run()` (binding path) so that cancelled requests are properly aborted.
+
+    **workers-ai-provider**: Pass `abortSignal` to `binding.run()` for chat, embedding, and image models, matching the existing behavior in transcription, speech, and reranking models.
+
+    **@cloudflare/tanstack-ai**: Pass `signal` through to `binding.run()` in both `createGatewayFetch` (AI Gateway binding path) and `createWorkersAiBindingFetch` (Workers AI binding path).
+
 ## 3.1.6
 
 ### Patch Changes
