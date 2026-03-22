@@ -338,18 +338,18 @@ describe("prepareToolsAndToolChoice", () => {
 		expect(result.tools).toHaveLength(2);
 	});
 
-	it("should handle 'required' tool choice by mapping to 'any'", () => {
+	it("should handle 'required' tool choice", () => {
 		const result = prepareToolsAndToolChoice(sampleTools, { type: "required" });
-		expect(result.tool_choice).toBe("any");
+		expect(result.tool_choice).toBe("required");
 		expect(result.tools).toHaveLength(2);
 	});
 
-	it("should handle 'tool' tool choice by filtering and using 'any'", () => {
+	it("should handle 'tool' tool choice by filtering and using 'required'", () => {
 		const result = prepareToolsAndToolChoice(sampleTools, {
 			type: "tool",
 			toolName: "calculator",
 		});
-		expect(result.tool_choice).toBe("any");
+		expect(result.tool_choice).toBe("required");
 		expect(result.tools).toHaveLength(1);
 		expect(result.tools![0].function.name).toBe("calculator");
 	});

@@ -153,6 +153,73 @@ export default {
 					});
 				}
 
+				// ----- Multi-step agentic tool loop -----
+				case "/chat/tool-multistep": {
+					const result = await generateText({
+						model: provider(model as any),
+						messages: [
+							{
+								role: "user",
+								content:
+									"I need two calculations done separately. First, what is 2 + 3? Second, what is 10 + 20? You MUST use the calculator tool for EACH calculation. Do NOT do math in your head.",
+							},
+						],
+						tools: {
+							calculator: {
+								description:
+									"Add two numbers together. Returns their sum. You MUST use this tool for every math operation.",
+								inputSchema: z.object({
+									a: z.number().describe("first number"),
+									b: z.number().describe("second number"),
+								}),
+								execute: async ({ a, b }: { a: number; b: number }) => ({
+									result: a + b,
+								}),
+							},
+						},
+						stopWhen: stepCountIs(4),
+					});
+
+					const toolCallCount = result.steps.reduce(
+						(sum, step) => sum + (step.toolCalls?.length || 0),
+						0,
+					);
+					return jsonResponse({
+						text: result.text,
+						steps: result.steps.length,
+						toolCallCount,
+					});
+				}
+
+				// ----- toolChoice: "required" -----
+				case "/chat/tool-required": {
+					const result = await generateText({
+						model: provider(model as any),
+						messages: [
+							{
+								role: "user",
+								content: "What is 7 + 8? You MUST use the calculator tool.",
+							},
+						],
+						tools: {
+							calculator: {
+								description: "Add two numbers. Returns their sum.",
+								inputSchema: z.object({
+									a: z.number().describe("first number"),
+									b: z.number().describe("second number"),
+								}),
+							},
+						},
+						toolChoice: "required",
+					});
+
+					return jsonResponse({
+						text: result.text,
+						toolCalls: result.toolCalls,
+						finishReason: result.finishReason,
+					});
+				}
+
 				// ----- Structured output -----
 				case "/chat/structured": {
 					const result = await generateText({

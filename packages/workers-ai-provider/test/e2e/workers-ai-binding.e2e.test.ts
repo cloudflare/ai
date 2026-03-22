@@ -34,8 +34,6 @@ const MODELS = [
 	{ id: "@cf/meta/llama-3.1-8b-instruct-fast", label: "Llama 3.1 8B Fast" },
 	{ id: "@cf/openai/gpt-oss-20b", label: "GPT-OSS 20B" },
 	{ id: "@cf/qwen/qwen3-30b-a3b-fp8", label: "Qwen3 30B" },
-	{ id: "@cf/google/gemma-3-12b-it", label: "Gemma 3 12B" },
-	{ id: "@cf/mistralai/mistral-small-3.1-24b-instruct", label: "Mistral Small 3.1" },
 	{ id: "@cf/moonshotai/kimi-k2.5", label: "Kimi K2.5" },
 ] as const;
 
@@ -53,6 +51,8 @@ const results: Record<
 		multiTurn: Status;
 		toolCall: Status;
 		toolRoundTrip: Status;
+		toolMultiStep: Status;
+		toolRequired: Status;
 		structuredOutput: Status;
 		notes: string[];
 	}
@@ -66,6 +66,8 @@ function getResult(label: string) {
 			multiTurn: "fail",
 			toolCall: "fail",
 			toolRoundTrip: "fail",
+			toolMultiStep: "fail",
+			toolRequired: "fail",
 			structuredOutput: "fail",
 			notes: [],
 		};
@@ -86,7 +88,7 @@ function printSummaryTable() {
 	const pad = (s: string, n: number) => s + " ".repeat(Math.max(0, n - s.length));
 	const maxLabel = Math.max(...labels.map((l) => l.length), 5);
 
-	const header = `${pad("Model", maxLabel)} | Chat | Strm | Turn | Tool | T-RT | JSON | Notes`;
+	const header = `${pad("Model", maxLabel)} | Chat | Strm | Turn | Tool | T-RT | T-MS | T-Rq | JSON | Notes`;
 	const sep = "-".repeat(header.length + 10);
 
 	console.log(`\n${sep}`);
@@ -99,12 +101,13 @@ function printSummaryTable() {
 		const r = results[label];
 		const notes = r.notes.length > 0 ? r.notes.join("; ") : "";
 		console.log(
-			`${pad(label, maxLabel)} | ${statusIcon(r.chat)} | ${statusIcon(r.stream)} | ${statusIcon(r.multiTurn)} | ${statusIcon(r.toolCall)} | ${statusIcon(r.toolRoundTrip)} | ${statusIcon(r.structuredOutput)} | ${notes}`,
+			`${pad(label, maxLabel)} | ${statusIcon(r.chat)} | ${statusIcon(r.stream)} | ${statusIcon(r.multiTurn)} | ${statusIcon(r.toolCall)} | ${statusIcon(r.toolRoundTrip)} | ${statusIcon(r.toolMultiStep)} | ${statusIcon(r.toolRequired)} | ${statusIcon(r.structuredOutput)} | ${notes}`,
 		);
 	}
 
 	console.log(sep);
 	console.log("  OK = works    ~ = partial/quirky    X = broken/error");
+	console.log("  T-MS = multi-step agentic loop    T-Rq = toolChoice required");
 	console.log(`${sep}\n`);
 }
 
@@ -330,6 +333,74 @@ describe("Workers AI Binding E2E", () => {
 				} else {
 					r.toolRoundTrip = "fail";
 					r.notes.push("t-rt: empty response");
+				}
+			});
+		}
+	});
+
+	// ------------------------------------------------------------------
+	// Multi-step agentic tool loop (per model)
+	// ------------------------------------------------------------------
+	describe("tool multi-step agentic loop (per model)", () => {
+		for (const model of MODELS) {
+			it(`${model.label} — multi-step tool loop via binding`, async () => {
+				if (!serverReady) return;
+
+				const r = getResult(model.label);
+				const data = await post("/chat/tool-multistep", { model: model.id });
+
+				if (data.error) {
+					r.toolMultiStep = "fail";
+					r.notes.push(`t-ms: ${String(data.error).slice(0, 60)}`);
+					return;
+				}
+
+				const steps = data.steps as number;
+				const toolCallCount = data.toolCallCount as number;
+				const text = data.text as string;
+
+				if (toolCallCount >= 2 && text && text.length > 0) {
+					r.toolMultiStep = "ok";
+				} else if (toolCallCount >= 1) {
+					r.toolMultiStep = "warn";
+					r.notes.push(`t-ms: only ${toolCallCount} tool call(s), ${steps} step(s)`);
+				} else if (text && text.length > 0) {
+					r.toolMultiStep = "warn";
+					r.notes.push("t-ms: skipped tools, answered directly");
+				} else {
+					r.toolMultiStep = "fail";
+					r.notes.push("t-ms: empty response");
+				}
+			});
+		}
+	});
+
+	// ------------------------------------------------------------------
+	// toolChoice: "required" (per model)
+	// ------------------------------------------------------------------
+	describe("toolChoice required (per model)", () => {
+		for (const model of MODELS) {
+			it(`${model.label} — toolChoice required via binding`, async () => {
+				if (!serverReady) return;
+
+				const r = getResult(model.label);
+				const data = await post("/chat/tool-required", { model: model.id });
+
+				if (data.error) {
+					r.toolRequired = "fail";
+					r.notes.push(`t-rq: ${String(data.error).slice(0, 60)}`);
+					return;
+				}
+
+				const toolCalls = data.toolCalls as unknown[];
+				if (Array.isArray(toolCalls) && toolCalls.length > 0) {
+					r.toolRequired = "ok";
+				} else if (typeof data.text === "string" && (data.text as string).length > 0) {
+					r.toolRequired = "warn";
+					r.notes.push("t-rq: answered as text despite required");
+				} else {
+					r.toolRequired = "fail";
+					r.notes.push("t-rq: no tool call or content");
 				}
 			});
 		}

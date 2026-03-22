@@ -184,8 +184,37 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV3Prompt): {
 			case "tool": {
 				for (const toolResponse of content) {
 					if (toolResponse.type === "tool-result") {
+						const output = toolResponse.output;
+						let content: string;
+						switch (output.type) {
+							case "text":
+							case "error-text":
+								content = output.value;
+								break;
+							case "json":
+							case "error-json":
+								content = JSON.stringify(output.value);
+								break;
+							case "execution-denied":
+								content = output.reason
+									? `Tool execution denied: ${output.reason}`
+									: "Tool execution was denied.";
+								break;
+							case "content":
+								content = output.value
+									.filter(
+										(p): p is { type: "text"; text: string } =>
+											p.type === "text",
+									)
+									.map((p) => p.text)
+									.join("\n");
+								break;
+							default:
+								content = "";
+								break;
+						}
 						messages.push({
-							content: JSON.stringify(toolResponse.output),
+							content,
 							name: toolResponse.toolName,
 							tool_call_id: toolResponse.toolCallId,
 							role: "tool",

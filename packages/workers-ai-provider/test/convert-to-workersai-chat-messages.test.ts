@@ -507,4 +507,212 @@ describe("convertToWorkersAIChatMessages", () => {
 			expect(messages[1].tool_call_id).toBe("call-1");
 		});
 	});
+
+	describe("tool result output unwrapping", () => {
+		it("should unwrap text output — not stringify the wrapper object", () => {
+			// LanguageModelV3ToolResultOutput is { type: 'text', value: string }
+			// The value must be sent to the API, not the wrapper object itself.
+			const { messages } = convertToWorkersAIChatMessages([
+				{
+					role: "tool" as const,
+					content: [
+						{
+							type: "tool-result" as const,
+							toolCallId: "call-1",
+							toolName: "getWeather",
+							output: { type: "text", value: "Tokyo: 22°C, sunny" } as any,
+						},
+					],
+				},
+			]);
+
+			expect(messages[0].content).toBe("Tokyo: 22°C, sunny");
+			// Must NOT be the stringified wrapper
+			expect(messages[0].content).not.toContain('"type":"text"');
+			expect(messages[0].content).not.toContain('"value"');
+		});
+
+		it("should unwrap json output — serialize only the value", () => {
+			const { messages } = convertToWorkersAIChatMessages([
+				{
+					role: "tool" as const,
+					content: [
+						{
+							type: "tool-result" as const,
+							toolCallId: "call-1",
+							toolName: "getWeather",
+							output: {
+								type: "json",
+								value: { city: "Tokyo", temp: 22, condition: "sunny" },
+							} as any,
+						},
+					],
+				},
+			]);
+
+			expect(messages[0].content).toBe(
+				JSON.stringify({ city: "Tokyo", temp: 22, condition: "sunny" }),
+			);
+			expect(messages[0].content).not.toContain('"type":"json"');
+		});
+
+		it("should handle multiple tool results with correct unwrapping", () => {
+			const { messages } = convertToWorkersAIChatMessages([
+				{
+					role: "tool" as const,
+					content: [
+						{
+							type: "tool-result" as const,
+							toolCallId: "call-1",
+							toolName: "getUserInfo",
+							output: {
+								type: "text",
+								value: '{"id":"u123","username":"alice"}',
+							} as any,
+						},
+						{
+							type: "tool-result" as const,
+							toolCallId: "call-2",
+							toolName: "getBalance",
+							output: { type: "json", value: { balance: 1234.56 } } as any,
+						},
+					],
+				},
+			]);
+
+			expect(messages).toHaveLength(2);
+			expect(messages[0].content).toBe('{"id":"u123","username":"alice"}');
+			expect(messages[1].content).toBe(JSON.stringify({ balance: 1234.56 }));
+		});
+
+		it("should unwrap error-text output as a plain string — not double-quoted", () => {
+			const { messages } = convertToWorkersAIChatMessages([
+				{
+					role: "tool" as const,
+					content: [
+						{
+							type: "tool-result" as const,
+							toolCallId: "call-1",
+							toolName: "fetchData",
+							output: { type: "error-text", value: "Connection timed out" } as any,
+						},
+					],
+				},
+			]);
+
+			expect(messages[0].content).toBe("Connection timed out");
+			expect(messages[0].content).not.toBe('"Connection timed out"');
+		});
+
+		it("should surface execution-denied with reason", () => {
+			const { messages } = convertToWorkersAIChatMessages([
+				{
+					role: "tool" as const,
+					content: [
+						{
+							type: "tool-result" as const,
+							toolCallId: "call-1",
+							toolName: "deleteFile",
+							output: {
+								type: "execution-denied",
+								reason: "User rejected the action",
+							} as any,
+						},
+					],
+				},
+			]);
+
+			expect(messages[0].content).toBe("Tool execution denied: User rejected the action");
+		});
+
+		it("should surface execution-denied without reason", () => {
+			const { messages } = convertToWorkersAIChatMessages([
+				{
+					role: "tool" as const,
+					content: [
+						{
+							type: "tool-result" as const,
+							toolCallId: "call-1",
+							toolName: "deleteFile",
+							output: { type: "execution-denied" } as any,
+						},
+					],
+				},
+			]);
+
+			expect(messages[0].content).toBe("Tool execution was denied.");
+		});
+
+		it("should serialize error-json output — not double-wrap", () => {
+			const { messages } = convertToWorkersAIChatMessages([
+				{
+					role: "tool" as const,
+					content: [
+						{
+							type: "tool-result" as const,
+							toolCallId: "call-1",
+							toolName: "apiCall",
+							output: {
+								type: "error-json",
+								value: { code: 404, message: "Not found" },
+							} as any,
+						},
+					],
+				},
+			]);
+
+			expect(messages[0].content).toBe(JSON.stringify({ code: 404, message: "Not found" }));
+			expect(messages[0].content).not.toContain('"type":"error-json"');
+		});
+
+		it("should extract text from content output parts", () => {
+			const { messages } = convertToWorkersAIChatMessages([
+				{
+					role: "tool" as const,
+					content: [
+						{
+							type: "tool-result" as const,
+							toolCallId: "call-1",
+							toolName: "screenshotTool",
+							output: {
+								type: "content",
+								value: [
+									{ type: "text", text: "Screenshot captured successfully" },
+									{ type: "file-data", data: "iVBOR...", mediaType: "image/png" },
+									{ type: "text", text: "Dimensions: 1920x1080" },
+								],
+							} as any,
+						},
+					],
+				},
+			]);
+
+			expect(messages[0].content).toBe(
+				"Screenshot captured successfully\nDimensions: 1920x1080",
+			);
+		});
+
+		it("should handle content output with no text parts", () => {
+			const { messages } = convertToWorkersAIChatMessages([
+				{
+					role: "tool" as const,
+					content: [
+						{
+							type: "tool-result" as const,
+							toolCallId: "call-1",
+							toolName: "screenshotTool",
+							output: {
+								type: "content",
+								value: [
+									{ type: "file-data", data: "iVBOR...", mediaType: "image/png" },
+								],
+							} as any,
+						},
+					],
+				},
+			]);
+
+			expect(messages[0].content).toBe("");
+		});
+	});
 });
