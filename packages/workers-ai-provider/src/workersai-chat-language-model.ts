@@ -178,10 +178,11 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 
 		const output = await this.config.binding.run(
 			args.model as keyof AiModels,
-			// Content arrays for vision are valid at runtime but not in the
-			// binding's strict TypeScript definitions (which expect string content).
 			inputs as AiModels[keyof AiModels]["inputs"],
-			runOptions,
+			{
+				...runOptions,
+				signal: options.abortSignal,
+			} as AiOptions,
 		);
 
 		if (output instanceof ReadableStream) {
@@ -228,7 +229,10 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 		const response = await this.config.binding.run(
 			args.model as keyof AiModels,
 			inputs as AiModels[keyof AiModels]["inputs"],
-			runOptions,
+			{
+				...runOptions,
+				signal: options.abortSignal,
+			} as AiOptions,
 		);
 
 		// If the binding returned a stream, pipe it through the SSE mapper

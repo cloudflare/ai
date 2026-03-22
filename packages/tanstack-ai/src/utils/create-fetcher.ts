@@ -245,7 +245,8 @@ export function createGatewayFetch(
 		}
 
 		if ("binding" in config) {
-			return config.binding.run(request);
+			return (config.binding as { run(req: unknown, opts?: { signal?: AbortSignal }): Promise<Response> })
+				.run(request, { signal: init?.signal ?? undefined });
 		}
 
 		return fetch(
@@ -335,10 +336,14 @@ export function createWorkersAiBindingFetch(
 		if (body.response_format) inputs.response_format = body.response_format;
 		if (stream) inputs.stream = true;
 
+		const runOptions: Record<string, unknown> = {};
+		if (options?.extraHeaders) runOptions.extraHeaders = options.extraHeaders;
+		if (init?.signal) runOptions.signal = init.signal;
+
 		const result = await binding.run(
 			model,
 			inputs,
-			options?.extraHeaders ? { extraHeaders: options.extraHeaders } : undefined,
+			Object.keys(runOptions).length > 0 ? runOptions : undefined,
 		);
 
 		if (stream && result instanceof ReadableStream) {
