@@ -217,6 +217,42 @@ const model = createAIGatewayFallback({
 });
 ```
 
+## Multi-provider routing
+
+If you use models from multiple providers, you can combine `createAIGateway` with the AI SDK's built-in [`createProviderRegistry`](https://sdk.vercel.ai/docs/ai-sdk-core/provider-management#provider-registry) to route by model name — all through the gateway:
+
+```typescript
+import { createProviderRegistry } from "ai";
+import { createAIGateway } from "ai-gateway-provider";
+import { createOpenAI } from "@ai-sdk/openai";
+import { createAnthropic } from "@ai-sdk/anthropic";
+
+const openai = createAIGateway({
+	provider: createOpenAI({ apiKey: process.env.OPENAI_API_KEY }),
+	binding: env.AI.gateway("my-gateway"),
+});
+
+const anthropic = createAIGateway({
+	provider: createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY }),
+	binding: env.AI.gateway("my-gateway"),
+});
+
+const registry = createProviderRegistry({ openai, anthropic });
+
+// Route by prefix — each request goes through AI Gateway
+const { text } = await generateText({
+	model: registry.languageModel("openai:gpt-4o"),
+	prompt: "Hello!",
+});
+
+const { text: text2 } = await generateText({
+	model: registry.languageModel("anthropic:claude-sonnet-4-20250514"),
+	prompt: "Hello!",
+});
+```
+
+This preserves provider-specific features (like Anthropic's prompt caching) since each provider uses its native SDK, while routing all traffic through AI Gateway for caching, logging, and analytics.
+
 ## Custom base URLs (`providerName`)
 
 If your provider uses a non-standard base URL (proxy, self-hosted, etc.), the gateway can't auto-detect which provider it is from the URL. Set `providerName` explicitly:
