@@ -376,7 +376,7 @@ export function createWorkersAiBindingFetch(
 				? (result as Record<string, unknown>)
 				: { response: String(result) };
 
-		const responseText = typeof responseObj.response === "string" ? responseObj.response : "";
+		const responseText = typeof responseObj.response === "string" ? responseObj.response : typeof responseObj.response === "object" && responseObj.response !== null ? JSON.stringify(responseObj.response) : "";
 
 		const message: Record<string, unknown> = {
 			role: "assistant",
