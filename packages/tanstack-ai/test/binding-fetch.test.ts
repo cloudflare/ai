@@ -49,6 +49,91 @@ describe("createWorkersAiBindingFetch", () => {
 		expect(json.choices[0]!.finish_reason).toBe("stop");
 	});
 
+	it("should stringify object responses in non-streaming mode", async () => {
+		const binding = mockBinding(
+			vi.fn().mockResolvedValue({ response: { key: "value", nested: { a: 1 } } }),
+		);
+
+		const fetcher = createWorkersAiBindingFetch(binding);
+
+		const response = await fetcher("https://api.openai.com/v1/chat/completions", {
+			method: "POST",
+			body: JSON.stringify({
+				model: "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+				messages: [{ role: "user", content: "Hi" }],
+			}),
+		});
+
+		const json = (await response.json()) as {
+			choices: Array<{
+				message: { content: string; role: string };
+			}>;
+		};
+		expect(json.choices[0]!.message.content).toBe(
+			JSON.stringify({ key: "value", nested: { a: 1 } }),
+		);
+	});
+
+	it("should default to empty string for non-string non-object responses", async () => {
+		const binding = mockBinding(vi.fn().mockResolvedValue({ response: 42 }));
+
+		const fetcher = createWorkersAiBindingFetch(binding);
+
+		const response = await fetcher("https://api.openai.com/v1/chat/completions", {
+			method: "POST",
+			body: JSON.stringify({
+				model: "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+				messages: [{ role: "user", content: "Hi" }],
+			}),
+		});
+
+		const json = (await response.json()) as {
+			choices: Array<{
+				message: { content: string; role: string };
+			}>;
+		};
+		expect(json.choices[0]!.message.content).toBe("");
+	});
+
+	it("should handle null response field gracefully", async () => {
+		const binding = mockBinding(vi.fn().mockResolvedValue({ response: null }));
+
+		const fetcher = createWorkersAiBindingFetch(binding);
+
+		const response = await fetcher("https://api.openai.com/v1/chat/completions", {
+			method: "POST",
+			body: JSON.stringify({
+				model: "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+				messages: [{ role: "user", content: "Hi" }],
+			}),
+		});
+
+		const json = (await response.json()) as {
+			choices: Array<{
+				message: { content: string; role: string };
+			}>;
+		};
+		expect(json.choices[0]!.message.content).toBe("");
+	});
+
+	it("should pass max_tokens to binding when provided", async () => {
+		const binding = mockBinding(vi.fn().mockResolvedValue({ response: "ok" }));
+
+		const fetcher = createWorkersAiBindingFetch(binding);
+
+		await fetcher("https://api.openai.com/v1/chat/completions", {
+			method: "POST",
+			body: JSON.stringify({
+				model: "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+				messages: [{ role: "user", content: "Hi" }],
+				max_tokens: 512,
+			}),
+		});
+
+		const [, inputs] = binding.run.mock.calls[0]!;
+		expect(inputs.max_tokens).toBe(512);
+	});
+
 	it("should handle tool calls in non-streaming response", async () => {
 		const binding = mockBinding(
 			vi.fn().mockResolvedValue({

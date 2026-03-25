@@ -242,7 +242,7 @@ export class WorkersAiTextAdapter<TModel extends WorkersAiTextModel> extends Bas
 	}
 
 	async *chatStream(options: TextOptions<any>): AsyncIterable<StreamChunk> {
-		const { systemPrompts, messages, tools, temperature, model } = options;
+		const { systemPrompts, messages, tools, temperature, maxTokens, model } = options;
 
 		const openAIMessages = buildOpenAIMessages(systemPrompts, messages);
 		const openAITools = buildOpenAITools(tools);
@@ -270,6 +270,7 @@ export class WorkersAiTextAdapter<TModel extends WorkersAiTextModel> extends Bas
 					messages: openAIMessages,
 					tools: openAITools,
 					temperature,
+					max_tokens: maxTokens,
 					stream: true,
 					stream_options: { include_usage: true },
 				});
@@ -285,6 +286,7 @@ export class WorkersAiTextAdapter<TModel extends WorkersAiTextModel> extends Bas
 					messages: openAIMessages,
 					tools: openAITools,
 					temperature,
+					max_tokens: maxTokens,
 				});
 
 				yield {

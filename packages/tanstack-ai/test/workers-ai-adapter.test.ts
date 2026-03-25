@@ -217,6 +217,37 @@ describe("WorkersAiTextAdapter.chatStream", () => {
 		expect(inputs.temperature).toBe(0.3);
 	});
 
+	it("should forward maxTokens to the binding as max_tokens", async () => {
+		const binding = createStreamingBinding(['data: {"response":"ok"}\n\n']);
+		const adapter = new WorkersAiTextAdapter(MODEL, { binding });
+
+		await collectChunks(
+			adapter.chatStream({
+				model: MODEL,
+				messages: [{ role: "user", content: "Hi" }],
+				maxTokens: 256,
+			} as any),
+		);
+
+		const [, inputs] = binding.run.mock.calls[0]!;
+		expect(inputs.max_tokens).toBe(256);
+	});
+
+	it("should not send max_tokens when maxTokens is not set", async () => {
+		const binding = createStreamingBinding(['data: {"response":"ok"}\n\n']);
+		const adapter = new WorkersAiTextAdapter(MODEL, { binding });
+
+		await collectChunks(
+			adapter.chatStream({
+				model: MODEL,
+				messages: [{ role: "user", content: "Hi" }],
+			} as any),
+		);
+
+		const [, inputs] = binding.run.mock.calls[0]!;
+		expect(inputs.max_tokens).toBeUndefined();
+	});
+
 	it("should handle multi-turn conversation with tool results", async () => {
 		const binding = createStreamingBinding(['data: {"response":"It is 72°F in SF"}\n\n']);
 		const adapter = new WorkersAiTextAdapter(MODEL, { binding });
