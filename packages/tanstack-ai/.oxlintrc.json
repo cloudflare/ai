@@ -8,5 +8,8 @@
 				"no-useless-constructor": "off"
 			}
 		}
-	]
+	],
+	"rules": {
+		"no-shadow": "off"
+	}
 }

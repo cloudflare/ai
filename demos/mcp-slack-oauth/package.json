@@ -10,16 +10,16 @@
 		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@cloudflare/workers-oauth-provider": "^0.2.3",
-		"@slack/web-api": "^7.14.1",
-		"hono": "^4.12.0",
+		"@cloudflare/workers-oauth-provider": "^0.3.0",
+		"@slack/web-api": "^7.15.0",
+		"hono": "^4.12.9",
 		"just-pick": "^4.2.0",
 		"octokit": "^5.0.5"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20260227.0",
+		"@cloudflare/workers-types": "^4.20260317.1",
 		"typescript": "5.9.3",
-		"wrangler": "^4.67.0",
+		"wrangler": "^4.77.0",
 		"zod": "^4.3.6"
 	}
 }

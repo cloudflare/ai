@@ -20,5 +20,6 @@
 		"type-check": {
 			"cache": true
 		}
-	}
+	},
+	"analytics": false
 }

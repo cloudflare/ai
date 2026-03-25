@@ -143,13 +143,9 @@ export const layout = (content: HtmlEscapedString | string, title: string) => ht
 				}
 			</style>
 		</head>
-		<body
-			class="bg-gray-50 text-gray-800 font-sans leading-relaxed flex flex-col min-h-screen"
-		>
+		<body class="bg-gray-50 text-gray-800 font-sans leading-relaxed flex flex-col min-h-screen">
 			<header class="bg-white shadow-sm mb-8">
-				<div
-					class="container mx-auto px-4 py-4 flex justify-between items-center"
-				>
+				<div class="container mx-auto px-4 py-4 flex justify-between items-center">
 					<a
 						href="/"
 						class="text-xl font-heading font-bold text-primary hover:text-primary/80 transition-colors"
@@ -209,11 +205,7 @@ export const renderLoggedInAuthorizeScreen = async (
 				</ul>
 			</div>
 			<form action="/approve" method="POST" class="space-y-4">
-				<input
-					type="hidden"
-					name="oauthReqInfo"
-					value="${JSON.stringify(oauthReqInfo)}"
-				/>
+				<input type="hidden" name="oauthReqInfo" value="${JSON.stringify(oauthReqInfo)}" />
 				<input type="hidden" name="email" value="user@example.com" />
 				<button
 					type="submit"
@@ -265,16 +257,10 @@ export const renderLoggedOutAuthorizeScreen = async (
 				</ul>
 			</div>
 			<form action="/approve" method="POST" class="space-y-4">
-				<input
-					type="hidden"
-					name="oauthReqInfo"
-					value="${JSON.stringify(oauthReqInfo)}"
-				/>
+				<input type="hidden" name="oauthReqInfo" value="${JSON.stringify(oauthReqInfo)}" />
 				<div class="space-y-4">
 					<div>
-						<label
-							for="email"
-							class="block text-sm font-medium text-gray-700 mb-1"
+						<label for="email" class="block text-sm font-medium text-gray-700 mb-1"
 							>Email</label
 						>
 						<input
@@ -286,9 +272,7 @@ export const renderLoggedOutAuthorizeScreen = async (
 						/>
 					</div>
 					<div>
-						<label
-							for="password"
-							class="block text-sm font-medium text-gray-700 mb-1"
+						<label for="password" class="block text-sm font-medium text-gray-700 mb-1"
 							>Password</label
 						>
 						<input
@@ -329,22 +313,16 @@ export const renderApproveContent = async (
 	return html`
 		<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
 			<div class="mb-4">
-				<span
-					class="inline-block p-3 ${
-						status === "success"
-							? "bg-green-100 text-green-800"
-							: "bg-red-100 text-red-800"
-					} rounded-full"
-				>
+				<span class="inline-block p-3 ${status === "success"
+											? "bg-green-100 text-green-800"
+											: "bg-red-100 text-red-800"} rounded-full">
 					${status === "success" ? "✓" : "✗"}
 				</span>
 			</div>
 			<h1 class="text-2xl font-heading font-bold mb-4 text-gray-900">
 				${message}
 			</h1>
-			<p class="mb-8 text-gray-600">
-				You will be redirected back to the application shortly.
-			</p>
+			<p class="mb-8 text-gray-600">You will be redirected back to the application shortly.</p>
 			<a
 				href="/"
 				class="inline-block py-2 px-4 bg-primary text-white rounded-md font-medium hover:bg-primary/90 transition-colors"
@@ -353,7 +331,7 @@ export const renderApproveContent = async (
 			</a>
 			<script data-redirect-url="${redirectUrl}">
 				setTimeout(() => {
-					const script = document.querySelector('script[data-redirect-url]')
+					const script = document.querySelector("script[data-redirect-url]");
 					window.location.href = script.dataset.redirectUrl;
 				}, 2000);
 			</script>

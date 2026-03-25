@@ -14,26 +14,26 @@
 		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@stytch/react": "^19.18.1",
-		"@stytch/vanilla-js": "^5.45.0",
-		"agents": "^0.5.0",
+		"@stytch/react": "^20.0.5",
+		"@stytch/vanilla-js": "^6.0.5",
+		"agents": "^0.8.4",
 		"commander": "^14.0.3",
-		"hono": "^4.12.0",
-		"lucide-react": "^0.575.0",
+		"hono": "^4.12.9",
+		"lucide-react": "^1.6.0",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
-		"react-router-dom": "^7.13.0",
+		"react-router-dom": "^7.13.2",
 		"stytch": "^13.1.0",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
-		"@cloudflare/vite-plugin": "^1.25.2",
+		"@cloudflare/vite-plugin": "^1.30.1",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
-		"@vitejs/plugin-react": "^5.1.4",
-		"oxlint": "^1.49.0",
+		"@vitejs/plugin-react": "^6.0.1",
+		"oxlint": "^1.57.0",
 		"typescript": "5.9.3",
-		"vite": "^7.3.1",
-		"wrangler": "^4.67.0"
+		"vite": "^8.0.2",
+		"wrangler": "^4.77.0"
 	}
 }

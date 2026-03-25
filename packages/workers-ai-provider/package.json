@@ -42,8 +42,8 @@
 	},
 	"devDependencies": {
 		"@ai-sdk/provider": "^3.0.8",
-		"@cloudflare/workers-types": "^4.20260227.0",
-		"ai": "^6.0.94",
+		"@cloudflare/workers-types": "^4.20260317.1",
+		"ai": "^6.0.138",
 		"zod": "^4.3.6"
 	},
 	"peerDependencies": {

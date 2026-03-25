@@ -1,6 +1,11 @@
 import {
+	AuthFlowType,
 	B2BIdentityProvider,
+	B2BOAuthProviders,
+	B2BProducts,
 	StytchB2B,
+	type StytchB2BUIConfig,
+	type StytchEvent,
 	useStytchB2BClient,
 	useStytchMember,
 } from "@stytch/react/b2b";
@@ -10,13 +15,6 @@ import {
 	AdminPortalOrgSettings,
 	AdminPortalSSO,
 } from "@stytch/react/b2b/adminPortal";
-import {
-	AuthFlowType,
-	B2BOAuthProviders,
-	B2BProducts,
-	type StytchB2BUIConfig,
-	type StytchEvent,
-} from "@stytch/vanilla-js";
 import type { IDPConsentScreenManifest } from "@stytch/vanilla-js/b2b";
 import { useEffect, useMemo, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";

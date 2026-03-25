@@ -76,7 +76,6 @@ export default new OAuthProvider({
 	apiRoute: "/mcp",
 	authorizeEndpoint: "/authorize",
 	clientRegistrationEndpoint: "/register",
-	// @ts-expect-error
 	defaultHandler: app,
 	tokenEndpoint: "/token",
 	tokenExchangeCallback,

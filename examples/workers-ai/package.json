@@ -9,23 +9,23 @@
 		"deploy": "vite build && wrangler deploy"
 	},
 	"dependencies": {
-		"@ai-sdk/react": "^3.0.96",
-		"ai": "^6.0.94",
+		"@ai-sdk/react": "^3.0.140",
+		"ai": "^6.0.138",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
 		"workers-ai-provider": "workspace:*",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
-		"@cloudflare/vite-plugin": "^1.25.2",
-		"@cloudflare/workers-types": "^4.20260227.0",
-		"@tailwindcss/vite": "^4.2.0",
+		"@cloudflare/vite-plugin": "^1.30.1",
+		"@cloudflare/workers-types": "^4.20260317.1",
+		"@tailwindcss/vite": "^4.2.2",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
-		"@vitejs/plugin-react": "^5.1.4",
-		"tailwindcss": "^4.2.0",
+		"@vitejs/plugin-react": "^6.0.1",
+		"tailwindcss": "^4.2.2",
 		"typescript": "5.9.3",
-		"vite": "^7.3.1",
-		"wrangler": "^4.67.0"
+		"vite": "^8.0.2",
+		"wrangler": "^4.77.0"
 	}
 }

@@ -1,6 +1,7 @@
 {
 	"$schema": "../../node_modules/oxlint/configuration_schema.json",
 	"rules": {
-		"react/no-array-index-key": "off"
+		"react/no-array-index-key": "off",
+		"no-shadow": "off"
 	}
 }

@@ -10,10 +10,10 @@
 		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
-		"agents": "^0.5.0"
+		"agents": "^0.8.4"
 	},
 	"devDependencies": {
 		"typescript": "5.9.3",
-		"wrangler": "^4.67.0"
+		"wrangler": "^4.77.0"
 	}
 }
