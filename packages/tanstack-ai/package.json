@@ -1,6 +1,6 @@
 {
 	"name": "@cloudflare/tanstack-ai",
-	"version": "0.1.5",
+	"version": "0.1.6",
 	"description": "Use TanStack AI with Cloudflare Workers AI and AI Gateway",
 	"keywords": [
 		"ai",
