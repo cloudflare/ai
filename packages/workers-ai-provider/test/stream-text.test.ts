@@ -653,6 +653,143 @@ describe("Binding - Streaming Text Tests", () => {
 		expect(await result.finishReason).toBe("tool-calls");
 	});
 
+	it("should close reasoning block before emitting tool calls", async () => {
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () => {
+					return mockStream([
+						{
+							choices: [
+								{
+									delta: { reasoning_content: "Let me think" },
+									finish_reason: null,
+								},
+							],
+						},
+						{
+							choices: [
+								{
+									delta: { reasoning_content: " about this." },
+									finish_reason: null,
+								},
+							],
+						},
+						{
+							choices: [
+								{
+									delta: {
+										tool_calls: [
+											{
+												id: "call-1",
+												type: "function",
+												index: 0,
+												function: {
+													name: "get_weather",
+													arguments: '{"location": "Paris"}',
+												},
+											},
+										],
+									},
+									finish_reason: null,
+								},
+							],
+						},
+						{
+							choices: [{ delta: {}, finish_reason: "tool_calls" }],
+						},
+						"[DONE]",
+					]);
+				},
+			},
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "What's the weather?",
+			tools: {
+				get_weather: {
+					description: "Get the weather",
+					execute: async ({ location }) => ({ location, weather: "Sunny" }),
+					inputSchema: z.object({
+						location: z.string(),
+					}),
+				},
+			},
+		});
+
+		const events: string[] = [];
+		for await (const chunk of result.fullStream) {
+			events.push(chunk.type);
+		}
+
+		// reasoning-end must appear BEFORE tool-input-start and tool-call
+		const reasoningEndIdx = events.indexOf("reasoning-end");
+		const toolInputStartIdx = events.indexOf("tool-input-start");
+		const toolCallIdx = events.indexOf("tool-call");
+
+		expect(reasoningEndIdx).toBeGreaterThan(-1);
+		expect(toolInputStartIdx).toBeGreaterThan(-1);
+		expect(toolCallIdx).toBeGreaterThan(-1);
+		expect(reasoningEndIdx).toBeLessThan(toolInputStartIdx);
+		expect(reasoningEndIdx).toBeLessThan(toolCallIdx);
+
+		// reasoning-end should NOT appear again in flush (no double close)
+		const reasoningEndCount = events.filter((e) => e === "reasoning-end").length;
+		expect(reasoningEndCount).toBe(1);
+	});
+
+	it("should close reasoning block before emitting text content", async () => {
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () => {
+					return mockStream([
+						{
+							choices: [
+								{
+									delta: { reasoning: "Thinking..." },
+									finish_reason: null,
+								},
+							],
+						},
+						{
+							choices: [
+								{
+									delta: { content: "Hello world" },
+									finish_reason: null,
+								},
+							],
+						},
+						{
+							choices: [{ delta: {}, finish_reason: "stop" }],
+						},
+						"[DONE]",
+					]);
+				},
+			},
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Hello",
+		});
+
+		const events: string[] = [];
+		for await (const chunk of result.fullStream) {
+			events.push(chunk.type);
+		}
+
+		const reasoningEndIdx = events.indexOf("reasoning-end");
+		const textStartIdx = events.indexOf("text-start");
+
+		expect(reasoningEndIdx).toBeGreaterThan(-1);
+		expect(textStartIdx).toBeGreaterThan(-1);
+		expect(reasoningEndIdx).toBeLessThan(textStartIdx);
+
+		// No double close
+		const reasoningEndCount = events.filter((e) => e === "reasoning-end").length;
+		expect(reasoningEndCount).toBe(1);
+	});
+
 	it("should handle content and reasoning_content fields if present", async () => {
 		const workersai = createWorkersAI({
 			binding: {

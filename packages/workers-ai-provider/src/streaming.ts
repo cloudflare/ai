@@ -142,6 +142,11 @@ export function getMappedStream(
 				if (nativeResponse != null && nativeResponse !== "") {
 					const responseText = String(nativeResponse);
 					if (responseText.length > 0) {
+						// Close active reasoning block before text starts
+						if (reasoningId) {
+							controller.enqueue({ type: "reasoning-end", id: reasoningId });
+							reasoningId = null;
+						}
 						if (!textId) {
 							textId = generateId();
 							controller.enqueue({ type: "text-start", id: textId });
@@ -156,6 +161,11 @@ export function getMappedStream(
 
 				// --- Native format: top-level `tool_calls` ---
 				if (Array.isArray(chunk.tool_calls)) {
+					// Close active reasoning block before tool calls start
+					if (reasoningId) {
+						controller.enqueue({ type: "reasoning-end", id: reasoningId });
+						reasoningId = null;
+					}
 					emitToolCallDeltas(chunk.tool_calls as Record<string, unknown>[], controller);
 				}
 
@@ -183,6 +193,11 @@ export function getMappedStream(
 
 					const textDelta = delta.content as string | undefined;
 					if (textDelta && textDelta.length > 0) {
+						// Close active reasoning block before text starts
+						if (reasoningId) {
+							controller.enqueue({ type: "reasoning-end", id: reasoningId });
+							reasoningId = null;
+						}
 						if (!textId) {
 							textId = generateId();
 							controller.enqueue({ type: "text-start", id: textId });
@@ -198,6 +213,11 @@ export function getMappedStream(
 						| Record<string, unknown>[]
 						| undefined;
 					if (Array.isArray(deltaToolCalls)) {
+						// Close active reasoning block before tool calls start
+						if (reasoningId) {
+							controller.enqueue({ type: "reasoning-end", id: reasoningId });
+							reasoningId = null;
+						}
 						emitToolCallDeltas(deltaToolCalls, controller);
 					}
 				}
