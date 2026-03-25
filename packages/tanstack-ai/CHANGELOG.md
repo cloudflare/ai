@@ -1,5 +1,13 @@
 # @cloudflare/tanstack-ai
 
+## 0.1.6
+
+### Patch Changes
+
+- [#459](https://github.com/cloudflare/ai/pull/459) [`a375d3f`](https://github.com/cloudflare/ai/commit/a375d3f70a27a6f2a937557aa4d08d06b875c1e1) Thanks [@TimoWilhelm](https://github.com/TimoWilhelm)! - Add maxTokens support to WorkersAi chat and handle non-string responses
+    - Forward `maxTokens` from `TextOptions` to the Workers AI binding as `max_tokens` in both streaming and non-streaming paths.
+    - Stringify object responses from the binding when building assistant messages instead of defaulting to empty string.
+
 ## 0.1.5
 
 ### Patch Changes

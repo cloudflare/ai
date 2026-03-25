@@ -1,5 +1,11 @@
 # workers-ai-provider
 
+## 3.1.8
+
+### Patch Changes
+
+- [#455](https://github.com/cloudflare/ai/pull/455) [`e02cdd2`](https://github.com/cloudflare/ai/commit/e02cdd20c841ffb564c568fcc9d5a000c2fb2615) Thanks [@ferdousbhai](https://github.com/ferdousbhai)! - fix(workers-ai-provider): close reasoning block before tool calls and text
+
 ## 3.1.7
 
 ### Patch Changes
