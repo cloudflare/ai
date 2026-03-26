@@ -25,119 +25,175 @@
 		"LICENSE",
 		"README.md"
 	],
-	"main": "./dist/index.js",
-	"module": "./dist/index.mjs",
-	"types": "./dist/index.d.ts",
+	"main": "./dist/index.mjs",
+	"types": "./dist/index.d.mts",
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
+			"types": {
+				"import": "./dist/index.d.mts",
+				"require": "./dist/index.d.cts"
+			},
 			"import": "./dist/index.mjs",
-			"require": "./dist/index.js"
+			"require": "./dist/index.cjs"
 		},
 		"./providers/amazon-bedrock": {
-			"types": "./dist/providers/amazon-bedrock.d.ts",
+			"types": {
+				"import": "./dist/providers/amazon-bedrock.d.mts",
+				"require": "./dist/providers/amazon-bedrock.d.cts"
+			},
 			"import": "./dist/providers/amazon-bedrock.mjs",
-			"require": "./dist/providers/amazon-bedrock.js"
+			"require": "./dist/providers/amazon-bedrock.cjs"
 		},
 		"./providers/openai": {
-			"types": "./dist/providers/openai.d.ts",
+			"types": {
+				"import": "./dist/providers/openai.d.mts",
+				"require": "./dist/providers/openai.d.cts"
+			},
 			"import": "./dist/providers/openai.mjs",
-			"require": "./dist/providers/openai.js"
+			"require": "./dist/providers/openai.cjs"
 		},
 		"./providers/xai": {
-			"types": "./dist/providers/xai.d.ts",
+			"types": {
+				"import": "./dist/providers/xai.d.mts",
+				"require": "./dist/providers/xai.d.cts"
+			},
 			"import": "./dist/providers/xai.mjs",
-			"require": "./dist/providers/xai.js"
+			"require": "./dist/providers/xai.cjs"
 		},
 		"./providers/google": {
-			"types": "./dist/providers/google.d.ts",
+			"types": {
+				"import": "./dist/providers/google.d.mts",
+				"require": "./dist/providers/google.d.cts"
+			},
 			"import": "./dist/providers/google.mjs",
-			"require": "./dist/providers/google.js"
+			"require": "./dist/providers/google.cjs"
 		},
 		"./providers/groq": {
-			"types": "./dist/providers/groq.d.ts",
+			"types": {
+				"import": "./dist/providers/groq.d.mts",
+				"require": "./dist/providers/groq.d.cts"
+			},
 			"import": "./dist/providers/groq.mjs",
-			"require": "./dist/providers/groq.js"
+			"require": "./dist/providers/groq.cjs"
 		},
 		"./providers/mistral": {
-			"types": "./dist/providers/mistral.d.ts",
+			"types": {
+				"import": "./dist/providers/mistral.d.mts",
+				"require": "./dist/providers/mistral.d.cts"
+			},
 			"import": "./dist/providers/mistral.mjs",
-			"require": "./dist/providers/mistral.js"
+			"require": "./dist/providers/mistral.cjs"
 		},
 		"./providers/perplexity": {
-			"types": "./dist/providers/perplexity.d.ts",
+			"types": {
+				"import": "./dist/providers/perplexity.d.mts",
+				"require": "./dist/providers/perplexity.d.cts"
+			},
 			"import": "./dist/providers/perplexity.mjs",
-			"require": "./dist/providers/perplexity.js"
+			"require": "./dist/providers/perplexity.cjs"
 		},
 		"./providers/anthropic": {
-			"types": "./dist/providers/anthropic.d.ts",
+			"types": {
+				"import": "./dist/providers/anthropic.d.mts",
+				"require": "./dist/providers/anthropic.d.cts"
+			},
 			"import": "./dist/providers/anthropic.mjs",
-			"require": "./dist/providers/anthropic.js"
+			"require": "./dist/providers/anthropic.cjs"
 		},
 		"./providers/azure": {
-			"types": "./dist/providers/azure.d.ts",
+			"types": {
+				"import": "./dist/providers/azure.d.mts",
+				"require": "./dist/providers/azure.d.cts"
+			},
 			"import": "./dist/providers/azure.mjs",
-			"require": "./dist/providers/azure.js"
+			"require": "./dist/providers/azure.cjs"
 		},
 		"./providers/cerebras": {
-			"types": "./dist/providers/cerebras.d.ts",
+			"types": {
+				"import": "./dist/providers/cerebras.d.mts",
+				"require": "./dist/providers/cerebras.d.cts"
+			},
 			"import": "./dist/providers/cerebras.mjs",
-			"require": "./dist/providers/cerebras.js"
+			"require": "./dist/providers/cerebras.cjs"
 		},
 		"./providers/cohere": {
-			"types": "./dist/providers/cohere.d.ts",
+			"types": {
+				"import": "./dist/providers/cohere.d.mts",
+				"require": "./dist/providers/cohere.d.cts"
+			},
 			"import": "./dist/providers/cohere.mjs",
-			"require": "./dist/providers/cohere.js"
+			"require": "./dist/providers/cohere.cjs"
 		},
 		"./providers/deepgram": {
-			"types": "./dist/providers/deepgram.d.ts",
+			"types": {
+				"import": "./dist/providers/deepgram.d.mts",
+				"require": "./dist/providers/deepgram.d.cts"
+			},
 			"import": "./dist/providers/deepgram.mjs",
-			"require": "./dist/providers/deepgram.js"
+			"require": "./dist/providers/deepgram.cjs"
 		},
 		"./providers/deepseek": {
-			"types": "./dist/providers/deepseek.d.ts",
+			"types": {
+				"import": "./dist/providers/deepseek.d.mts",
+				"require": "./dist/providers/deepseek.d.cts"
+			},
 			"import": "./dist/providers/deepseek.mjs",
-			"require": "./dist/providers/deepseek.js"
+			"require": "./dist/providers/deepseek.cjs"
 		},
 		"./providers/elevenlabs": {
-			"types": "./dist/providers/elevenlabs.d.ts",
+			"types": {
+				"import": "./dist/providers/elevenlabs.d.mts",
+				"require": "./dist/providers/elevenlabs.d.cts"
+			},
 			"import": "./dist/providers/elevenlabs.mjs",
-			"require": "./dist/providers/elevenlabs.js"
+			"require": "./dist/providers/elevenlabs.cjs"
 		},
 		"./providers/fireworks": {
-			"types": "./dist/providers/fireworks.d.ts",
+			"types": {
+				"import": "./dist/providers/fireworks.d.mts",
+				"require": "./dist/providers/fireworks.d.cts"
+			},
 			"import": "./dist/providers/fireworks.mjs",
-			"require": "./dist/providers/fireworks.js"
+			"require": "./dist/providers/fireworks.cjs"
 		},
 		"./providers/google-vertex": {
-			"types": "./dist/providers/google-vertex.d.ts",
+			"types": {
+				"import": "./dist/providers/google-vertex.d.mts",
+				"require": "./dist/providers/google-vertex.d.cts"
+			},
 			"import": "./dist/providers/google-vertex.mjs",
-			"require": "./dist/providers/google-vertex.js"
+			"require": "./dist/providers/google-vertex.cjs"
 		},
 		"./providers/openrouter": {
-			"types": "./dist/providers/openrouter.d.ts",
+			"types": {
+				"import": "./dist/providers/openrouter.d.mts",
+				"require": "./dist/providers/openrouter.d.cts"
+			},
 			"import": "./dist/providers/openrouter.mjs",
-			"require": "./dist/providers/openrouter.js"
+			"require": "./dist/providers/openrouter.cjs"
 		},
 		"./providers/unified": {
-			"types": "./dist/providers/unified.d.ts",
+			"types": {
+				"import": "./dist/providers/unified.d.mts",
+				"require": "./dist/providers/unified.d.cts"
+			},
 			"import": "./dist/providers/unified.mjs",
-			"require": "./dist/providers/unified.js"
+			"require": "./dist/providers/unified.cjs"
 		}
 	},
 	"publishConfig": {
 		"access": "public"
 	},
 	"scripts": {
-		"build": "rm -rf dist && tsup --config tsup.config.ts",
+		"build": "rm -rf dist && tsdown --config tsdown.config.ts",
 		"format": "oxfmt --write .",
 		"test:ci": "vitest --watch=false",
 		"test": "vitest",
 		"type-check": "tsc --noEmit"
 	},
 	"devDependencies": {
-		"tsup": "^8.5.1",
-		"typescript": "5.9.3"
+		"tsdown": "^0.21.4",
+		"typescript": "6.0.2"
 	},
 	"peerDependencies": {
 		"@ai-sdk/openai-compatible": "^2.0.0",

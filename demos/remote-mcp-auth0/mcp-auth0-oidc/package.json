@@ -10,8 +10,8 @@
 		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@cloudflare/workers-oauth-provider": "^0.3.0",
-		"agents": "^0.8.4",
+		"@cloudflare/workers-oauth-provider": "^0.3.1",
+		"agents": "^0.8.6",
 		"hono": "^4.12.9",
 		"jose": "^6.2.2",
 		"just-pick": "^4.2.0",
@@ -20,7 +20,7 @@
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20260317.1",
-		"typescript": "5.9.3",
+		"typescript": "6.0.2",
 		"wrangler": "^4.77.0"
 	}
 }

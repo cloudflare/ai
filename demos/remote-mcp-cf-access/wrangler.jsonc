@@ -6,7 +6,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "mcp-access-oauth",
   "main": "src/index.ts",
-  "compatibility_date": "2025-03-10",
+  "compatibility_date": "2026-03-10",
   "migrations": [
     {
       "new_sqlite_classes": ["MyMCP"],
@@ -36,5 +36,15 @@
   },
   "dev": {
     "port": 8788
+  },
+  "secrets": {
+    "required": [
+      "ACCESS_CLIENT_ID",
+      "ACCESS_CLIENT_SECRET",
+      "ACCESS_TOKEN_URL",
+      "ACCESS_AUTHORIZATION_URL",
+      "ACCESS_JWKS_URL",
+      "COOKIE_ENCRYPTION_KEY"
+    ]
   }
 }

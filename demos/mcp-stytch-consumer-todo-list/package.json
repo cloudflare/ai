@@ -15,7 +15,7 @@
 	"dependencies": {
 		"@stytch/react": "^20.0.5",
 		"@stytch/vanilla-js": "^6.0.5",
-		"agents": "^0.8.4",
+		"agents": "^0.8.6",
 		"hono": "^4.12.9",
 		"jose": "^6.2.2",
 		"react": "^19.2.4",
@@ -29,8 +29,8 @@
 		"@types/react-dom": "^19.2.3",
 		"@vitejs/plugin-react": "^6.0.1",
 		"oxlint": "^1.57.0",
-		"typescript": "5.9.3",
-		"vite": "^8.0.2",
+		"typescript": "6.0.2",
+		"vite": "^8.0.3",
 		"wrangler": "^4.77.0"
 	}
 }

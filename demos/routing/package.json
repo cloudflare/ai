@@ -15,7 +15,7 @@
 		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
-		"agents": "^0.8.4",
+		"agents": "^0.8.6",
 		"ai": "^6.0.138",
 		"hono": "^4.12.9",
 		"workers-ai-provider": "^3.1.8",
@@ -25,8 +25,8 @@
 		"@cloudflare/vite-plugin": "^1.30.1",
 		"@cloudflare/vitest-pool-workers": "^0.13.4",
 		"oxlint": "^1.57.0",
-		"typescript": "5.9.3",
-		"vite": "^8.0.2",
+		"typescript": "6.0.2",
+		"vite": "^8.0.3",
 		"vitest": "~4.1.1",
 		"wrangler": "^4.77.0"
 	}
