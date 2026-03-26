@@ -25,62 +25,95 @@
 		"README.md"
 	],
 	"type": "module",
-	"main": "./dist/index.js",
-	"types": "./dist/index.d.ts",
+	"main": "./dist/index.mjs",
+	"types": "./dist/index.d.mts",
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js",
+			"types": {
+				"import": "./dist/index.d.mts",
+				"require": "./dist/index.d.cts"
+			},
+			"import": "./dist/index.mjs",
 			"require": "./dist/index.cjs"
 		},
 		"./adapters/openai": {
-			"types": "./dist/adapters/openai.d.ts",
-			"import": "./dist/adapters/openai.js",
+			"types": {
+				"import": "./dist/adapters/openai.d.mts",
+				"require": "./dist/adapters/openai.d.cts"
+			},
+			"import": "./dist/adapters/openai.mjs",
 			"require": "./dist/adapters/openai.cjs"
 		},
 		"./adapters/anthropic": {
-			"types": "./dist/adapters/anthropic.d.ts",
-			"import": "./dist/adapters/anthropic.js",
+			"types": {
+				"import": "./dist/adapters/anthropic.d.mts",
+				"require": "./dist/adapters/anthropic.d.cts"
+			},
+			"import": "./dist/adapters/anthropic.mjs",
 			"require": "./dist/adapters/anthropic.cjs"
 		},
 		"./adapters/gemini": {
-			"types": "./dist/adapters/gemini.d.ts",
-			"import": "./dist/adapters/gemini.js",
+			"types": {
+				"import": "./dist/adapters/gemini.d.mts",
+				"require": "./dist/adapters/gemini.d.cts"
+			},
+			"import": "./dist/adapters/gemini.mjs",
 			"require": "./dist/adapters/gemini.cjs"
 		},
 		"./adapters/grok": {
-			"types": "./dist/adapters/grok.d.ts",
-			"import": "./dist/adapters/grok.js",
+			"types": {
+				"import": "./dist/adapters/grok.d.mts",
+				"require": "./dist/adapters/grok.d.cts"
+			},
+			"import": "./dist/adapters/grok.mjs",
 			"require": "./dist/adapters/grok.cjs"
 		},
 		"./adapters/openrouter": {
-			"types": "./dist/adapters/openrouter.d.ts",
-			"import": "./dist/adapters/openrouter.js",
+			"types": {
+				"import": "./dist/adapters/openrouter.d.mts",
+				"require": "./dist/adapters/openrouter.d.cts"
+			},
+			"import": "./dist/adapters/openrouter.mjs",
 			"require": "./dist/adapters/openrouter.cjs"
 		},
 		"./adapters/workers-ai": {
-			"types": "./dist/adapters/workers-ai.d.ts",
-			"import": "./dist/adapters/workers-ai.js",
+			"types": {
+				"import": "./dist/adapters/workers-ai.d.mts",
+				"require": "./dist/adapters/workers-ai.d.cts"
+			},
+			"import": "./dist/adapters/workers-ai.mjs",
 			"require": "./dist/adapters/workers-ai.cjs"
 		},
 		"./adapters/workers-ai-image": {
-			"types": "./dist/adapters/workers-ai-image.d.ts",
-			"import": "./dist/adapters/workers-ai-image.js",
+			"types": {
+				"import": "./dist/adapters/workers-ai-image.d.mts",
+				"require": "./dist/adapters/workers-ai-image.d.cts"
+			},
+			"import": "./dist/adapters/workers-ai-image.mjs",
 			"require": "./dist/adapters/workers-ai-image.cjs"
 		},
 		"./adapters/workers-ai-transcription": {
-			"types": "./dist/adapters/workers-ai-transcription.d.ts",
-			"import": "./dist/adapters/workers-ai-transcription.js",
+			"types": {
+				"import": "./dist/adapters/workers-ai-transcription.d.mts",
+				"require": "./dist/adapters/workers-ai-transcription.d.cts"
+			},
+			"import": "./dist/adapters/workers-ai-transcription.mjs",
 			"require": "./dist/adapters/workers-ai-transcription.cjs"
 		},
 		"./adapters/workers-ai-tts": {
-			"types": "./dist/adapters/workers-ai-tts.d.ts",
-			"import": "./dist/adapters/workers-ai-tts.js",
+			"types": {
+				"import": "./dist/adapters/workers-ai-tts.d.mts",
+				"require": "./dist/adapters/workers-ai-tts.d.cts"
+			},
+			"import": "./dist/adapters/workers-ai-tts.mjs",
 			"require": "./dist/adapters/workers-ai-tts.cjs"
 		},
 		"./adapters/workers-ai-summarize": {
-			"types": "./dist/adapters/workers-ai-summarize.d.ts",
-			"import": "./dist/adapters/workers-ai-summarize.js",
+			"types": {
+				"import": "./dist/adapters/workers-ai-summarize.d.mts",
+				"require": "./dist/adapters/workers-ai-summarize.d.cts"
+			},
+			"import": "./dist/adapters/workers-ai-summarize.mjs",
 			"require": "./dist/adapters/workers-ai-summarize.cjs"
 		}
 	},
@@ -88,7 +121,7 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build": "rm -rf dist && tsup --config tsup.config.ts",
+		"build": "rm -rf dist && tsdown --config tsdown.config.ts",
 		"format": "biome format --write",
 		"type-check": "tsc --noEmit",
 		"test": "vitest --run",
@@ -99,7 +132,7 @@
 		"test:e2e:binding": "vitest --config vitest.e2e.config.ts --watch=false test/e2e/workers-ai-binding.e2e.test.ts"
 	},
 	"dependencies": {
-		"openai": "^6.32.0"
+		"openai": "^6.33.0"
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20260317.1",

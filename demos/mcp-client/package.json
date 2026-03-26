@@ -11,7 +11,7 @@
 		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
-		"agents": "^0.8.4",
+		"agents": "^0.8.6",
 		"nanoid": "^5.1.7",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4"
@@ -22,6 +22,6 @@
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
 		"@vitejs/plugin-react": "^6.0.1",
-		"vite": "^8.0.2"
+		"vite": "^8.0.3"
 	}
 }

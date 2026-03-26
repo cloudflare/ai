@@ -1,4 +1,4 @@
-import { defineConfig } from "tsup";
+import { defineConfig } from "tsdown";
 
 export default defineConfig({
 	entry: [
@@ -14,11 +14,10 @@ export default defineConfig({
 		"src/adapters/workers-ai-tts.ts",
 		"src/adapters/workers-ai-summarize.ts",
 	],
-	splitting: true,
 	sourcemap: true,
 	clean: true,
-	experimentalDts: true,
+	dts: true,
 	format: ["cjs", "esm"],
-	skipNodeModulesBundle: true,
+	deps: { skipNodeModulesBundle: true },
 	target: "es2020",
 });

@@ -14,6 +14,8 @@
 		/* Specify how TypeScript looks up a file from a given module specifier. */
 		"moduleResolution": "bundler",
 
+		"types": ["node", "vite/client"],
+
 		/* Enable importing .json files */
 		"resolveJsonModule": true,
 

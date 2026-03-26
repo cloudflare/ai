@@ -27,10 +27,10 @@
 		"package.json"
 	],
 	"type": "module",
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
+	"main": "dist/index.mjs",
+	"types": "dist/index.d.mts",
 	"scripts": {
-		"build": "rm -rf dist && tsup src/index.ts --dts --sourcemap --format esm --target es2020",
+		"build": "rm -rf dist && tsdown src/index.ts --dts --sourcemap --format esm --target es2020",
 		"prepare": "pnpm build",
 		"format": "oxfmt --write .",
 		"test:ci": "vitest --watch=false",
