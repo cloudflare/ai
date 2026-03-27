@@ -77,8 +77,8 @@ importers:
         specifier: ^17.4.0
         version: 17.4.0
       handlebars:
-        specifier: ^4.7.8
-        version: 4.7.8
+        specifier: ^4.7.9
+        version: 4.7.9
       hono:
         specifier: ^4.12.9
         version: 4.12.9
@@ -104,7 +104,7 @@ importers:
         specifier: ^1.57.0
         version: 1.57.0
       tsdown:
-        specifier: ^0.21.4
+        specifier: ^0.21.5
         version: 0.21.5(typescript@6.0.2)
       tsx:
         specifier: ^4.21.0
@@ -116,8 +116,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wait-on:
         specifier: ^9.0.4
         version: 9.0.4
@@ -151,7 +151,7 @@ importers:
         version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
-        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
+        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -165,8 +165,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler:
         specifier: ^4.77.0
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -194,7 +194,7 @@ importers:
         version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
-        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
+        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -208,8 +208,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler:
         specifier: ^4.77.0
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -237,7 +237,7 @@ importers:
         version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
-        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
+        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -251,8 +251,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler:
         specifier: ^4.77.0
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -280,7 +280,7 @@ importers:
         version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
-        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
+        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -294,8 +294,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler:
         specifier: ^4.77.0
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -333,7 +333,7 @@ importers:
         version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
-        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
+        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -347,8 +347,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler:
         specifier: ^4.77.0
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -479,8 +479,8 @@ importers:
         specifier: ^7.13.2
         version: 7.13.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       stytch:
-        specifier: ^13.1.0
-        version: 13.1.0
+        specifier: ^13.2.3
+        version: 13.2.3
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -591,7 +591,7 @@ importers:
         version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
-        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
+        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -605,8 +605,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler:
         specifier: ^4.77.0
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -634,7 +634,7 @@ importers:
         version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
-        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
+        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -648,8 +648,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler:
         specifier: ^4.77.0
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -677,7 +677,7 @@ importers:
         version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
-        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
+        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -691,8 +691,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler:
         specifier: ^4.77.0
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -720,7 +720,7 @@ importers:
         version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
-        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
+        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -734,8 +734,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler:
         specifier: ^4.77.0
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -1095,7 +1095,7 @@ importers:
         version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
-        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
+        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
       oxlint:
         specifier: ^1.57.0
         version: 1.57.0
@@ -1106,8 +1106,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler:
         specifier: ^4.77.0
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -1135,7 +1135,7 @@ importers:
         version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
-        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
+        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -1149,8 +1149,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler:
         specifier: ^4.77.0
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -1180,8 +1180,8 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
 
   demos/text-generation:
     dependencies:
@@ -1206,7 +1206,7 @@ importers:
         version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
-        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
+        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -1217,8 +1217,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler:
         specifier: ^4.77.0
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -1246,7 +1246,7 @@ importers:
         version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
-        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
+        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -1260,8 +1260,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler:
         specifier: ^4.77.0
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -1289,7 +1289,7 @@ importers:
         version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
-        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
+        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -1303,8 +1303,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler:
         specifier: ^4.77.0
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -1332,7 +1332,7 @@ importers:
         version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
-        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
+        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -1346,8 +1346,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler:
         specifier: ^4.77.0
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -1372,7 +1372,7 @@ importers:
         version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
-        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
+        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -1386,8 +1386,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler:
         specifier: ^4.77.0
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -1448,7 +1448,7 @@ importers:
         version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
-        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
+        version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
       '@types/react':
         specifier: ^19.2.14
         version: 19.2.14
@@ -1480,8 +1480,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       vitest:
-        specifier: ~4.1.1
-        version: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        specifier: ~4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler:
         specifier: ^4.77.0
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -1654,7 +1654,7 @@ importers:
         version: 6.0.1(zod@4.3.6)
     devDependencies:
       tsdown:
-        specifier: ^0.21.4
+        specifier: ^0.21.5
         version: 0.21.5(typescript@6.0.2)
       typescript:
         specifier: 6.0.2
@@ -1738,8 +1738,8 @@ importers:
         specifier: ^1.46.0
         version: 1.46.0(@modelcontextprotocol/sdk@1.28.0(@cfworker/json-schema@4.1.1)(zod@4.3.6))(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@openrouter/sdk':
-        specifier: ^0.9.11
-        version: 0.9.11
+        specifier: ^0.10.2
+        version: 0.10.2
       '@tanstack/ai-anthropic':
         specifier: ^0.7.0
         version: 0.7.0(@tanstack/ai@0.8.1)(zod@4.3.6)
@@ -3268,11 +3268,11 @@ packages:
       ai: ^6.0.0
       zod: ^3.25.0 || ^4.0.0
 
+  '@openrouter/sdk@0.10.2':
+    resolution: {integrity: sha512-od0aWkk+vhndEI78YyPvPgMxv2+32KO4MRrk8lFxro/YABKAHkozXugc+x3YeNf/d9KQaBO6M4Rut1uf+yeD2g==}
+
   '@openrouter/sdk@0.3.15':
     resolution: {integrity: sha512-tmiMQGu6L1fHD9NpIABN9LALEZitqM27CFebSVyJTQDcxCcR3m1F6v1O1MnOlLmedCFU+/BojniRGFAXo1F3Bw==}
-
-  '@openrouter/sdk@0.9.11':
-    resolution: {integrity: sha512-BgFu6NcIJO4a9aVjr04y3kZ8pyM71j15I+bzfVAGEvxnj+KQNIkBYQGgwrG3D+aT1QpDKLki8btcQmpaxUas6A==}
 
   '@opentelemetry/api@1.9.0':
     resolution: {integrity: sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==}
@@ -4171,11 +4171,11 @@ packages:
       babel-plugin-react-compiler:
         optional: true
 
-  '@vitest/expect@4.1.1':
-    resolution: {integrity: sha512-xAV0fqBTk44Rn6SjJReEQkHP3RrqbJo6JQ4zZ7/uVOiJZRarBtblzrOfFIZeYUrukp2YD6snZG6IBqhOoHTm+A==}
+  '@vitest/expect@4.1.2':
+    resolution: {integrity: sha512-gbu+7B0YgUJ2nkdsRJrFFW6X7NTP44WlhiclHniUhxADQJH5Szt9mZ9hWnJPJ8YwOK5zUOSSlSvyzRf0u1DSBQ==}
 
-  '@vitest/mocker@4.1.1':
-    resolution: {integrity: sha512-h3BOylsfsCLPeceuCPAAJ+BvNwSENgJa4hXoXu4im0bs9Lyp4URc4JYK4pWLZ4pG/UQn7AT92K6IByi6rE6g3A==}
+  '@vitest/mocker@4.1.2':
+    resolution: {integrity: sha512-Ize4iQtEALHDttPRCmN+FKqOl2vxTiNUhzobQFFt/BM1lRUTG7zRCLOykG/6Vo4E4hnUdfVLo5/eqKPukcWW7Q==}
     peerDependencies:
       msw: ^2.4.9
       vite: ^6.0.0 || ^7.0.0 || ^8.0.0
@@ -4185,20 +4185,20 @@ packages:
       vite:
         optional: true
 
-  '@vitest/pretty-format@4.1.1':
-    resolution: {integrity: sha512-GM+TEQN5WhOygr1lp7skeVjdLPqqWMHsfzXrcHAqZJi/lIVh63H0kaRCY8MDhNWikx19zBUK8ceaLB7X5AH9NQ==}
+  '@vitest/pretty-format@4.1.2':
+    resolution: {integrity: sha512-dwQga8aejqeuB+TvXCMzSQemvV9hNEtDDpgUKDzOmNQayl2OG241PSWeJwKRH3CiC+sESrmoFd49rfnq7T4RnA==}
 
-  '@vitest/runner@4.1.1':
-    resolution: {integrity: sha512-f7+FPy75vN91QGWsITueq0gedwUZy1fLtHOCMeQpjs8jTekAHeKP80zfDEnhrleviLHzVSDXIWuCIOFn3D3f8A==}
+  '@vitest/runner@4.1.2':
+    resolution: {integrity: sha512-Gr+FQan34CdiYAwpGJmQG8PgkyFVmARK8/xSijia3eTFgVfpcpztWLuP6FttGNfPLJhaZVP/euvujeNYar36OQ==}
 
-  '@vitest/snapshot@4.1.1':
-    resolution: {integrity: sha512-kMVSgcegWV2FibXEx9p9WIKgje58lcTbXgnJixfcg15iK8nzCXhmalL0ZLtTWLW9PH1+1NEDShiFFedB3tEgWg==}
+  '@vitest/snapshot@4.1.2':
+    resolution: {integrity: sha512-g7yfUmxYS4mNxk31qbOYsSt2F4m1E02LFqO53Xpzg3zKMhLAPZAjjfyl9e6z7HrW6LvUdTwAQR3HHfLjpko16A==}
 
-  '@vitest/spy@4.1.1':
-    resolution: {integrity: sha512-6Ti/KT5OVaiupdIZEuZN7l3CZcR0cxnxt70Z0//3CtwgObwA6jZhmVBA3yrXSVN3gmwjgd7oDNLlsXz526gpRA==}
+  '@vitest/spy@4.1.2':
+    resolution: {integrity: sha512-DU4fBnbVCJGNBwVA6xSToNXrkZNSiw59H8tcuUspVMsBDBST4nfvsPsEHDHGtWRRnqBERBQu7TrTKskmjqTXKA==}
 
-  '@vitest/utils@4.1.1':
-    resolution: {integrity: sha512-cNxAlaB3sHoCdL6pj6yyUXv9Gry1NHNg0kFTXdvSIZXLHsqKH7chiWOkwJ5s5+d/oMwcoG9T0bKU38JZWKusrQ==}
+  '@vitest/utils@4.1.2':
+    resolution: {integrity: sha512-xw2/TiX82lQHA06cgbqRKFb5lCAy3axQ4H4SoUFhUsg+wztiet+co86IAMDtF6Vm1hc7J6j09oh/rgDn+JdKIQ==}
 
   '@workos-inc/node@8.10.0':
     resolution: {integrity: sha512-3UqtU+QqITkQy77UZJumrZxb+4FcUjxgHfC4c186Q0rzSNDZ7YF7iNLWN7QB/q/26KbtgHlEpFS9GX75wUxSEQ==}
@@ -5075,8 +5075,8 @@ packages:
     resolution: {integrity: sha512-+CqsMbHPiSTdtSO14O51eMNlrp9N79gmeqmXeouJOhfucAedHw9noVe/n5uJk3tbKE6a+6ZCQg3RPhVhHByAIw==}
     engines: {node: '>=18'}
 
-  handlebars@4.7.8:
-    resolution: {integrity: sha512-vafaFqs8MZkRrSX7sFVUdo3ap/eNiLnb4IakshzvP56X5Nr1iGKAIqdX6tMlm6HcNRIkr6AxO5jFEoJzzpT8aQ==}
+  handlebars@4.7.9:
+    resolution: {integrity: sha512-4E71E0rpOaQuJR2A3xDZ+GM1HyWYv1clR58tC8emQNeQe3RH7MAzSbat+V0wG78LQBo6m6bzSG/L4pBuCsgnUQ==}
     engines: {node: '>=0.4.7'}
     hasBin: true
 
@@ -6293,8 +6293,8 @@ packages:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
 
-  stytch@13.1.0:
-    resolution: {integrity: sha512-2BIjvPkcFqTsyOXjl/DUHjRCmWItF36dUhHt0so3EsSbon3EgECqrxAbyuimh4XNWeKSTSLLZLHITUHUKs0PPA==}
+  stytch@13.2.3:
+    resolution: {integrity: sha512-irfL8caPf1LKnmSioQpvqZFg4K1NHEa+0fQ1H8+AAEDNCuhb24EmtrT1JfQQQqz8k2826bR+LS0ehZuUozVlXQ==}
     engines: {node: '>= 18.0.0'}
 
   sugarss@5.0.0:
@@ -6490,8 +6490,8 @@ packages:
   undici-types@7.18.2:
     resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
 
-  undici@6.21.2:
-    resolution: {integrity: sha512-uROZWze0R0itiAKVPsYhFov9LxrPMHLMEQFszeI2gCN6bnIIZ8twzBCJcN2LJrBBLfrP0t1FW0g+JmKVl8Vk1g==}
+  undici@6.24.1:
+    resolution: {integrity: sha512-sC+b0tB1whOCzbtlx20fx3WgCXwkW627p4EA9uM+/tNNPkSS+eSEld6pAs9nDv7WbY1UUljBMYPtu9BCOrCWKA==}
     engines: {node: '>=18.17'}
 
   undici@7.24.4:
@@ -6667,18 +6667,18 @@ packages:
       yaml:
         optional: true
 
-  vitest@4.1.1:
-    resolution: {integrity: sha512-yF+o4POL41rpAzj5KVILUxm1GCjKnELvaqmU9TLLUbMfDzuN0UpUR9uaDs+mCtjPe+uYPksXDRLQGGPvj1cTmA==}
+  vitest@4.1.2:
+    resolution: {integrity: sha512-xjR1dMTVHlFLh98JE3i/f/WePqJsah4A0FK9cc8Ehp9Udk0AZk6ccpIZhh1qJ/yxVWRZ+Q54ocnD8TXmkhspGg==}
     engines: {node: ^20.0.0 || ^22.0.0 || >=24.0.0}
     hasBin: true
     peerDependencies:
       '@edge-runtime/vm': '*'
       '@opentelemetry/api': ^1.9.0
       '@types/node': ^20.0.0 || ^22.0.0 || >=24.0.0
-      '@vitest/browser-playwright': 4.1.1
-      '@vitest/browser-preview': 4.1.1
-      '@vitest/browser-webdriverio': 4.1.1
-      '@vitest/ui': 4.1.1
+      '@vitest/browser-playwright': 4.1.2
+      '@vitest/browser-preview': 4.1.2
+      '@vitest/browser-webdriverio': 4.1.2
+      '@vitest/ui': 4.1.2
       happy-dom: '*'
       jsdom: '*'
       vite: ^6.0.0 || ^7.0.0 || ^8.0.0
@@ -7462,14 +7462,14 @@ snapshots:
       - utf-8-validate
       - workerd
 
-  '@cloudflare/vitest-pool-workers@0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.1)(@vitest/snapshot@4.1.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))':
+  '@cloudflare/vitest-pool-workers@0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))':
     dependencies:
-      '@vitest/runner': 4.1.1
-      '@vitest/snapshot': 4.1.1
+      '@vitest/runner': 4.1.2
+      '@vitest/snapshot': 4.1.2
       cjs-module-lexer: 1.4.3
       esbuild: 0.27.3
       miniflare: 4.20260317.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      vitest: 4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+      vitest: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       wrangler: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       zod: 3.25.76
     transitivePeerDependencies:
@@ -8427,12 +8427,12 @@ snapshots:
       zod: 4.3.6
     optional: true
 
-  '@openrouter/sdk@0.3.15':
+  '@openrouter/sdk@0.10.2':
     dependencies:
       zod: 4.3.6
     optional: true
 
-  '@openrouter/sdk@0.9.11':
+  '@openrouter/sdk@0.3.15':
     dependencies:
       zod: 4.3.6
     optional: true
@@ -9102,45 +9102,45 @@ snapshots:
     optionalDependencies:
       '@rolldown/plugin-babel': 0.2.2(@babel/core@7.29.0)(@babel/runtime@7.27.0)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
 
-  '@vitest/expect@4.1.1':
+  '@vitest/expect@4.1.2':
     dependencies:
       '@standard-schema/spec': 1.1.0
       '@types/chai': 5.2.2
-      '@vitest/spy': 4.1.1
-      '@vitest/utils': 4.1.1
+      '@vitest/spy': 4.1.2
+      '@vitest/utils': 4.1.2
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.1(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))':
+  '@vitest/mocker@4.1.2(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))':
     dependencies:
-      '@vitest/spy': 4.1.1
+      '@vitest/spy': 4.1.2
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
       msw: 2.12.14(@types/node@25.5.0)(typescript@6.0.2)
       vite: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
 
-  '@vitest/pretty-format@4.1.1':
+  '@vitest/pretty-format@4.1.2':
     dependencies:
       tinyrainbow: 3.1.0
 
-  '@vitest/runner@4.1.1':
+  '@vitest/runner@4.1.2':
     dependencies:
-      '@vitest/utils': 4.1.1
+      '@vitest/utils': 4.1.2
       pathe: 2.0.3
 
-  '@vitest/snapshot@4.1.1':
+  '@vitest/snapshot@4.1.2':
     dependencies:
-      '@vitest/pretty-format': 4.1.1
-      '@vitest/utils': 4.1.1
+      '@vitest/pretty-format': 4.1.2
+      '@vitest/utils': 4.1.2
       magic-string: 0.30.21
       pathe: 2.0.3
 
-  '@vitest/spy@4.1.1': {}
+  '@vitest/spy@4.1.2': {}
 
-  '@vitest/utils@4.1.1':
+  '@vitest/utils@4.1.2':
     dependencies:
-      '@vitest/pretty-format': 4.1.1
+      '@vitest/pretty-format': 4.1.2
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
 
@@ -10012,7 +10012,7 @@ snapshots:
       - supports-color
     optional: true
 
-  handlebars@4.7.8:
+  handlebars@4.7.9:
     dependencies:
       minimist: 1.2.8
       neo-async: 2.6.2
@@ -11293,10 +11293,10 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
-  stytch@13.1.0:
+  stytch@13.2.3:
     dependencies:
       jose: 5.10.0
-      undici: 6.21.2
+      undici: 6.24.1
 
   sugarss@5.0.0(postcss@8.5.8):
     dependencies:
@@ -11457,7 +11457,7 @@ snapshots:
 
   undici-types@7.18.2: {}
 
-  undici@6.21.2: {}
+  undici@6.24.1: {}
 
   undici@7.24.4: {}
 
@@ -11591,21 +11591,21 @@ snapshots:
       tsx: 4.21.0
       yaml: 2.7.1
 
-  vitest@4.1.1(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)):
+  vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)):
     dependencies:
-      '@vitest/expect': 4.1.1
-      '@vitest/mocker': 4.1.1(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
-      '@vitest/pretty-format': 4.1.1
-      '@vitest/runner': 4.1.1
-      '@vitest/snapshot': 4.1.1
-      '@vitest/spy': 4.1.1
-      '@vitest/utils': 4.1.1
+      '@vitest/expect': 4.1.2
+      '@vitest/mocker': 4.1.2(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+      '@vitest/pretty-format': 4.1.2
+      '@vitest/runner': 4.1.2
+      '@vitest/snapshot': 4.1.2
+      '@vitest/spy': 4.1.2
+      '@vitest/utils': 4.1.2
       es-module-lexer: 2.0.0
       expect-type: 1.3.0
       magic-string: 0.30.21
       obug: 2.1.1
       pathe: 2.0.3
-      picomatch: 4.0.3
+      picomatch: 4.0.4
       std-env: 4.0.0
       tinybench: 2.9.0
       tinyexec: 1.0.4

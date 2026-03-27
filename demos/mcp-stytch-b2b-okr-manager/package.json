@@ -23,7 +23,7 @@
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
 		"react-router-dom": "^7.13.2",
-		"stytch": "^13.1.0",
+		"stytch": "^13.2.3",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
