@@ -141,7 +141,7 @@
 		"dotenv": "^17.3.1"
 	},
 	"peerDependencies": {
-		"@tanstack/ai": "^0.5.0"
+		"@tanstack/ai": "^0.8.0"
 	},
 	"optionalDependencies": {
 		"@anthropic-ai/sdk": "^0.80.0",
