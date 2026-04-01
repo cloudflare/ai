@@ -144,7 +144,7 @@
 		"@tanstack/ai": "^0.5.0"
 	},
 	"optionalDependencies": {
-		"@anthropic-ai/sdk": "^0.80.0",
+		"@anthropic-ai/sdk": "^0.81.0",
 		"@google/genai": "^1.46.0",
 		"@openrouter/sdk": "^0.10.2",
 		"@tanstack/ai-anthropic": "^0.7.0",

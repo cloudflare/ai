@@ -48,7 +48,7 @@ importers:
         version: 5.3.4
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       ai:
         specifier: ^6.0.138
         version: 6.0.138(zod@4.3.6)
@@ -132,7 +132,7 @@ importers:
     dependencies:
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       ai:
         specifier: ^6.0.138
         version: 6.0.138(zod@4.3.6)
@@ -175,7 +175,7 @@ importers:
     dependencies:
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       ai:
         specifier: ^6.0.138
         version: 6.0.138(zod@4.3.6)
@@ -191,7 +191,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
         version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
@@ -218,7 +218,7 @@ importers:
     dependencies:
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       ai:
         specifier: ^6.0.138
         version: 6.0.138(zod@4.3.6)
@@ -234,7 +234,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
         version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
@@ -261,7 +261,7 @@ importers:
     dependencies:
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       ai:
         specifier: ^6.0.138
         version: 6.0.138(zod@4.3.6)
@@ -277,7 +277,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
         version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
@@ -304,7 +304,7 @@ importers:
     dependencies:
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.142(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
     devDependencies:
       typescript:
         specifier: 6.0.2
@@ -330,7 +330,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
         version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
@@ -357,7 +357,7 @@ importers:
     dependencies:
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.142(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       nanoid:
         specifier: ^5.1.7
         version: 5.1.7
@@ -370,7 +370,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.79.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/workers-types':
         specifier: ^4.20260317.1
         version: 4.20260317.1
@@ -382,7 +382,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
         specifier: ^6.0.1
-        version: 6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.27.0)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        version: 6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       vite:
         specifier: ^8.0.3
         version: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
@@ -394,7 +394,7 @@ importers:
         version: 0.3.1
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.142(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       hono:
         specifier: ^4.12.9
         version: 4.12.9
@@ -459,7 +459,7 @@ importers:
         version: 6.0.5
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.142(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       commander:
         specifier: ^14.0.3
         version: 14.0.3
@@ -487,7 +487,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@types/react':
         specifier: ^19.2.14
         version: 19.2.14
@@ -496,7 +496,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
         specifier: ^6.0.1
-        version: 6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.27.0)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        version: 6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       oxlint:
         specifier: ^1.57.0
         version: 1.57.0
@@ -520,7 +520,7 @@ importers:
         version: 6.0.5
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.142(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       hono:
         specifier: ^4.12.9
         version: 4.12.9
@@ -542,7 +542,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@types/react':
         specifier: ^19.2.14
         version: 19.2.14
@@ -551,7 +551,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
         specifier: ^6.0.1
-        version: 6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.27.0)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        version: 6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       oxlint:
         specifier: ^1.57.0
         version: 1.57.0
@@ -572,7 +572,7 @@ importers:
         version: 3.0.48(zod@4.3.6)
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       ai:
         specifier: ^6.0.138
         version: 6.0.138(zod@4.3.6)
@@ -588,7 +588,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
         version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
@@ -615,7 +615,7 @@ importers:
     dependencies:
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       ai:
         specifier: ^6.0.138
         version: 6.0.138(zod@4.3.6)
@@ -631,7 +631,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
         version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
@@ -658,7 +658,7 @@ importers:
     dependencies:
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       ai:
         specifier: ^6.0.138
         version: 6.0.138(zod@4.3.6)
@@ -674,7 +674,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
         version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
@@ -701,7 +701,7 @@ importers:
     dependencies:
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       ai:
         specifier: ^6.0.138
         version: 6.0.138(zod@4.3.6)
@@ -717,7 +717,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
         version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
@@ -753,7 +753,7 @@ importers:
         version: 0.3.1
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.142(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       hono:
         specifier: ^4.12.9
         version: 4.12.9
@@ -812,7 +812,7 @@ importers:
         version: 8.10.0
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.142(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       hono:
         specifier: ^4.12.9
         version: 4.12.9
@@ -843,7 +843,7 @@ importers:
     dependencies:
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.142(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -868,7 +868,7 @@ importers:
         version: 0.3.1
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.142(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       just-pick:
         specifier: ^4.2.0
         version: 4.2.0
@@ -896,7 +896,7 @@ importers:
         version: 0.3.1
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.142(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       hono:
         specifier: ^4.12.9
         version: 4.12.9
@@ -927,7 +927,7 @@ importers:
         version: 0.3.1
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.142(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       hono:
         specifier: ^4.12.9
         version: 4.12.9
@@ -958,7 +958,7 @@ importers:
         version: 3.1.9
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.142(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       hono:
         specifier: ^4.12.9
         version: 4.12.9
@@ -986,7 +986,7 @@ importers:
         version: 0.3.1
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.142(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       hono:
         specifier: ^4.12.9
         version: 4.12.9
@@ -1017,7 +1017,7 @@ importers:
         version: 0.3.1
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.142(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       hono:
         specifier: ^4.12.9
         version: 4.12.9
@@ -1048,7 +1048,7 @@ importers:
         version: 0.3.1
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.142(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       hono:
         specifier: ^4.12.9
         version: 4.12.9
@@ -1076,7 +1076,7 @@ importers:
     dependencies:
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       ai:
         specifier: ^6.0.138
         version: 6.0.138(zod@4.3.6)
@@ -1092,7 +1092,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
         version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
@@ -1116,7 +1116,7 @@ importers:
     dependencies:
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       ai:
         specifier: ^6.0.138
         version: 6.0.138(zod@4.3.6)
@@ -1132,7 +1132,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
         version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
@@ -1187,7 +1187,7 @@ importers:
     dependencies:
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       ai:
         specifier: ^6.0.138
         version: 6.0.138(zod@4.3.6)
@@ -1203,7 +1203,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
         version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
@@ -1227,7 +1227,7 @@ importers:
     dependencies:
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       ai:
         specifier: ^6.0.138
         version: 6.0.138(zod@4.3.6)
@@ -1243,7 +1243,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
         version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
@@ -1270,7 +1270,7 @@ importers:
     dependencies:
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       ai:
         specifier: ^6.0.138
         version: 6.0.138(zod@4.3.6)
@@ -1286,7 +1286,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
         version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
@@ -1313,7 +1313,7 @@ importers:
     dependencies:
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       ai:
         specifier: ^6.0.138
         version: 6.0.138(zod@4.3.6)
@@ -1329,7 +1329,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
         version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
@@ -1356,7 +1356,7 @@ importers:
     dependencies:
       agents:
         specifier: ^0.8.6
-        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+        version: 0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
       ai:
         specifier: ^6.0.138
         version: 6.0.138(zod@4.3.6)
@@ -1369,7 +1369,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
         version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
@@ -1445,7 +1445,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.4
         version: 0.13.4(@cloudflare/workers-types@4.20260317.1)(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(msw@2.12.14(@types/node@25.5.0)(typescript@6.0.2))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))
@@ -1457,7 +1457,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
         specifier: ^6.0.1
-        version: 6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.27.0)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        version: 6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -1509,7 +1509,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@types/react':
         specifier: ^19.2.14
         version: 19.2.14
@@ -1518,7 +1518,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
         specifier: ^6.0.1
-        version: 6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.27.0)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        version: 6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -1558,7 +1558,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@types/react':
         specifier: ^19.2.14
         version: 19.2.14
@@ -1567,7 +1567,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
         specifier: ^6.0.1
-        version: 6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.27.0)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        version: 6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       typescript:
         specifier: ~6.0.2
         version: 6.0.2
@@ -1601,7 +1601,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.30.1
-        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@cloudflare/workers-types':
         specifier: ^4.20260317.1
         version: 4.20260317.1
@@ -1616,7 +1616,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
         specifier: ^6.0.1
-        version: 6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.27.0)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+        version: 6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       tailwindcss:
         specifier: ^4.2.2
         version: 4.2.2
@@ -1651,7 +1651,7 @@ importers:
         version: 4.0.0(zod@4.3.6)
       ai:
         specifier: ^6.0.0
-        version: 6.0.1(zod@4.3.6)
+        version: 6.0.142(zod@4.3.6)
     devDependencies:
       tsdown:
         specifier: ^0.21.5
@@ -1710,7 +1710,7 @@ importers:
         version: 3.0.74(zod@4.3.6)
       '@openrouter/ai-sdk-provider':
         specifier: ^2.3.3
-        version: 2.3.3(ai@6.0.1(zod@4.3.6))(zod@4.3.6)
+        version: 2.3.3(ai@6.0.142(zod@4.3.6))(zod@4.3.6)
 
   packages/tanstack-ai:
     dependencies:
@@ -1732,8 +1732,8 @@ importers:
         version: 17.3.1
     optionalDependencies:
       '@anthropic-ai/sdk':
-        specifier: ^0.80.0
-        version: 0.80.0(zod@4.3.6)
+        specifier: ^0.81.0
+        version: 0.81.0(zod@4.3.6)
       '@google/genai':
         specifier: ^1.46.0
         version: 1.46.0(@modelcontextprotocol/sdk@1.28.0(@cfworker/json-schema@4.1.1)(zod@4.3.6))(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -1855,14 +1855,14 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/gateway@3.0.0':
-    resolution: {integrity: sha512-JcjePYVpbezv+XOxkxPemwnorjWpgDiiKWMYy6FXTCG2rFABIK2Co1bFxIUSDT4vYO6f1448x9rKbn38vbhDiA==}
+  '@ai-sdk/gateway@3.0.80':
+    resolution: {integrity: sha512-uM7kpZB5l977lW7+2X1+klBUxIZQ78+1a9jHlaHFEzcOcmmslTl3sdP0QqfuuBcO0YBM2gwOiqVdp8i4TRQYcw==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/gateway@3.0.80':
-    resolution: {integrity: sha512-uM7kpZB5l977lW7+2X1+klBUxIZQ78+1a9jHlaHFEzcOcmmslTl3sdP0QqfuuBcO0YBM2gwOiqVdp8i4TRQYcw==}
+  '@ai-sdk/gateway@3.0.84':
+    resolution: {integrity: sha512-RnUw6UNvkaw9MEaJU9cIjA+WBP+ZR5+M/9nfbfJHcGKtTbcWXijJuYKx9nYRnm+qU+iiakb0XvQA/vvho6lTsw==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -1956,8 +1956,8 @@ packages:
       zod:
         optional: true
 
-  '@anthropic-ai/sdk@0.80.0':
-    resolution: {integrity: sha512-WeXLn7zNVk3yjeshn+xZHvld6AoFUOR3Sep6pSoHho5YbSi6HwcirqgPA5ccFuW8QTVJAAU7N8uQQC6Wa9TG+g==}
+  '@anthropic-ai/sdk@0.81.0':
+    resolution: {integrity: sha512-D4K5PvEV6wPiRtVlVsJHIUhHAmOZ6IT/I9rKlTf84gR7GyyAurPJK7z9BOf/AZqC5d1DhYQGJNKRmV+q8dGhgw==}
     hasBin: true
     peerDependencies:
       zod: ^3.25.0 || ^4.0.0
@@ -2070,12 +2070,17 @@ packages:
     resolution: {integrity: sha512-YvjJow9FxbhFFKDSuFnVCe2WxXk1zWc22fFePVNEaWJEu8IrZVlda6N0uHwzZrUM1il7NC9Mlp4MaJYbYd9JSg==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/helpers@7.28.6':
-    resolution: {integrity: sha512-xOBvwq86HHdB7WUDTfKfT/Vuxh7gElQ+Sfti2Cy6yIWNW05P8iUslOVcZ4/sKbE+/jQaukQAdz/gf3724kYdqw==}
+  '@babel/helpers@7.29.2':
+    resolution: {integrity: sha512-HoGuUs4sCZNezVEKdVcwqmZN8GoHirLUcLaYVNBK2J0DadGtdcqgr3BCbvH8+XUo4NGjNl3VOtSjEKNzqfFgKw==}
     engines: {node: '>=6.9.0'}
 
   '@babel/parser@7.29.0':
     resolution: {integrity: sha512-IyDgFV5GeDUVX4YdF/3CPULtVGSXXMLh1xVIgdCgxApktqnQV0r7/8Nqthg+8YLGaAtdyIlo2qIdZrbCv4+7ww==}
+    engines: {node: '>=6.0.0'}
+    hasBin: true
+
+  '@babel/parser@7.29.2':
+    resolution: {integrity: sha512-4GgRzy/+fsBa72/RZVJmGKPmZu9Byn8o4MoLpmNe1m8ZfYnz5emHLQz3U4gLud6Zwl0RZIcgiLD7Uq7ySFuDLA==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -2102,6 +2107,10 @@ packages:
 
   '@babel/runtime@7.27.0':
     resolution: {integrity: sha512-VtPOkrdPHZsKc/clNqyi9WUA8TINkZ4cGk63UUE3u4pmB2k+ZMQRDuIOagv8UVd6j7k0T3+RRIb7beKTebNbcw==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/runtime@7.29.2':
+    resolution: {integrity: sha512-JiDShH45zKHWyGe4ZNVRrCjBz8Nh9TMmZG1kh4QTK8hCBTWBi8Da+i7s1fJw7/lYpM4ccepSNfqzZ/QvABBi5g==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.28.6':
@@ -2222,8 +2231,20 @@ packages:
     cpu: [x64]
     os: [darwin]
 
+  '@cloudflare/workerd-darwin-64@1.20260329.1':
+    resolution: {integrity: sha512-oyDXYlPBuGXKkZ85+M3jFz0/qYmvA4AEURN8USIGPDCR5q+HFSRwywSd9neTx3Wi7jhey2wuYaEpD3fEFWyWUA==}
+    engines: {node: '>=16'}
+    cpu: [x64]
+    os: [darwin]
+
   '@cloudflare/workerd-darwin-arm64@1.20260317.1':
     resolution: {integrity: sha512-M/MnNyvO5HMgoIdr3QHjdCj2T1ki9gt0vIUnxYxBu9ISXS/jgtMl6chUVPJ7zHYBn9MyYr8ByeN6frjYxj0MGg==}
+    engines: {node: '>=16'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@cloudflare/workerd-darwin-arm64@1.20260329.1':
+    resolution: {integrity: sha512-++ZxVa3ovzYeDLEG6zMqql9gzZAG8vak6ZSBQgprGKZp7akr+GKTpw9f3RrMP552NSi3gTisroLobrrkPBtYLQ==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [darwin]
@@ -2234,14 +2255,32 @@ packages:
     cpu: [x64]
     os: [linux]
 
+  '@cloudflare/workerd-linux-64@1.20260329.1':
+    resolution: {integrity: sha512-kkeywAgIHwbqHkVILqbj/YkfbrA6ARbmutjiYzZA2MwMSfNXlw6/kedAKOY8YwcymZIgepx3YTIPnBP50pOotw==}
+    engines: {node: '>=16'}
+    cpu: [x64]
+    os: [linux]
+
   '@cloudflare/workerd-linux-arm64@1.20260317.1':
     resolution: {integrity: sha512-3QrNnPF1xlaNwkHpasvRvAMidOvQs2NhXQmALJrEfpIJ/IDL2la8g499yXp3eqhG3hVMCB07XVY149GTs42Xtw==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [linux]
 
+  '@cloudflare/workerd-linux-arm64@1.20260329.1':
+    resolution: {integrity: sha512-eYBN20+B7XOUSWEe0mlqkMUbfLoIKjKZnpqQiSxnLbL72JKY0D/KlfN/b7RVGLpewB7i8rTrwTNr0szCKnZzSQ==}
+    engines: {node: '>=16'}
+    cpu: [arm64]
+    os: [linux]
+
   '@cloudflare/workerd-windows-64@1.20260317.1':
     resolution: {integrity: sha512-MfZTz+7LfuIpMGTa3RLXHX8Z/pnycZLItn94WRdHr8LPVet+C5/1Nzei399w/jr3+kzT4pDKk26JF/tlI5elpQ==}
+    engines: {node: '>=16'}
+    cpu: [x64]
+    os: [win32]
+
+  '@cloudflare/workerd-windows-64@1.20260329.1':
+    resolution: {integrity: sha512-5R+/oxrDhS9nL3oA3ZWtD6ndMOqm7RfKknDNxLcmYW5DkUu7UH3J/s1t/Dz66iFePzr5BJmE7/8gbmve6TjtZQ==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [win32]
@@ -3035,10 +3074,6 @@ packages:
 
   '@noble/curves@1.9.1':
     resolution: {integrity: sha512-k11yZxZg+t+gWvBbIswW0yoJlu8cHOC7dhunwOzoWH/mXGBiYyR4YY6hAEK/3EUs4UpB8la1RfdRpeGsFHkWsA==}
-    engines: {node: ^14.21.3 || >=16}
-
-  '@noble/curves@1.9.7':
-    resolution: {integrity: sha512-gbKGcRUYIjA3/zCCNaWDciTMFI0dCkvou3TL8Zmy5Nc7sJ47a0jtOeZoTaMxkuqRo9cRhjOdZJXegxYE5FN/xw==}
     engines: {node: ^14.21.3 || >=16}
 
   '@noble/hashes@1.8.0':
@@ -4150,10 +4185,6 @@ packages:
   '@types/wait-on@5.3.4':
     resolution: {integrity: sha512-EBsPjFMrFlMbbUFf9D1Fp+PAB2TwmUn7a3YtHyD9RLuTIk1jDd8SxXVAoez2Ciy+8Jsceo2MYEYZzJ/DvorOKw==}
 
-  '@vercel/oidc@3.0.5':
-    resolution: {integrity: sha512-fnYhv671l+eTTp48gB4zEsTW/YtRgRPnkI2nT7x6qw5rkI1Lq2hTmQIpHPgyThI0znLK+vX2n9XxKdXZ7BUbbw==}
-    engines: {node: '>= 20'}
-
   '@vercel/oidc@3.1.0':
     resolution: {integrity: sha512-Fw28YZpRnA3cAHHDlkt7xQHiJ0fcL+NRcIqsocZQUSmbzeIKRpwttJjik5ZGanXP+vlA4SbTg+AbA3bP363l+w==}
     engines: {node: '>= 20'}
@@ -4226,17 +4257,6 @@ packages:
       zod:
         optional: true
 
-  abitype@1.1.1:
-    resolution: {integrity: sha512-Loe5/6tAgsBukY95eGaPSDmQHIjRZYQq8PB1MpsNccDIK8WiV+Uw6WzaIXipvaxTEL2yEB0OpEaQv3gs8pkS9Q==}
-    peerDependencies:
-      typescript: '>=5.0.4'
-      zod: ^3.22.0 || ^4.0.0
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-      zod:
-        optional: true
-
   accepts@2.0.0:
     resolution: {integrity: sha512-5cvg6CtKwfgdmVqY1WIiXKc3Q1bkRqGLi+2W/6ao+6Y7gu/RCwRuAhGEzh5B4KlszSuTLgZYuqFqo5bImjNKng==}
     engines: {node: '>= 0.6'}
@@ -4278,14 +4298,14 @@ packages:
       vite:
         optional: true
 
-  ai@6.0.1:
-    resolution: {integrity: sha512-g/jPakC6h4vUJKDww0d6+VaJmfMC38UqH3kKsngiP+coT0uvCUdQ7lpFDJ0mNmamaOyRMaY2zwEB2RnTAaJU/w==}
+  ai@6.0.138:
+    resolution: {integrity: sha512-49OfPe0f5uxJ6jUdA5BBXjIinP6+ZdYfAtpF2aEH64GA5wPcxH2rf/TBUQQ0bbamBz/D+TLMV18xilZqOC+zaA==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  ai@6.0.138:
-    resolution: {integrity: sha512-49OfPe0f5uxJ6jUdA5BBXjIinP6+ZdYfAtpF2aEH64GA5wPcxH2rf/TBUQQ0bbamBz/D+TLMV18xilZqOC+zaA==}
+  ai@6.0.142:
+    resolution: {integrity: sha512-ZoxAsnTL/dFg5WdcwC8QNhKVlLtqwwT3I7p/4i8IJJP+6ZwqF1ljuwMsAsPYYvppZ+RzUxjxxFGb1cbEhNH3dg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -4377,6 +4397,11 @@ packages:
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
 
+  baseline-browser-mapping@2.10.13:
+    resolution: {integrity: sha512-BL2sTuHOdy0YT1lYieUxTw/QMtPBC3pmlJC6xk8BBYVv6vcw3SGdKemQ+Xsx9ik2F/lYDO9tqsFQH1r9PFuHKw==}
+    engines: {node: '>=6.0.0'}
+    hasBin: true
+
   before-after-hook@4.0.0:
     resolution: {integrity: sha512-q6tR3RPqIB1pMiTRMFcZwuG5T8vwp+vUvEG0vuI6B+Rikh5BfPp2fQ82c925FOs+b0lcFQ8CFrL+KbilfZFhOQ==}
 
@@ -4417,8 +4442,8 @@ packages:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
     engines: {node: '>=8'}
 
-  browserslist@4.24.4:
-    resolution: {integrity: sha512-KDi1Ny1gSePi1vm0q4oxSF8b4DR44GF4BbmS2YdhPLOEqd8pDviZOGH/GsmRwoWJ2+5Lr085X7naowMwKHDG1A==}
+  browserslist@4.28.2:
+    resolution: {integrity: sha512-48xSriZYYg+8qXna9kwqjIVzuQxi+KYWp2+5nCYnYKPTr0LvD89Jqk2Or5ogxz0NUMfIjhh2lIUX/LyX9B4oIg==}
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
 
@@ -4464,8 +4489,8 @@ packages:
     resolution: {integrity: sha512-8WB3Jcas3swSvjIeA2yvCJ+Miyz5l1ZmB6HFb9R1317dt9LCQoswg/BGrmAmkWVEszSrrg4RwmO46qIm2OEnSA==}
     engines: {node: '>=16'}
 
-  caniuse-lite@1.0.30001712:
-    resolution: {integrity: sha512-MBqPpGYYdQ7/hfKiet9SCI+nmN5/hp4ZzveOJubl5DTAMa5oggjAuoi0Z4onBpKPFI2ePGnQuQIzF3VxDjDJig==}
+  caniuse-lite@1.0.30001784:
+    resolution: {integrity: sha512-WU346nBTklUV9YfUl60fqRbU5ZqyXlqvo1SgigE1OAXK5bFL8LL9q1K7aap3N739l4BvNqnkm3YrGHiY9sfUQw==}
 
   chai@6.2.2:
     resolution: {integrity: sha512-NUPRluOfOiTKBKvWPtSD4PhFvWCqOi0BGStNWs57X9js7XGTprSmFoz5F0tWhR4WPjNeR9jXqdC7/UpSJTnlRg==}
@@ -4746,8 +4771,8 @@ packages:
     engines: {node: '>=0.12.18'}
     hasBin: true
 
-  electron-to-chromium@1.5.134:
-    resolution: {integrity: sha512-zSwzrLg3jNP3bwsLqWHmS5z2nIOQ5ngMnfMZOWWtXnqqQkPVyOipxK98w+1beLw1TB+EImPNcG8wVP/cLVs2Og==}
+  electron-to-chromium@1.5.330:
+    resolution: {integrity: sha512-jFNydB5kFtYUobh4IkWUnXeyDbjf/r9gcUEXe1xcrcUxIGfTdzPXA+ld6zBRbwvgIGVzDll/LTIiDztEtckSnA==}
 
   emoji-regex@10.6.0:
     resolution: {integrity: sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A==}
@@ -5042,6 +5067,7 @@ packages:
 
   glob@10.4.5:
     resolution: {integrity: sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   globals@17.4.0:
@@ -5534,6 +5560,11 @@ packages:
     engines: {node: '>=18.0.0'}
     hasBin: true
 
+  miniflare@4.20260329.0:
+    resolution: {integrity: sha512-+G+1YFVeuEpw/gZZmUHQR7IfzJV+DDGvnSl0yXzhgvHh8Nbr8Go5uiWIwl17EyZ1Uors3FKUMDUyU6+ejeKZOw==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+
   minimatch@10.2.3:
     resolution: {integrity: sha512-Rwi3pnapEqirPSbWbrZaa6N3nmqq4Xer/2XooiOKyV3q12ML06f7MOuc5DVH8ONZIFhwIYQ3yzPH4nt7iWHaTg==}
     engines: {node: 18 || 20 || >=22}
@@ -5624,8 +5655,8 @@ packages:
     resolution: {integrity: sha512-LA4ZjwlnUblHVgq0oBF3Jl/6h/Nvs5fzBLwdEF4nuxnFdsfajde4WfxtJr3CaiH+F6ewcIB/q4jQ4UzPyid+CQ==}
     hasBin: true
 
-  node-releases@2.0.19:
-    resolution: {integrity: sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw==}
+  node-releases@2.0.36:
+    resolution: {integrity: sha512-TdC8FSgHz8Mwtw9g5L4gR/Sh9XhSP/0DEkQxfEFXOpiul5IiHgHan2VhYYb6agDSfp4KuvltmGApc8HMgUrIkA==}
 
   npm-run-path@4.0.1:
     resolution: {integrity: sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==}
@@ -6532,8 +6563,8 @@ packages:
   until-async@3.0.2:
     resolution: {integrity: sha512-IiSk4HlzAMqTUseHHe3VhIGyuFmN90zMTpD3Z3y8jeQbzLIq500MVM7Jq2vUAnTKAFPJrqwkzr6PoTcPhGcOiw==}
 
-  update-browserslist-db@1.1.3:
-    resolution: {integrity: sha512-UxhIZQ+QInVdunkDAaiazvvT/+fXL5Osr0JZlJulepYu6Jd7qJtDZjlur0emRlT71EN3ScPoE7gvsuIKKNavKw==}
+  update-browserslist-db@1.2.3:
+    resolution: {integrity: sha512-Js0m9cx+qOgDxo0eMiFGEueWztz+d4+M3rGlmKPT+T4IS/jP4ylw3Nwpu6cpTTP8R1MAC1kF4VbdLt3ARf209w==}
     hasBin: true
     peerDependencies:
       browserslist: '>= 4.21.0'
@@ -6738,6 +6769,11 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
+  workerd@1.20260329.1:
+    resolution: {integrity: sha512-+ifMv3uBuD33ee7pan5n8+sgVxm2u5HnbgfXzHKwMNTKw86znqBJSnJoBqtP88+2T5U2Lu11xXUt+khPYioXwQ==}
+    engines: {node: '>=16'}
+    hasBin: true
+
   workers-ai-provider@3.1.8:
     resolution: {integrity: sha512-zVT4MeAKE+9XhrB2+jyhcsmCq/1klDcTr7uDkNnnz9RLOi7J86+RWXOuCdOPd/jOJmDFdbjj+n8PmQ7DyP/stA==}
     peerDependencies:
@@ -6750,6 +6786,16 @@ packages:
     hasBin: true
     peerDependencies:
       '@cloudflare/workers-types': ^4.20260317.1
+    peerDependenciesMeta:
+      '@cloudflare/workers-types':
+        optional: true
+
+  wrangler@4.79.0:
+    resolution: {integrity: sha512-NMinIdB1pXIqdk+NLw4+RjzB7K5z4+lWMxhTxFTfZomwJu3Pm6N+kZ+a66D3nI7w0oCjsdv/umrZVmSHCBp2cg==}
+    engines: {node: '>=20.3.0'}
+    hasBin: true
+    peerDependencies:
+      '@cloudflare/workers-types': ^4.20260329.1
     peerDependenciesMeta:
       '@cloudflare/workers-types':
         optional: true
@@ -6929,14 +6975,14 @@ snapshots:
       zod: 4.3.6
     optional: true
 
-  '@ai-sdk/gateway@3.0.0(zod@4.3.6)':
+  '@ai-sdk/gateway@3.0.80(zod@4.3.6)':
     dependencies:
-      '@ai-sdk/provider': 3.0.0
-      '@ai-sdk/provider-utils': 4.0.0(zod@4.3.6)
-      '@vercel/oidc': 3.0.5
+      '@ai-sdk/provider': 3.0.8
+      '@ai-sdk/provider-utils': 4.0.21(zod@4.3.6)
+      '@vercel/oidc': 3.1.0
       zod: 4.3.6
 
-  '@ai-sdk/gateway@3.0.80(zod@4.3.6)':
+  '@ai-sdk/gateway@3.0.84(zod@4.3.6)':
     dependencies:
       '@ai-sdk/provider': 3.0.8
       '@ai-sdk/provider-utils': 4.0.21(zod@4.3.6)
@@ -7049,7 +7095,7 @@ snapshots:
       zod: 4.3.6
     optional: true
 
-  '@anthropic-ai/sdk@0.80.0(zod@4.3.6)':
+  '@anthropic-ai/sdk@0.81.0(zod@4.3.6)':
     dependencies:
       json-schema-to-ts: 3.1.1
     optionalDependencies:
@@ -7096,8 +7142,8 @@ snapshots:
       '@babel/generator': 7.29.1
       '@babel/helper-compilation-targets': 7.28.6
       '@babel/helper-module-transforms': 7.28.6(@babel/core@7.29.0)
-      '@babel/helpers': 7.28.6
-      '@babel/parser': 7.29.0
+      '@babel/helpers': 7.29.2
+      '@babel/parser': 7.29.2
       '@babel/template': 7.28.6
       '@babel/traverse': 7.29.0
       '@babel/types': 7.29.0
@@ -7135,7 +7181,7 @@ snapshots:
     dependencies:
       '@babel/compat-data': 7.29.0
       '@babel/helper-validator-option': 7.27.1
-      browserslist: 4.24.4
+      browserslist: 4.28.2
       lru-cache: 5.1.1
       semver: 6.3.1
 
@@ -7209,12 +7255,16 @@ snapshots:
 
   '@babel/helper-validator-option@7.27.1': {}
 
-  '@babel/helpers@7.28.6':
+  '@babel/helpers@7.29.2':
     dependencies:
       '@babel/template': 7.28.6
       '@babel/types': 7.29.0
 
   '@babel/parser@7.29.0':
+    dependencies:
+      '@babel/types': 7.29.0
+
+  '@babel/parser@7.29.2':
     dependencies:
       '@babel/types': 7.29.0
 
@@ -7243,6 +7293,8 @@ snapshots:
   '@babel/runtime@7.27.0':
     dependencies:
       regenerator-runtime: 0.14.1
+
+  '@babel/runtime@7.29.2': {}
 
   '@babel/template@7.28.6':
     dependencies:
@@ -7449,6 +7501,12 @@ snapshots:
     optionalDependencies:
       workerd: 1.20260317.1
 
+  '@cloudflare/unenv-preset@2.16.0(unenv@2.0.0-rc.24)(workerd@1.20260329.1)':
+    dependencies:
+      unenv: 2.0.0-rc.24
+    optionalDependencies:
+      workerd: 1.20260329.1
+
   '@cloudflare/vite-plugin@1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260317.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@cloudflare/unenv-preset': 2.16.0(unenv@2.0.0-rc.24)(workerd@1.20260317.1)
@@ -7456,6 +7514,32 @@ snapshots:
       unenv: 2.0.0-rc.24
       vite: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
       wrangler: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      ws: 8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+      - workerd
+
+  '@cloudflare/vite-plugin@1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
+    dependencies:
+      '@cloudflare/unenv-preset': 2.16.0(unenv@2.0.0-rc.24)(workerd@1.20260329.1)
+      miniflare: 4.20260317.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      unenv: 2.0.0-rc.24
+      vite: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
+      wrangler: 4.77.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      ws: 8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+      - workerd
+
+  '@cloudflare/vite-plugin@1.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(workerd@1.20260329.1)(wrangler@4.79.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
+    dependencies:
+      '@cloudflare/unenv-preset': 2.16.0(unenv@2.0.0-rc.24)(workerd@1.20260329.1)
+      miniflare: 4.20260317.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      unenv: 2.0.0-rc.24
+      vite: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
+      wrangler: 4.79.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       ws: 8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
@@ -7480,16 +7564,31 @@ snapshots:
   '@cloudflare/workerd-darwin-64@1.20260317.1':
     optional: true
 
+  '@cloudflare/workerd-darwin-64@1.20260329.1':
+    optional: true
+
   '@cloudflare/workerd-darwin-arm64@1.20260317.1':
+    optional: true
+
+  '@cloudflare/workerd-darwin-arm64@1.20260329.1':
     optional: true
 
   '@cloudflare/workerd-linux-64@1.20260317.1':
     optional: true
 
+  '@cloudflare/workerd-linux-64@1.20260329.1':
+    optional: true
+
   '@cloudflare/workerd-linux-arm64@1.20260317.1':
     optional: true
 
+  '@cloudflare/workerd-linux-arm64@1.20260329.1':
+    optional: true
+
   '@cloudflare/workerd-windows-64@1.20260317.1':
+    optional: true
+
+  '@cloudflare/workerd-windows-64@1.20260329.1':
     optional: true
 
   '@cloudflare/workers-oauth-provider@0.3.1': {}
@@ -8057,7 +8156,7 @@ snapshots:
 
   '@manypkg/find-root@1.1.0':
     dependencies:
-      '@babel/runtime': 7.27.0
+      '@babel/runtime': 7.29.2
       '@types/node': 12.20.55
       find-up: 4.1.0
       fs-extra: 8.1.0
@@ -8157,11 +8256,6 @@ snapshots:
     optional: true
 
   '@noble/curves@1.9.1':
-    dependencies:
-      '@noble/hashes': 1.8.0
-    optional: true
-
-  '@noble/curves@1.9.7':
     dependencies:
       '@noble/hashes': 1.8.0
     optional: true
@@ -8421,9 +8515,9 @@ snapshots:
 
   '@open-draft/until@2.1.0': {}
 
-  '@openrouter/ai-sdk-provider@2.3.3(ai@6.0.1(zod@4.3.6))(zod@4.3.6)':
+  '@openrouter/ai-sdk-provider@2.3.3(ai@6.0.142(zod@4.3.6))(zod@4.3.6)':
     dependencies:
-      ai: 6.0.1(zod@4.3.6)
+      ai: 6.0.142(zod@4.3.6)
       zod: 4.3.6
     optional: true
 
@@ -8713,13 +8807,13 @@ snapshots:
   '@rolldown/binding-win32-x64-msvc@1.0.0-rc.12':
     optional: true
 
-  '@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.27.0)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))':
+  '@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))':
     dependencies:
       '@babel/core': 7.29.0
       picomatch: 4.0.4
       rolldown: 1.0.0-rc.12
     optionalDependencies:
-      '@babel/runtime': 7.27.0
+      '@babel/runtime': 7.29.2
       vite: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
 
   '@rolldown/pluginutils@1.0.0-rc.11': {}
@@ -8772,7 +8866,7 @@ snapshots:
 
   '@scure/bip32@1.7.0':
     dependencies:
-      '@noble/curves': 1.9.7
+      '@noble/curves': 1.9.1
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
     optional: true
@@ -9091,16 +9185,14 @@ snapshots:
     dependencies:
       '@types/node': 25.5.0
 
-  '@vercel/oidc@3.0.5': {}
-
   '@vercel/oidc@3.1.0': {}
 
-  '@vitejs/plugin-react@6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.27.0)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))':
+  '@vitejs/plugin-react@6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))':
     dependencies:
       '@rolldown/pluginutils': 1.0.0-rc.7
       vite: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
     optionalDependencies:
-      '@rolldown/plugin-babel': 0.2.2(@babel/core@7.29.0)(@babel/runtime@7.27.0)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+      '@rolldown/plugin-babel': 0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
 
   '@vitest/expect@4.1.2':
     dependencies:
@@ -9163,12 +9255,6 @@ snapshots:
       zod: 4.3.6
     optional: true
 
-  abitype@1.1.1(typescript@6.0.2)(zod@4.3.6):
-    optionalDependencies:
-      typescript: 6.0.2
-      zod: 4.3.6
-    optional: true
-
   accepts@2.0.0:
     dependencies:
       mime-types: 3.0.1
@@ -9177,12 +9263,12 @@ snapshots:
   agent-base@7.1.4:
     optional: true
 
-  agents@0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6):
+  agents@0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.138(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6):
     dependencies:
       '@babel/plugin-proposal-decorators': 7.29.0(@babel/core@7.29.0)
       '@cfworker/json-schema': 4.1.1
       '@modelcontextprotocol/sdk': 1.28.0(@cfworker/json-schema@4.1.1)(zod@4.3.6)
-      '@rolldown/plugin-babel': 0.2.2(@babel/core@7.29.0)(@babel/runtime@7.27.0)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+      '@rolldown/plugin-babel': 0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
       ai: 6.0.138(zod@4.3.6)
       cron-schedule: 6.0.0
       json-schema: 0.4.0
@@ -9208,17 +9294,48 @@ snapshots:
       - rolldown
       - supports-color
 
-  ai@6.0.1(zod@4.3.6):
+  agents@0.8.6(@ai-sdk/openai@3.0.48(zod@4.3.6))(@ai-sdk/react@3.0.140(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@cloudflare/workers-types@4.20260317.1)(ai@6.0.142(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6):
     dependencies:
-      '@ai-sdk/gateway': 3.0.0(zod@4.3.6)
-      '@ai-sdk/provider': 3.0.0
-      '@ai-sdk/provider-utils': 4.0.0(zod@4.3.6)
-      '@opentelemetry/api': 1.9.0
+      '@babel/plugin-proposal-decorators': 7.29.0(@babel/core@7.29.0)
+      '@cfworker/json-schema': 4.1.1
+      '@modelcontextprotocol/sdk': 1.28.0(@cfworker/json-schema@4.1.1)(zod@4.3.6)
+      '@rolldown/plugin-babel': 0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.0-rc.12)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))
+      ai: 6.0.142(zod@4.3.6)
+      cron-schedule: 6.0.0
+      json-schema: 0.4.0
+      json-schema-to-typescript: 15.0.4
+      mimetext: 3.0.28
+      nanoid: 5.1.7
+      partyserver: 0.4.0(@cloudflare/workers-types@4.20260317.1)
+      partysocket: 1.1.16(react@19.2.4)
+      picomatch: 4.0.4
+      react: 19.2.4
+      yargs: 18.0.0
       zod: 4.3.6
+    optionalDependencies:
+      '@ai-sdk/openai': 3.0.48(zod@4.3.6)
+      '@ai-sdk/react': 3.0.140(react@19.2.4)(zod@4.3.6)
+      viem: 2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6)
+      vite: 8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1)
+    transitivePeerDependencies:
+      - '@babel/core'
+      - '@babel/plugin-transform-runtime'
+      - '@babel/runtime'
+      - '@cloudflare/workers-types'
+      - rolldown
+      - supports-color
 
   ai@6.0.138(zod@4.3.6):
     dependencies:
       '@ai-sdk/gateway': 3.0.80(zod@4.3.6)
+      '@ai-sdk/provider': 3.0.8
+      '@ai-sdk/provider-utils': 4.0.21(zod@4.3.6)
+      '@opentelemetry/api': 1.9.0
+      zod: 4.3.6
+
+  ai@6.0.142(zod@4.3.6):
+    dependencies:
+      '@ai-sdk/gateway': 3.0.84(zod@4.3.6)
       '@ai-sdk/provider': 3.0.8
       '@ai-sdk/provider-utils': 4.0.21(zod@4.3.6)
       '@opentelemetry/api': 1.9.0
@@ -9294,6 +9411,8 @@ snapshots:
 
   base64-js@1.5.1: {}
 
+  baseline-browser-mapping@2.10.13: {}
+
   before-after-hook@4.0.0: {}
 
   better-path-resolve@1.0.0:
@@ -9346,12 +9465,13 @@ snapshots:
     dependencies:
       fill-range: 7.1.1
 
-  browserslist@4.24.4:
+  browserslist@4.28.2:
     dependencies:
-      caniuse-lite: 1.0.30001712
-      electron-to-chromium: 1.5.134
-      node-releases: 2.0.19
-      update-browserslist-db: 1.1.3(browserslist@4.24.4)
+      baseline-browser-mapping: 2.10.13
+      caniuse-lite: 1.0.30001784
+      electron-to-chromium: 1.5.330
+      node-releases: 2.0.36
+      update-browserslist-db: 1.2.3(browserslist@4.28.2)
 
   buffer-equal-constant-time@1.0.1:
     optional: true
@@ -9393,7 +9513,7 @@ snapshots:
 
   camelcase@8.0.0: {}
 
-  caniuse-lite@1.0.30001712: {}
+  caniuse-lite@1.0.30001784: {}
 
   chai@6.2.2: {}
 
@@ -9564,7 +9684,7 @@ snapshots:
 
   dom-helpers@5.2.1:
     dependencies:
-      '@babel/runtime': 7.27.0
+      '@babel/runtime': 7.29.2
       csstype: 3.2.3
 
   dotenv-expand@11.0.7:
@@ -9603,7 +9723,7 @@ snapshots:
 
   ejs@5.0.1: {}
 
-  electron-to-chromium@1.5.134: {}
+  electron-to-chromium@1.5.330: {}
 
   emoji-regex@10.6.0: {}
 
@@ -10195,7 +10315,7 @@ snapshots:
 
   json-schema-to-ts@3.1.1:
     dependencies:
-      '@babel/runtime': 7.27.0
+      '@babel/runtime': 7.29.2
       ts-algebra: 2.0.0
     optional: true
 
@@ -10419,6 +10539,18 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
+  miniflare@4.20260329.0(bufferutil@4.0.9)(utf-8-validate@5.0.10):
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      sharp: 0.34.5
+      undici: 7.24.4
+      workerd: 1.20260329.1
+      ws: 8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      youch: 4.1.0-beta.10
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
   minimatch@10.2.3:
     dependencies:
       brace-expansion: 5.0.5
@@ -10503,7 +10635,7 @@ snapshots:
   node-gyp-build@4.8.4:
     optional: true
 
-  node-releases@2.0.19: {}
+  node-releases@2.0.36: {}
 
   npm-run-path@4.0.1:
     dependencies:
@@ -10629,7 +10761,7 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.1.1(typescript@6.0.2)(zod@4.3.6)
+      abitype: 1.1.0(typescript@6.0.2)(zod@4.3.6)
       eventemitter3: 5.0.1
     optionalDependencies:
       typescript: 6.0.2
@@ -11481,9 +11613,9 @@ snapshots:
 
   until-async@3.0.2: {}
 
-  update-browserslist-db@1.1.3(browserslist@4.24.4):
+  update-browserslist-db@1.2.3(browserslist@4.28.2):
     dependencies:
-      browserslist: 4.24.4
+      browserslist: 4.28.2
       escalade: 3.2.0
       picocolors: 1.1.1
 
@@ -11662,6 +11794,14 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20260317.1
       '@cloudflare/workerd-windows-64': 1.20260317.1
 
+  workerd@1.20260329.1:
+    optionalDependencies:
+      '@cloudflare/workerd-darwin-64': 1.20260329.1
+      '@cloudflare/workerd-darwin-arm64': 1.20260329.1
+      '@cloudflare/workerd-linux-64': 1.20260329.1
+      '@cloudflare/workerd-linux-arm64': 1.20260329.1
+      '@cloudflare/workerd-windows-64': 1.20260329.1
+
   workers-ai-provider@3.1.8(@ai-sdk/provider@3.0.8)(ai@6.0.138(zod@4.3.6)):
     dependencies:
       '@ai-sdk/provider': 3.0.8
@@ -11677,6 +11817,23 @@ snapshots:
       path-to-regexp: 6.3.0
       unenv: 2.0.0-rc.24
       workerd: 1.20260317.1
+    optionalDependencies:
+      '@cloudflare/workers-types': 4.20260317.1
+      fsevents: 2.3.3
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
+  wrangler@4.79.0(@cloudflare/workers-types@4.20260317.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10):
+    dependencies:
+      '@cloudflare/kv-asset-handler': 0.4.2
+      '@cloudflare/unenv-preset': 2.16.0(unenv@2.0.0-rc.24)(workerd@1.20260329.1)
+      blake3-wasm: 2.1.5
+      esbuild: 0.27.3
+      miniflare: 4.20260329.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      path-to-regexp: 6.3.0
+      unenv: 2.0.0-rc.24
+      workerd: 1.20260329.1
     optionalDependencies:
       '@cloudflare/workers-types': 4.20260317.1
       fsevents: 2.3.3
