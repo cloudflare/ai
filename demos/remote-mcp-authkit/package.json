@@ -14,18 +14,18 @@
 		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@cloudflare/workers-oauth-provider": "^0.3.1",
+		"@cloudflare/workers-oauth-provider": "^0.4.0",
 		"@workos-inc/node": "^8.10.0",
-		"agents": "^0.8.6",
+		"agents": "^0.9.0",
 		"hono": "^4.12.9",
 		"jose": "^6.2.2",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20260317.1",
-		"oxfmt": "^0.42.0",
-		"oxlint": "^1.57.0",
+		"@cloudflare/workers-types": "^4.20260402.1",
+		"oxfmt": "^0.43.0",
+		"oxlint": "^1.58.0",
 		"typescript": "6.0.2",
-		"wrangler": "^4.77.0"
+		"wrangler": "^4.79.0"
 	}
 }

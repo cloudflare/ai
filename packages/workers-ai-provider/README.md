@@ -20,7 +20,7 @@ export default {
 		const workersai = createWorkersAI({ binding: env.AI });
 
 		const result = streamText({
-			model: workersai("@cf/meta/llama-4-scout-17b-16e-instruct"),
+			model: workersai("@cf/moonshotai/kimi-k2.5"),
 			messages: [{ role: "user", content: "Write a haiku about Cloudflare" }],
 		});
 
@@ -71,19 +71,20 @@ Browse the full catalog at [developers.cloudflare.com/workers-ai/models](https:/
 
 Some good defaults:
 
-| Task           | Model                                      | Notes                            |
-| -------------- | ------------------------------------------ | -------------------------------- |
-| Chat           | `@cf/meta/llama-4-scout-17b-16e-instruct`  | Fast, strong tool calling        |
-| Chat           | `@cf/meta/llama-3.3-70b-instruct-fp8-fast` | Largest Llama, best quality      |
-| Chat           | `@cf/openai/gpt-oss-120b`                  | OpenAI open-weights, high reason |
-| Reasoning      | `@cf/qwen/qwq-32b`                         | Emits `reasoning_content`        |
-| Embeddings     | `@cf/baai/bge-base-en-v1.5`                | 768-dim, English                 |
-| Embeddings     | `@cf/google/embeddinggemma-300m`           | 100+ languages, by Google        |
-| Images         | `@cf/black-forest-labs/flux-1-schnell`     | Fast image generation            |
-| Transcription  | `@cf/openai/whisper-large-v3-turbo`        | Best accuracy, multilingual      |
-| Transcription  | `@cf/deepgram/nova-3`                      | Fast, high accuracy              |
-| Text-to-Speech | `@cf/deepgram/aura-2-en`                   | Context-aware, natural pacing    |
-| Reranking      | `@cf/baai/bge-reranker-base`               | Fast document reranking          |
+| Task           | Model                                  | Notes                               |
+| -------------- | -------------------------------------- | ----------------------------------- |
+| Chat           | `@cf/moonshotai/kimi-k2.5`             | 256k ctx, tools, vision, reasoning  |
+| Chat           | `@cf/zai-org/glm-4.7-flash`            | Fast, multilingual, 131k ctx        |
+| Chat           | `@cf/openai/gpt-oss-120b`              | OpenAI open-weights, high reasoning |
+| Reasoning      | `@cf/moonshotai/kimi-k2.5`             | Configurable `reasoning_effort`     |
+| Reasoning      | `@cf/qwen/qwq-32b`                     | Emits `reasoning_content`           |
+| Embeddings     | `@cf/baai/bge-base-en-v1.5`            | 768-dim, English                    |
+| Embeddings     | `@cf/google/embeddinggemma-300m`       | 100+ languages, by Google           |
+| Images         | `@cf/black-forest-labs/flux-1-schnell` | Fast, free-tier image generation    |
+| Transcription  | `@cf/openai/whisper-large-v3-turbo`    | Best accuracy, multilingual         |
+| Transcription  | `@cf/deepgram/nova-3`                  | Fast, high accuracy                 |
+| Text-to-Speech | `@cf/deepgram/aura-2-en`               | Context-aware, natural pacing       |
+| Reranking      | `@cf/baai/bge-reranker-base`           | Fast document reranking             |
 
 ## Text Generation
 
@@ -91,7 +92,7 @@ Some good defaults:
 import { generateText } from "ai";
 
 const { text } = await generateText({
-	model: workersai("@cf/meta/llama-3.3-70b-instruct-fp8-fast"),
+	model: workersai("@cf/moonshotai/kimi-k2.5"),
 	prompt: "Explain Workers AI in one paragraph",
 });
 ```
@@ -102,7 +103,7 @@ Streaming:
 import { streamText } from "ai";
 
 const result = streamText({
-	model: workersai("@cf/meta/llama-4-scout-17b-16e-instruct"),
+	model: workersai("@cf/moonshotai/kimi-k2.5"),
 	messages: [{ role: "user", content: "Write a short story" }],
 });
 
@@ -113,13 +114,13 @@ for await (const chunk of result.textStream) {
 
 ## Vision (Image Inputs)
 
-Send images to vision-capable models like Llama 4 Scout and Kimi K2.5:
+Send images to vision-capable models like Kimi K2.5:
 
 ```ts
 import { generateText } from "ai";
 
 const { text } = await generateText({
-	model: workersai("@cf/meta/llama-4-scout-17b-16e-instruct"),
+	model: workersai("@cf/moonshotai/kimi-k2.5"),
 	messages: [
 		{
 			role: "user",
@@ -141,7 +142,7 @@ import { generateText, stepCountIs } from "ai";
 import { z } from "zod";
 
 const { text } = await generateText({
-	model: workersai("@cf/meta/llama-4-scout-17b-16e-instruct"),
+	model: workersai("@cf/moonshotai/kimi-k2.5"),
 	prompt: "What's the weather in London?",
 	tools: {
 		getWeather: {
@@ -161,7 +162,7 @@ import { generateText, Output } from "ai";
 import { z } from "zod";
 
 const { output } = await generateText({
-	model: workersai("@cf/meta/llama-3.3-70b-instruct-fp8-fast"),
+	model: workersai("@cf/moonshotai/kimi-k2.5"),
 	prompt: "Recipe for spaghetti bolognese",
 	output: Output.object({
 		schema: z.object({
@@ -313,7 +314,7 @@ Streaming works the same way — use `streamText` instead of `generateText`.
 Returns a provider with model factories. Each factory accepts an optional second argument for per-model settings:
 
 ```ts
-workersai("@cf/meta/llama-3.3-70b-instruct-fp8-fast", {
+workersai("@cf/moonshotai/kimi-k2.5", {
 	sessionAffinity: "my-unique-session-id",
 });
 ```

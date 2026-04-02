@@ -10,14 +10,14 @@
 		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
-		"ai": "^6.0.138",
+		"ai": "^6.0.143",
 		"workers-ai-provider": "^3.1.8",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20260317.1",
-		"oxfmt": "^0.42.0",
-		"oxlint": "^1.57.0",
+		"@cloudflare/workers-types": "^4.20260402.1",
+		"oxfmt": "^0.43.0",
+		"oxlint": "^1.58.0",
 		"typescript": "6.0.2",
 		"vitest": "~4.1.2"
 	}

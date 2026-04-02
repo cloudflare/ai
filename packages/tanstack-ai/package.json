@@ -135,23 +135,23 @@
 		"openai": "^6.33.0"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20260317.1",
-		"@microsoft/api-extractor": "^7.57.7",
-		"@tanstack/ai": "^0.8.1",
-		"dotenv": "^17.3.1"
+		"@cloudflare/workers-types": "^4.20260402.1",
+		"@microsoft/api-extractor": "^7.58.0",
+		"@tanstack/ai": "^0.9.2",
+		"dotenv": "^17.4.0"
 	},
 	"peerDependencies": {
-		"@tanstack/ai": "^0.5.0"
+		"@tanstack/ai": "^0.8.0"
 	},
 	"optionalDependencies": {
-		"@anthropic-ai/sdk": "^0.80.0",
-		"@google/genai": "^1.46.0",
+		"@anthropic-ai/sdk": "^0.82.0",
+		"@google/genai": "^1.48.0",
 		"@openrouter/sdk": "^0.10.2",
-		"@tanstack/ai-anthropic": "^0.7.0",
-		"@tanstack/ai-gemini": "^0.8.2",
-		"@tanstack/ai-grok": "^0.6.2",
-		"@tanstack/ai-openai": "^0.7.1",
-		"@tanstack/ai-openrouter": "^0.6.6"
+		"@tanstack/ai-anthropic": "^0.7.1",
+		"@tanstack/ai-gemini": "^0.8.4",
+		"@tanstack/ai-grok": "^0.6.3",
+		"@tanstack/ai-openai": "^0.7.2",
+		"@tanstack/ai-openrouter": "^0.7.0"
 	},
 	"packageManager": "pnpm@10.33.0"
 }

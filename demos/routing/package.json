@@ -15,19 +15,19 @@
 		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
-		"agents": "^0.8.6",
-		"ai": "^6.0.138",
+		"agents": "^0.9.0",
+		"ai": "^6.0.143",
 		"hono": "^4.12.9",
 		"workers-ai-provider": "^3.1.8",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
-		"@cloudflare/vite-plugin": "^1.30.1",
-		"@cloudflare/vitest-pool-workers": "^0.13.4",
-		"oxlint": "^1.57.0",
+		"@cloudflare/vite-plugin": "^1.30.3",
+		"@cloudflare/vitest-pool-workers": "^0.14.0",
+		"oxlint": "^1.58.0",
 		"typescript": "6.0.2",
 		"vite": "^8.0.3",
 		"vitest": "~4.1.2",
-		"wrangler": "^4.77.0"
+		"wrangler": "^4.79.0"
 	}
 }

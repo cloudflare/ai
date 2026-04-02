@@ -46,7 +46,7 @@ The simplest way to use AI in a Cloudflare Worker. No API keys needed for Worker
 import { createWorkersAiChat } from "@cloudflare/tanstack-ai";
 import { chat, toHttpResponse } from "@tanstack/ai";
 
-const adapter = createWorkersAiChat("@cf/meta/llama-4-scout-17b-16e-instruct", {
+const adapter = createWorkersAiChat("@cf/moonshotai/kimi-k2.5", {
 	binding: env.AI,
 });
 
@@ -62,7 +62,7 @@ return toHttpResponse(response);
 **Using REST credentials:**
 
 ```typescript
-const adapter = createWorkersAiChat("@cf/meta/llama-4-scout-17b-16e-instruct", {
+const adapter = createWorkersAiChat("@cf/moonshotai/kimi-k2.5", {
 	accountId: "your-account-id",
 	apiKey: "your-api-key",
 });
@@ -73,7 +73,7 @@ const adapter = createWorkersAiChat("@cf/meta/llama-4-scout-17b-16e-instruct", {
 Send images to vision-capable chat models:
 
 ```typescript
-const adapter = createWorkersAiChat("@cf/meta/llama-4-scout-17b-16e-instruct", {
+const adapter = createWorkersAiChat("@cf/moonshotai/kimi-k2.5", {
 	accountId: "your-account-id",
 	apiKey: "your-api-key",
 });
@@ -110,7 +110,7 @@ Works with all configuration modes (binding, REST, and AI Gateway).
 import { createWorkersAiImage } from "@cloudflare/tanstack-ai";
 import { generateImage } from "@tanstack/ai";
 
-const adapter = createWorkersAiImage("@cf/stabilityai/stable-diffusion-xl-base-1.0", {
+const adapter = createWorkersAiImage("@cf/black-forest-labs/flux-1-schnell", {
 	binding: env.AI,
 });
 
@@ -205,7 +205,7 @@ const adapter = createOpenAiChat("gpt-4o", {
 ### Workers AI through Gateway
 
 ```typescript
-const adapter = createWorkersAiChat("@cf/meta/llama-4-scout-17b-16e-instruct", {
+const adapter = createWorkersAiChat("@cf/moonshotai/kimi-k2.5", {
 	binding: env.AI.gateway("my-gateway-id"),
 	apiKey: env.WORKERS_AI_TOKEN,
 });
@@ -314,7 +314,7 @@ Third-party providers (OpenAI, Anthropic, Gemini, Grok, OpenRouter) only support
 All Workers AI config modes also accept `sessionAffinity` to route requests with the same key to the same backend replica for prefix-cache optimization:
 
 ```typescript
-const adapter = createWorkersAiChat("@cf/meta/llama-3.3-70b-instruct-fp8-fast", {
+const adapter = createWorkersAiChat("@cf/moonshotai/kimi-k2.5", {
 	binding: env.AI,
 	sessionAffinity: "my-unique-session-id",
 });
