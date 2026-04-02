@@ -1,16 +1,24 @@
 # ai-gateway-provider
 
+## 3.1.3
+
+### Patch Changes
+
+- [#474](https://github.com/cloudflare/ai/pull/474) [`dc95a5f`](https://github.com/cloudflare/ai/commit/dc95a5fb65e472f610247d55bae0774914fe06ce) Thanks [@threepointone](https://github.com/threepointone)! - update dependencies
+
+- [#461](https://github.com/cloudflare/ai/pull/461) [`9131bb4`](https://github.com/cloudflare/ai/commit/9131bb470663908632f2c86ef552dc9eae56194c) Thanks [@threepointone](https://github.com/threepointone)! - Replace tsup with tsdown as the build tool
+
 ## 3.1.2
 
 ### Patch Changes
 
 - [#457](https://github.com/cloudflare/ai/pull/457) [`cc94a06`](https://github.com/cloudflare/ai/commit/cc94a06ca85603e473f41cc12ed83f53cbe9e136) Thanks [@threepointone](https://github.com/threepointone)! - Fix request cancellation by propagating `abortSignal` to outbound network calls.
 
-    **ai-gateway-provider**: Pass `abortSignal` to the `fetch` call (API path) and to `binding.run()` (binding path) so that cancelled requests are properly aborted.
+  **ai-gateway-provider**: Pass `abortSignal` to the `fetch` call (API path) and to `binding.run()` (binding path) so that cancelled requests are properly aborted.
 
-    **workers-ai-provider**: Pass `abortSignal` to `binding.run()` for chat, embedding, and image models, matching the existing behavior in transcription, speech, and reranking models.
+  **workers-ai-provider**: Pass `abortSignal` to `binding.run()` for chat, embedding, and image models, matching the existing behavior in transcription, speech, and reranking models.
 
-    **@cloudflare/tanstack-ai**: Pass `signal` through to `binding.run()` in both `createGatewayFetch` (AI Gateway binding path) and `createWorkersAiBindingFetch` (Workers AI binding path).
+  **@cloudflare/tanstack-ai**: Pass `signal` through to `binding.run()` in both `createGatewayFetch` (AI Gateway binding path) and `createWorkersAiBindingFetch` (Workers AI binding path).
 
 ## 3.1.1
 
@@ -108,7 +116,7 @@
 
 - [#256](https://github.com/cloudflare/ai/pull/256) [`a538901`](https://github.com/cloudflare/ai/commit/a5389013b9a512707fb1de1501a1547fce20c014) Thanks [@jahands](https://github.com/jahands)! - feat: Migrate to AI SDK v5
 
-    This updates workers-ai-provider and ai-gateway-provider to use the AI SDK v5. Please refer to the official migration guide to migrate your code https://ai-sdk.dev/docs/migration-guides/migration-guide-5-0
+  This updates workers-ai-provider and ai-gateway-provider to use the AI SDK v5. Please refer to the official migration guide to migrate your code https://ai-sdk.dev/docs/migration-guides/migration-guide-5-0
 
 ### Patch Changes
 
