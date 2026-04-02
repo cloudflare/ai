@@ -1,5 +1,13 @@
 # workers-ai-provider
 
+## 3.1.9
+
+### Patch Changes
+
+- [#474](https://github.com/cloudflare/ai/pull/474) [`dc95a5f`](https://github.com/cloudflare/ai/commit/dc95a5fb65e472f610247d55bae0774914fe06ce) Thanks [@threepointone](https://github.com/threepointone)! - update dependencies
+
+- [#461](https://github.com/cloudflare/ai/pull/461) [`9131bb4`](https://github.com/cloudflare/ai/commit/9131bb470663908632f2c86ef552dc9eae56194c) Thanks [@threepointone](https://github.com/threepointone)! - Replace tsup with tsdown as the build tool
+
 ## 3.1.8
 
 ### Patch Changes
