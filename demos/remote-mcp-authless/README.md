@@ -6,7 +6,7 @@ This example allows you to deploy a remote MCP server that doesn't require authe
 
 [![Deploy to Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/ai/tree/main/demos/remote-mcp-authless)
 
-This will deploy your MCP server to a URL like: `remote-mcp-server-authless.<your-account>.workers.dev/sse`
+This will deploy your MCP server to a URL like: `remote-mcp-server-authless.<your-account>.workers.dev/mcp`
 
 Alternatively, you can use the command line below to get the remote MCP Server created on your local machine:
 
@@ -23,7 +23,7 @@ To add your own [tools](https://developers.cloudflare.com/agents/model-context-p
 You can connect to your MCP server from the Cloudflare AI Playground, which is a remote MCP client:
 
 1. Go to https://playground.ai.cloudflare.com/
-2. Enter your deployed MCP server URL (`remote-mcp-server-authless.<your-account>.workers.dev/sse`)
+2. Enter your deployed MCP server URL (`remote-mcp-server-authless.<your-account>.workers.dev/mcp`)
 3. You can now use your MCP tools directly from the playground!
 
 ## Connect Claude Desktop to your MCP server
@@ -41,7 +41,7 @@ Update with this configuration:
 			"command": "npx",
 			"args": [
 				"mcp-remote",
-				"http://localhost:8787/sse" // or remote-mcp-server-authless.your-account.workers.dev/sse
+				"http://localhost:8787/mcp" // or remote-mcp-server-authless.your-account.workers.dev/mcp
 			]
 		}
 	}
