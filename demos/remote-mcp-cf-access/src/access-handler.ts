@@ -30,11 +30,14 @@ export async function handleAccessRequest(
 			return new Response("Invalid request", { status: 400 });
 		}
 
-		// Check if client is already approved
+		// Check if client is already approved — no approval form so no CSRF cookie to clear
 		if (await isClientApproved(request, clientId, env.COOKIE_ENCRYPTION_KEY)) {
-			// Skip approval dialog but still create secure state
-			const { stateToken } = await createOAuthState(oauthReqInfo, env.OAUTH_KV);
-			return redirectToAccess(request, env, stateToken);
+			const { stateToken, codeChallenge } = await createOAuthState(
+				oauthReqInfo,
+				env.OAUTH_KV,
+				env.COOKIE_ENCRYPTION_KEY,
+			);
+			return redirectToAccess(request, env, stateToken, codeChallenge);
 		}
 
 		// Generate CSRF protection for the approval form
@@ -58,8 +61,8 @@ export async function handleAccessRequest(
 			// Read form data once at top
 			const formData = await request.formData();
 
-			// Validate CSRF token - pass parsed FormData
-			validateCSRFToken(formData, request);
+			// Validate CSRF token and capture clearCookie to expire the one-time-use token
+			const csrfResult = validateCSRFToken(formData, request);
 
 			// Extract state from form data
 			const encodedState = formData.get("state");
@@ -85,12 +88,19 @@ export async function handleAccessRequest(
 				env.COOKIE_ENCRYPTION_KEY,
 			);
 
-			// Create OAuth state with CSRF protection
-			const { stateToken } = await createOAuthState(state.oauthReqInfo, env.OAUTH_KV);
+			// Create OAuth state
+			const { stateToken, codeChallenge } = await createOAuthState(
+				state.oauthReqInfo,
+				env.OAUTH_KV,
+				env.COOKIE_ENCRYPTION_KEY,
+			);
 
-			return redirectToAccess(request, env, stateToken, {
-				"Set-Cookie": approvedClientCookie,
-			});
+			// Build redirect headers — use Headers to support multiple Set-Cookie values
+			const redirectHeaders = new Headers();
+			redirectHeaders.append("Set-Cookie", approvedClientCookie);
+			redirectHeaders.append("Set-Cookie", csrfResult.clearCookie);
+
+			return redirectToAccess(request, env, stateToken, codeChallenge, redirectHeaders);
 		} catch (error: any) {
 			console.error("POST /authorize error:", error);
 			if (error instanceof OAuthError) {
@@ -104,11 +114,12 @@ export async function handleAccessRequest(
 	if (request.method === "GET" && pathname === "/callback") {
 		// Validate OAuth state (retrieves stored data from KV)
 		let oauthReqInfo: AuthRequest;
+		let codeVerifier: string;
 
 		try {
-			const result = await validateOAuthState(request, env.OAUTH_KV);
+			const result = await validateOAuthState(request, env.OAUTH_KV, env.COOKIE_ENCRYPTION_KEY);
 			oauthReqInfo = result.oauthReqInfo;
-			// No clearCookie variable needed since we're using KV-only state validation
+			codeVerifier = result.codeVerifier;
 		} catch (error: any) {
 			if (error instanceof OAuthError) {
 				return error.toResponse();
@@ -121,13 +132,14 @@ export async function handleAccessRequest(
 			return new Response("Invalid OAuth request data", { status: 400 });
 		}
 
-		// Exchange the code for an access token
+		// Exchange the code for an access token, including the PKCE verifier
 		const [accessToken, idToken, errResponse] = await fetchUpstreamAuthToken({
 			client_id: env.ACCESS_CLIENT_ID,
 			client_secret: env.ACCESS_CLIENT_SECRET,
 			code: searchParams.get("code") ?? undefined,
 			redirect_uri: new URL("/callback", request.url).href,
 			upstream_url: env.ACCESS_TOKEN_URL,
+			code_verifier: codeVerifier,
 		});
 		if (errResponse) {
 			return errResponse;
@@ -167,21 +179,22 @@ async function redirectToAccess(
 	request: Request,
 	env: Env,
 	stateToken: string,
-	headers: Record<string, string> = {},
+	codeChallenge: string,
+	extraHeaders: Headers = new Headers(),
 ) {
-	return new Response(null, {
-		headers: {
-			...headers,
-			location: getUpstreamAuthorizeUrl({
-				client_id: env.ACCESS_CLIENT_ID,
-				redirect_uri: new URL("/callback", request.url).href,
-				scope: "openid email profile",
-				state: stateToken,
-				upstream_url: env.ACCESS_AUTHORIZATION_URL,
-			}),
-		},
-		status: 302,
-	});
+	const headers = new Headers(extraHeaders);
+	headers.set(
+		"location",
+		getUpstreamAuthorizeUrl({
+			client_id: env.ACCESS_CLIENT_ID,
+			code_challenge: codeChallenge,
+			redirect_uri: new URL("/callback", request.url).href,
+			scope: "openid email profile",
+			state: stateToken,
+			upstream_url: env.ACCESS_AUTHORIZATION_URL,
+		}),
+	);
+	return new Response(null, { headers, status: 302 });
 }
 
 /**

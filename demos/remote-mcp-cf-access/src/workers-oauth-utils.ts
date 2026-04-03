@@ -42,17 +42,21 @@ export class OAuthError extends Error {
 }
 
 /**
- * Result from createOAuthState containing the state token
+ * Result from createOAuthState containing the state token and PKCE code challenge
  */
 export interface OAuthStateResult {
 	/**
-	 * The generated state token to be used in OAuth authorization requests
+	 * The generated state token (signed as {uuid}.{hmac}) to be used in OAuth authorization requests
 	 */
 	stateToken: string;
+	/**
+	 * The PKCE code challenge to include in the upstream authorization request
+	 */
+	codeChallenge: string;
 }
 
 /**
- * Result from validateOAuthState containing the original OAuth request info and cookie to clear
+ * Result from validateOAuthState containing the original OAuth request info and PKCE verifier
  */
 export interface ValidateStateResult {
 	/**
@@ -61,9 +65,9 @@ export interface ValidateStateResult {
 	oauthReqInfo: AuthRequest;
 
 	/**
-	 * Set-Cookie header value to clear the state cookie
+	 * The PKCE code verifier to include in the upstream token exchange request
 	 */
-	clearCookie: string;
+	codeVerifier: string;
 }
 
 /**
@@ -234,38 +238,49 @@ export function validateCSRFToken(formData: FormData, request: Request): Validat
 }
 
 /**
- * Creates and stores OAuth state information, returning a state token
+ * Creates and stores OAuth state information, returning a signed state token and PKCE challenge.
+ * The state token is HMAC-signed to prevent state injection attacks: forged values are rejected
+ * before any KV operation because the signature check fails first.
  * @param oauthReqInfo - OAuth request information to store with the state
  * @param kv - Cloudflare KV namespace for storing OAuth state data
+ * @param secret - Secret key used to HMAC-sign the state token
  * @param stateTTL - Time-to-live for OAuth state in seconds (defaults to 600)
- * @returns Object containing the state token (KV-only validation, no cookie needed)
+ * @returns Object containing the signed state token and PKCE code challenge
  */
 export async function createOAuthState(
 	oauthReqInfo: AuthRequest,
 	kv: KVNamespace,
+	secret: string,
 	stateTTL = 600,
 ): Promise<OAuthStateResult> {
-	const stateToken = crypto.randomUUID();
+	const uuid = crypto.randomUUID();
+	const { codeVerifier, codeChallenge } = await generatePKCE();
 
-	// Store state in KV (secure, one-time use, with TTL)
-	await kv.put(`oauth:state:${stateToken}`, JSON.stringify(oauthReqInfo), {
+	// HMAC-sign the UUID so forged state values are rejected before touching KV
+	const hmac = await signData(uuid, secret);
+	const stateToken = `${uuid}.${hmac}`;
+
+	// Store oauthReqInfo and codeVerifier together so they can be retrieved at callback
+	await kv.put(`oauth:state:${uuid}`, JSON.stringify({ oauthReqInfo, codeVerifier }), {
 		expirationTtl: stateTTL,
 	});
 
-	return { stateToken };
+	return { stateToken, codeChallenge };
 }
 
 /**
- * Validates OAuth state from the request, ensuring the state parameter matches the cookie
- * and retrieving the stored OAuth request information
- * @param request - The HTTP request containing state parameter and cookies
+ * Validates OAuth state from the request, verifying the HMAC signature before any KV lookup,
+ * and retrieving the stored OAuth request information and PKCE code verifier.
+ * @param request - The HTTP request containing state parameter
  * @param kv - Cloudflare KV namespace for storing OAuth state data
- * @returns Object containing the original OAuth request info and cookie to clear
- * @throws {OAuthError} If state is missing, mismatched, or expired
+ * @param secret - Secret key used to verify the state token HMAC signature
+ * @returns Object containing the original OAuth request info, PKCE code verifier, and cookie to clear
+ * @throws {OAuthError} If state is missing, has an invalid signature, or is expired/not found in KV
  */
 export async function validateOAuthState(
 	request: Request,
 	kv: KVNamespace,
+	secret: string,
 ): Promise<ValidateStateResult> {
 	const url = new URL(request.url);
 	const stateFromQuery = url.searchParams.get("state");
@@ -274,26 +289,36 @@ export async function validateOAuthState(
 		throw new OAuthError("invalid_request", "Missing state parameter", 400);
 	}
 
-	// Validate state exists in KV (secure, one-time use, with TTL)
-	const storedDataJson = await kv.get(`oauth:state:${stateFromQuery}`);
+	// Verify HMAC signature before touching KV — rejects forged/injected state values immediately
+	const dotIndex = stateFromQuery.lastIndexOf(".");
+	if (dotIndex === -1) {
+		throw new OAuthError("invalid_request", "Invalid state format", 400);
+	}
+	const uuid = stateFromQuery.substring(0, dotIndex);
+	const hmac = stateFromQuery.substring(dotIndex + 1);
+
+	const isValid = await verifySignature(hmac, uuid, secret);
+	if (!isValid) {
+		throw new OAuthError("invalid_request", "Invalid state signature", 400);
+	}
+
+	// Look up by UUID only after signature is verified
+	const storedDataJson = await kv.get(`oauth:state:${uuid}`);
 	if (!storedDataJson) {
 		throw new OAuthError("invalid_request", "Invalid or expired state", 400);
 	}
 
-	let oauthReqInfo: AuthRequest;
+	let stored: { oauthReqInfo: AuthRequest; codeVerifier: string };
 	try {
-		oauthReqInfo = JSON.parse(storedDataJson) as AuthRequest;
+		stored = JSON.parse(storedDataJson) as { oauthReqInfo: AuthRequest; codeVerifier: string };
 	} catch (_e) {
 		throw new OAuthError("server_error", "Invalid state data", 500);
 	}
 
 	// Delete state from KV (one-time use)
-	await kv.delete(`oauth:state:${stateFromQuery}`);
+	await kv.delete(`oauth:state:${uuid}`);
 
-	// No cookie to clear since we're not using state cookies anymore
-	const clearCookie = "";
-
-	return { oauthReqInfo, clearCookie };
+	return { oauthReqInfo: stored.oauthReqInfo, codeVerifier: stored.codeVerifier };
 }
 
 /**
@@ -709,6 +734,24 @@ export function renderApprovalDialog(request: Request, options: ApprovalDialogOp
 
 // --- Helper Functions ---
 
+async function generatePKCE(): Promise<{ codeVerifier: string; codeChallenge: string }> {
+	const verifierBytes = crypto.getRandomValues(new Uint8Array(32));
+	const codeVerifier = btoa(String.fromCharCode(...verifierBytes))
+		.replace(/\+/g, "-")
+		.replace(/\//g, "_")
+		.replace(/=/g, "");
+
+	const encoder = new TextEncoder();
+	const digest = await crypto.subtle.digest("SHA-256", encoder.encode(codeVerifier));
+	const codeChallenge = btoa(String.fromCharCode(...new Uint8Array(digest)))
+		.replace(/\+/g, "-")
+		.replace(/\//g, "_")
+		.replace(/=/g, "");
+
+	return { codeVerifier, codeChallenge };
+}
+
+
 async function getApprovedClientsFromCookie(
 	request: Request,
 	cookieSecret: string,
@@ -763,6 +806,9 @@ async function verifySignature(
 	data: string,
 	secret: string,
 ): Promise<boolean> {
+	if (!signatureHex || !/^[0-9a-f]+$/i.test(signatureHex)) {
+		return false;
+	}
 	const key = await importKey(secret);
 	const enc = new TextEncoder();
 	try {
@@ -790,7 +836,7 @@ async function importKey(secret: string): Promise<CryptoKey> {
 }
 
 /**
- * Constructs an upstream OAuth authorization URL with query parameters
+ * Constructs an upstream OAuth authorization URL with query parameters including PKCE
  */
 export function getUpstreamAuthorizeUrl(params: {
 	upstream_url: string;
@@ -798,6 +844,8 @@ export function getUpstreamAuthorizeUrl(params: {
 	redirect_uri: string;
 	scope: string;
 	state: string;
+	code_challenge: string;
+	code_challenge_method?: string;
 }): string {
 	const url = new URL(params.upstream_url);
 	url.searchParams.set("client_id", params.client_id);
@@ -805,11 +853,14 @@ export function getUpstreamAuthorizeUrl(params: {
 	url.searchParams.set("response_type", "code");
 	url.searchParams.set("scope", params.scope);
 	url.searchParams.set("state", params.state);
+	url.searchParams.set("code_challenge", params.code_challenge);
+	url.searchParams.set("code_challenge_method", params.code_challenge_method ?? "S256");
 	return url.toString();
 }
 
 /**
- * Exchanges an authorization code for an access token from the upstream provider
+ * Exchanges an authorization code for an access token from the upstream provider.
+ * Sends the PKCE code_verifier to bind the exchange to the original authorization request.
  */
 export async function fetchUpstreamAuthToken(params: {
 	upstream_url: string;
@@ -817,6 +868,7 @@ export async function fetchUpstreamAuthToken(params: {
 	client_secret: string;
 	code?: string;
 	redirect_uri: string;
+	code_verifier: string;
 }): Promise<[string, string, null] | [null, null, Response]> {
 	if (!params.code) {
 		return [null, null, new Response("Missing authorization code", { status: 400 })];
@@ -828,6 +880,7 @@ export async function fetchUpstreamAuthToken(params: {
 		code: params.code,
 		grant_type: "authorization_code",
 		redirect_uri: params.redirect_uri,
+		code_verifier: params.code_verifier,
 	});
 
 	const response = await fetch(params.upstream_url, {
