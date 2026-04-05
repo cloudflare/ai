@@ -314,8 +314,8 @@ export const renderApproveContent = async (
 		<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
 			<div class="mb-4">
 				<span class="inline-block p-3 ${status === "success"
-																																	? "bg-green-100 text-green-800"
-																																	: "bg-red-100 text-red-800"} rounded-full">
+																																			? "bg-green-100 text-green-800"
+																																			: "bg-red-100 text-red-800"} rounded-full">
 					${status === "success" ? "✓" : "✗"}
 				</span>
 			</div>
