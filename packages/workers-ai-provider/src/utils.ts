@@ -60,6 +60,8 @@ export interface CreateRunConfig {
 	accountId: string;
 	/** Cloudflare API token/key with appropriate permissions. */
 	apiKey: string;
+	/** Custom fetch implementation for intercepting requests. */
+	fetch?: typeof globalThis.fetch;
 }
 
 /**
@@ -68,6 +70,7 @@ export interface CreateRunConfig {
  */
 export function createRun(config: CreateRunConfig): AiRun {
 	const { accountId, apiKey } = config;
+	const fetchFn = config.fetch ?? globalThis.fetch;
 
 	return async function run<Name extends keyof AiModels>(
 		model: Name,
@@ -141,7 +144,7 @@ export function createRun(config: CreateRunConfig): AiRun {
 
 		const body = JSON.stringify(inputs);
 
-		const response = await fetch(url, {
+		const response = await fetchFn(url, {
 			body,
 			headers,
 			method: "POST",
@@ -180,7 +183,7 @@ export function createRun(config: CreateRunConfig): AiRun {
 			// Retry without streaming so doStream's graceful degradation path can
 			// wrap the complete response as a synthetic stream.
 			// Use the same URL (gateway or direct) as the original request.
-			const retryResponse = await fetch(url, {
+			const retryResponse = await fetchFn(url, {
 				body: JSON.stringify({
 					...(inputs as Record<string, unknown>),
 					stream: false,

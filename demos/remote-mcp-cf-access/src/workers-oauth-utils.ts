@@ -751,7 +751,6 @@ async function generatePKCE(): Promise<{ codeVerifier: string; codeChallenge: st
 	return { codeVerifier, codeChallenge };
 }
 
-
 async function getApprovedClientsFromCookie(
 	request: Request,
 	cookieSecret: string,

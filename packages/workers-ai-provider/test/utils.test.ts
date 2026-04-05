@@ -639,4 +639,53 @@ describe("createRun", () => {
 			}),
 		);
 	});
+
+	it("should use custom fetch when provided", async () => {
+		const customFetch = vi.fn().mockResolvedValue({
+			ok: true,
+			json: vi.fn().mockResolvedValue({ result: { response: "Hello" } }),
+			headers: new Headers({ "content-type": "application/json" }),
+		});
+
+		const run = createRun({
+			accountId: "test-account",
+			apiKey: "test-key",
+			fetch: customFetch as typeof globalThis.fetch,
+		});
+		await run("@cf/meta/llama-3.1-8b-instruct" as any, { prompt: "Hi" });
+
+		expect(customFetch).toHaveBeenCalledWith(
+			"https://api.cloudflare.com/client/v4/accounts/test-account/ai/run/@cf/meta/llama-3.1-8b-instruct",
+			expect.objectContaining({ method: "POST" }),
+		);
+		expect(globalThis.fetch).not.toHaveBeenCalled();
+	});
+
+	it("should use custom fetch for streaming retry fallback", async () => {
+		const customFetch = vi
+			.fn()
+			// First call: streaming request returns JSON instead of SSE (triggers retry)
+			.mockResolvedValueOnce({
+				ok: true,
+				headers: new Headers({ "content-type": "application/json" }),
+				body: null,
+				json: vi.fn().mockResolvedValue({ result: { response: "" } }),
+			})
+			// Second call: non-streaming retry
+			.mockResolvedValueOnce({
+				ok: true,
+				headers: new Headers({ "content-type": "application/json" }),
+				json: vi.fn().mockResolvedValue({ result: { response: "Hello" } }),
+			});
+
+		const run = createRun({
+			accountId: "test-account",
+			apiKey: "test-key",
+			fetch: customFetch as typeof globalThis.fetch,
+		});
+		await run("@cf/meta/llama-3.1-8b-instruct" as any, { prompt: "Hi", stream: true } as any);
+
+		expect(customFetch).toHaveBeenCalledTimes(2);
+		expect(globalThis.fetch).not.toHaveBeenCalled();
+	});
 });
