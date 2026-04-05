@@ -1,5 +1,11 @@
 # workers-ai-provider
 
+## 3.1.10
+
+### Patch Changes
+
+- [#480](https://github.com/cloudflare/ai/pull/480) [`1c6bdad`](https://github.com/cloudflare/ai/commit/1c6bdade0f8ac07855876ddad96ab838435117bb) Thanks [@threepointone](https://github.com/threepointone)! - Add optional `fetch` parameter to credentials mode for request interception and testing. Available when using `accountId + apiKey` (not with bindings). Matches the pattern used by `@ai-sdk/openai` and `@ai-sdk/anthropic`.
+
 ## 3.1.9
 
 ### Patch Changes
