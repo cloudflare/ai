@@ -117,7 +117,11 @@ export async function handleAccessRequest(
 		let codeVerifier: string;
 
 		try {
-			const result = await validateOAuthState(request, env.OAUTH_KV, env.COOKIE_ENCRYPTION_KEY);
+			const result = await validateOAuthState(
+				request,
+				env.OAUTH_KV,
+				env.COOKIE_ENCRYPTION_KEY,
+			);
 			oauthReqInfo = result.oauthReqInfo;
 			codeVerifier = result.codeVerifier;
 		} catch (error: any) {

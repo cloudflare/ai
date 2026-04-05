@@ -67,6 +67,13 @@ export type WorkersAISettings = (
 			 * Both binding must be absent if credentials are used directly.
 			 */
 			binding?: never;
+
+			/**
+			 * Custom fetch implementation. You can use it as a middleware to
+			 * intercept requests, or to provide a custom fetch implementation
+			 * for e.g. testing. Only available in credentials mode.
+			 */
+			fetch?: typeof globalThis.fetch;
 	  }
 ) & {
 	/**
@@ -159,7 +166,7 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 	} else {
 		const { accountId, apiKey } = options;
 		binding = {
-			run: createRun({ accountId, apiKey }),
+			run: createRun({ accountId, apiKey, fetch: options.fetch }),
 		} as Ai;
 	}
 
