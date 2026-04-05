@@ -11,7 +11,7 @@
 	},
 	"dependencies": {
 		"ai": "^6.0.143",
-		"workers-ai-provider": "^3.1.10",
+		"workers-ai-provider": "^3.1.9",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {

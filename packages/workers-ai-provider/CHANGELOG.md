@@ -26,11 +26,11 @@
 
 - [#457](https://github.com/cloudflare/ai/pull/457) [`cc94a06`](https://github.com/cloudflare/ai/commit/cc94a06ca85603e473f41cc12ed83f53cbe9e136) Thanks [@threepointone](https://github.com/threepointone)! - Fix request cancellation by propagating `abortSignal` to outbound network calls.
 
-  **ai-gateway-provider**: Pass `abortSignal` to the `fetch` call (API path) and to `binding.run()` (binding path) so that cancelled requests are properly aborted.
+    **ai-gateway-provider**: Pass `abortSignal` to the `fetch` call (API path) and to `binding.run()` (binding path) so that cancelled requests are properly aborted.
 
-  **workers-ai-provider**: Pass `abortSignal` to `binding.run()` for chat, embedding, and image models, matching the existing behavior in transcription, speech, and reranking models.
+    **workers-ai-provider**: Pass `abortSignal` to `binding.run()` for chat, embedding, and image models, matching the existing behavior in transcription, speech, and reranking models.
 
-  **@cloudflare/tanstack-ai**: Pass `signal` through to `binding.run()` in both `createGatewayFetch` (AI Gateway binding path) and `createWorkersAiBindingFetch` (Workers AI binding path).
+    **@cloudflare/tanstack-ai**: Pass `signal` through to `binding.run()` in both `createGatewayFetch` (AI Gateway binding path) and `createWorkersAiBindingFetch` (Workers AI binding path).
 
 ## 3.1.6
 
@@ -38,25 +38,25 @@
 
 - [#454](https://github.com/cloudflare/ai/pull/454) [`29087ad`](https://github.com/cloudflare/ai/commit/29087ad9ea9cb5398d03e0dfff13c24aa3759c61) Thanks [@mchenco](https://github.com/mchenco)! - Fix three tool calling bugs that caused multi-turn agentic loops to fail
 
-  **1. Tool result output not unwrapped**
+    **1. Tool result output not unwrapped**
 
-  `convert-to-workersai-chat-messages.ts` was calling `JSON.stringify(toolResponse.output)` on the entire `LanguageModelV3ToolResultOutput` wrapper object (`{ type: 'text', value: '...' }`), sending the wrapper as the tool message content instead of just the value. Models received garbled tool results and stopped after the first tool call instead of continuing.
+    `convert-to-workersai-chat-messages.ts` was calling `JSON.stringify(toolResponse.output)` on the entire `LanguageModelV3ToolResultOutput` wrapper object (`{ type: 'text', value: '...' }`), sending the wrapper as the tool message content instead of just the value. Models received garbled tool results and stopped after the first tool call instead of continuing.
 
-  Fix: extract `output.value` and serialize only that.
+    Fix: extract `output.value` and serialize only that.
 
-  **2. `toolChoice: "required"` mapped to `"any"` instead of `"required"`**
+    **2. `toolChoice: "required"` mapped to `"any"` instead of `"required"`**
 
-  `utils.ts` mapped `toolChoice: "required"` to `tool_choice: "any"`. All vLLM-backed models (`@cf/moonshotai/kimi-k2.5`, `@cf/meta/llama-4-scout-17b-16e-instruct`, `@cf/zai-org/glm-4.7-flash`) return `8001: Invalid input` for `tool_choice: "any"`. The same incorrect mapping applied to `toolChoice: { type: "tool" }`.
+    `utils.ts` mapped `toolChoice: "required"` to `tool_choice: "any"`. All vLLM-backed models (`@cf/moonshotai/kimi-k2.5`, `@cf/meta/llama-4-scout-17b-16e-instruct`, `@cf/zai-org/glm-4.7-flash`) return `8001: Invalid input` for `tool_choice: "any"`. The same incorrect mapping applied to `toolChoice: { type: "tool" }`.
 
-  Fix: map both to `"required"`.
+    Fix: map both to `"required"`.
 
-  **3. `description: false` in tool definitions**
+    **3. `description: false` in tool definitions**
 
-  `utils.ts` used `&&` short-circuit for tool description and parameters, which evaluates to `false` (not `undefined`) when `tool.type !== "function"`. Sending `description: false` to the binding causes `8001: Invalid input`.
+    `utils.ts` used `&&` short-circuit for tool description and parameters, which evaluates to `false` (not `undefined`) when `tool.type !== "function"`. Sending `description: false` to the binding causes `8001: Invalid input`.
 
-  Fix: use ternary to produce `undefined` when not applicable.
+    Fix: use ternary to produce `undefined` when not applicable.
 
-  Tested against `@cf/moonshotai/kimi-k2.5`, `@cf/meta/llama-4-scout-17b-16e-instruct`, and `@cf/zai-org/glm-4.7-flash` via the Workers AI binding.
+    Tested against `@cf/moonshotai/kimi-k2.5`, `@cf/meta/llama-4-scout-17b-16e-instruct`, and `@cf/zai-org/glm-4.7-flash` via the Workers AI binding.
 
 ## 3.1.5
 
@@ -64,18 +64,18 @@
 
 - [#451](https://github.com/cloudflare/ai/pull/451) [`2a62e23`](https://github.com/cloudflare/ai/commit/2a62e23c7159df5ba69348f15da7a44eef73e83d) Thanks [@mchenco](https://github.com/mchenco)! - Fix reasoning content being concatenated into assistant message content in multi-turn conversations
 
-  Previously, reasoning parts in assistant messages were concatenated into the `content` string when building message history. This caused models like `kimi-k2.5` and `deepseek-r1` to receive their own internal reasoning as if it were spoken text, corrupting the conversation history and resulting in empty text responses or leaked special tokens on subsequent turns.
+    Previously, reasoning parts in assistant messages were concatenated into the `content` string when building message history. This caused models like `kimi-k2.5` and `deepseek-r1` to receive their own internal reasoning as if it were spoken text, corrupting the conversation history and resulting in empty text responses or leaked special tokens on subsequent turns.
 
-  Reasoning parts are now sent as the `reasoning` field on the assistant message object, which is the field name vLLM expects on input for reasoning models (kimi-k2.5, glm-4.7-flash).
+    Reasoning parts are now sent as the `reasoning` field on the assistant message object, which is the field name vLLM expects on input for reasoning models (kimi-k2.5, glm-4.7-flash).
 
 ## 3.1.4
 
 ### Patch Changes
 
 - [#448](https://github.com/cloudflare/ai/pull/448) [`054ccb8`](https://github.com/cloudflare/ai/commit/054ccb834ea3eb7a07d2b011e1ff1b8344f348fb) Thanks [@threepointone](https://github.com/threepointone)! - Fix image inputs for vision-capable chat models
-  - Handle all `LanguageModelV3DataContent` variants (Uint8Array, base64 string, data URL) instead of only Uint8Array
-  - Send images as OpenAI-compatible `image_url` content parts inline in messages, enabling vision for models like Llama 4 Scout and Kimi K2.5
-  - Works with both the binding and REST API paths
+    - Handle all `LanguageModelV3DataContent` variants (Uint8Array, base64 string, data URL) instead of only Uint8Array
+    - Send images as OpenAI-compatible `image_url` content parts inline in messages, enabling vision for models like Llama 4 Scout and Kimi K2.5
+    - Works with both the binding and REST API paths
 
 ## 3.1.3
 
@@ -100,10 +100,10 @@
 ### Patch Changes
 
 - [#396](https://github.com/cloudflare/ai/pull/396) [`2fb3ca8`](https://github.com/cloudflare/ai/commit/2fb3ca80542c8335fea83cac314fa52da772f38f) Thanks [@threepointone](https://github.com/threepointone)! - - Rewrite README with updated model recommendations (GPT-OSS 120B, EmbeddingGemma 300M, Aura-2 EN)
-  - Stream tool calls incrementally using tool-input-start/delta/end events instead of buffering until stream end
-  - Fix REST streaming for models that don't support it on /ai/run/ (GPT-OSS, Kimi) by retrying without streaming
-  - Add Aura-2 EN/ES to SpeechModels type
-  - Log malformed SSE events with console.warn instead of silently swallowing
+    - Stream tool calls incrementally using tool-input-start/delta/end events instead of buffering until stream end
+    - Fix REST streaming for models that don't support it on /ai/run/ (GPT-OSS, Kimi) by retrying without streaming
+    - Add Aura-2 EN/ES to SpeechModels type
+    - Log malformed SSE events with console.warn instead of silently swallowing
 
 ## 3.1.0
 
@@ -111,52 +111,46 @@
 
 - [#389](https://github.com/cloudflare/ai/pull/389) [`8538cd5`](https://github.com/cloudflare/ai/commit/8538cd53ce2e1be28cca95217725dfd4642fd7da) Thanks [@vaibhavshn](https://github.com/vaibhavshn)! - Add transcription, text-to-speech, and reranking support to the Workers AI provider.
 
-  ### New capabilities
+    ### New capabilities
+    - **Transcription** (`provider.transcription(model)`) — implements `TranscriptionModelV3`. Supports Whisper models (`@cf/openai/whisper`, `whisper-tiny-en`, `whisper-large-v3-turbo`) and Deepgram Nova-3 (`@cf/deepgram/nova-3`). Handles model-specific input formats: number arrays for basic Whisper, base64 for v3-turbo via REST, and `{ body, contentType }` for Nova-3 via binding or raw binary upload for Nova-3 via REST.
 
-  - **Transcription** (`provider.transcription(model)`) — implements `TranscriptionModelV3`. Supports Whisper models (`@cf/openai/whisper`, `whisper-tiny-en`, `whisper-large-v3-turbo`) and Deepgram Nova-3 (`@cf/deepgram/nova-3`). Handles model-specific input formats: number arrays for basic Whisper, base64 for v3-turbo via REST, and `{ body, contentType }` for Nova-3 via binding or raw binary upload for Nova-3 via REST.
+    - **Speech / TTS** (`provider.speech(model)`) — implements `SpeechModelV3`. Supports Workers AI TTS models including Deepgram Aura-1 (`@cf/deepgram/aura-1`). Accepts `text`, `voice`, and `speed` options. Returns audio as `Uint8Array`. Uses `returnRawResponse` to handle binary audio from the REST path without JSON parsing.
 
-  - **Speech / TTS** (`provider.speech(model)`) — implements `SpeechModelV3`. Supports Workers AI TTS models including Deepgram Aura-1 (`@cf/deepgram/aura-1`). Accepts `text`, `voice`, and `speed` options. Returns audio as `Uint8Array`. Uses `returnRawResponse` to handle binary audio from the REST path without JSON parsing.
+    - **Reranking** (`provider.reranking(model)`) — implements `RerankingModelV3`. Supports BGE reranker models (`@cf/baai/bge-reranker-base`, `bge-reranker-v2-m3`). Converts AI SDK's document format to Workers AI's `{ query, contexts, top_k }` input. Handles both text and JSON object documents.
 
-  - **Reranking** (`provider.reranking(model)`) — implements `RerankingModelV3`. Supports BGE reranker models (`@cf/baai/bge-reranker-base`, `bge-reranker-v2-m3`). Converts AI SDK's document format to Workers AI's `{ query, contexts, top_k }` input. Handles both text and JSON object documents.
+    ### Bug fixes
+    - **AbortSignal passthrough** — `createRun` REST shim now passes the abort signal to `fetch`, enabling request cancellation and timeout handling. Previously the signal was silently dropped.
+    - **Nova-3 REST support** — Added `createRunBinary` utility for models that require raw binary upload instead of JSON (used by Nova-3 transcription via REST).
 
-  ### Bug fixes
+    ### Usage
 
-  - **AbortSignal passthrough** — `createRun` REST shim now passes the abort signal to `fetch`, enabling request cancellation and timeout handling. Previously the signal was silently dropped.
-  - **Nova-3 REST support** — Added `createRunBinary` utility for models that require raw binary upload instead of JSON (used by Nova-3 transcription via REST).
+    ```typescript
+    import { createWorkersAI } from "workers-ai-provider";
+    import { experimental_transcribe, experimental_generateSpeech, rerank } from "ai";
 
-  ### Usage
+    const workersai = createWorkersAI({ binding: env.AI });
 
-  ```typescript
-  import { createWorkersAI } from "workers-ai-provider";
-  import {
-    experimental_transcribe,
-    experimental_generateSpeech,
-    rerank,
-  } from "ai";
+    // Transcription
+    const transcript = await experimental_transcribe({
+    	model: workersai.transcription("@cf/openai/whisper-large-v3-turbo"),
+    	audio: audioData,
+    	mediaType: "audio/wav",
+    });
 
-  const workersai = createWorkersAI({ binding: env.AI });
+    // Speech
+    const speech = await experimental_generateSpeech({
+    	model: workersai.speech("@cf/deepgram/aura-1"),
+    	text: "Hello world",
+    	voice: "asteria",
+    });
 
-  // Transcription
-  const transcript = await experimental_transcribe({
-    model: workersai.transcription("@cf/openai/whisper-large-v3-turbo"),
-    audio: audioData,
-    mediaType: "audio/wav",
-  });
-
-  // Speech
-  const speech = await experimental_generateSpeech({
-    model: workersai.speech("@cf/deepgram/aura-1"),
-    text: "Hello world",
-    voice: "asteria",
-  });
-
-  // Reranking
-  const ranked = await rerank({
-    model: workersai.reranking("@cf/baai/bge-reranker-base"),
-    query: "What is machine learning?",
-    documents: ["ML is a branch of AI.", "The weather is sunny."],
-  });
-  ```
+    // Reranking
+    const ranked = await rerank({
+    	model: workersai.reranking("@cf/baai/bge-reranker-base"),
+    	query: "What is machine learning?",
+    	documents: ["ML is a branch of AI.", "The weather is sunny."],
+    });
+    ```
 
 ## 3.0.5
 
@@ -164,60 +158,53 @@
 
 - [#393](https://github.com/cloudflare/ai/pull/393) [`91b32e0`](https://github.com/cloudflare/ai/commit/91b32e0b0ef543fd198ddf387b9521ac3bd9650a) Thanks [@threepointone](https://github.com/threepointone)! - Comprehensive cleanup of the workers-ai-provider package.
 
-  **Bug fixes:**
+    **Bug fixes:**
+    - Fixed phantom dependency on `fetch-event-stream` that caused runtime crashes when installed outside the monorepo. Replaced with a built-in SSE parser.
+    - Fixed streaming buffering: responses now stream token-by-token instead of arriving all at once. The root cause was twofold — an eager `ReadableStream` `start()` pattern that buffered all chunks, and a heuristic that silently fell back to non-streaming `doGenerate` whenever tools were defined. Both are fixed. Streaming now uses a proper `TransformStream` pipeline with backpressure.
+    - Fixed `reasoning-delta` ID mismatch in simulated streaming — was using `generateId()` instead of the `reasoningId` from the preceding `reasoning-start` event, causing the AI SDK to drop reasoning content.
+    - Fixed REST API client (`createRun`) silently swallowing HTTP errors. Non-200 responses now throw with status code and response body.
+    - Fixed `response_format` being sent as `undefined` on every non-JSON request. Now only included when actually set.
+    - Fixed `json_schema` field evaluating to `false` (a boolean) instead of `undefined` when schema was missing.
 
-  - Fixed phantom dependency on `fetch-event-stream` that caused runtime crashes when installed outside the monorepo. Replaced with a built-in SSE parser.
-  - Fixed streaming buffering: responses now stream token-by-token instead of arriving all at once. The root cause was twofold — an eager `ReadableStream` `start()` pattern that buffered all chunks, and a heuristic that silently fell back to non-streaming `doGenerate` whenever tools were defined. Both are fixed. Streaming now uses a proper `TransformStream` pipeline with backpressure.
-  - Fixed `reasoning-delta` ID mismatch in simulated streaming — was using `generateId()` instead of the `reasoningId` from the preceding `reasoning-start` event, causing the AI SDK to drop reasoning content.
-  - Fixed REST API client (`createRun`) silently swallowing HTTP errors. Non-200 responses now throw with status code and response body.
-  - Fixed `response_format` being sent as `undefined` on every non-JSON request. Now only included when actually set.
-  - Fixed `json_schema` field evaluating to `false` (a boolean) instead of `undefined` when schema was missing.
+    **Workers AI quirk workarounds:**
+    - Added `sanitizeToolCallId()` — strips non-alphanumeric characters and pads/truncates to 9 chars, fixing tool call round-trips through the binding which rejects its own generated IDs.
+    - Added `normalizeMessagesForBinding()` — converts `content: null` to `""` and sanitizes tool call IDs before every binding call. Only applied on the binding path (REST preserves original IDs).
+    - Added null-finalization chunk filtering for streaming tool calls.
+    - Added numeric value coercion in native-format streams (Workers AI sometimes returns numbers instead of strings for the `response` field).
+    - Improved image model to handle all output types from `binding.run()`: `ReadableStream`, `Uint8Array`, `ArrayBuffer`, `Response`, and `{ image: base64 }` objects.
+    - Graceful degradation: if `binding.run()` returns a non-streaming response despite `stream: true`, it wraps the complete response as a simulated stream instead of throwing.
 
-  **Workers AI quirk workarounds:**
+    **Premature stream termination detection:**
+    - Streams that end without a `[DONE]` sentinel now report `finishReason: "error"` with `raw: "stream-truncated"` instead of silently reporting `"stop"`.
+    - Stream read errors are caught and emit `finishReason: "error"` with `raw: "stream-error"`.
 
-  - Added `sanitizeToolCallId()` — strips non-alphanumeric characters and pads/truncates to 9 chars, fixing tool call round-trips through the binding which rejects its own generated IDs.
-  - Added `normalizeMessagesForBinding()` — converts `content: null` to `""` and sanitizes tool call IDs before every binding call. Only applied on the binding path (REST preserves original IDs).
-  - Added null-finalization chunk filtering for streaming tool calls.
-  - Added numeric value coercion in native-format streams (Workers AI sometimes returns numbers instead of strings for the `response` field).
-  - Improved image model to handle all output types from `binding.run()`: `ReadableStream`, `Uint8Array`, `ArrayBuffer`, `Response`, and `{ image: base64 }` objects.
-  - Graceful degradation: if `binding.run()` returns a non-streaming response despite `stream: true`, it wraps the complete response as a simulated stream instead of throwing.
+    **AI Search (formerly AutoRAG):**
+    - Added `createAISearch` and `AISearchChatLanguageModel` as the canonical exports, reflecting the rename from AutoRAG to AI Search.
+    - `createAutoRAG` still works but emits a one-time deprecation warning pointing to `createAISearch`.
+    - `createAutoRAG` preserves `"autorag.chat"` as the provider name for backward compatibility.
+    - AI Search now warns when tools or JSON response format are provided (unsupported by the `aiSearch` API).
+    - Simplified AI Search internals — removed dead tool/response-format processing code.
 
-  **Premature stream termination detection:**
+    **Code quality:**
+    - Removed dead code: `workersai-error.ts` (never imported), `workersai-image-config.ts` (inlined).
+    - Consistent file naming: renamed `workers-ai-embedding-model.ts` to `workersai-embedding-model.ts`.
+    - Replaced `StringLike` catch-all index signatures with `[key: string]: unknown` on settings types.
+    - Replaced `any` types with proper interfaces (`FlatToolCall`, `OpenAIToolCall`, `PartialToolCall`).
+    - Tightened `processToolCall` format detection to check `function.name` instead of just the presence of a `function` property.
+    - Removed `@ai-sdk/provider-utils` and `zod` peer dependencies (no longer used in source).
+    - Added `imageModel` to the `WorkersAI` interface type for consistency.
 
-  - Streams that end without a `[DONE]` sentinel now report `finishReason: "error"` with `raw: "stream-truncated"` instead of silently reporting `"stop"`.
-  - Stream read errors are caught and emit `finishReason: "error"` with `raw: "stream-error"`.
+    **Tests:**
+    - 149 unit tests across 10 test files (up from 82).
+    - New test coverage: `sanitizeToolCallId`, `normalizeMessagesForBinding`, `prepareToolsAndToolChoice`, `processText`, `mapWorkersAIUsage`, image model output types, streaming error scenarios (malformed SSE, premature termination, empty stream), backpressure verification, graceful degradation (non-streaming fallback with text/tools/reasoning), REST API error handling (401/404/500), AI Search warnings, embedding `TooManyEmbeddingValuesForCallError`, message conversion with images and reasoning.
+    - Integration tests for REST API and binding across 12 models and 7 categories (chat, streaming, multi-turn, tool calling, tool round-trip, structured output, image generation, embeddings).
+    - All tests use the AI SDK's public APIs (`generateText`, `streamText`, `generateImage`, `embedMany`) instead of internal `.doGenerate()`/`.doStream()` methods.
 
-  **AI Search (formerly AutoRAG):**
-
-  - Added `createAISearch` and `AISearchChatLanguageModel` as the canonical exports, reflecting the rename from AutoRAG to AI Search.
-  - `createAutoRAG` still works but emits a one-time deprecation warning pointing to `createAISearch`.
-  - `createAutoRAG` preserves `"autorag.chat"` as the provider name for backward compatibility.
-  - AI Search now warns when tools or JSON response format are provided (unsupported by the `aiSearch` API).
-  - Simplified AI Search internals — removed dead tool/response-format processing code.
-
-  **Code quality:**
-
-  - Removed dead code: `workersai-error.ts` (never imported), `workersai-image-config.ts` (inlined).
-  - Consistent file naming: renamed `workers-ai-embedding-model.ts` to `workersai-embedding-model.ts`.
-  - Replaced `StringLike` catch-all index signatures with `[key: string]: unknown` on settings types.
-  - Replaced `any` types with proper interfaces (`FlatToolCall`, `OpenAIToolCall`, `PartialToolCall`).
-  - Tightened `processToolCall` format detection to check `function.name` instead of just the presence of a `function` property.
-  - Removed `@ai-sdk/provider-utils` and `zod` peer dependencies (no longer used in source).
-  - Added `imageModel` to the `WorkersAI` interface type for consistency.
-
-  **Tests:**
-
-  - 149 unit tests across 10 test files (up from 82).
-  - New test coverage: `sanitizeToolCallId`, `normalizeMessagesForBinding`, `prepareToolsAndToolChoice`, `processText`, `mapWorkersAIUsage`, image model output types, streaming error scenarios (malformed SSE, premature termination, empty stream), backpressure verification, graceful degradation (non-streaming fallback with text/tools/reasoning), REST API error handling (401/404/500), AI Search warnings, embedding `TooManyEmbeddingValuesForCallError`, message conversion with images and reasoning.
-  - Integration tests for REST API and binding across 12 models and 7 categories (chat, streaming, multi-turn, tool calling, tool round-trip, structured output, image generation, embeddings).
-  - All tests use the AI SDK's public APIs (`generateText`, `streamText`, `generateImage`, `embedMany`) instead of internal `.doGenerate()`/`.doStream()` methods.
-
-  **README:**
-
-  - Rewritten from scratch with concise examples, model recommendations, configuration guide, and known limitations section.
-  - Updated to use current AI SDK v6 APIs (`generateText` + `Output.object` instead of deprecated `generateObject`, `generateImage` instead of `experimental_generateImage`, `stopWhen: stepCountIs(2)` instead of `maxSteps`).
-  - Added sections for tool calling, structured output, embeddings, image generation, and AI Search.
-  - Uses `wrangler.jsonc` format for configuration examples.
+    **README:**
+    - Rewritten from scratch with concise examples, model recommendations, configuration guide, and known limitations section.
+    - Updated to use current AI SDK v6 APIs (`generateText` + `Output.object` instead of deprecated `generateObject`, `generateImage` instead of `experimental_generateImage`, `stopWhen: stepCountIs(2)` instead of `maxSteps`).
+    - Added sections for tool calling, structured output, embeddings, image generation, and AI Search.
+    - Uses `wrangler.jsonc` format for configuration examples.
 
 ## 3.0.4
 
@@ -225,14 +212,13 @@
 
 - [#390](https://github.com/cloudflare/ai/pull/390) [`41b92a3`](https://github.com/cloudflare/ai/commit/41b92a34ce4d9dffba8bb42b4933bbc06e4b1aaa) Thanks [@mchenco](https://github.com/mchenco)! - fix(workers-ai-provider): extract actual finish reason in streaming instead of hardcoded "stop"
 
-  Previously, the streaming implementation always returned `finishReason: "stop"` regardless of the actual completion reason. This caused:
+    Previously, the streaming implementation always returned `finishReason: "stop"` regardless of the actual completion reason. This caused:
+    - Tool calling scenarios to incorrectly report "stop" instead of "tool-calls"
+    - Multi-turn tool conversations to fail because the AI SDK couldn't detect when tools were requested
+    - Length limit scenarios to show "stop" instead of "length"
+    - Error scenarios to show "stop" instead of "error"
 
-  - Tool calling scenarios to incorrectly report "stop" instead of "tool-calls"
-  - Multi-turn tool conversations to fail because the AI SDK couldn't detect when tools were requested
-  - Length limit scenarios to show "stop" instead of "length"
-  - Error scenarios to show "stop" instead of "error"
-
-  The fix extracts the actual `finish_reason` from streaming chunks and uses the existing `mapWorkersAIFinishReason()` function to properly map it to the AI SDK's finish reason format. This enables proper multi-turn tool calling and accurate completion status reporting.
+    The fix extracts the actual `finish_reason` from streaming chunks and uses the existing `mapWorkersAIFinishReason()` function to properly map it to the AI SDK's finish reason format. This enables proper multi-turn tool calling and accurate completion status reporting.
 
 ## 3.0.3
 
@@ -276,7 +262,7 @@
 
 - [#256](https://github.com/cloudflare/ai/pull/256) [`a538901`](https://github.com/cloudflare/ai/commit/a5389013b9a512707fb1de1501a1547fce20c014) Thanks [@jahands](https://github.com/jahands)! - feat: Migrate to AI SDK v5
 
-  This updates workers-ai-provider and ai-gateway-provider to use the AI SDK v5. Please refer to the official migration guide to migrate your code https://ai-sdk.dev/docs/migration-guides/migration-guide-5-0
+    This updates workers-ai-provider and ai-gateway-provider to use the AI SDK v5. Please refer to the official migration guide to migrate your code https://ai-sdk.dev/docs/migration-guides/migration-guide-5-0
 
 ### Patch Changes
 
