@@ -93,8 +93,11 @@ export function getMappedStream(
 	// Track tool call streaming state per index.
 	// When we see the first chunk for a tool call index, we emit tool-input-start.
 	// Subsequent argument deltas emit tool-input-delta.
-	// All open tool calls are closed with tool-input-end in flush().
+	// tool-input-end is emitted eagerly when a new tool index starts or a null
+	// finalization chunk arrives; any remaining open calls are closed in flush().
 	const activeToolCalls = new Map<number, { id: string; toolName: string; args: string }>();
+	const closedToolCalls = new Set<number>();
+	let lastActiveToolIndex: number | null = null;
 
 	// Step 1: Decode bytes into SSE lines
 	const sseStream = rawStream.pipeThrough(new SSEDecoder());
@@ -224,18 +227,10 @@ export function getMappedStream(
 			},
 
 			flush(controller) {
-				// Close all open tool call inputs and emit complete tool-call events
-				for (const [, tc] of activeToolCalls) {
-					controller.enqueue({ type: "tool-input-end", id: tc.id });
-					// Emit the complete tool-call event — the AI SDK expects both
-					// incremental tool-input-* events AND a final tool-call event,
-					// matching how @ai-sdk/openai-compatible works.
-					controller.enqueue({
-						type: "tool-call",
-						toolCallId: tc.id,
-						toolName: tc.toolName,
-						input: tc.args,
-					});
+				// Close any tool calls that weren't already closed during streaming
+				for (const [idx] of activeToolCalls) {
+					if (closedToolCalls.has(idx)) continue;
+					closeToolCall(idx, controller);
 				}
 
 				// Close open text/reasoning blocks
@@ -265,23 +260,50 @@ export function getMappedStream(
 	);
 
 	/**
+	 * Emit tool-input-end + tool-call for a tool call that is complete.
+	 */
+	function closeToolCall(
+		index: number,
+		controller: TransformStreamDefaultController<LanguageModelV3StreamPart>,
+	) {
+		const tc = activeToolCalls.get(index);
+		if (!tc || closedToolCalls.has(index)) return;
+		closedToolCalls.add(index);
+		controller.enqueue({ type: "tool-input-end", id: tc.id });
+		controller.enqueue({
+			type: "tool-call",
+			toolCallId: tc.id,
+			toolName: tc.toolName,
+			input: tc.args,
+		});
+	}
+
+	/**
 	 * Emit incremental tool call events from streaming chunks.
 	 *
 	 * Workers AI streams tool calls as:
 	 *   Chunk A: { id, type, index, function: { name } }                — start
 	 *   Chunk B: { index, function: { arguments: "partial..." } }       — args delta
 	 *   Chunk C: { index, function: { arguments: "rest..." } }          — args delta
-	 *   Chunk D: { id: null, type: null, function: { name: null } }     — finalize (skip)
+	 *   Chunk D: { id: null, type: null, function: { name: null } }     — finalize
 	 *
 	 * We emit tool-input-start on first sight, tool-input-delta for each
-	 * argument chunk, and tool-input-end in flush().
+	 * argument chunk, and tool-input-end eagerly — either when a new tool
+	 * index starts (closing the previous one) or on a null finalization
+	 * chunk. Any remaining open calls are closed in flush().
 	 */
 	function emitToolCallDeltas(
 		toolCalls: Record<string, unknown>[],
 		controller: TransformStreamDefaultController<LanguageModelV3StreamPart>,
 	) {
 		for (const tc of toolCalls) {
-			if (isNullFinalizationChunk(tc)) continue;
+			if (isNullFinalizationChunk(tc)) {
+				// Null finalization sentinel — close the last active tool call
+				if (lastActiveToolIndex != null) {
+					closeToolCall(lastActiveToolIndex, controller);
+				}
+				continue;
+			}
 
 			const tcIndex = (tc.index as number) ?? 0;
 			const fn = tc.function as Record<string, unknown> | undefined;
@@ -290,10 +312,15 @@ export function getMappedStream(
 			const tcId = tc.id as string | null;
 
 			if (!activeToolCalls.has(tcIndex)) {
-				// First chunk for this tool call — emit tool-input-start
+				// A new tool call is starting — close the previous one first
+				if (lastActiveToolIndex != null && lastActiveToolIndex !== tcIndex) {
+					closeToolCall(lastActiveToolIndex, controller);
+				}
+
 				const id = tcId || generateId();
 				const toolName = tcName || "";
 				activeToolCalls.set(tcIndex, { id, toolName, args: "" });
+				lastActiveToolIndex = tcIndex;
 
 				controller.enqueue({
 					type: "tool-input-start",
@@ -301,7 +328,6 @@ export function getMappedStream(
 					toolName,
 				});
 
-				// If arguments arrived in the same chunk as the start, emit them
 				if (tcArgs != null && tcArgs !== "") {
 					const delta = typeof tcArgs === "string" ? tcArgs : JSON.stringify(tcArgs);
 					activeToolCalls.get(tcIndex)!.args += delta;
@@ -312,8 +338,8 @@ export function getMappedStream(
 					});
 				}
 			} else {
-				// Subsequent chunks — emit argument deltas
 				const active = activeToolCalls.get(tcIndex)!;
+				lastActiveToolIndex = tcIndex;
 				if (tcArgs != null && tcArgs !== "") {
 					const delta = typeof tcArgs === "string" ? tcArgs : JSON.stringify(tcArgs);
 					active.args += delta;
