@@ -2028,9 +2028,7 @@ describe("Eager tool-input-end streaming (issue #488)", () => {
 
 		const allToolEvents = events
 			.map((e, i) => ({ ...e, idx: i }))
-			.filter((e) =>
-				["tool-input-start", "tool-input-end", "tool-call"].includes(e.type),
-			);
+			.filter((e) => ["tool-input-start", "tool-input-end", "tool-call"].includes(e.type));
 
 		// Expected order: start(0), end(0), call(0), start(1), end(1), call(1)
 		expect(allToolEvents.map((e) => e.type)).toEqual([
@@ -2125,9 +2123,7 @@ describe("Eager tool-input-end streaming (issue #488)", () => {
 						},
 						// Tool 0 args
 						{
-							tool_calls: [
-								{ index: 0, function: { arguments: 'ath":"a.txt"}' } },
-							],
+							tool_calls: [{ index: 0, function: { arguments: 'ath":"a.txt"}' } }],
 						},
 						// Tool 1 start (should close tool 0)
 						{
@@ -2208,9 +2204,7 @@ describe("Eager tool-input-end streaming (issue #488)", () => {
 							],
 						},
 						{
-							tool_calls: [
-								{ index: 0, function: { arguments: 'ation":"NYC"}' } },
-							],
+							tool_calls: [{ index: 0, function: { arguments: 'ation":"NYC"}' } }],
 						},
 						{ finish_reason: "tool_calls" },
 						"[DONE]",

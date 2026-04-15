@@ -1,5 +1,11 @@
 # workers-ai-provider
 
+## 3.1.11
+
+### Patch Changes
+
+- [#494](https://github.com/cloudflare/ai/pull/494) [`ed6112a`](https://github.com/cloudflare/ai/commit/ed6112a7938ea3b9136876edb6830f3f1138d2b4) Thanks [@threepointone](https://github.com/threepointone)! - Emit `tool-input-end` and `tool-call` events eagerly when streaming multiple tool calls, instead of deferring all of them to stream close. Previously, all tool calls appeared "in progress" simultaneously because `tool-input-end` was only emitted in `flush()`. Now each tool call is closed as soon as the next one starts or a null finalization chunk is received, matching the behavior of other AI SDK providers.
+
 ## 3.1.10
 
 ### Patch Changes
