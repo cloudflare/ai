@@ -17,7 +17,7 @@
 	},
 	"dependencies": {
 		"ai": "^6.0.143",
-		"hono": "^4.12.9",
+		"hono": "^4.12.12",
 		"workers-ai-provider": "^3.1.10",
 		"zod": "^4.3.6"
 	},
