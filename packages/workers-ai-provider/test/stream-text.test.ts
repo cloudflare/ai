@@ -1900,6 +1900,871 @@ describe("Graceful Degradation", () => {
 	});
 });
 
+describe("Eager tool-input-end streaming (issue #488)", () => {
+	it("should emit tool-input-end for first tool BEFORE tool-input-start for second tool", async () => {
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () => {
+					return mockStream([
+						{
+							tool_calls: [
+								{
+									id: "call_1",
+									type: "function",
+									index: 0,
+									function: { name: "writeFile", arguments: '{"path": "a.txt"' },
+								},
+							],
+						},
+						{
+							tool_calls: [
+								{ index: 0, function: { arguments: ', "content": "hello"}' } },
+							],
+						},
+						{
+							tool_calls: [
+								{
+									id: "call_2",
+									type: "function",
+									index: 1,
+									function: {
+										name: "writeFile",
+										arguments: '{"path": "b.txt", "content": "world"}',
+									},
+								},
+							],
+						},
+						{ finish_reason: "tool_calls" },
+						"[DONE]",
+					]);
+				},
+			},
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Write two files",
+			tools: {
+				writeFile: {
+					description: "Write a file",
+					inputSchema: z.object({
+						path: z.string(),
+						content: z.string(),
+					}),
+				},
+			},
+		});
+
+		const events: string[] = [];
+		for await (const chunk of result.fullStream) {
+			events.push(chunk.type);
+		}
+
+		const firstEnd = events.indexOf("tool-input-end");
+		const secondStart = events.lastIndexOf("tool-input-start");
+		expect(firstEnd).toBeGreaterThan(-1);
+		expect(secondStart).toBeGreaterThan(-1);
+		expect(firstEnd).toBeLessThan(secondStart);
+	});
+
+	it("should emit tool-call for first tool before second tool starts", async () => {
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () => {
+					return mockStream([
+						{
+							tool_calls: [
+								{
+									id: "call_1",
+									type: "function",
+									index: 0,
+									function: {
+										name: "get_weather",
+										arguments: '{"location": "London"}',
+									},
+								},
+							],
+						},
+						{
+							tool_calls: [
+								{
+									id: "call_2",
+									type: "function",
+									index: 1,
+									function: {
+										name: "get_weather",
+										arguments: '{"location": "Paris"}',
+									},
+								},
+							],
+						},
+						{ finish_reason: "tool_calls" },
+						"[DONE]",
+					]);
+				},
+			},
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Get weather for London and Paris",
+			tools: {
+				get_weather: {
+					description: "Get weather",
+					inputSchema: z.object({ location: z.string() }),
+				},
+			},
+		});
+
+		const events: { type: string; id?: string }[] = [];
+		for await (const chunk of result.fullStream) {
+			events.push({ type: chunk.type, id: (chunk as any).toolCallId ?? (chunk as any).id });
+		}
+
+		const toolCalls = events.filter((e) => e.type === "tool-call");
+		const toolInputStarts = events.filter((e) => e.type === "tool-input-start");
+		expect(toolCalls).toHaveLength(2);
+		expect(toolInputStarts).toHaveLength(2);
+
+		const allToolEvents = events
+			.map((e, i) => ({ ...e, idx: i }))
+			.filter((e) =>
+				["tool-input-start", "tool-input-end", "tool-call"].includes(e.type),
+			);
+
+		// Expected order: start(0), end(0), call(0), start(1), end(1), call(1)
+		expect(allToolEvents.map((e) => e.type)).toEqual([
+			"tool-input-start",
+			"tool-input-end",
+			"tool-call",
+			"tool-input-start",
+			"tool-input-end",
+			"tool-call",
+		]);
+	});
+
+	it("should handle null finalization chunk to close tool call", async () => {
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () => {
+					return mockStream([
+						{
+							tool_calls: [
+								{
+									id: "call_1",
+									type: "function",
+									index: 0,
+									function: {
+										name: "get_weather",
+										arguments: '{"location": "London"}',
+									},
+								},
+							],
+						},
+						// Null finalization chunk — explicit signal tool is done
+						{
+							tool_calls: [
+								{
+									id: null,
+									type: null,
+									function: { name: null, arguments: "" },
+								},
+							],
+						},
+						{ finish_reason: "tool_calls" },
+						"[DONE]",
+					]);
+				},
+			},
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Get weather",
+			tools: {
+				get_weather: {
+					description: "Get weather",
+					inputSchema: z.object({ location: z.string() }),
+				},
+			},
+		});
+
+		const events: string[] = [];
+		for await (const chunk of result.fullStream) {
+			events.push(chunk.type);
+		}
+
+		const toolEvents = events.filter((e) =>
+			["tool-input-start", "tool-input-end", "tool-call"].includes(e),
+		);
+
+		// tool-input-end should appear (triggered by finalization chunk, not just flush)
+		expect(toolEvents).toEqual(["tool-input-start", "tool-input-end", "tool-call"]);
+
+		// Verify tool-input-end comes BEFORE finish
+		const endIdx = events.indexOf("tool-input-end");
+		const finishIdx = events.indexOf("finish");
+		expect(endIdx).toBeLessThan(finishIdx);
+	});
+
+	it("should handle three sequential tool calls with incremental args", async () => {
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () => {
+					return mockStream([
+						// Tool 0 start
+						{
+							tool_calls: [
+								{
+									id: "call_a",
+									type: "function",
+									index: 0,
+									function: { name: "writeFile", arguments: '{"p' },
+								},
+							],
+						},
+						// Tool 0 args
+						{
+							tool_calls: [
+								{ index: 0, function: { arguments: 'ath":"a.txt"}' } },
+							],
+						},
+						// Tool 1 start (should close tool 0)
+						{
+							tool_calls: [
+								{
+									id: "call_b",
+									type: "function",
+									index: 1,
+									function: { name: "writeFile", arguments: '{"path":"b.txt"}' },
+								},
+							],
+						},
+						// Tool 2 start (should close tool 1)
+						{
+							tool_calls: [
+								{
+									id: "call_c",
+									type: "function",
+									index: 2,
+									function: { name: "writeFile", arguments: '{"path":"c.txt"}' },
+								},
+							],
+						},
+						{ finish_reason: "tool_calls" },
+						"[DONE]",
+					]);
+				},
+			},
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Write three files",
+			tools: {
+				writeFile: {
+					description: "Write a file",
+					inputSchema: z.object({ path: z.string() }),
+				},
+			},
+		});
+
+		const events: string[] = [];
+		for await (const chunk of result.fullStream) {
+			events.push(chunk.type);
+		}
+
+		const toolEvents = events.filter((e) =>
+			["tool-input-start", "tool-input-end", "tool-call"].includes(e),
+		);
+
+		// Each tool should be fully closed before the next starts
+		expect(toolEvents).toEqual([
+			"tool-input-start", // tool 0
+			"tool-input-end", // tool 0
+			"tool-call", // tool 0
+			"tool-input-start", // tool 1
+			"tool-input-end", // tool 1
+			"tool-call", // tool 1
+			"tool-input-start", // tool 2
+			"tool-input-end", // tool 2 (closed in flush)
+			"tool-call", // tool 2
+		]);
+	});
+
+	it("should still work correctly for a single tool call (closed in flush)", async () => {
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () => {
+					return mockStream([
+						{
+							tool_calls: [
+								{
+									id: "solo",
+									type: "function",
+									index: 0,
+									function: { name: "get_weather", arguments: '{"loc' },
+								},
+							],
+						},
+						{
+							tool_calls: [
+								{ index: 0, function: { arguments: 'ation":"NYC"}' } },
+							],
+						},
+						{ finish_reason: "tool_calls" },
+						"[DONE]",
+					]);
+				},
+			},
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Weather?",
+			tools: {
+				get_weather: {
+					description: "Get weather",
+					inputSchema: z.object({ location: z.string() }),
+				},
+			},
+		});
+
+		const events: string[] = [];
+		const toolCallData: any[] = [];
+		for await (const chunk of result.fullStream) {
+			events.push(chunk.type);
+			if (chunk.type === "tool-call") toolCallData.push(chunk);
+		}
+
+		const toolEvents = events.filter((e) =>
+			["tool-input-start", "tool-input-delta", "tool-input-end", "tool-call"].includes(e),
+		);
+
+		expect(toolEvents).toEqual([
+			"tool-input-start",
+			"tool-input-delta",
+			"tool-input-delta",
+			"tool-input-end",
+			"tool-call",
+		]);
+		expect(toolCallData[0].toolCallId).toBe("solo");
+		expect(toolCallData[0].toolName).toBe("get_weather");
+	});
+
+	it("should handle OpenAI-format sequential tool calls with eager close", async () => {
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () => {
+					return mockStream([
+						{
+							choices: [
+								{
+									delta: {
+										tool_calls: [
+											{
+												id: "oai_1",
+												type: "function",
+												index: 0,
+												function: {
+													name: "search",
+													arguments: '{"query":"cats"}',
+												},
+											},
+										],
+									},
+									finish_reason: null,
+								},
+							],
+						},
+						{
+							choices: [
+								{
+									delta: {
+										tool_calls: [
+											{
+												id: "oai_2",
+												type: "function",
+												index: 1,
+												function: {
+													name: "search",
+													arguments: '{"query":"dogs"}',
+												},
+											},
+										],
+									},
+									finish_reason: null,
+								},
+							],
+						},
+						{
+							choices: [{ delta: {}, finish_reason: "tool_calls" }],
+						},
+						"[DONE]",
+					]);
+				},
+			},
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Search for cats and dogs",
+			tools: {
+				search: {
+					description: "Search",
+					inputSchema: z.object({ query: z.string() }),
+				},
+			},
+		});
+
+		const events: string[] = [];
+		for await (const chunk of result.fullStream) {
+			events.push(chunk.type);
+		}
+
+		const toolEvents = events.filter((e) =>
+			["tool-input-start", "tool-input-end", "tool-call"].includes(e),
+		);
+
+		expect(toolEvents).toEqual([
+			"tool-input-start",
+			"tool-input-end",
+			"tool-call",
+			"tool-input-start",
+			"tool-input-end",
+			"tool-call",
+		]);
+	});
+
+	it("should handle text followed by tool calls", async () => {
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () => {
+					return mockStream([
+						{ response: "Let me check " },
+						{ response: "the weather." },
+						{
+							tool_calls: [
+								{
+									id: "call_1",
+									type: "function",
+									index: 0,
+									function: {
+										name: "get_weather",
+										arguments: '{"location":"London"}',
+									},
+								},
+							],
+						},
+						{
+							tool_calls: [
+								{
+									id: "call_2",
+									type: "function",
+									index: 1,
+									function: {
+										name: "get_weather",
+										arguments: '{"location":"Paris"}',
+									},
+								},
+							],
+						},
+						{ finish_reason: "tool_calls" },
+						"[DONE]",
+					]);
+				},
+			},
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Weather in London and Paris",
+			tools: {
+				get_weather: {
+					description: "Get weather",
+					inputSchema: z.object({ location: z.string() }),
+				},
+			},
+		});
+
+		const events: string[] = [];
+		let text = "";
+		for await (const chunk of result.fullStream) {
+			events.push(chunk.type);
+			if (chunk.type === "text-delta") text += chunk.text;
+		}
+
+		expect(text).toBe("Let me check the weather.");
+
+		const toolEvents = events.filter((e) =>
+			["tool-input-start", "tool-input-end", "tool-call"].includes(e),
+		);
+
+		expect(toolEvents).toEqual([
+			"tool-input-start",
+			"tool-input-end",
+			"tool-call",
+			"tool-input-start",
+			"tool-input-end",
+			"tool-call",
+		]);
+
+		// Text events should come before tool events
+		const lastTextDelta = events.lastIndexOf("text-delta");
+		const firstToolStart = events.indexOf("tool-input-start");
+		expect(lastTextDelta).toBeLessThan(firstToolStart);
+	});
+
+	it("should handle null finalization between sequential tools", async () => {
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () => {
+					return mockStream([
+						{
+							tool_calls: [
+								{
+									id: "call_1",
+									type: "function",
+									index: 0,
+									function: {
+										name: "read",
+										arguments: '{"file":"a.txt"}',
+									},
+								},
+							],
+						},
+						// Explicit finalization for tool 0
+						{
+							tool_calls: [
+								{
+									id: null,
+									type: null,
+									function: { name: null, arguments: "" },
+								},
+							],
+						},
+						{
+							tool_calls: [
+								{
+									id: "call_2",
+									type: "function",
+									index: 1,
+									function: {
+										name: "read",
+										arguments: '{"file":"b.txt"}',
+									},
+								},
+							],
+						},
+						// Explicit finalization for tool 1
+						{
+							tool_calls: [
+								{
+									id: null,
+									type: null,
+									function: { name: null, arguments: "" },
+								},
+							],
+						},
+						{ finish_reason: "tool_calls" },
+						"[DONE]",
+					]);
+				},
+			},
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Read two files",
+			tools: {
+				read: {
+					description: "Read a file",
+					inputSchema: z.object({ file: z.string() }),
+				},
+			},
+		});
+
+		const events: string[] = [];
+		const toolCalls: any[] = [];
+		for await (const chunk of result.fullStream) {
+			events.push(chunk.type);
+			if (chunk.type === "tool-call") toolCalls.push(chunk);
+		}
+
+		const toolEvents = events.filter((e) =>
+			["tool-input-start", "tool-input-end", "tool-call"].includes(e),
+		);
+
+		expect(toolEvents).toEqual([
+			"tool-input-start",
+			"tool-input-end",
+			"tool-call",
+			"tool-input-start",
+			"tool-input-end",
+			"tool-call",
+		]);
+
+		expect(toolCalls[0].toolCallId).toBe("call_1");
+		expect(toolCalls[1].toolCallId).toBe("call_2");
+	});
+
+	it("should not double-close a tool call (finalization + new index)", async () => {
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () => {
+					return mockStream([
+						{
+							tool_calls: [
+								{
+									id: "call_1",
+									type: "function",
+									index: 0,
+									function: {
+										name: "read",
+										arguments: '{"file":"a.txt"}',
+									},
+								},
+							],
+						},
+						// Finalization closes tool 0
+						{
+							tool_calls: [
+								{
+									id: null,
+									type: null,
+									function: { name: null, arguments: "" },
+								},
+							],
+						},
+						// New tool 1 starts — tool 0 is already closed, should not double-close
+						{
+							tool_calls: [
+								{
+									id: "call_2",
+									type: "function",
+									index: 1,
+									function: {
+										name: "read",
+										arguments: '{"file":"b.txt"}',
+									},
+								},
+							],
+						},
+						{ finish_reason: "tool_calls" },
+						"[DONE]",
+					]);
+				},
+			},
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Read two files",
+			tools: {
+				read: {
+					description: "Read a file",
+					inputSchema: z.object({ file: z.string() }),
+				},
+			},
+		});
+
+		const events: string[] = [];
+		for await (const chunk of result.fullStream) {
+			events.push(chunk.type);
+		}
+
+		// Count tool-input-end and tool-call — should be exactly 2 of each
+		const endCount = events.filter((e) => e === "tool-input-end").length;
+		const callCount = events.filter((e) => e === "tool-call").length;
+		expect(endCount).toBe(2);
+		expect(callCount).toBe(2);
+	});
+
+	it("should handle multiple tool calls in a single SSE chunk", async () => {
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () => {
+					return mockStream([
+						{
+							tool_calls: [
+								{
+									id: "call_1",
+									type: "function",
+									index: 0,
+									function: {
+										name: "get_weather",
+										arguments: '{"location":"London"}',
+									},
+								},
+								{
+									id: "call_2",
+									type: "function",
+									index: 1,
+									function: {
+										name: "get_weather",
+										arguments: '{"location":"Paris"}',
+									},
+								},
+							],
+						},
+						{ finish_reason: "tool_calls" },
+						"[DONE]",
+					]);
+				},
+			},
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Weather in London and Paris",
+			tools: {
+				get_weather: {
+					description: "Get weather",
+					inputSchema: z.object({ location: z.string() }),
+				},
+			},
+		});
+
+		const events: string[] = [];
+		const toolCalls: any[] = [];
+		for await (const chunk of result.fullStream) {
+			events.push(chunk.type);
+			if (chunk.type === "tool-call") toolCalls.push(chunk);
+		}
+
+		const toolEvents = events.filter((e) =>
+			["tool-input-start", "tool-input-end", "tool-call"].includes(e),
+		);
+
+		// Even in a single chunk, first tool should be closed before second starts
+		expect(toolEvents).toEqual([
+			"tool-input-start",
+			"tool-input-end",
+			"tool-call",
+			"tool-input-start",
+			"tool-input-end",
+			"tool-call",
+		]);
+		expect(toolCalls[0].toolCallId).toBe("call_1");
+		expect(toolCalls[1].toolCallId).toBe("call_2");
+	});
+
+	it("should handle three sequential OpenAI-format tool calls with eager close", async () => {
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () => {
+					return mockStream([
+						{
+							choices: [
+								{
+									delta: {
+										tool_calls: [
+											{
+												id: "call_1",
+												type: "function",
+												index: 0,
+												function: {
+													name: "get_data",
+													arguments: '{"id": 1}',
+												},
+											},
+										],
+									},
+									finish_reason: null,
+								},
+							],
+						},
+						{
+							choices: [
+								{
+									delta: {
+										tool_calls: [
+											{
+												id: "call_2",
+												type: "function",
+												index: 1,
+												function: {
+													name: "get_data",
+													arguments: '{"id": 2}',
+												},
+											},
+										],
+									},
+									finish_reason: null,
+								},
+							],
+						},
+						{
+							choices: [
+								{
+									delta: {
+										tool_calls: [
+											{
+												id: "call_3",
+												type: "function",
+												index: 2,
+												function: {
+													name: "get_data",
+													arguments: '{"id": 3}',
+												},
+											},
+										],
+									},
+									finish_reason: null,
+								},
+							],
+						},
+						{
+							choices: [{ delta: {}, finish_reason: "tool_calls" }],
+						},
+						"[DONE]",
+					]);
+				},
+			},
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Get data for IDs 1, 2, 3",
+			tools: {
+				get_data: {
+					description: "Get data",
+					inputSchema: z.object({ id: z.number() }),
+				},
+			},
+		});
+
+		const toolCalls: any[] = [];
+		const events: string[] = [];
+		for await (const chunk of result.fullStream) {
+			events.push(chunk.type);
+			if (chunk.type === "tool-call") toolCalls.push(chunk);
+		}
+
+		expect(toolCalls).toHaveLength(3);
+		expect(toolCalls[0].toolCallId).toBe("call_1");
+		expect(toolCalls[1].toolCallId).toBe("call_2");
+		expect(toolCalls[2].toolCallId).toBe("call_3");
+
+		const toolEvents = events.filter((e) =>
+			["tool-input-start", "tool-input-end", "tool-call"].includes(e),
+		);
+
+		// Each tool is fully closed before the next starts
+		expect(toolEvents).toEqual([
+			"tool-input-start",
+			"tool-input-end",
+			"tool-call",
+			"tool-input-start",
+			"tool-input-end",
+			"tool-call",
+			"tool-input-start",
+			"tool-input-end",
+			"tool-call",
+		]);
+	});
+});
+
 /**
  * Helper to produce SSE lines in a Node ReadableStream.
  */
