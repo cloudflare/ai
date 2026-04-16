@@ -107,6 +107,9 @@
 		},
 		"./demos/hello-world": {
 			"package_json_hash": "286f536168d5b046228c88c689758c9eb4ff3fb8"
+		},
+		"./demos/remote-mcp-cf-access-self-hosted": {
+			"package_json_hash": "711087c91bcd285999ba2bba9db991df68220718"
 		}
 	}
 }

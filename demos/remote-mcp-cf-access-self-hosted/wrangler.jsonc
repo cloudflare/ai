@@ -1,0 +1,38 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mcp-access-self-hosted",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-03-10",
+  "migrations": [
+    {
+      "new_sqlite_classes": ["MyMCP"],
+      "tag": "v1",
+    },
+  ],
+  "compatibility_flags": ["nodejs_compat"],
+  "durable_objects": {
+    "bindings": [
+      {
+        "class_name": "MyMCP",
+        "name": "MCP_OBJECT",
+      },
+    ],
+  },
+  "ai": {
+    "binding": "AI",
+  },
+  "observability": {
+    "enabled": true,
+  },
+  // Required for JWT validation.
+  // TEAM_DOMAIN: "https://<your-team-name>.cloudflareaccess.com"
+  // POLICY_AUD: your application's AUD tag from Access
+  "vars": {
+    "TEAM_DOMAIN": "<Add-Team-Domain>",
+    "POLICY_AUD": "<Add-Policy-AUD>",
+  },
+}
