@@ -889,6 +889,28 @@ importers:
         specifier: ^4.79.0
         version: 4.79.0(@cloudflare/workers-types@4.20260402.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
 
+  demos/remote-mcp-cf-access-self-hosted:
+    dependencies:
+      agents:
+        specifier: ^0.9.0
+        version: 0.9.0(@ai-sdk/openai@3.0.49(zod@4.3.6))(@ai-sdk/react@3.0.145(react@19.2.4)(zod@4.3.6))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260402.1)(ai@6.0.143(zod@4.3.6))(react@19.2.4)(rolldown@1.0.0-rc.12)(viem@2.37.8(bufferutil@4.0.9)(typescript@6.0.2)(utf-8-validate@5.0.10)(zod@4.3.6))(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(sugarss@5.0.0(postcss@8.5.8))(tsx@4.21.0)(yaml@2.7.1))(zod@4.3.6)
+      jose:
+        specifier: ^6.0.11
+        version: 6.2.2
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+    devDependencies:
+      '@types/node':
+        specifier: ^25.5.0
+        version: 25.5.0
+      typescript:
+        specifier: 6.0.2
+        version: 6.0.2
+      wrangler:
+        specifier: ^4.79.0
+        version: 4.79.0(@cloudflare/workers-types@4.20260402.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+
   demos/remote-mcp-github-oauth:
     dependencies:
       '@cloudflare/workers-oauth-provider':
