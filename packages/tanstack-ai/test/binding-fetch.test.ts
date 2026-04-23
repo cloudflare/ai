@@ -790,6 +790,35 @@ describe("createWorkersAiBindingFetch", () => {
 		expect(inputs.chat_template_kwargs).toEqual({});
 	});
 
+	it("should NOT forward unknown body fields to binding inputs (allowlist policy)", async () => {
+		// The binding shim uses an explicit allowlist. Fields that the Workers
+		// AI binding doesn't understand (e.g. `stream_options` from the OpenAI
+		// SDK, or an arbitrary `seed`) must be dropped so the binding's schema
+		// validation doesn't reject the whole request. REST and gateway paths
+		// forward everything; binding drops unknowns. This asymmetry is
+		// documented in `WorkersAiTextModelOptions`.
+		const binding = mockBinding(vi.fn().mockResolvedValue({ response: "ok" }));
+		const fetcher = createWorkersAiBindingFetch(binding);
+
+		await fetcher("https://api.openai.com/v1/chat/completions", {
+			method: "POST",
+			body: JSON.stringify({
+				model: "@cf/zai-org/glm-4.7-flash",
+				messages: [{ role: "user", content: "Hi" }],
+				seed: 42,
+				stream_options: { include_usage: true },
+				some_unknown_future_field: "hello",
+			}),
+		});
+
+		const [, inputs] = binding.run.mock.calls[0]! as [unknown, Record<string, unknown>];
+		expect(inputs).not.toHaveProperty("seed");
+		expect(inputs).not.toHaveProperty("stream_options");
+		expect(inputs).not.toHaveProperty("some_unknown_future_field");
+		// Canonical fields and reasoning fields still flow
+		expect(inputs.messages).toBeDefined();
+	});
+
 	it("should forward reasoning params alongside streaming requests", async () => {
 		const encoder = new TextEncoder();
 		const stream = new ReadableStream({

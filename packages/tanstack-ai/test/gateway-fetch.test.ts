@@ -446,6 +446,31 @@ describe("createGatewayFetch", () => {
 			expect(request.query).toHaveProperty("reasoning_effort");
 			expect(request.query.reasoning_effort).toBeNull();
 		});
+
+		// Counterpart to the binding shim's allowlist: the gateway path
+		// forwards arbitrary fields. This is the escape-hatch side of the
+		// asymmetry documented on `WorkersAiTextModelOptions`.
+		it("should forward arbitrary unknown fields on the gateway query", async () => {
+			const config: AiGatewayAdapterConfig = {
+				binding: mockBinding,
+				apiKey: "test-key",
+			};
+			const fetcher = createGatewayFetch("workers-ai", config);
+
+			await fetcher("https://api.openai.com/v1/chat/completions", {
+				method: "POST",
+				body: JSON.stringify({
+					model: "@cf/zai-org/glm-4.7-flash",
+					messages: [],
+					seed: 42,
+					some_future_field: "hello",
+				}),
+			});
+
+			const request = mockBinding.run.mock.calls[0]![0];
+			expect(request.query.seed).toBe(42);
+			expect(request.query.some_future_field).toBe("hello");
+		});
 	});
 
 	describe("endpoint extraction", () => {

@@ -1052,6 +1052,83 @@ describe("WorkersAiTextAdapter modelOptions passthrough", () => {
 		expect(inputs).not.toHaveProperty("reasoning_effort");
 		expect(inputs).not.toHaveProperty("chat_template_kwargs");
 	});
+
+	it("should ignore modelOptions when it is not a plain object", async () => {
+		// AI SDK types modelOptions as an object, but users can bypass with
+		// `as any`. We must not leak spurious keys into the body — e.g.
+		// Object.entries("ab") returns [["0","a"],["1","b"]] which would
+		// become inputs["0"] = "a" if we weren't careful.
+		const binding = createStreamingBinding(['data: {"response":"ok"}\n\n']);
+		const adapter = new WorkersAiTextAdapter(MODEL, { binding });
+
+		await collectChunks(
+			adapter.chatStream({
+				model: MODEL,
+				messages: [{ role: "user", content: "Hi" }],
+				modelOptions: "not-an-object" as any,
+			} as any),
+		);
+
+		const [, inputs] = binding.run.mock.calls[0]!;
+		expect(inputs).not.toHaveProperty("0");
+		expect(inputs).not.toHaveProperty("reasoning_effort");
+		// Canonical fields are still present
+		expect(inputs.messages).toBeDefined();
+	});
+
+	it("should preserve modelOptions through the non-streaming fallback path", async () => {
+		// Some models reject stream: true. The adapter falls back to a
+		// non-streaming request; modelOptions must survive the retry so that
+		// users don't lose reasoning controls on fallback-affected models.
+		const adapter = new WorkersAiTextAdapter(
+			"@cf/openai/gpt-oss-120b" as WorkersAiTextModel,
+			{
+				// binding must be valid for the adapter to construct
+				binding: {
+					run: vi.fn(),
+					gateway: () => ({ run: () => Promise.resolve(new Response("ok")) }),
+				},
+			},
+		);
+
+		const createMock = vi
+			.fn()
+			// First call (streaming) throws
+			.mockRejectedValueOnce(new Error("streaming not supported"))
+			// Second call (non-streaming fallback) succeeds
+			.mockResolvedValueOnce({
+				model: "@cf/openai/gpt-oss-120b",
+				choices: [
+					{ message: { role: "assistant", content: "ok" }, finish_reason: "stop" },
+				],
+				usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
+			});
+
+		(adapter as any).client = {
+			chat: { completions: { create: createMock } },
+		};
+
+		const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+		await collectChunks(
+			adapter.chatStream({
+				model: "@cf/openai/gpt-oss-120b" as WorkersAiTextModel,
+				messages: [{ role: "user", content: "Hi" }],
+				modelOptions: {
+					reasoning_effort: "low",
+					chat_template_kwargs: { enable_thinking: false },
+				},
+			} as any),
+		);
+
+		expect(createMock).toHaveBeenCalledTimes(2);
+		// Both attempts must carry the user's reasoning controls
+		for (const [args] of createMock.mock.calls) {
+			expect(args.reasoning_effort).toBe("low");
+			expect(args.chat_template_kwargs).toEqual({ enable_thinking: false });
+		}
+		warnSpy.mockRestore();
+	});
 });
 
 // ---------------------------------------------------------------------------

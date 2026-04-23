@@ -287,7 +287,18 @@ function generateId(prefix = "chatcmpl"): string {
 function normalizeModelOptions(
 	modelOptions: WorkersAiTextModelOptions | undefined,
 ): Record<string, unknown> {
-	if (!modelOptions) return {};
+	// Guard against runtime misuse. TanStack AI types this as an object, but
+	// users can always bypass with `as any`. `Object.entries` on a string
+	// surprisingly returns per-character tuples (e.g. `Object.entries("ab") →
+	// [["0","a"],["1","b"]]`), which would leak spurious keys into the body.
+	// Arrays similarly become index-keyed. Only accept plain objects.
+	if (
+		modelOptions === null ||
+		typeof modelOptions !== "object" ||
+		Array.isArray(modelOptions)
+	) {
+		return {};
+	}
 	const out: Record<string, unknown> = {};
 	for (const [key, value] of Object.entries(modelOptions)) {
 		if (value !== undefined) out[key] = value;
