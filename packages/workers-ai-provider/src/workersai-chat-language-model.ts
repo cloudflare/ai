@@ -123,12 +123,36 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 	 * accept this format at runtime.
 	 *
 	 * The binding path additionally normalises null content to empty strings.
+	 *
+	 * Reasoning controls (`reasoning_effort`, `chat_template_kwargs`) are
+	 * forwarded here from settings. These belong on the INPUTS object, not on
+	 * the 3rd-arg options / REST query string — see
+	 * https://github.com/cloudflare/ai/issues/501. Per-call values from
+	 * `providerOptions["workers-ai"]` override settings.
+	 *
+	 * `reasoning_effort: null` is a valid value ("disable reasoning"), so we
+	 * check `!== undefined` rather than truthiness.
 	 */
 	private buildRunInputs(
 		args: ReturnType<typeof this.getArgs>["args"],
 		messages: ReturnType<typeof convertToWorkersAIChatMessages>["messages"],
-		options?: { stream?: boolean },
+		options?: { stream?: boolean; providerOptions?: Record<string, unknown> },
 	) {
+		// The AI SDK types this as `Record<string, JSONObject>` but we defensively
+		// accept anything and only treat it as a lookup if it's a plain object.
+		// `"key" in x` throws for primitives, so we can't skip the typeof guard.
+		const rawPerCall = options?.providerOptions?.["workers-ai"];
+		const perCall: Record<string, unknown> =
+			rawPerCall !== null && typeof rawPerCall === "object" && !Array.isArray(rawPerCall)
+				? (rawPerCall as Record<string, unknown>)
+				: {};
+		const reasoningEffort =
+			"reasoning_effort" in perCall ? perCall.reasoning_effort : this.settings.reasoning_effort;
+		const chatTemplateKwargs =
+			"chat_template_kwargs" in perCall
+				? perCall.chat_template_kwargs
+				: this.settings.chat_template_kwargs;
+
 		return {
 			max_tokens: args.max_tokens,
 			messages: this.config.isBinding ? normalizeMessagesForBinding(messages) : messages,
@@ -138,11 +162,19 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 			top_p: args.top_p,
 			...(args.response_format ? { response_format: args.response_format } : {}),
 			...(options?.stream ? { stream: true } : {}),
+			...(reasoningEffort !== undefined ? { reasoning_effort: reasoningEffort } : {}),
+			...(chatTemplateKwargs !== undefined
+				? { chat_template_kwargs: chatTemplateKwargs }
+				: {}),
 		};
 	}
 
 	/**
 	 * Get passthrough options for binding.run() from settings.
+	 *
+	 * `reasoning_effort` and `chat_template_kwargs` are explicitly excluded
+	 * here — they belong on the `inputs` object (see `buildRunInputs`), not on
+	 * the `options` (3rd) arg of binding.run() or the REST query string.
 	 */
 	private getRunOptions() {
 		const {
@@ -150,6 +182,8 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 			safePrompt: _safePrompt,
 			sessionAffinity,
 			extraHeaders,
+			reasoning_effort: _reasoningEffort,
+			chat_template_kwargs: _chatTemplateKwargs,
 			...passthroughOptions
 		} = this.settings;
 
@@ -173,7 +207,9 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 		const { args, warnings } = this.getArgs(options);
 		const { messages } = convertToWorkersAIChatMessages(options.prompt);
 
-		const inputs = this.buildRunInputs(args, messages);
+		const inputs = this.buildRunInputs(args, messages, {
+			providerOptions: options.providerOptions,
+		});
 		const runOptions = this.getRunOptions();
 
 		const output = await this.config.binding.run(
@@ -223,7 +259,10 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 		const { args, warnings } = this.getArgs(options);
 		const { messages } = convertToWorkersAIChatMessages(options.prompt);
 
-		const inputs = this.buildRunInputs(args, messages, { stream: true });
+		const inputs = this.buildRunInputs(args, messages, {
+			stream: true,
+			providerOptions: options.providerOptions,
+		});
 		const runOptions = this.getRunOptions();
 
 		const response = await this.config.binding.run(
