@@ -52,12 +52,12 @@ Open Claude Desktop, go to Settings > Developer > Edit Config, and add:
 
 ```json
 {
-  "mcpServers": {
-    "access-self-hosted": {
-      "type": "http",
-      "url": "https://mcp-access-self-hosted.<your-subdomain>.workers.dev/mcp"
-    }
-  }
+	"mcpServers": {
+		"access-self-hosted": {
+			"type": "http",
+			"url": "https://mcp-access-self-hosted.<your-subdomain>.workers.dev/mcp"
+		}
+	}
 }
 ```
 

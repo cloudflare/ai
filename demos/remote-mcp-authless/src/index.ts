@@ -11,9 +11,13 @@ export class MyMCP extends McpAgent {
 
 	async init() {
 		// Simple addition tool
-		this.server.registerTool("add", { inputSchema: { a: z.number(), b: z.number() }}, async ({ a, b }) => ({
-			content: [{ type: "text", text: String(a + b) }],
-		}));
+		this.server.registerTool(
+			"add",
+			{ inputSchema: { a: z.number(), b: z.number() } },
+			async ({ a, b }) => ({
+				content: [{ type: "text", text: String(a + b) }],
+			}),
+		);
 
 		// Calculator tool with multiple operations
 		this.server.registerTool(
