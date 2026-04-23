@@ -1,5 +1,5 @@
 ---
-"@cloudflare/tanstack-ai": minor
+"@cloudflare/tanstack-ai": patch
 ---
 
 Add passthrough for `reasoning_effort` and `chat_template_kwargs` in `createWorkersAiChat`. Pass them per-call through `modelOptions`:
