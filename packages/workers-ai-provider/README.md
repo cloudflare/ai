@@ -112,6 +112,35 @@ for await (const chunk of result.textStream) {
 }
 ```
 
+## Reasoning Controls
+
+Reasoning-capable Workers AI models (GLM-4.7-flash, Kimi K2.5/K2.6, GPT-OSS, QwQ) accept `reasoning_effort` and `chat_template_kwargs` on their inputs. Either set them at model creation time as settings, or per-call via `providerOptions["workers-ai"]` (per-call wins):
+
+```ts
+// Settings-level (applies to every request on this model instance)
+const model = workersai("@cf/zai-org/glm-4.7-flash", {
+	reasoning_effort: "low", // "low" | "medium" | "high" | null
+	chat_template_kwargs: { enable_thinking: false },
+});
+
+await generateText({ model, prompt: "Summarize in one sentence." });
+```
+
+```ts
+// Per-call (overrides any settings-level value)
+const model = workersai("@cf/zai-org/glm-4.7-flash");
+
+await generateText({
+	model,
+	prompt: "Summarize in one sentence.",
+	providerOptions: {
+		"workers-ai": { reasoning_effort: "low" },
+	},
+});
+```
+
+`reasoning_effort: null` is meaningful — it's the explicit "disable reasoning" signal for models that support it. Both fields land on the `inputs` object of `binding.run()` (and the JSON body of the REST request), matching the shape expected by Workers AI. See the [model catalog](https://developers.cloudflare.com/workers-ai/models/) for per-model reasoning capabilities.
+
 ## Vision (Image Inputs)
 
 Send images to vision-capable models like Kimi K2.5:
