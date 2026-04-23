@@ -680,6 +680,97 @@ describe("Binding - Text Generation Tests", () => {
 		expect(capturedInputs.reasoning_effort).toBe("low");
 	});
 
+	it("should allow per-call null to override a non-null settings value", async () => {
+		// The `in` operator is what enables this: an explicit key in per-call
+		// overrides settings even when the per-call value is null.
+		let capturedInputs: any = null;
+
+		const workersai = createWorkersAI({
+			binding: {
+				run: async (_modelName: string, inputs: any, _options?: any) => {
+					capturedInputs = inputs;
+					return { response: "ok" };
+				},
+			},
+		});
+
+		const model = workersai("@cf/zai-org/glm-4.7-flash", {
+			reasoning_effort: "high",
+		});
+
+		await generateText({
+			model,
+			prompt: "Hi",
+			providerOptions: {
+				"workers-ai": { reasoning_effort: null },
+			},
+		});
+
+		expect(capturedInputs).toHaveProperty("reasoning_effort");
+		expect(capturedInputs.reasoning_effort).toBeNull();
+	});
+
+	it("should ignore providerOptions['workers-ai'] when not a plain object", async () => {
+		// Guard against runtime misuse — AI SDK types say JSONObject, but users
+		// can bypass with `as any`. `"key" in primitive` throws, so we fall back
+		// to settings instead of crashing.
+		let capturedInputs: any = null;
+
+		const workersai = createWorkersAI({
+			binding: {
+				run: async (_modelName: string, inputs: any, _options?: any) => {
+					capturedInputs = inputs;
+					return { response: "ok" };
+				},
+			},
+		});
+
+		const model = workersai("@cf/zai-org/glm-4.7-flash", {
+			reasoning_effort: "medium",
+		});
+
+		await generateText({
+			model,
+			prompt: "Hi",
+			providerOptions: {
+				// Intentionally wrong shape — string/array/null should be ignored
+				"workers-ai": "not-an-object" as any,
+			},
+		});
+
+		// Falls back to settings
+		expect(capturedInputs.reasoning_effort).toBe("medium");
+	});
+
+	it("should combine reasoning params with AI Gateway on the binding path", async () => {
+		// Reasoning params must land on inputs (2nd arg); gateway config stays on
+		// options (3rd arg). They should not interfere with each other.
+		let capturedInputs: any = null;
+		let capturedOptions: any = null;
+
+		const workersai = createWorkersAI({
+			binding: {
+				run: async (_modelName: string, inputs: any, options?: any) => {
+					capturedInputs = inputs;
+					capturedOptions = options;
+					return { response: "ok" };
+				},
+			},
+			gateway: { id: "my-gw" },
+		});
+
+		const model = workersai("@cf/zai-org/glm-4.7-flash", {
+			reasoning_effort: "low",
+		});
+
+		await generateText({ model, prompt: "Hi" });
+
+		expect(capturedInputs.reasoning_effort).toBe("low");
+		expect(capturedOptions.gateway).toEqual({ id: "my-gw" });
+		// And crucially: the gateway shouldn't pick up reasoning_effort
+		expect(capturedOptions).not.toHaveProperty("reasoning_effort");
+	});
+
 	it("should forward reasoning params on streaming requests too", async () => {
 		let capturedInputs: any = null;
 
@@ -786,6 +877,29 @@ describe("REST - reasoning passthrough", () => {
 		// null is explicitly meaningful — must round-trip
 		expect(capturedBody).toHaveProperty("reasoning_effort");
 		expect(capturedBody.reasoning_effort).toBeNull();
+	});
+
+	it("should NOT throw when reasoning_effort is null in settings (REST regression)", async () => {
+		// Before this fix, `createRun` would throw because it can't coerce
+		// `null` into a URL query-string value. Now that reasoning_effort is
+		// moved to the JSON body, this round-trips cleanly.
+		server.use(
+			http.post(
+				`https://api.cloudflare.com/client/v4/accounts/${TEST_ACCOUNT_ID}/ai/run/${REASONING_MODEL}`,
+				async () => HttpResponse.json({ result: { response: "ok" } }),
+			),
+		);
+
+		const workersai = createWorkersAI({
+			accountId: TEST_ACCOUNT_ID,
+			apiKey: TEST_API_KEY,
+		});
+
+		const model = workersai(REASONING_MODEL, {
+			reasoning_effort: null,
+		});
+
+		await expect(generateText({ model, prompt: "Hi" })).resolves.toBeDefined();
 	});
 
 	it("should still passthrough unrelated settings as URL query (no regression)", async () => {

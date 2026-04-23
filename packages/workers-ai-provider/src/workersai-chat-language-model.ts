@@ -138,8 +138,14 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 		messages: ReturnType<typeof convertToWorkersAIChatMessages>["messages"],
 		options?: { stream?: boolean; providerOptions?: Record<string, unknown> },
 	) {
-		const perCall =
-			(options?.providerOptions?.["workers-ai"] as Record<string, unknown> | undefined) ?? {};
+		// The AI SDK types this as `Record<string, JSONObject>` but we defensively
+		// accept anything and only treat it as a lookup if it's a plain object.
+		// `"key" in x` throws for primitives, so we can't skip the typeof guard.
+		const rawPerCall = options?.providerOptions?.["workers-ai"];
+		const perCall: Record<string, unknown> =
+			rawPerCall !== null && typeof rawPerCall === "object" && !Array.isArray(rawPerCall)
+				? (rawPerCall as Record<string, unknown>)
+				: {};
 		const reasoningEffort =
 			"reasoning_effort" in perCall ? perCall.reasoning_effort : this.settings.reasoning_effort;
 		const chatTemplateKwargs =
