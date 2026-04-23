@@ -339,6 +339,19 @@ export function createWorkersAiBindingFetch(
 		if (body.response_format) inputs.response_format = body.response_format;
 		if (stream) inputs.stream = true;
 
+		// Workers AI-specific reasoning controls. These belong on the INPUTS object
+		// passed to binding.run(model, inputs), not on the options (3rd) arg.
+		// See https://github.com/cloudflare/ai/issues/503.
+		//
+		// `reasoning_effort: null` is a valid value (disables reasoning on models
+		// that support it), so we check `!== undefined` rather than truthiness.
+		if (body.reasoning_effort !== undefined) {
+			inputs.reasoning_effort = body.reasoning_effort;
+		}
+		if (body.chat_template_kwargs !== undefined) {
+			inputs.chat_template_kwargs = body.chat_template_kwargs;
+		}
+
 		const runOptions: Record<string, unknown> = {};
 		if (options?.extraHeaders) runOptions.extraHeaders = options.extraHeaders;
 		if (init?.signal) runOptions.signal = init.signal;

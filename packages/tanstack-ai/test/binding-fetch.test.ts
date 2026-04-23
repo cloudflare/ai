@@ -690,6 +690,164 @@ describe("createWorkersAiBindingFetch", () => {
 		});
 	});
 
+	// ---------------------------------------------------------------------------
+	// Reasoning passthrough — reasoning_effort + chat_template_kwargs
+	// https://github.com/cloudflare/ai/issues/503
+	// ---------------------------------------------------------------------------
+
+	it("should forward reasoning_effort to binding.run inputs (not options)", async () => {
+		const binding = mockBinding(vi.fn().mockResolvedValue({ response: "ok" }));
+		const fetcher = createWorkersAiBindingFetch(binding);
+
+		await fetcher("https://api.openai.com/v1/chat/completions", {
+			method: "POST",
+			body: JSON.stringify({
+				model: "@cf/zai-org/glm-4.7-flash",
+				messages: [{ role: "user", content: "Hi" }],
+				reasoning_effort: "low",
+			}),
+		});
+
+		const [, inputs, options] = binding.run.mock.calls[0]! as [
+			unknown,
+			Record<string, unknown>,
+			Record<string, unknown> | undefined,
+		];
+		// Must land on inputs (2nd arg), not options (3rd arg)
+		expect(inputs.reasoning_effort).toBe("low");
+		if (options) {
+			expect(options).not.toHaveProperty("reasoning_effort");
+		}
+	});
+
+	it("should forward chat_template_kwargs to binding.run inputs", async () => {
+		const binding = mockBinding(vi.fn().mockResolvedValue({ response: "ok" }));
+		const fetcher = createWorkersAiBindingFetch(binding);
+
+		await fetcher("https://api.openai.com/v1/chat/completions", {
+			method: "POST",
+			body: JSON.stringify({
+				model: "@cf/zai-org/glm-4.7-flash",
+				messages: [{ role: "user", content: "Hi" }],
+				chat_template_kwargs: { enable_thinking: false },
+			}),
+		});
+
+		const [, inputs] = binding.run.mock.calls[0]! as [unknown, Record<string, unknown>];
+		expect(inputs.chat_template_kwargs).toEqual({ enable_thinking: false });
+	});
+
+	it("should preserve reasoning_effort: null (disables reasoning)", async () => {
+		const binding = mockBinding(vi.fn().mockResolvedValue({ response: "ok" }));
+		const fetcher = createWorkersAiBindingFetch(binding);
+
+		await fetcher("https://api.openai.com/v1/chat/completions", {
+			method: "POST",
+			body: JSON.stringify({
+				model: "@cf/zai-org/glm-4.7-flash",
+				messages: [{ role: "user", content: "Hi" }],
+				reasoning_effort: null,
+			}),
+		});
+
+		const [, inputs] = binding.run.mock.calls[0]! as [unknown, Record<string, unknown>];
+		// null must be preserved — it's the explicit "no reasoning" signal
+		expect(inputs).toHaveProperty("reasoning_effort");
+		expect(inputs.reasoning_effort).toBeNull();
+	});
+
+	it("should not set reasoning_effort when omitted", async () => {
+		const binding = mockBinding(vi.fn().mockResolvedValue({ response: "ok" }));
+		const fetcher = createWorkersAiBindingFetch(binding);
+
+		await fetcher("https://api.openai.com/v1/chat/completions", {
+			method: "POST",
+			body: JSON.stringify({
+				model: "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+				messages: [{ role: "user", content: "Hi" }],
+			}),
+		});
+
+		const [, inputs] = binding.run.mock.calls[0]! as [unknown, Record<string, unknown>];
+		expect(inputs).not.toHaveProperty("reasoning_effort");
+		expect(inputs).not.toHaveProperty("chat_template_kwargs");
+	});
+
+	it("should forward an empty chat_template_kwargs object", async () => {
+		const binding = mockBinding(vi.fn().mockResolvedValue({ response: "ok" }));
+		const fetcher = createWorkersAiBindingFetch(binding);
+
+		await fetcher("https://api.openai.com/v1/chat/completions", {
+			method: "POST",
+			body: JSON.stringify({
+				model: "@cf/zai-org/glm-4.7-flash",
+				messages: [{ role: "user", content: "Hi" }],
+				chat_template_kwargs: {},
+			}),
+		});
+
+		const [, inputs] = binding.run.mock.calls[0]! as [unknown, Record<string, unknown>];
+		expect(inputs.chat_template_kwargs).toEqual({});
+	});
+
+	it("should NOT forward unknown body fields to binding inputs (allowlist policy)", async () => {
+		// The binding shim uses an explicit allowlist. Fields that the Workers
+		// AI binding doesn't understand (e.g. `stream_options` from the OpenAI
+		// SDK, or an arbitrary `seed`) must be dropped so the binding's schema
+		// validation doesn't reject the whole request. REST and gateway paths
+		// forward everything; binding drops unknowns. This asymmetry is
+		// documented in `WorkersAiTextModelOptions`.
+		const binding = mockBinding(vi.fn().mockResolvedValue({ response: "ok" }));
+		const fetcher = createWorkersAiBindingFetch(binding);
+
+		await fetcher("https://api.openai.com/v1/chat/completions", {
+			method: "POST",
+			body: JSON.stringify({
+				model: "@cf/zai-org/glm-4.7-flash",
+				messages: [{ role: "user", content: "Hi" }],
+				seed: 42,
+				stream_options: { include_usage: true },
+				some_unknown_future_field: "hello",
+			}),
+		});
+
+		const [, inputs] = binding.run.mock.calls[0]! as [unknown, Record<string, unknown>];
+		expect(inputs).not.toHaveProperty("seed");
+		expect(inputs).not.toHaveProperty("stream_options");
+		expect(inputs).not.toHaveProperty("some_unknown_future_field");
+		// Canonical fields and reasoning fields still flow
+		expect(inputs.messages).toBeDefined();
+	});
+
+	it("should forward reasoning params alongside streaming requests", async () => {
+		const encoder = new TextEncoder();
+		const stream = new ReadableStream({
+			start(controller) {
+				controller.enqueue(encoder.encode('data: {"response":"ok"}\n\n'));
+				controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+				controller.close();
+			},
+		});
+		const binding = mockBinding(vi.fn().mockResolvedValue(stream));
+		const fetcher = createWorkersAiBindingFetch(binding);
+
+		await fetcher("https://api.openai.com/v1/chat/completions", {
+			method: "POST",
+			body: JSON.stringify({
+				model: "@cf/zai-org/glm-4.7-flash",
+				messages: [{ role: "user", content: "Hi" }],
+				stream: true,
+				reasoning_effort: "medium",
+				chat_template_kwargs: { enable_thinking: true },
+			}),
+		});
+
+		const [, inputs] = binding.run.mock.calls[0]! as [unknown, Record<string, unknown>];
+		expect(inputs.stream).toBe(true);
+		expect(inputs.reasoning_effort).toBe("medium");
+		expect(inputs.chat_template_kwargs).toEqual({ enable_thinking: true });
+	});
+
 	it("should pass content arrays through to binding for vision models", async () => {
 		const binding = mockBinding(vi.fn().mockResolvedValue({ response: "A red square" }));
 
