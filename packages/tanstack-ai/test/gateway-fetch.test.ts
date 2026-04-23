@@ -400,6 +400,52 @@ describe("createGatewayFetch", () => {
 			const request = mockBinding.run.mock.calls[0]![0];
 			expect(request.endpoint).toBe("run/@cf/meta/llama-3.3-70b-instruct-fp8-fast");
 		});
+
+		// https://github.com/cloudflare/ai/issues/503
+		it("should forward reasoning_effort and chat_template_kwargs in the gateway query", async () => {
+			const config: AiGatewayAdapterConfig = {
+				binding: mockBinding,
+				apiKey: "test-key",
+			};
+			const fetcher = createGatewayFetch("workers-ai", config);
+
+			await fetcher("https://api.openai.com/v1/chat/completions", {
+				method: "POST",
+				body: JSON.stringify({
+					model: "@cf/zai-org/glm-4.7-flash",
+					messages: [{ role: "user", content: "Hi" }],
+					reasoning_effort: "low",
+					chat_template_kwargs: { enable_thinking: false },
+				}),
+			});
+
+			const request = mockBinding.run.mock.calls[0]![0];
+			expect(request.query.reasoning_effort).toBe("low");
+			expect(request.query.chat_template_kwargs).toEqual({ enable_thinking: false });
+			// model is still stripped (becomes part of endpoint)
+			expect(request.query.model).toBeUndefined();
+		});
+
+		it("should preserve reasoning_effort: null in the gateway query", async () => {
+			const config: AiGatewayAdapterConfig = {
+				binding: mockBinding,
+				apiKey: "test-key",
+			};
+			const fetcher = createGatewayFetch("workers-ai", config);
+
+			await fetcher("https://api.openai.com/v1/chat/completions", {
+				method: "POST",
+				body: JSON.stringify({
+					model: "@cf/zai-org/glm-4.7-flash",
+					messages: [],
+					reasoning_effort: null,
+				}),
+			});
+
+			const request = mockBinding.run.mock.calls[0]![0];
+			expect(request.query).toHaveProperty("reasoning_effort");
+			expect(request.query.reasoning_effort).toBeNull();
+		});
 	});
 
 	describe("endpoint extraction", () => {

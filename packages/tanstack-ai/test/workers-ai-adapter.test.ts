@@ -904,6 +904,157 @@ describe("WorkersAiTextAdapter reasoning events", () => {
 });
 
 // ---------------------------------------------------------------------------
+// modelOptions passthrough — reasoning_effort / chat_template_kwargs
+// https://github.com/cloudflare/ai/issues/503
+// ---------------------------------------------------------------------------
+
+describe("WorkersAiTextAdapter modelOptions passthrough", () => {
+	it("should forward reasoning_effort from modelOptions to binding inputs (chatStream)", async () => {
+		const binding = createStreamingBinding(['data: {"response":"ok"}\n\n']);
+		const adapter = new WorkersAiTextAdapter(
+			"@cf/zai-org/glm-4.7-flash" as WorkersAiTextModel,
+			{ binding },
+		);
+
+		await collectChunks(
+			adapter.chatStream({
+				model: "@cf/zai-org/glm-4.7-flash" as WorkersAiTextModel,
+				messages: [{ role: "user", content: "Hi" }],
+				modelOptions: { reasoning_effort: "low" },
+			} as any),
+		);
+
+		const [, inputs] = binding.run.mock.calls[0]!;
+		expect(inputs.reasoning_effort).toBe("low");
+	});
+
+	it("should forward chat_template_kwargs from modelOptions to binding inputs (chatStream)", async () => {
+		const binding = createStreamingBinding(['data: {"response":"ok"}\n\n']);
+		const adapter = new WorkersAiTextAdapter(
+			"@cf/zai-org/glm-4.7-flash" as WorkersAiTextModel,
+			{ binding },
+		);
+
+		await collectChunks(
+			adapter.chatStream({
+				model: "@cf/zai-org/glm-4.7-flash" as WorkersAiTextModel,
+				messages: [{ role: "user", content: "Hi" }],
+				modelOptions: {
+					chat_template_kwargs: { enable_thinking: false },
+				},
+			} as any),
+		);
+
+		const [, inputs] = binding.run.mock.calls[0]!;
+		expect(inputs.chat_template_kwargs).toEqual({ enable_thinking: false });
+	});
+
+	it("should forward reasoning_effort: null (explicit 'no reasoning')", async () => {
+		const binding = createStreamingBinding(['data: {"response":"ok"}\n\n']);
+		const adapter = new WorkersAiTextAdapter(
+			"@cf/zai-org/glm-4.7-flash" as WorkersAiTextModel,
+			{ binding },
+		);
+
+		await collectChunks(
+			adapter.chatStream({
+				model: "@cf/zai-org/glm-4.7-flash" as WorkersAiTextModel,
+				messages: [{ role: "user", content: "Hi" }],
+				modelOptions: { reasoning_effort: null },
+			} as any),
+		);
+
+		const [, inputs] = binding.run.mock.calls[0]!;
+		expect(inputs).toHaveProperty("reasoning_effort");
+		expect(inputs.reasoning_effort).toBeNull();
+	});
+
+	it("should strip undefined values from modelOptions", async () => {
+		const binding = createStreamingBinding(['data: {"response":"ok"}\n\n']);
+		const adapter = new WorkersAiTextAdapter(
+			"@cf/zai-org/glm-4.7-flash" as WorkersAiTextModel,
+			{ binding },
+		);
+
+		await collectChunks(
+			adapter.chatStream({
+				model: "@cf/zai-org/glm-4.7-flash" as WorkersAiTextModel,
+				messages: [{ role: "user", content: "Hi" }],
+				modelOptions: { reasoning_effort: undefined },
+			} as any),
+		);
+
+		const [, inputs] = binding.run.mock.calls[0]!;
+		expect(inputs).not.toHaveProperty("reasoning_effort");
+	});
+
+	it("should prefer top-level temperature over a conflicting modelOptions value", async () => {
+		// If a user accidentally sets `temperature` inside modelOptions while also
+		// passing it at the top level, the TanStack-AI field wins. This prevents
+		// confusing behavior where provider options silently override standard knobs.
+		const binding = createStreamingBinding(['data: {"response":"ok"}\n\n']);
+		const adapter = new WorkersAiTextAdapter(
+			"@cf/zai-org/glm-4.7-flash" as WorkersAiTextModel,
+			{ binding },
+		);
+
+		await collectChunks(
+			adapter.chatStream({
+				model: "@cf/zai-org/glm-4.7-flash" as WorkersAiTextModel,
+				messages: [{ role: "user", content: "Hi" }],
+				temperature: 0.1,
+				modelOptions: { temperature: 0.9 } as any,
+			} as any),
+		);
+
+		const [, inputs] = binding.run.mock.calls[0]!;
+		expect(inputs.temperature).toBe(0.1);
+	});
+
+	it("should forward reasoning_effort from modelOptions in structuredOutput", async () => {
+		const binding = createMockBinding({ response: '{"x":1}' });
+		const adapter = new WorkersAiTextAdapter(
+			"@cf/zai-org/glm-4.7-flash" as WorkersAiTextModel,
+			{ binding },
+		);
+
+		await adapter.structuredOutput({
+			outputSchema: { type: "object" },
+			chatOptions: {
+				model: "@cf/zai-org/glm-4.7-flash" as WorkersAiTextModel,
+				messages: [{ role: "user", content: "Hi" }],
+				modelOptions: {
+					reasoning_effort: "medium",
+					chat_template_kwargs: { enable_thinking: false },
+				},
+			},
+		} as any);
+
+		const [, inputs] = binding.run.mock.calls[0]!;
+		expect(inputs.reasoning_effort).toBe("medium");
+		expect(inputs.chat_template_kwargs).toEqual({ enable_thinking: false });
+		// response_format should still be set for structured output
+		expect(inputs.response_format).toBeDefined();
+	});
+
+	it("should work when modelOptions is undefined (default path)", async () => {
+		const binding = createStreamingBinding(['data: {"response":"ok"}\n\n']);
+		const adapter = new WorkersAiTextAdapter(MODEL, { binding });
+
+		await collectChunks(
+			adapter.chatStream({
+				model: MODEL,
+				messages: [{ role: "user", content: "Hi" }],
+			} as any),
+		);
+
+		const [, inputs] = binding.run.mock.calls[0]!;
+		expect(inputs).not.toHaveProperty("reasoning_effort");
+		expect(inputs).not.toHaveProperty("chat_template_kwargs");
+	});
+});
+
+// ---------------------------------------------------------------------------
 // Premature stream termination
 // ---------------------------------------------------------------------------
 

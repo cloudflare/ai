@@ -68,6 +68,35 @@ const adapter = createWorkersAiChat("@cf/moonshotai/kimi-k2.5", {
 });
 ```
 
+### Reasoning Controls
+
+Reasoning-capable Workers AI models (GLM-4.7-flash, Kimi K2.5/K2.6, GPT-OSS, QwQ) accept `reasoning_effort` and `chat_template_kwargs` on their inputs. Pass them per-call through `modelOptions`:
+
+```typescript
+import { chat } from "@tanstack/ai";
+import { createWorkersAiChat } from "@cloudflare/tanstack-ai";
+
+const adapter = createWorkersAiChat("@cf/zai-org/glm-4.7-flash", {
+	binding: env.AI,
+});
+
+const response = chat({
+	adapter,
+	stream: true,
+	messages: [{ role: "user", content: "Summarize in one sentence." }],
+	modelOptions: {
+		// "low" | "medium" | "high" | null — null disables reasoning.
+		reasoning_effort: "low",
+		// Toggle thinking on models that expose template kwargs (GLM, Kimi).
+		chat_template_kwargs: { enable_thinking: false },
+	},
+});
+```
+
+This works in all four config modes (binding, REST, gateway binding, gateway REST). `modelOptions` keys with `undefined` values are stripped; `null` values are preserved.
+
+See the [Workers AI docs](https://developers.cloudflare.com/workers-ai/) for per-model reasoning capabilities.
+
 ### Vision (Image Inputs)
 
 Send images to vision-capable chat models:

@@ -27,6 +27,55 @@ export type WorkersAiTextModel =
 	| (string & {});
 
 // ---------------------------------------------------------------------------
+// Provider-specific options forwarded to Workers AI's chat completions inputs.
+//
+// These correspond to fields on `ChatCompletionsCommonOptions` in
+// `@cloudflare/workers-types`. They are passed verbatim into the request body
+// sent to the Workers AI binding / REST endpoint / AI Gateway, and ultimately
+// land on the `inputs` object of `binding.run(model, inputs)`.
+//
+// Pass via `modelOptions` on a per-call basis:
+//
+//   await adapter.chatStream({
+//     model, messages,
+//     modelOptions: {
+//       reasoning_effort: "low",
+//       chat_template_kwargs: { enable_thinking: false },
+//     },
+//   });
+// ---------------------------------------------------------------------------
+
+export interface WorkersAiTextModelOptions {
+	/**
+	 * Controls the reasoning budget for reasoning-capable models
+	 * (e.g. `@cf/zai-org/glm-4.7-flash`, `@cf/moonshotai/kimi-k2.5`,
+	 * `@cf/openai/gpt-oss-120b`).
+	 *
+	 * `null` is a valid value and disables reasoning for models that support it.
+	 */
+	reasoning_effort?: "low" | "medium" | "high" | null;
+	/**
+	 * Chat-template overrides for reasoning-capable models that expose
+	 * thinking toggles (e.g. GLM, Kimi).
+	 */
+	chat_template_kwargs?: {
+		/** Whether to enable reasoning. Enabled by default on reasoning models. */
+		enable_thinking?: boolean;
+		/** If false, preserves reasoning context between turns. */
+		clear_thinking?: boolean;
+	};
+	/**
+	 * Escape hatch for other Workers AI inputs-level parameters.
+	 *
+	 * Keys placed here are merged into the outbound request body and forwarded
+	 * to the underlying transport (binding / REST / gateway). Only fields that
+	 * the binding shim knows about are extracted for direct `env.AI` bindings;
+	 * everything is passed through on REST and gateway paths.
+	 */
+	[key: string]: unknown;
+}
+
+// ---------------------------------------------------------------------------
 // Helpers: build the right OpenAI client depending on config mode
 // ---------------------------------------------------------------------------
 
@@ -219,16 +268,41 @@ function generateId(prefix = "chatcmpl"): string {
 }
 
 // ---------------------------------------------------------------------------
+// modelOptions normalization
+//
+// Users pass Workers AI-specific chat params (e.g. `reasoning_effort`,
+// `chat_template_kwargs`) via `modelOptions`. We merge these into the outbound
+// request body so they reach the binding / REST / gateway transports.
+//
+// Spread order matters: these go FIRST in the request body so that TanStack-AI
+// managed fields (`model`, `messages`, `temperature`, `max_tokens`, `stream`,
+// `tools`, `response_format`, ...) always win if a user accidentally sets
+// them both at the top level and inside `modelOptions`.
+//
+// `undefined` values are stripped so that JSON.stringify (and our binding shim
+// which does `!== undefined` checks) see them as absent. `null` values are
+// preserved — they're meaningful for fields like `reasoning_effort: null`
+// which explicitly disables reasoning on some models.
+// ---------------------------------------------------------------------------
+function normalizeModelOptions(
+	modelOptions: WorkersAiTextModelOptions | undefined,
+): Record<string, unknown> {
+	if (!modelOptions) return {};
+	const out: Record<string, unknown> = {};
+	for (const [key, value] of Object.entries(modelOptions)) {
+		if (value !== undefined) out[key] = value;
+	}
+	return out;
+}
+
+// ---------------------------------------------------------------------------
 // WorkersAiTextAdapter: chat / structured output via OpenAI Chat Completions
 // ---------------------------------------------------------------------------
 
-// TODO: Replace `any` generic params with proper types once BaseTextAdapter's
-// provider-options generics stabilize. Workers AI doesn't have provider-specific
-// options in the TanStack sense, so `any` is pragmatic for now.
 export class WorkersAiTextAdapter<TModel extends WorkersAiTextModel> extends BaseTextAdapter<
 	TModel,
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- BaseTextAdapter generic params are opaque
-	any,
+	WorkersAiTextModelOptions,
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- remaining BaseTextAdapter generics are opaque
 	any,
 	any
 > {
@@ -241,8 +315,12 @@ export class WorkersAiTextAdapter<TModel extends WorkersAiTextModel> extends Bas
 		this.client = buildWorkersAiClient(config);
 	}
 
-	async *chatStream(options: TextOptions<any>): AsyncIterable<StreamChunk> {
-		const { systemPrompts, messages, tools, temperature, maxTokens, model } = options;
+	async *chatStream(
+		options: TextOptions<WorkersAiTextModelOptions>,
+	): AsyncIterable<StreamChunk> {
+		const { systemPrompts, messages, tools, temperature, maxTokens, model, modelOptions } =
+			options;
+		const extraBody = normalizeModelOptions(modelOptions);
 
 		const openAIMessages = buildOpenAIMessages(systemPrompts, messages);
 		const openAITools = buildOpenAITools(tools);
@@ -266,6 +344,7 @@ export class WorkersAiTextAdapter<TModel extends WorkersAiTextModel> extends Bas
 			let stream: AsyncIterable<OpenAI.Chat.Completions.ChatCompletionChunk>;
 			try {
 				stream = await this.client.chat.completions.create({
+					...extraBody,
 					model: model ?? this.model,
 					messages: openAIMessages,
 					tools: openAITools,
@@ -273,7 +352,7 @@ export class WorkersAiTextAdapter<TModel extends WorkersAiTextModel> extends Bas
 					max_tokens: maxTokens,
 					stream: true,
 					stream_options: { include_usage: true },
-				});
+				} as OpenAI.Chat.Completions.ChatCompletionCreateParamsStreaming);
 			} catch (streamError: unknown) {
 				// Some models (e.g. GPT-OSS) don't support streaming via the REST API.
 				// Fall back to a non-streaming call and yield the result as a single chunk.
@@ -282,12 +361,13 @@ export class WorkersAiTextAdapter<TModel extends WorkersAiTextModel> extends Bas
 					streamError instanceof Error ? streamError.message : streamError,
 				);
 				const nonStreamResult = await this.client.chat.completions.create({
+					...extraBody,
 					model: model ?? this.model,
 					messages: openAIMessages,
 					tools: openAITools,
 					temperature,
 					max_tokens: maxTokens,
-				});
+				} as OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming);
 
 				yield {
 					type: "RUN_STARTED",
@@ -634,16 +714,18 @@ export class WorkersAiTextAdapter<TModel extends WorkersAiTextModel> extends Bas
 	}
 
 	async structuredOutput(
-		options: StructuredOutputOptions<any>,
+		options: StructuredOutputOptions<WorkersAiTextModelOptions>,
 	): Promise<StructuredOutputResult<unknown>> {
 		const { outputSchema, chatOptions } = options;
-		const { systemPrompts, messages, temperature, model } = chatOptions;
+		const { systemPrompts, messages, temperature, model, modelOptions } = chatOptions;
+		const extraBody = normalizeModelOptions(modelOptions);
 
 		const openAIMessages = buildOpenAIMessages(systemPrompts, messages, {
 			includeToolMessages: false,
 		});
 
 		const response = await this.client.chat.completions.create({
+			...extraBody,
 			model: model ?? this.model,
 			messages: openAIMessages,
 			temperature,
@@ -656,7 +738,7 @@ export class WorkersAiTextAdapter<TModel extends WorkersAiTextModel> extends Bas
 					schema: outputSchema,
 				},
 			},
-		});
+		} as OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming);
 
 		const choice = response.choices?.[0];
 

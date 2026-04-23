@@ -67,7 +67,7 @@ export type {
 } from "./adapters/openrouter";
 
 export { createWorkersAiChat } from "./adapters/workers-ai";
-export type { WorkersAiTextModel } from "./adapters/workers-ai";
+export type { WorkersAiTextModel, WorkersAiTextModelOptions } from "./adapters/workers-ai";
 
 export { createWorkersAiImage } from "./adapters/workers-ai-image";
 export type { WorkersAiImageModel } from "./adapters/workers-ai-image";
