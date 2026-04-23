@@ -11,11 +11,7 @@ export interface AccessIdentity {
 
 const ALLOWED_EMAILS = new Set(["<INSERT EMAIL>"]);
 
-export class MyMCP extends McpAgent<
-	Env,
-	Record<string, never>,
-	AccessIdentity
-> {
+export class MyMCP extends McpAgent<Env, Record<string, never>, AccessIdentity> {
 	server = new McpServer({
 		name: "Access Self-Hosted MCP Demo",
 		version: "1.0.0",
@@ -47,14 +43,12 @@ export class MyMCP extends McpAgent<
 						.describe("Number of diffusion steps (4-8)."),
 				},
 				async ({ prompt, steps }) => {
-					const response = await this.env.AI.run(
-						"@cf/black-forest-labs/flux-1-schnell",
-						{ prompt, steps },
-					);
+					const response = await this.env.AI.run("@cf/black-forest-labs/flux-1-schnell", {
+						prompt,
+						steps,
+					});
 					return {
-						content: [
-							{ data: response.image!, mimeType: "image/jpeg", type: "image" },
-						],
+						content: [{ data: response.image!, mimeType: "image/jpeg", type: "image" }],
 					};
 				},
 			);
@@ -66,13 +60,8 @@ export class MyMCP extends McpAgent<
  * Verify the Access JWT using your team's public keys.
  * See: https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/
  */
-async function verifyAccessJwt(
-	token: string,
-	env: Env,
-): Promise<AccessIdentity> {
-	const JWKS = createRemoteJWKSet(
-		new URL(`${env.TEAM_DOMAIN}/cdn-cgi/access/certs`),
-	);
+async function verifyAccessJwt(token: string, env: Env): Promise<AccessIdentity> {
+	const JWKS = createRemoteJWKSet(new URL(`${env.TEAM_DOMAIN}/cdn-cgi/access/certs`));
 
 	const { payload } = await jwtVerify(token, JWKS, {
 		issuer: env.TEAM_DOMAIN,
@@ -86,11 +75,7 @@ async function verifyAccessJwt(
 }
 
 export default {
-	async fetch(
-		request: Request,
-		env: Env,
-		ctx: ExecutionContext,
-	): Promise<Response> {
+	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		const token = request.headers.get("Cf-Access-Jwt-Assertion");
 		if (!token) {
 			return new Response("Unauthorized: missing Cf-Access-Jwt-Assertion", {

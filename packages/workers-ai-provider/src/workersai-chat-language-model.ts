@@ -147,7 +147,9 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 				? (rawPerCall as Record<string, unknown>)
 				: {};
 		const reasoningEffort =
-			"reasoning_effort" in perCall ? perCall.reasoning_effort : this.settings.reasoning_effort;
+			"reasoning_effort" in perCall
+				? perCall.reasoning_effort
+				: this.settings.reasoning_effort;
 		const chatTemplateKwargs =
 			"chat_template_kwargs" in perCall
 				? perCall.chat_template_kwargs

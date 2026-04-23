@@ -1,5 +1,32 @@
 # @cloudflare/tanstack-ai
 
+## 0.1.8
+
+### Patch Changes
+
+- [#505](https://github.com/cloudflare/ai/pull/505) [`f43f6f0`](https://github.com/cloudflare/ai/commit/f43f6f0c5f71f78e0ea7ca9f6fb5af965e46500c) Thanks [@threepointone](https://github.com/threepointone)! - Add passthrough for `reasoning_effort` and `chat_template_kwargs` in `createWorkersAiChat`. Pass them per-call through `modelOptions`:
+
+    ```ts
+    const adapter = createWorkersAiChat("@cf/zai-org/glm-4.7-flash", {
+    	binding: env.AI,
+    });
+
+    chat({
+    	adapter,
+    	messages,
+    	modelOptions: {
+    		reasoning_effort: "low",
+    		chat_template_kwargs: { enable_thinking: false },
+    	},
+    });
+    ```
+
+    Previously these fields were silently dropped, which could cause reasoning models (GLM-4.7-flash, Kimi K2.5/K2.6, GPT-OSS) to burn the entire output token budget on chain-of-thought with no visible content. They now reach `binding.run(model, inputs)` at the `inputs` level as required by Workers AI.
+
+    A new `WorkersAiTextModelOptions` type is exported from `@cloudflare/tanstack-ai` and `@cloudflare/tanstack-ai/adapters/workers-ai`.
+
+    Closes [#503](https://github.com/cloudflare/ai/issues/503).
+
 ## 0.1.7
 
 ### Patch Changes

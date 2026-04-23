@@ -292,11 +292,7 @@ function normalizeModelOptions(
 	// surprisingly returns per-character tuples (e.g. `Object.entries("ab") →
 	// [["0","a"],["1","b"]]`), which would leak spurious keys into the body.
 	// Arrays similarly become index-keyed. Only accept plain objects.
-	if (
-		modelOptions === null ||
-		typeof modelOptions !== "object" ||
-		Array.isArray(modelOptions)
-	) {
+	if (modelOptions === null || typeof modelOptions !== "object" || Array.isArray(modelOptions)) {
 		return {};
 	}
 	const out: Record<string, unknown> = {};
@@ -326,9 +322,7 @@ export class WorkersAiTextAdapter<TModel extends WorkersAiTextModel> extends Bas
 		this.client = buildWorkersAiClient(config);
 	}
 
-	async *chatStream(
-		options: TextOptions<WorkersAiTextModelOptions>,
-	): AsyncIterable<StreamChunk> {
+	async *chatStream(options: TextOptions<WorkersAiTextModelOptions>): AsyncIterable<StreamChunk> {
 		const { systemPrompts, messages, tools, temperature, maxTokens, model, modelOptions } =
 			options;
 		const extraBody = normalizeModelOptions(modelOptions);

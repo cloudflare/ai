@@ -1,5 +1,34 @@
 # workers-ai-provider
 
+## 3.1.12
+
+### Patch Changes
+
+- [#504](https://github.com/cloudflare/ai/pull/504) [`e9b2a9a`](https://github.com/cloudflare/ai/commit/e9b2a9a4e4e63a8c045c1ac9e5d07fec3d4f2535) Thanks [@threepointone](https://github.com/threepointone)! - Forward `reasoning_effort` and `chat_template_kwargs` onto `binding.run(model, inputs)`'s `inputs` object instead of silently dropping them into the options arg / REST query string. This fixes reasoning models (GLM-4.7-flash, Kimi K2.5/K2.6, GPT-OSS, QwQ) burning the entire output token budget on chain-of-thought with no visible content.
+
+    Both settings-level and per-call usage are supported:
+
+    ```ts
+    // Settings-level
+    const model = workersai("@cf/zai-org/glm-4.7-flash", {
+    	reasoning_effort: "low",
+    	chat_template_kwargs: { enable_thinking: false },
+    });
+
+    // Per-call (overrides settings)
+    await generateText({
+    	model,
+    	prompt,
+    	providerOptions: {
+    		"workers-ai": { reasoning_effort: "low" },
+    	},
+    });
+    ```
+
+    `reasoning_effort: null` is preserved as-is (explicit "disable reasoning" signal). The two fields are also typed directly on `WorkersAIChatSettings`.
+
+    Closes [#501](https://github.com/cloudflare/ai/issues/501).
+
 ## 3.1.11
 
 ### Patch Changes

@@ -1080,16 +1080,13 @@ describe("WorkersAiTextAdapter modelOptions passthrough", () => {
 		// Some models reject stream: true. The adapter falls back to a
 		// non-streaming request; modelOptions must survive the retry so that
 		// users don't lose reasoning controls on fallback-affected models.
-		const adapter = new WorkersAiTextAdapter(
-			"@cf/openai/gpt-oss-120b" as WorkersAiTextModel,
-			{
-				// binding must be valid for the adapter to construct
-				binding: {
-					run: vi.fn(),
-					gateway: () => ({ run: () => Promise.resolve(new Response("ok")) }),
-				},
+		const adapter = new WorkersAiTextAdapter("@cf/openai/gpt-oss-120b" as WorkersAiTextModel, {
+			// binding must be valid for the adapter to construct
+			binding: {
+				run: vi.fn(),
+				gateway: () => ({ run: () => Promise.resolve(new Response("ok")) }),
 			},
-		);
+		});
 
 		const createMock = vi
 			.fn()
@@ -1098,9 +1095,7 @@ describe("WorkersAiTextAdapter modelOptions passthrough", () => {
 			// Second call (non-streaming fallback) succeeds
 			.mockResolvedValueOnce({
 				model: "@cf/openai/gpt-oss-120b",
-				choices: [
-					{ message: { role: "assistant", content: "ok" }, finish_reason: "stop" },
-				],
+				choices: [{ message: { role: "assistant", content: "ok" }, finish_reason: "stop" }],
 				usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
 			});
 
