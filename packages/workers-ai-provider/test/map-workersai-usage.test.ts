@@ -70,4 +70,56 @@ describe("mapWorkersAIUsage", () => {
 		expect(result.inputTokens.total).toBe(5);
 		expect(result.outputTokens.total).toBe(10);
 	});
+
+	it("should map cacheRead and noCache when prompt_tokens_details is present", () => {
+		const result = mapWorkersAIUsage({
+			usage: {
+				prompt_tokens: 6377,
+				completion_tokens: 349,
+				prompt_tokens_details: { cached_tokens: 2861 },
+			},
+		} as any);
+
+		expect(result.inputTokens.cacheRead).toBe(2861);
+		expect(result.inputTokens.noCache).toBe(6377 - 2861);
+		expect(result.inputTokens.cacheWrite).toBeUndefined();
+	});
+
+	it("should handle cached_tokens of 0 (all tokens uncached)", () => {
+		const result = mapWorkersAIUsage({
+			usage: {
+				prompt_tokens: 100,
+				completion_tokens: 50,
+				prompt_tokens_details: { cached_tokens: 0 },
+			},
+		} as any);
+
+		expect(result.inputTokens.cacheRead).toBe(0);
+		expect(result.inputTokens.noCache).toBe(100 - 0);
+	});
+
+	it("should handle prompt_tokens_details with missing cached_tokens", () => {
+		const result = mapWorkersAIUsage({
+			usage: {
+				prompt_tokens: 100,
+				completion_tokens: 50,
+				prompt_tokens_details: {},
+			},
+		} as any);
+
+		expect(result.inputTokens.cacheRead).toBeUndefined();
+		expect(result.inputTokens.noCache).toBeUndefined();
+	});
+
+	it("should compute raw total correctly regardless of cache fields", () => {
+		const result = mapWorkersAIUsage({
+			usage: {
+				prompt_tokens: 1000,
+				completion_tokens: 200,
+				prompt_tokens_details: { cached_tokens: 800 },
+			},
+		} as any);
+
+		expect(result.raw).toEqual({ total: 1000 + 200 });
+	});
 });

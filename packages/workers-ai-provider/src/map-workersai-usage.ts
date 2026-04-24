@@ -9,7 +9,11 @@ export function mapWorkersAIUsage(
 ): LanguageModelV3Usage {
 	const usage = (
 		output as {
-			usage?: { prompt_tokens?: number; completion_tokens?: number };
+			usage?: {
+				prompt_tokens?: number;
+				completion_tokens?: number;
+				prompt_tokens_details?: { cached_tokens?: number };
+			};
 		}
 	).usage ?? {
 		completion_tokens: 0,
@@ -18,6 +22,7 @@ export function mapWorkersAIUsage(
 
 	const promptTokens = usage.prompt_tokens ?? 0;
 	const completionTokens = usage.completion_tokens ?? 0;
+	const cachedTokens = usage.prompt_tokens_details?.cached_tokens;
 
 	return {
 		outputTokens: {
@@ -27,8 +32,8 @@ export function mapWorkersAIUsage(
 		},
 		inputTokens: {
 			total: promptTokens,
-			noCache: undefined,
-			cacheRead: undefined,
+			noCache: cachedTokens !== undefined ? promptTokens - cachedTokens : undefined,
+			cacheRead: cachedTokens,
 			cacheWrite: undefined,
 		},
 		raw: { total: promptTokens + completionTokens },
