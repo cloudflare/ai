@@ -78,7 +78,7 @@ describe("mapWorkersAIUsage", () => {
 				completion_tokens: 349,
 				prompt_tokens_details: { cached_tokens: 2861 },
 			},
-		} as any);
+		});
 
 		expect(result.inputTokens.cacheRead).toBe(2861);
 		expect(result.inputTokens.noCache).toBe(6377 - 2861);
@@ -92,7 +92,7 @@ describe("mapWorkersAIUsage", () => {
 				completion_tokens: 50,
 				prompt_tokens_details: { cached_tokens: 0 },
 			},
-		} as any);
+		});
 
 		expect(result.inputTokens.cacheRead).toBe(0);
 		expect(result.inputTokens.noCache).toBe(100 - 0);
@@ -105,7 +105,7 @@ describe("mapWorkersAIUsage", () => {
 				completion_tokens: 50,
 				prompt_tokens_details: {},
 			},
-		} as any);
+		});
 
 		expect(result.inputTokens.cacheRead).toBeUndefined();
 		expect(result.inputTokens.noCache).toBeUndefined();
@@ -118,7 +118,7 @@ describe("mapWorkersAIUsage", () => {
 				completion_tokens: 200,
 				prompt_tokens_details: { cached_tokens: 800 },
 			},
-		} as any);
+		});
 
 		expect(result.raw).toEqual({ total: 1000 + 200 });
 	});
