@@ -70,4 +70,71 @@ describe("mapWorkersAIUsage", () => {
 		expect(result.inputTokens.total).toBe(5);
 		expect(result.outputTokens.total).toBe(10);
 	});
+
+	describe("with prompt_tokens_details", () => {
+		it("maps cached_tokens to cacheRead and computes noCache", () => {
+			const result = mapWorkersAIUsage({
+				usage: {
+					prompt_tokens: 6377,
+					completion_tokens: 349,
+					prompt_tokens_details: { cached_tokens: 2861 },
+				},
+			});
+
+			expect(result.inputTokens.cacheRead).toBe(2861);
+			expect(result.inputTokens.noCache).toBe(6377 - 2861);
+			expect(result.inputTokens.cacheWrite).toBeUndefined();
+		});
+
+		it("treats cached_tokens=0 as a real signal (not 'unknown')", () => {
+			const result = mapWorkersAIUsage({
+				usage: {
+					prompt_tokens: 100,
+					completion_tokens: 50,
+					prompt_tokens_details: { cached_tokens: 0 },
+				},
+			});
+
+			expect(result.inputTokens.cacheRead).toBe(0);
+			expect(result.inputTokens.noCache).toBe(100);
+		});
+
+		it("falls back to undefined when cached_tokens is absent", () => {
+			const result = mapWorkersAIUsage({
+				usage: {
+					prompt_tokens: 100,
+					completion_tokens: 50,
+					prompt_tokens_details: {},
+				},
+			});
+
+			expect(result.inputTokens.cacheRead).toBeUndefined();
+			expect(result.inputTokens.noCache).toBeUndefined();
+		});
+
+		it("clamps noCache at 0 when cached_tokens > prompt_tokens", () => {
+			const result = mapWorkersAIUsage({
+				usage: {
+					prompt_tokens: 100,
+					completion_tokens: 10,
+					prompt_tokens_details: { cached_tokens: 150 },
+				},
+			});
+
+			expect(result.inputTokens.noCache).toBe(0);
+			expect(result.inputTokens.cacheRead).toBe(150);
+		});
+
+		it("does not let cache fields affect raw.total", () => {
+			const result = mapWorkersAIUsage({
+				usage: {
+					prompt_tokens: 1000,
+					completion_tokens: 200,
+					prompt_tokens_details: { cached_tokens: 800 },
+				},
+			});
+
+			expect(result.raw).toEqual({ total: 1200 });
+		});
+	});
 });
