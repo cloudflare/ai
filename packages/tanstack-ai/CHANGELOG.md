@@ -1,5 +1,11 @@
 # @cloudflare/tanstack-ai
 
+## 0.1.9
+
+### Patch Changes
+
+- [#518](https://github.com/cloudflare/ai/pull/518) [`4358cc1`](https://github.com/cloudflare/ai/commit/4358cc1b4dffdca44784300d0c04552b64157bdd) Thanks [@zackarychapple](https://github.com/zackarychapple)! - Widen `@tanstack/ai` peer dependency and optional adapter ranges to accept newer 0.x releases (up to but not including 1.0.0). Previously the caret ranges on pre-1.0 versions resolved to a single minor (e.g. `^0.8.0` only allowed `>=0.8.0 <0.9.0`), causing unmet-peer warnings when consumers installed `@tanstack/ai@0.14.0` and matching adapter versions.
+
 ## 0.1.8
 
 ### Patch Changes
