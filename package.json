@@ -35,7 +35,7 @@
 		"get-port": "^7.2.0",
 		"globals": "^17.4.0",
 		"handlebars": "^4.7.9",
-		"hono": "^4.12.9",
+		"hono": "^4.12.14",
 		"husky": "^9.1.7",
 		"langchain": "^1.2.39",
 		"marked": "^17.0.5",
