@@ -1763,19 +1763,19 @@ importers:
         specifier: ^0.10.2
         version: 0.10.2
       '@tanstack/ai-anthropic':
-        specifier: ^0.7.1
+        specifier: '>=0.7.1 <1.0.0'
         version: 0.7.1(@tanstack/ai@0.9.2)(zod@4.3.6)
       '@tanstack/ai-gemini':
-        specifier: ^0.8.4
+        specifier: '>=0.8.4 <1.0.0'
         version: 0.8.4(@modelcontextprotocol/sdk@1.29.0(@cfworker/json-schema@4.1.1)(zod@4.3.6))(@tanstack/ai@0.9.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@tanstack/ai-grok':
-        specifier: ^0.6.3
+        specifier: '>=0.6.3 <1.0.0'
         version: 0.6.3(@tanstack/ai@0.9.2)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@4.3.6)
       '@tanstack/ai-openai':
-        specifier: ^0.7.2
+        specifier: '>=0.7.2 <1.0.0'
         version: 0.7.2(@tanstack/ai-client@0.7.6)(@tanstack/ai@0.9.2)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@4.3.6)
       '@tanstack/ai-openrouter':
-        specifier: ^0.7.0
+        specifier: '>=0.7.0 <1.0.0'
         version: 0.7.0(@tanstack/ai@0.9.2)
 
   packages/workers-ai-provider:
