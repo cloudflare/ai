@@ -141,17 +141,17 @@
 		"dotenv": "^17.4.0"
 	},
 	"peerDependencies": {
-		"@tanstack/ai": "^0.8.0"
+		"@tanstack/ai": ">=0.8.0 <1.0.0"
 	},
 	"optionalDependencies": {
 		"@anthropic-ai/sdk": "^0.82.0",
 		"@google/genai": "^1.48.0",
 		"@openrouter/sdk": "^0.10.2",
-		"@tanstack/ai-anthropic": "^0.7.1",
-		"@tanstack/ai-gemini": "^0.8.4",
-		"@tanstack/ai-grok": "^0.6.3",
-		"@tanstack/ai-openai": "^0.7.2",
-		"@tanstack/ai-openrouter": "^0.7.0"
+		"@tanstack/ai-anthropic": ">=0.7.1 <1.0.0",
+		"@tanstack/ai-gemini": ">=0.8.4 <1.0.0",
+		"@tanstack/ai-grok": ">=0.6.3 <1.0.0",
+		"@tanstack/ai-openai": ">=0.7.2 <1.0.0",
+		"@tanstack/ai-openrouter": ">=0.7.0 <1.0.0"
 	},
 	"packageManager": "pnpm@10.33.0"
 }
