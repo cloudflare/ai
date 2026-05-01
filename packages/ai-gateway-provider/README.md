@@ -180,6 +180,26 @@ const aigateway = createAiGateway({
     - `retryDelayMs`: Delay between retries
     - `backoff`: Retry backoff strategy ('constant', 'linear', 'exponential')
 
+### Google AI Studio Example
+
+```typescript
+import { createAiGateway } from "ai-gateway-provider";
+import { createGoogle } from "ai-gateway-provider/providers/google";
+import { generateText } from "ai";
+
+const aigateway = createAiGateway({
+	accountId: "{CLOUDFLARE_ACCOUNT_ID}",
+	gateway: "{GATEWAY_NAME}",
+});
+
+const google = createGoogle({ apiKey: "{GOOGLE_API_KEY}" });
+
+const { text } = await generateText({
+	model: aigateway(google("gemini-1.5-pro")),
+	prompt: "Write a vegetarian lasagna recipe for 4 people.",
+});
+```
+
 ## Supported Providers
 
 - OpenAI
