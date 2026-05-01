@@ -1,0 +1,5 @@
+SSOJET_CLIENT_ID=<your_ssojet_client_id>
+SSOJET_CLIENT_SECRET=<your_ssojet_client_secret>
+SSOJET_ISSUER=https://<your-tenant>.auth.ssojet.com/v1/
+SSOJET_SCOPE="openid profile email"
+NODE_ENV=development
