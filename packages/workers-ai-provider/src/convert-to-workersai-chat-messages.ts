@@ -1,4 +1,5 @@
 import type { LanguageModelV3DataContent, LanguageModelV3Prompt } from "@ai-sdk/provider";
+import { toWorkersAIToolCallId } from "./utils";
 import type { WorkersAIContentPart, WorkersAIChatPrompt } from "./workersai-chat-prompt";
 
 /**
@@ -144,7 +145,7 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV3Prompt): {
 									arguments: JSON.stringify(part.input),
 									name: part.toolName,
 								},
-								id: part.toolCallId,
+								id: toWorkersAIToolCallId(part.toolCallId),
 								type: "function",
 							});
 							break;
@@ -216,7 +217,7 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV3Prompt): {
 						messages.push({
 							content,
 							name: toolResponse.toolName,
-							tool_call_id: toolResponse.toolCallId,
+							tool_call_id: toWorkersAIToolCallId(toolResponse.toolCallId),
 							role: "tool",
 						});
 					}

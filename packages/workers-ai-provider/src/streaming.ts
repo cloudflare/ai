@@ -6,6 +6,7 @@ import type {
 import { generateId } from "ai";
 import { mapWorkersAIFinishReason } from "./map-workersai-finish-reason";
 import { mapWorkersAIUsage } from "./map-workersai-usage";
+import { createAISDKToolCallId } from "./utils";
 
 /**
  * Prepend a stream-start event to an existing LanguageModelV3 stream.
@@ -317,7 +318,7 @@ export function getMappedStream(
 					closeToolCall(lastActiveToolIndex, controller);
 				}
 
-				const id = tcId || generateId();
+				const id = createAISDKToolCallId(tcId);
 				const toolName = tcName || "";
 				activeToolCalls.set(tcIndex, { id, toolName, args: "" });
 				lastActiveToolIndex = tcIndex;

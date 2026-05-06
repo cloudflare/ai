@@ -1,11 +1,13 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import {
+	createAISDKToolCallId,
 	processPartialToolCalls,
 	processToolCalls,
 	processText,
 	normalizeMessagesForBinding,
 	prepareToolsAndToolChoice,
 	createRun,
+	toWorkersAIToolCallId,
 } from "../src/utils";
 
 // ---------------------------------------------------------------------------
@@ -120,7 +122,8 @@ describe("processPartialToolCalls", () => {
 		expect(result).toHaveLength(1);
 		expect(result[0].input).toBe('{"param": "value"}');
 		expect(result[0].toolName).toBe("test_func");
-		expect(result[0].toolCallId).toBe("call_123");
+		expect(result[0].toolCallId).not.toBe("call_123");
+		expect(toWorkersAIToolCallId(result[0].toolCallId)).toBe("call_123");
 	});
 
 	it("should handle multiple partial tool calls with different indices", () => {
@@ -148,8 +151,8 @@ describe("processPartialToolCalls", () => {
 		const result = processPartialToolCalls(partialCalls);
 		expect(result).toHaveLength(2);
 
-		const call1 = result.find((call) => call.toolCallId === "call_1");
-		const call2 = result.find((call) => call.toolCallId === "call_2");
+		const call1 = result.find((call) => toWorkersAIToolCallId(call.toolCallId) === "call_1");
+		const call2 = result.find((call) => toWorkersAIToolCallId(call.toolCallId) === "call_2");
 
 		expect(call1?.input).toBe('{"a":"value1"}');
 		expect(call2?.input).toBe('{"b":"value2"}');
@@ -176,14 +179,14 @@ describe("processToolCalls", () => {
 		};
 
 		const result = processToolCalls(output);
-		expect(result).toEqual([
-			{
-				input: '{"param": "value"}',
-				toolCallId: "call_123",
-				toolName: "test_function",
-				type: "tool-call",
-			},
-		]);
+		expect(result).toHaveLength(1);
+		expect(result[0]).toMatchObject({
+			input: '{"param": "value"}',
+			toolName: "test_function",
+			type: "tool-call",
+		});
+		expect(result[0].toolCallId).not.toBe("call_123");
+		expect(toWorkersAIToolCallId(result[0].toolCallId)).toBe("call_123");
 	});
 
 	it("should handle tool calls with object arguments", () => {
@@ -216,14 +219,14 @@ describe("processToolCalls", () => {
 		};
 
 		const result = processToolCalls(output);
-		expect(result).toEqual([
-			{
-				input: '{"param": "value"}',
-				toolCallId: "call_123",
-				toolName: "test_function",
-				type: "tool-call",
-			},
-		]);
+		expect(result).toHaveLength(1);
+		expect(result[0]).toMatchObject({
+			input: '{"param": "value"}',
+			toolName: "test_function",
+			type: "tool-call",
+		});
+		expect(result[0].toolCallId).not.toBe("call_123");
+		expect(toWorkersAIToolCallId(result[0].toolCallId)).toBe("call_123");
 	});
 
 	it("should return empty array when no tool calls present", () => {
@@ -272,8 +275,40 @@ describe("processToolCalls", () => {
 		const result = processToolCalls(output);
 		expect(result).toHaveLength(1);
 		expect(result[0].toolName).toBe("get_weather");
-		expect(result[0].toolCallId).toBe("call_abc");
+		expect(result[0].toolCallId).not.toBe("call_abc");
+		expect(toWorkersAIToolCallId(result[0].toolCallId)).toBe("call_abc");
 		expect(result[0].input).toBe('{"city": "London"}');
+	});
+
+	it("should rewrite duplicate Kimi-style tool call IDs for AI SDK consumers", () => {
+		const output = {
+			tool_calls: [
+				{
+					id: "functions.list_toolbox_tools:0",
+					type: "function",
+					function: { name: "list_toolbox_tools", arguments: "{}" },
+				},
+				{
+					id: "functions.list_toolbox_tools:0",
+					type: "function",
+					function: { name: "list_toolbox_tools", arguments: "{}" },
+				},
+			],
+		};
+
+		const result = processToolCalls(output);
+		expect(result).toHaveLength(2);
+		expect(result[0].toolCallId).not.toBe(result[1].toolCallId);
+		expect(toWorkersAIToolCallId(result[0].toolCallId)).toBe("functions.list_toolbox_tools:0");
+		expect(toWorkersAIToolCallId(result[1].toolCallId)).toBe("functions.list_toolbox_tools:0");
+	});
+
+	it("should round-trip already-unique GLM-style tool call IDs", () => {
+		const originalId = "chatcmpl-tool-8a89c35582d60474";
+		const rewrittenId = createAISDKToolCallId(originalId);
+
+		expect(rewrittenId).not.toBe(originalId);
+		expect(toWorkersAIToolCallId(rewrittenId)).toBe(originalId);
 	});
 });
 
