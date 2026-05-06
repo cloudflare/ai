@@ -5,6 +5,7 @@ import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { z } from "zod/v4";
 import { createWorkersAI } from "../src/index";
+import { toWorkersAIToolCallId } from "../src/utils";
 
 const TEST_ACCOUNT_ID = "test-account-id";
 const TEST_API_KEY = "test-api-key";
@@ -206,7 +207,8 @@ describe("REST API - Streaming Text Tests", () => {
 
 		expect(toolCalls).toHaveLength(1);
 		expect(toolCalls[0].toolName).toBe("get_weather");
-		expect(toolCalls[0].toolCallId).toBe("call123");
+		expect(toolCalls[0].toolCallId).not.toBe("call123");
+		expect(toWorkersAIToolCallId(toolCalls[0].toolCallId)).toBe("call123");
 		expect(await result.finishReason).toBe("tool-calls");
 	});
 
@@ -263,7 +265,8 @@ describe("REST API - Streaming Text Tests", () => {
 
 		expect(toolCalls).toHaveLength(1);
 		expect(toolCalls[0].toolName).toBe("get_weather");
-		expect(toolCalls[0].toolCallId).toBe("chatcmpl-tool-abc");
+		expect(toolCalls[0].toolCallId).not.toBe("chatcmpl-tool-abc");
+		expect(toWorkersAIToolCallId(toolCalls[0].toolCallId)).toBe("chatcmpl-tool-abc");
 		expect(await result.finishReason).toBe("tool-calls");
 	});
 
@@ -496,7 +499,8 @@ describe("Binding - Streaming Text Tests", () => {
 
 		expect(toolCalls).toHaveLength(1);
 		expect(toolCalls[0].toolName).toBe("get_weather");
-		expect(toolCalls[0].toolCallId).toBe("call_abc");
+		expect(toolCalls[0].toolCallId).not.toBe("call_abc");
+		expect(toWorkersAIToolCallId(toolCalls[0].toolCallId)).toBe("call_abc");
 	});
 
 	it("should handle streamed multiple tool calls via binding", async () => {
@@ -575,6 +579,98 @@ describe("Binding - Streaming Text Tests", () => {
 		expect(toolCalls[1].toolName).toBe("get_temperature");
 	});
 
+	it("should rewrite repeated Kimi-style tool call IDs across turns and restore originals in prompts", async () => {
+		const capturedInputs: any[] = [];
+		const workersai = createWorkersAI({
+			binding: {
+				run: async (_modelName: string, inputs: any) => {
+					capturedInputs.push(inputs);
+					return mockStream([
+						{
+							tool_calls: [
+								{
+									id: "functions.list_toolbox_tools:0",
+									type: "function",
+									index: 0,
+									function: { name: "list_toolbox_tools", arguments: "{}" },
+								},
+							],
+						},
+						{ finish_reason: "tool_calls" },
+						"[DONE]",
+					]);
+				},
+			},
+		});
+
+		const model = workersai(TEST_MODEL);
+		const tools = {
+			list_toolbox_tools: {
+				description: "List tools",
+				inputSchema: z.object({}),
+			},
+		};
+
+		const first = streamText({
+			model,
+			messages: [{ role: "user", content: "first" }],
+			tools,
+		});
+		const firstToolCalls: any[] = [];
+		for await (const chunk of first.fullStream) {
+			if (chunk.type === "tool-call") firstToolCalls.push(chunk);
+		}
+
+		const second = streamText({
+			model,
+			messages: [
+				{ role: "user", content: "first" },
+				{
+					role: "assistant",
+					content: [
+						{
+							type: "tool-call",
+							toolCallId: firstToolCalls[0].toolCallId,
+							toolName: "list_toolbox_tools",
+							input: {},
+						},
+					],
+				},
+				{
+					role: "tool",
+					content: [
+						{
+							type: "tool-result",
+							toolCallId: firstToolCalls[0].toolCallId,
+							toolName: "list_toolbox_tools",
+							output: { type: "text", value: "[]" },
+						},
+					],
+				},
+				{ role: "user", content: "second" },
+			] as any,
+			tools,
+		});
+		const secondToolCalls: any[] = [];
+		for await (const chunk of second.fullStream) {
+			if (chunk.type === "tool-call") secondToolCalls.push(chunk);
+		}
+
+		expect(firstToolCalls).toHaveLength(1);
+		expect(secondToolCalls).toHaveLength(1);
+		expect(firstToolCalls[0].toolCallId).not.toBe(secondToolCalls[0].toolCallId);
+		expect(toWorkersAIToolCallId(firstToolCalls[0].toolCallId)).toBe(
+			"functions.list_toolbox_tools:0",
+		);
+		expect(toWorkersAIToolCallId(secondToolCalls[0].toolCallId)).toBe(
+			"functions.list_toolbox_tools:0",
+		);
+		expect(capturedInputs[1].messages[1].tool_calls[0].id).toBe(
+			"functions.list_toolbox_tools:0",
+		);
+		expect(capturedInputs[1].messages[2].tool_call_id).toBe("functions.list_toolbox_tools:0");
+	});
+
 	it("should handle streamed OpenAI-format tool calls with reasoning via binding", async () => {
 		const workersai = createWorkersAI({
 			binding: {
@@ -649,7 +745,8 @@ describe("Binding - Streaming Text Tests", () => {
 		expect(reasoning).toBe("Let me check the weather.");
 		expect(toolCalls).toHaveLength(1);
 		expect(toolCalls[0].toolName).toBe("get_weather");
-		expect(toolCalls[0].toolCallId).toBe("chatcmpl-tool-abc");
+		expect(toolCalls[0].toolCallId).not.toBe("chatcmpl-tool-abc");
+		expect(toWorkersAIToolCallId(toolCalls[0].toolCallId)).toBe("chatcmpl-tool-abc");
 		expect(await result.finishReason).toBe("tool-calls");
 	});
 
@@ -1583,7 +1680,17 @@ describe("Incremental Tool Call Streaming", () => {
 		const toolCall = parts.find((p) => p.type === "tool-call");
 		expect(toolCall).toBeDefined();
 		expect(toolCall.toolName).toBe("get_weather");
-		expect(toolCall.toolCallId).toBe("call1");
+		expect(toolCall.toolCallId).not.toBe("call1");
+		expect(toWorkersAIToolCallId(toolCall.toolCallId)).toBe("call1");
+
+		const toolEventIds = parts
+			.filter((p) =>
+				["tool-input-start", "tool-input-delta", "tool-input-end", "tool-call"].includes(
+					p.type,
+				),
+			)
+			.map((p) => p.toolCallId ?? p.id);
+		expect(new Set(toolEventIds)).toEqual(new Set([toolCall.toolCallId]));
 
 		// The AI SDK assembles and parses the full arguments from incremental events
 		const args = toolCall.args ?? toolCall.input;
@@ -2242,7 +2349,8 @@ describe("Eager tool-input-end streaming (issue #488)", () => {
 			"tool-input-end",
 			"tool-call",
 		]);
-		expect(toolCallData[0].toolCallId).toBe("solo");
+		expect(toolCallData[0].toolCallId).not.toBe("solo");
+		expect(toWorkersAIToolCallId(toolCallData[0].toolCallId)).toBe("solo");
 		expect(toolCallData[0].toolName).toBe("get_weather");
 	});
 
@@ -2498,8 +2606,10 @@ describe("Eager tool-input-end streaming (issue #488)", () => {
 			"tool-call",
 		]);
 
-		expect(toolCalls[0].toolCallId).toBe("call_1");
-		expect(toolCalls[1].toolCallId).toBe("call_2");
+		expect(toolCalls[0].toolCallId).not.toBe("call_1");
+		expect(toolCalls[1].toolCallId).not.toBe("call_2");
+		expect(toWorkersAIToolCallId(toolCalls[0].toolCallId)).toBe("call_1");
+		expect(toWorkersAIToolCallId(toolCalls[1].toolCallId)).toBe("call_2");
 	});
 
 	it("should not double-close a tool call (finalization + new index)", async () => {
@@ -2639,8 +2749,10 @@ describe("Eager tool-input-end streaming (issue #488)", () => {
 			"tool-input-end",
 			"tool-call",
 		]);
-		expect(toolCalls[0].toolCallId).toBe("call_1");
-		expect(toolCalls[1].toolCallId).toBe("call_2");
+		expect(toolCalls[0].toolCallId).not.toBe("call_1");
+		expect(toolCalls[1].toolCallId).not.toBe("call_2");
+		expect(toWorkersAIToolCallId(toolCalls[0].toolCallId)).toBe("call_1");
+		expect(toWorkersAIToolCallId(toolCalls[1].toolCallId)).toBe("call_2");
 	});
 
 	it("should handle three sequential OpenAI-format tool calls with eager close", async () => {
@@ -2736,9 +2848,12 @@ describe("Eager tool-input-end streaming (issue #488)", () => {
 		}
 
 		expect(toolCalls).toHaveLength(3);
-		expect(toolCalls[0].toolCallId).toBe("call_1");
-		expect(toolCalls[1].toolCallId).toBe("call_2");
-		expect(toolCalls[2].toolCallId).toBe("call_3");
+		expect(toolCalls[0].toolCallId).not.toBe("call_1");
+		expect(toolCalls[1].toolCallId).not.toBe("call_2");
+		expect(toolCalls[2].toolCallId).not.toBe("call_3");
+		expect(toWorkersAIToolCallId(toolCalls[0].toolCallId)).toBe("call_1");
+		expect(toWorkersAIToolCallId(toolCalls[1].toolCallId)).toBe("call_2");
+		expect(toWorkersAIToolCallId(toolCalls[2].toolCallId)).toBe("call_3");
 
 		const toolEvents = events.filter((e) =>
 			["tool-input-start", "tool-input-end", "tool-call"].includes(e),

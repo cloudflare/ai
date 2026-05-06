@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { convertToWorkersAIChatMessages } from "../src/convert-to-workersai-chat-messages";
+import { createAISDKToolCallId } from "../src/utils";
 
 describe("convertToWorkersAIChatMessages", () => {
 	describe("tool call ID preservation", () => {
@@ -151,6 +152,82 @@ describe("convertToWorkersAIChatMessages", () => {
 			expect(messages[0].content).toBe("");
 			expect(messages[0].tool_calls).toBeDefined();
 			expect(messages[0].tool_calls![0].id).toBe(originalId);
+		});
+
+		it("should restore rewritten assistant tool call IDs before sending to Workers AI", () => {
+			const originalId = "functions.list_toolbox_tools:0";
+			const rewrittenId = createAISDKToolCallId(originalId);
+
+			const { messages } = convertToWorkersAIChatMessages([
+				{
+					role: "assistant" as const,
+					content: [
+						{
+							type: "tool-call" as const,
+							toolCallId: rewrittenId,
+							toolName: "list_toolbox_tools",
+							input: {},
+						},
+					],
+				},
+			]);
+
+			expect(messages[0].tool_calls![0].id).toBe(originalId);
+		});
+
+		it("should restore rewritten tool result IDs for tool error outputs", () => {
+			const originalId = "functions.invoke_toolbox_tool:1";
+			const rewrittenId = createAISDKToolCallId(originalId);
+
+			const { messages } = convertToWorkersAIChatMessages([
+				{
+					role: "tool" as const,
+					content: [
+						{
+							type: "tool-result" as const,
+							toolCallId: rewrittenId,
+							toolName: "invoke_toolbox_tool",
+							output: { type: "error-text", value: "tool failed" } as any,
+						},
+					],
+				},
+			]);
+
+			expect(messages[0].tool_call_id).toBe(originalId);
+			expect(messages[0].content).toBe("tool failed");
+		});
+
+		it("should round-trip already-unique GLM-style IDs back to their exact original", () => {
+			const originalId = "chatcmpl-tool-8a89c35582d60474";
+			const rewrittenId = createAISDKToolCallId(originalId);
+
+			const { messages } = convertToWorkersAIChatMessages([
+				{
+					role: "assistant" as const,
+					content: [
+						{
+							type: "tool-call" as const,
+							toolCallId: rewrittenId,
+							toolName: "get_weather",
+							input: { city: "London" },
+						},
+					],
+				},
+				{
+					role: "tool" as const,
+					content: [
+						{
+							type: "tool-result" as const,
+							toolCallId: rewrittenId,
+							toolName: "get_weather",
+							output: { type: "json", value: { weather: "Raining" } } as any,
+						},
+					],
+				},
+			]);
+
+			expect(messages[0].tool_calls![0].id).toBe(originalId);
+			expect(messages[1].tool_call_id).toBe(originalId);
 		});
 	});
 

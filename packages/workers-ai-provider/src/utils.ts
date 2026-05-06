@@ -323,6 +323,23 @@ export function prepareToolsAndToolChoice(
 // Tool call processing
 // ---------------------------------------------------------------------------
 
+const TOOL_CALL_ID_MARKER = "::cf-wai-tool-call::";
+
+export function createAISDKToolCallId(toolCallId: string | null | undefined): string {
+	const originalId = toolCallId || generateId();
+	return `${originalId}${TOOL_CALL_ID_MARKER}${generateId()}`;
+}
+
+export function toWorkersAIToolCallId(toolCallId: string): string {
+	const markerIndex = toolCallId.lastIndexOf(TOOL_CALL_ID_MARKER);
+	if (markerIndex === -1) return toolCallId;
+
+	const suffixIndex = markerIndex + TOOL_CALL_ID_MARKER.length;
+	if (suffixIndex >= toolCallId.length) return toolCallId;
+
+	return toolCallId.slice(0, markerIndex);
+}
+
 /** Workers AI flat tool call format (non-streaming, native) */
 interface FlatToolCall {
 	name: string;
@@ -406,7 +423,7 @@ function processToolCall(toolCall: FlatToolCall | OpenAIToolCall): LanguageModel
 				typeof fn.arguments === "string"
 					? fn.arguments
 					: JSON.stringify(fn.arguments || {}),
-			toolCallId: toolCall.id || generateId(),
+			toolCallId: createAISDKToolCallId(toolCall.id),
 			type: "tool-call",
 			toolName: fn.name,
 		};
@@ -419,7 +436,7 @@ function processToolCall(toolCall: FlatToolCall | OpenAIToolCall): LanguageModel
 			typeof flat.arguments === "string"
 				? flat.arguments
 				: JSON.stringify(flat.arguments || {}),
-		toolCallId: flat.id || generateId(),
+		toolCallId: createAISDKToolCallId(flat.id),
 		type: "tool-call",
 		toolName: flat.name,
 	};
