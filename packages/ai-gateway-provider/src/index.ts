@@ -118,6 +118,17 @@ export class AiGatewayChatLanguageModel implements LanguageModelV3 {
 					} else {
 						delete req.request.headers[authHeader];
 					}
+
+					// Strip companion auth headers (e.g. AWS SigV4 headers for Bedrock)
+					if (providerConfig.extraStripHeaders) {
+						for (const header of providerConfig.extraStripHeaders) {
+							if ("delete" in req.request.headers) {
+								req.request.headers.delete(header);
+							} else {
+								delete req.request.headers[header];
+							}
+						}
+					}
 				}
 
 				return {

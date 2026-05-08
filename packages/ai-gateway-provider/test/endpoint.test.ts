@@ -52,6 +52,16 @@ const testCases = [
 		name: "azure-openai",
 		url: "https://myresource.openai.azure.com/openai/deployments/mydeployment/chat/completions?api-version=2024-02-15-preview",
 	},
+	{
+		expected: "bedrock-runtime/us-east-1/model/anthropic.claude-sonnet-4-5-20250929-v1:0/invoke",
+		name: "aws-bedrock",
+		url: "https://bedrock-runtime.us-east-1.amazonaws.com/model/anthropic.claude-sonnet-4-5-20250929-v1:0/invoke",
+	},
+	{
+		expected: "bedrock-runtime/us-east-1/model/anthropic.claude-sonnet-4-5-20250929-v1%3A0/converse",
+		name: "aws-bedrock",
+		url: "https://bedrock-runtime.us-east-1.amazonaws.com/model/anthropic.claude-sonnet-4-5-20250929-v1%3A0/converse",
+	},
 ];
 
 describe("ProvidersConfigs endpoint parsing", () => {
