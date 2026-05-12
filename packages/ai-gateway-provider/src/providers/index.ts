@@ -7,7 +7,7 @@ export { createDeepgram } from "./deepgram";
 export { createDeepSeek } from "./deepseek";
 export { createElevenLabs } from "./elevenlabs";
 export { createFireworks } from "./fireworks";
-export { createGoogleGenerativeAI } from "./google";
+export { createGoogle, createGoogleGenerativeAI } from "./google";
 export { createVertex } from "./google-vertex";
 export { createGroq } from "./groq";
 export { createMistral } from "./mistral";
