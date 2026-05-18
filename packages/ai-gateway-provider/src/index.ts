@@ -22,12 +22,12 @@ export class AiGatewayChatLanguageModel implements LanguageModelV3 {
 	readonly specificationVersion = "v3";
 	readonly defaultObjectGenerationMode = "json";
 
-	readonly supportedUrls: Record<string, RegExp[]> | PromiseLike<Record<string, RegExp[]>> = {
-		// No URLS are supported for this language model
-	};
-
 	readonly models: InternalLanguageModelV3[];
 	readonly config: AiGatewaySettings;
+
+	get supportedUrls(): Record<string, RegExp[]> | PromiseLike<Record<string, RegExp[]>> {
+		return this.models[0]?.supportedUrls ?? {};
+	}
 
 	get modelId(): string {
 		if (!this.models[0]) {
