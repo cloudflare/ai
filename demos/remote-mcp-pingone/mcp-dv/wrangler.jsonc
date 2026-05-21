@@ -1,0 +1,49 @@
+/**
+ * Wrangler Configuration
+ * Details: https://developers.cloudflare.com/workers/wrangler/configuration/
+ *
+ * 1. Environment Variables
+ *      - Docs: https://developers.cloudflare.com/workers/configuration/secrets
+ *      - For local development, use the '.dev.vars' file
+ *      - For remote deployment, run this command: 'wrangler secret put <SECRET>'
+ *
+ * 2. Persistent Storage
+ *      - Docs: https://developers.cloudflare.com/kv/get-started
+ *      - For local development, KV storage is automatically simulated in-memory by wrangler
+ *      - For remote deployment, run this command: 'wrangler kv namespace create <NAMESPACE>'
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "remote-mcp-pingone-dv",
+	"main": "dist/index.js",
+	"compatibility_date": "2025-03-10",
+	"compatibility_flags": ["nodejs_compat"],
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["TodoMcpServer"]
+    }
+  ],
+	"durable_objects": {
+		"bindings": [
+			{
+				"class_name": "TodoMcpServer",
+				"name": "MCP_OBJECT"
+			}
+		],
+	},
+	"kv_namespaces": [
+		{
+			"binding": "OAUTH_KV",
+      // TODO: Replace placeholder with real ID from Cloudflare before deploying
+			"id": "<PLACEHOLDER>"
+		}
+	],
+	"ai": {
+		"binding": "AI",
+    "remote": true
+	},
+	"observability": {
+		"enabled": true
+	}
+}
