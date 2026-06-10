@@ -73,6 +73,58 @@ describe("REST API - Structured Output Tests", () => {
 		expect(object?.recipe.ingredients.length).toBeGreaterThan(0);
 		expect(object?.recipe.steps.length).toBeGreaterThan(0);
 	});
+
+	it("should forward structured output name and description", async () => {
+		let requestBody: any;
+
+		server.use(
+			http.post(
+				`https://api.cloudflare.com/client/v4/accounts/${TEST_ACCOUNT_ID}/ai/run/${TEST_MODEL}`,
+				async ({ request }) => {
+					requestBody = await request.json();
+
+					return HttpResponse.json({
+						errors: [],
+						messages: [],
+						result: {
+							response: JSON.stringify({
+								recipe: {
+									ingredients: [{ amount: "200g", name: "spaghetti" }],
+									name: "Spaghetti Bolognese",
+									steps: ["Cook spaghetti."],
+								},
+							}),
+						},
+						success: true,
+					});
+				},
+			),
+		);
+
+		const workersai = createWorkersAI({
+			accountId: TEST_ACCOUNT_ID,
+			apiKey: TEST_API_KEY,
+		});
+
+		await generateText({
+			model: workersai(TEST_MODEL),
+			prompt: "Give me a Spaghetti Bolognese recipe",
+			output: Output.object({
+				description: "A recipe response",
+				name: "Recipe",
+				schema: recipeSchema,
+			}),
+		});
+
+		expect(requestBody.response_format).toMatchObject({
+			type: "json_schema",
+			json_schema: {
+				description: "A recipe response",
+				name: "Recipe",
+				schema: expect.any(Object),
+			},
+		});
+	});
 });
 
 describe("Binding - Structured Output Tests", () => {

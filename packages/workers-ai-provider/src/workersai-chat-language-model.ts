@@ -99,7 +99,13 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 						response_format: {
 							type: "json_schema",
 							json_schema:
-								responseFormat?.type === "json" ? responseFormat.schema : undefined,
+								responseFormat?.type === "json" && responseFormat.schema != null
+									? {
+											name: responseFormat.name ?? "response",
+											description: responseFormat.description,
+											schema: responseFormat.schema,
+										}
+									: undefined,
 						},
 						tools: undefined,
 						tool_choice: undefined,
