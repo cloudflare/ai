@@ -2,6 +2,11 @@
 	"name": "tanstack-ai-binding-test",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-09-27",
+	// `nodejs_compat` is required because importing `@tanstack/ai` (for the
+	// StreamProcessor used by the /chat/tool-call-processed endpoint) pulls in
+	// transitive dependencies that reference Node built-ins (e.g.
+	// `node:fs/promises`). Without this flag the worker fails to boot.
+	"compatibility_flags": ["nodejs_compat"],
 	"ai": {
 		"binding": "AI"
 	}
