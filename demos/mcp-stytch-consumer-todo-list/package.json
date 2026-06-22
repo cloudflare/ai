@@ -24,13 +24,13 @@
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {
-		"@cloudflare/vite-plugin": "^1.40.2",
+		"@cloudflare/vite-plugin": "^1.42.1",
 		"@types/react": "^19.2.17",
 		"@types/react-dom": "^19.2.3",
 		"@vitejs/plugin-react": "^6.0.2",
 		"oxlint": "^1.69.0",
 		"typescript": "6.0.3",
 		"vite": "^8.0.16",
-		"wrangler": "^4.100.0"
+		"wrangler": "^4.103.0"
 	}
 }
