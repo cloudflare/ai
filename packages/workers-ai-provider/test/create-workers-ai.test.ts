@@ -238,6 +238,28 @@ describe("createWorkersAI implicit gateway routing", () => {
 		expect(model.provider).toBe("workersai.chat");
 	});
 
+	it("treats `dynamic/<model>` slugs as Workers AI model ids (not catalog slugs)", () => {
+		const { binding } = makeBinding();
+		const workersai = createWorkersAI({ binding, gateway: { id: "default" } });
+		const model = workersai("dynamic/gemma-4-fallback");
+		expect(model.modelId).toBe("dynamic/gemma-4-fallback");
+		expect(model.provider).toBe("workersai.chat");
+	});
+
+	it("routes `dynamic/<model>` slugs to Workers AI even when providers are configured", () => {
+		const { binding, runCalls } = makeBinding();
+		const workersai = createWorkersAI({
+			binding,
+			gateway: { id: "default" },
+			providers: [openaiPlugin],
+		});
+		const model = workersai("dynamic/gemma-4-fallback");
+		expect(model.modelId).toBe("dynamic/gemma-4-fallback");
+		expect(model.provider).toBe("workersai.chat");
+		// `.chat()` routes the same way.
+		expect(workersai.chat("dynamic/gemma-4-fallback").provider).toBe("workersai.chat");
+	});
+
 	it("builds the delegate lazily (only on first catalog slug)", () => {
 		const { binding } = makeBinding();
 		const createSpy = vi.spyOn(openaiPlugin, "create");

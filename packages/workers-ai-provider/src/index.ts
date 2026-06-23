@@ -323,9 +323,13 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 
 	// Workers AI model ids are always `@cf/...`; gateway catalog slugs are
 	// `"<provider>/<model>"`. Anything with a slash that is not `@`-prefixed is
-	// treated as a catalog slug.
+	// treated as a catalog slug, unless it starts with `dynamic/` which is an
+	// AI Gateway dynamic routing prefix and must pass through to Workers AI.
 	const isGatewaySlug = (id: unknown): id is string =>
-		typeof id === "string" && !id.startsWith("@") && id.includes("/");
+		typeof id === "string" &&
+		!id.startsWith("@") &&
+		!id.startsWith("dynamic/") &&
+		id.includes("/");
 
 	// Settings is the union of both shapes here; the public `WorkersAI` interface
 	// narrows it per call via `ModelSettings<M>`. We branch at runtime and cast to
