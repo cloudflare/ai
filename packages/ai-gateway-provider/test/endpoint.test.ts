@@ -52,6 +52,12 @@ const testCases = [
 		name: "azure-openai",
 		url: "https://myresource.openai.azure.com/openai/deployments/mydeployment/chat/completions?api-version=2024-02-15-preview",
 	},
+	{
+		expected:
+			"bedrock-runtime/us-east-1/model/us.anthropic.claude-haiku-4-5-20251001-v1:0/invoke",
+		name: "aws-bedrock",
+		url: "https://bedrock-runtime.us-east-1.amazonaws.com/model/us.anthropic.claude-haiku-4-5-20251001-v1:0/invoke",
+	},
 ];
 
 describe("ProvidersConfigs endpoint parsing", () => {

@@ -78,6 +78,21 @@ export const providers = [
 		headerKey: "api-key",
 	},
 	{
+		name: "aws-bedrock",
+		regex: /^https:\/\/bedrock-runtime\.(?<region>[^.]+)\.amazonaws\.com\/(?<rest>.*)$/,
+		transformEndpoint: (url: string) => {
+			const match = url.match(
+				/^https:\/\/bedrock-runtime\.(?<region>[^.]+)\.amazonaws\.com\/(?<rest>.*)$/,
+			);
+			if (!match || !match.groups) return url;
+			const { region, rest } = match.groups;
+			if (!region || rest === undefined) {
+				throw new Error("Failed to parse Amazon Bedrock endpoint URL.");
+			}
+			return `bedrock-runtime/${region}/${rest}`;
+		},
+	},
+	{
 		name: "openrouter",
 		regex: /^https:\/\/openrouter\.ai\/api\//,
 		transformEndpoint: (url: string) => url.replace(/^https:\/\/openrouter\.ai\/api\//, ""),

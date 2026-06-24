@@ -184,6 +184,7 @@ const aigateway = createAiGateway({
 
 - OpenAI
 - Anthropic
+- Amazon Bedrock
 - DeepSeek
 - Google AI Studio
 - Grok
