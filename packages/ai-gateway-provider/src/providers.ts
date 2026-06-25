@@ -1,4 +1,12 @@
-export const providers = [
+type ProviderConfig = {
+	name: string;
+	regex: RegExp;
+	transformEndpoint: (url: string) => string;
+	headerKey?: string;
+	extraStripHeaders?: string[];
+};
+
+export const providers: ProviderConfig[] = [
 	{
 		name: "openai",
 		regex: /^https:\/\/api\.openai\.com\//,
@@ -81,6 +89,20 @@ export const providers = [
 		name: "openrouter",
 		regex: /^https:\/\/openrouter\.ai\/api\//,
 		transformEndpoint: (url: string) => url.replace(/^https:\/\/openrouter\.ai\/api\//, ""),
+	},
+	{
+		name: "aws-bedrock",
+		regex: /^https:\/\/bedrock-runtime\.([a-z0-9-]+)\.amazonaws\.com\//,
+		transformEndpoint: (url: string) => {
+			const match = url.match(
+				/^https:\/\/bedrock-runtime\.([a-z0-9-]+)\.amazonaws\.com\/(.*)/,
+			);
+			if (!match || !match[1] || !match[2]) {
+				throw new Error("Failed to parse AWS Bedrock endpoint URL.");
+			}
+			return `bedrock-runtime/${match[1]}/${match[2]}`;
+		},
+		extraStripHeaders: ["x-amz-date", "x-amz-security-token", "x-amz-content-sha256"],
 	},
 	{
 		name: "compat",
