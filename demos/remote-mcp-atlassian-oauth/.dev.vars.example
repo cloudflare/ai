@@ -1,0 +1,3 @@
+CLIENT_ID=<your atlassian client id>
+CLIENT_SECRET=<your atlassian client secret>
+COOKIE_ENCRYPTION_KEY=<your cookie encryption key>
