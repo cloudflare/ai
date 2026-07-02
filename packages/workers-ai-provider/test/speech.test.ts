@@ -1,5 +1,5 @@
 import { APICallError } from "@ai-sdk/provider";
-import { experimental_generateSpeech as generateSpeech } from "ai";
+import { generateSpeech } from "ai";
 import { describe, expect, it } from "vitest";
 import { createWorkersAI } from "../src/index";
 

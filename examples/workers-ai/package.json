@@ -9,10 +9,10 @@
 		"deploy": "vite build && wrangler deploy"
 	},
 	"dependencies": {
-		"@ai-sdk/anthropic": "^3.0.84",
-		"@ai-sdk/openai": "^3.0.71",
-		"@ai-sdk/react": "^3.0.206",
-		"ai": "^6.0.204",
+		"@ai-sdk/anthropic": "^4.0.5",
+		"@ai-sdk/openai": "^4.0.5",
+		"@ai-sdk/react": "^4.0.12",
+		"ai": "^7.0.11",
 		"react": "^19.2.7",
 		"react-dom": "^19.2.7",
 		"workers-ai-provider": "workspace:*",

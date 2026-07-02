@@ -1,4 +1,4 @@
-import type { SpeechModelV3, SharedV3Warning } from "@ai-sdk/provider";
+import type { SpeechModelV4, SharedV4Warning } from "@ai-sdk/provider";
 import { apiCallErrorFromResponse, normalizeBindingError } from "./workersai-error";
 import type { WorkersAISpeechSettings } from "./workersai-speech-settings";
 import type { SpeechModels } from "./workersai-models";
@@ -10,13 +10,13 @@ export type WorkersAISpeechConfig = {
 };
 
 /**
- * Workers AI speech (text-to-speech) model implementing the AI SDK's `SpeechModelV3` interface.
+ * Workers AI speech (text-to-speech) model implementing the AI SDK's `SpeechModelV4` interface.
  *
  * Currently supports Deepgram Aura-1 (`@cf/deepgram/aura-1`).
  * The model accepts `{ text, voice?, speed? }` and returns raw audio bytes.
  */
-export class WorkersAISpeechModel implements SpeechModelV3 {
-	readonly specificationVersion = "v3";
+export class WorkersAISpeechModel implements SpeechModelV4 {
+	readonly specificationVersion = "v4";
 
 	get provider(): string {
 		return this.config.provider;
@@ -29,11 +29,11 @@ export class WorkersAISpeechModel implements SpeechModelV3 {
 	) {}
 
 	async doGenerate(
-		options: Parameters<SpeechModelV3["doGenerate"]>[0],
-	): Promise<Awaited<ReturnType<SpeechModelV3["doGenerate"]>>> {
+		options: Parameters<SpeechModelV4["doGenerate"]>[0],
+	): Promise<Awaited<ReturnType<SpeechModelV4["doGenerate"]>>> {
 		const { text, voice, speed, abortSignal } = options;
 
-		const warnings: Array<SharedV3Warning> = [];
+		const warnings: Array<SharedV4Warning> = [];
 
 		if (options.instructions) {
 			warnings.push({

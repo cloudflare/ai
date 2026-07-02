@@ -1,4 +1,4 @@
-import type { LanguageModelV3FinishReason } from "@ai-sdk/provider";
+import type { LanguageModelV4FinishReason } from "@ai-sdk/provider";
 
 /**
  * Map a Workers AI finish reason to the AI SDK unified finish reason.
@@ -9,7 +9,7 @@ import type { LanguageModelV3FinishReason } from "@ai-sdk/provider";
  */
 export function mapWorkersAIFinishReason(
 	finishReasonOrResponse: string | null | undefined | Record<string, unknown>,
-): LanguageModelV3FinishReason {
+): LanguageModelV4FinishReason {
 	let finishReason: string | null | undefined;
 
 	if (

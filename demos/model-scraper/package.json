@@ -19,9 +19,9 @@
 		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@ai-sdk/openai": "^3.0.71",
+		"@ai-sdk/openai": "^4.0.5",
 		"agents": "^0.17.1",
-		"ai": "^6.0.204",
+		"ai": "^7.0.11",
 		"hono": "^4.12.27",
 		"workers-ai-provider": "^3.2.1",
 		"zod": "^4.4.3"

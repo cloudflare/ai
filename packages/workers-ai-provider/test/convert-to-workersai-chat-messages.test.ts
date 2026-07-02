@@ -291,7 +291,7 @@ describe("convertToWorkersAIChatMessages", () => {
 						{ type: "text" as const, text: "What's in this image?" },
 						{
 							type: "file" as const,
-							data: imageData,
+							data: { type: "data" as const, data: imageData },
 							mediaType: "image/png",
 							providerOptions: undefined,
 						},
@@ -323,7 +323,7 @@ describe("convertToWorkersAIChatMessages", () => {
 						{ type: "text" as const, text: "First" },
 						{
 							type: "file" as const,
-							data: new Uint8Array([1, 2, 3]),
+							data: { type: "data" as const, data: new Uint8Array([1, 2, 3]) },
 							mediaType: "image/png",
 							providerOptions: undefined,
 						},
@@ -348,7 +348,7 @@ describe("convertToWorkersAIChatMessages", () => {
 					content: [
 						{
 							type: "file" as const,
-							data: new Uint8Array([1, 2, 3]),
+							data: { type: "data" as const, data: new Uint8Array([1, 2, 3]) },
 							mediaType: "image/jpeg",
 							providerOptions: undefined,
 						},
@@ -377,7 +377,7 @@ describe("convertToWorkersAIChatMessages", () => {
 						{ type: "text" as const, text: "Describe this image" },
 						{
 							type: "file" as const,
-							data: base64,
+							data: { type: "data" as const, data: base64 },
 							mediaType: "image/png",
 							providerOptions: undefined,
 						},
@@ -407,7 +407,7 @@ describe("convertToWorkersAIChatMessages", () => {
 						{ type: "text" as const, text: "What is this?" },
 						{
 							type: "file" as const,
-							data: dataUrl,
+							data: { type: "data" as const, data: dataUrl },
 							mediaType: "image/jpeg",
 							providerOptions: undefined,
 						},
@@ -432,7 +432,7 @@ describe("convertToWorkersAIChatMessages", () => {
 					content: [
 						{
 							type: "file" as const,
-							data: new URL("https://example.com/image.png"),
+							data: { type: "url" as const, url: new URL("https://example.com/image.png") },
 							mediaType: "image/png",
 							providerOptions: undefined,
 						},
@@ -453,7 +453,7 @@ describe("convertToWorkersAIChatMessages", () => {
 						{ type: "text" as const, text: "Summarize this PDF" },
 						{
 							type: "file" as const,
-							data: new Uint8Array([0x25, 0x50, 0x44, 0x46]),
+							data: { type: "data" as const, data: new Uint8Array([0x25, 0x50, 0x44, 0x46]) },
 							mediaType: "application/pdf",
 							providerOptions: undefined,
 						},
@@ -473,7 +473,7 @@ describe("convertToWorkersAIChatMessages", () => {
 					content: [
 						{
 							type: "file" as const,
-							data: new Uint8Array([1, 2, 3]),
+							data: { type: "data" as const, data: new Uint8Array([1, 2, 3]) },
 							providerOptions: undefined,
 						} as any,
 					],
@@ -492,7 +492,7 @@ describe("convertToWorkersAIChatMessages", () => {
 					content: [
 						{
 							type: "file" as const,
-							data: new Uint8Array([0x25, 0x50, 0x44, 0x46]),
+							data: { type: "data" as const, data: new Uint8Array([0x25, 0x50, 0x44, 0x46]) },
 							mediaType: "application/pdf",
 							providerOptions: undefined,
 						},
@@ -513,7 +513,7 @@ describe("convertToWorkersAIChatMessages", () => {
 						{ type: "text" as const, text: "What is this?" },
 						{
 							type: "file" as const,
-							data: new Uint8Array([0xff, 0xd8, 0xff, 0xe0]),
+							data: { type: "data" as const, data: new Uint8Array([0xff, 0xd8, 0xff, 0xe0]) },
 							mediaType: "IMAGE/JPEG",
 							providerOptions: undefined,
 						},
@@ -554,13 +554,13 @@ describe("convertToWorkersAIChatMessages", () => {
 						{ type: "text" as const, text: "Compare these images" },
 						{
 							type: "file" as const,
-							data: new Uint8Array([1, 2, 3]),
+							data: { type: "data" as const, data: new Uint8Array([1, 2, 3]) },
 							mediaType: "image/png",
 							providerOptions: undefined,
 						},
 						{
 							type: "file" as const,
-							data: new Uint8Array([4, 5, 6]),
+							data: { type: "data" as const, data: new Uint8Array([4, 5, 6]) },
 							mediaType: "image/jpeg",
 							providerOptions: undefined,
 						},
@@ -675,7 +675,7 @@ describe("convertToWorkersAIChatMessages", () => {
 
 	describe("tool result output unwrapping", () => {
 		it("should unwrap text output — not stringify the wrapper object", () => {
-			// LanguageModelV3ToolResultOutput is { type: 'text', value: string }
+			// LanguageModelV4ToolResultOutput is { type: 'text', value: string }
 			// The value must be sent to the API, not the wrapper object itself.
 			const { messages } = convertToWorkersAIChatMessages([
 				{

@@ -1,45 +1,72 @@
-import type { LanguageModelV3DataContent, LanguageModelV3Prompt } from "@ai-sdk/provider";
+import type { LanguageModelV4Prompt, SharedV4FileData } from "@ai-sdk/provider";
 import { UnsupportedFunctionalityError } from "@ai-sdk/provider";
 import { toWorkersAIToolCallId } from "./utils";
 import type { WorkersAIContentPart, WorkersAIChatPrompt } from "./workersai-chat-prompt";
 
 /**
- * Normalise any LanguageModelV3DataContent value to a Uint8Array.
+ * Normalise a tagged `SharedV4FileData` value to a Uint8Array.
  *
  * Handles:
- *   - Uint8Array  → returned as-is
- *   - string      → decoded from base64 (with or without data-URL prefix)
- *   - URL         → not supported (Workers AI needs raw bytes, not a reference)
+ *   - { type: 'data' }      → Uint8Array returned as-is; string decoded from
+ *                             base64 (with or without data-URL prefix)
+ *   - { type: 'url' }       → not supported (Workers AI needs raw bytes, not a reference)
+ *   - { type: 'reference' } → not supported (Workers AI has no file store to resolve it)
+ *   - { type: 'text' }      → not supported for image parts
  */
-function toUint8Array(data: LanguageModelV3DataContent): Uint8Array | null {
-	if (data instanceof Uint8Array) {
-		return data;
-	}
-
-	if (typeof data === "string") {
-		let base64 = data;
-		if (base64.startsWith("data:")) {
-			const commaIndex = base64.indexOf(",");
-			if (commaIndex >= 0) {
-				base64 = base64.slice(commaIndex + 1);
+function toUint8Array(fileData: SharedV4FileData): Uint8Array | null {
+	switch (fileData.type) {
+		case "data": {
+			const data = fileData.data;
+			if (data instanceof Uint8Array) {
+				return data;
 			}
+			let base64 = data;
+			if (base64.startsWith("data:")) {
+				const commaIndex = base64.indexOf(",");
+				if (commaIndex >= 0) {
+					base64 = base64.slice(commaIndex + 1);
+				}
+			}
+			const binaryString = atob(base64);
+			const bytes = new Uint8Array(binaryString.length);
+			for (let i = 0; i < binaryString.length; i++) {
+				bytes[i] = binaryString.charCodeAt(i);
+			}
+			return bytes;
 		}
-		const binaryString = atob(base64);
-		const bytes = new Uint8Array(binaryString.length);
-		for (let i = 0; i < binaryString.length; i++) {
-			bytes[i] = binaryString.charCodeAt(i);
+
+		case "url": {
+			throw new Error(
+				"URL image sources are not supported by Workers AI. " +
+					"Provide image data as a Uint8Array or base64 string instead.",
+			);
 		}
-		return bytes;
-	}
 
-	if (data instanceof URL) {
-		throw new Error(
-			"URL image sources are not supported by Workers AI. " +
-				"Provide image data as a Uint8Array or base64 string instead.",
-		);
-	}
+		case "reference": {
+			throw new UnsupportedFunctionalityError({
+				functionality: "file-part-provider-reference",
+				message:
+					"Provider file references are not supported by Workers AI. " +
+					"Provide image data as a Uint8Array or base64 string instead.",
+			});
+		}
 
-	return null;
+		case "text": {
+			throw new UnsupportedFunctionalityError({
+				functionality: "file-part-inline-text",
+				message:
+					"Inline text file parts are not supported by Workers AI chat. " +
+					"Pass text as a regular text part instead.",
+			});
+		}
+
+		default: {
+			const exhaustiveCheck = fileData satisfies never;
+			throw new Error(
+				`Unsupported file data type: ${(exhaustiveCheck as { type: string }).type}`,
+			);
+		}
+	}
 }
 
 function assertImageMediaType(mediaType: string | undefined): string {
@@ -76,7 +103,7 @@ function uint8ArrayToBase64(bytes: Uint8Array): string {
 	return btoa(binary);
 }
 
-export function convertToWorkersAIChatMessages(prompt: LanguageModelV3Prompt): {
+export function convertToWorkersAIChatMessages(prompt: LanguageModelV4Prompt): {
 	messages: WorkersAIChatPrompt;
 } {
 	const messages: WorkersAIChatPrompt = [];
@@ -161,6 +188,18 @@ export function convertToWorkersAIChatMessages(prompt: LanguageModelV3Prompt): {
 
 						case "file": {
 							// File parts in assistant messages - no action needed
+							break;
+						}
+
+						case "reasoning-file": {
+							// Files inside reasoning traces (new in spec v4) cannot be
+							// replayed to Workers AI - no action needed
+							break;
+						}
+
+						case "custom": {
+							// Provider-specific custom parts (new in spec v4) from other
+							// providers are not replayable to Workers AI - no action needed
 							break;
 						}
 

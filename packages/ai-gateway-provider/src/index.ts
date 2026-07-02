@@ -4,7 +4,7 @@ import {
 	type ResumableStreamOptions,
 	type ResumeExpiredPolicy,
 } from "@cloudflare/gateway-core";
-import type { LanguageModelV3 } from "@ai-sdk/provider";
+import type { LanguageModelV4 } from "@ai-sdk/provider";
 import type { FetchFunction } from "@ai-sdk/provider-utils";
 import { CF_TEMP_TOKEN } from "./auth";
 import { providers } from "./providers";
@@ -42,19 +42,19 @@ async function readGatewayErrorCode(resp: Response): Promise<number | undefined>
 	return undefined;
 }
 
-type InternalLanguageModelV3 = LanguageModelV3 & {
+type InternalLanguageModelV4 = LanguageModelV4 & {
 	config?: { fetch?: FetchFunction | undefined };
 };
 
-export class AiGatewayChatLanguageModel implements LanguageModelV3 {
-	readonly specificationVersion = "v3";
+export class AiGatewayChatLanguageModel implements LanguageModelV4 {
+	readonly specificationVersion = "v4";
 	readonly defaultObjectGenerationMode = "json";
 
 	readonly supportedUrls: Record<string, RegExp[]> | PromiseLike<Record<string, RegExp[]>> = {
 		// No URLS are supported for this language model
 	};
 
-	readonly models: InternalLanguageModelV3[];
+	readonly models: InternalLanguageModelV4[];
 	readonly config: AiGatewaySettings;
 
 	get modelId(): string {
@@ -73,13 +73,13 @@ export class AiGatewayChatLanguageModel implements LanguageModelV3 {
 		return this.models[0].provider;
 	}
 
-	constructor(models: LanguageModelV3[], config: AiGatewaySettings) {
+	constructor(models: LanguageModelV4[], config: AiGatewaySettings) {
 		this.models = models;
 		this.config = config;
 	}
 
 	async processModelRequest<
-		T extends LanguageModelV3["doStream"] | LanguageModelV3["doGenerate"],
+		T extends LanguageModelV4["doStream"] | LanguageModelV4["doGenerate"],
 	>(
 		options: Parameters<T>[0],
 		modelMethod: "doStream" | "doGenerate",
@@ -245,15 +245,15 @@ export class AiGatewayChatLanguageModel implements LanguageModelV3 {
 	}
 
 	async doStream(
-		options: Parameters<LanguageModelV3["doStream"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV3["doStream"]>>> {
-		return this.processModelRequest<LanguageModelV3["doStream"]>(options, "doStream");
+		options: Parameters<LanguageModelV4["doStream"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV4["doStream"]>>> {
+		return this.processModelRequest<LanguageModelV4["doStream"]>(options, "doStream");
 	}
 
 	async doGenerate(
-		options: Parameters<LanguageModelV3["doGenerate"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV3["doGenerate"]>>> {
-		return this.processModelRequest<LanguageModelV3["doGenerate"]>(options, "doGenerate");
+		options: Parameters<LanguageModelV4["doGenerate"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV4["doGenerate"]>>> {
+		return this.processModelRequest<LanguageModelV4["doGenerate"]>(options, "doGenerate");
 	}
 }
 
@@ -264,9 +264,9 @@ export class AiGatewayChatLanguageModel implements LanguageModelV3 {
  * that succeeds wins, selected via `cf-aig-step`).
  */
 export interface AiGateway {
-	(models: LanguageModelV3 | LanguageModelV3[]): LanguageModelV3;
+	(models: LanguageModelV4 | LanguageModelV4[]): LanguageModelV4;
 
-	chat(models: LanguageModelV3 | LanguageModelV3[]): LanguageModelV3;
+	chat(models: LanguageModelV4 | LanguageModelV4[]): LanguageModelV4;
 }
 
 export type AiGatewayRetries = {
@@ -338,11 +338,11 @@ export type AiGatewayBindingSettings = {
 export type AiGatewaySettings = AiGatewayAPISettings | AiGatewayBindingSettings;
 
 export function createAiGateway(options: AiGatewaySettings): AiGateway {
-	const createChatModel = (models: LanguageModelV3 | LanguageModelV3[]) => {
+	const createChatModel = (models: LanguageModelV4 | LanguageModelV4[]) => {
 		return new AiGatewayChatLanguageModel(Array.isArray(models) ? models : [models], options);
 	};
 
-	const provider = (models: LanguageModelV3 | LanguageModelV3[]) => createChatModel(models);
+	const provider = (models: LanguageModelV4 | LanguageModelV4[]) => createChatModel(models);
 
 	provider.chat = createChatModel;
 

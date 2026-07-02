@@ -16,8 +16,8 @@
 		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@ai-sdk/openai": "^3.0.71",
-		"@ai-sdk/react": "^3.0.206",
+		"@ai-sdk/openai": "^4.0.5",
+		"@ai-sdk/react": "^4.0.12",
 		"@mantine/charts": "^9.4.1",
 		"@mantine/code-highlight": "^9.4.1",
 		"@mantine/core": "^9.4.1",
@@ -26,7 +26,7 @@
 		"@mantine/hooks": "^9.4.1",
 		"@mantine/modals": "^9.4.1",
 		"@mantine/notifications": "^9.4.1",
-		"ai": "^6.0.204",
+		"ai": "^7.0.11",
 		"hono": "^4.12.27",
 		"react": "^19.2.7",
 		"react-dom": "^19.2.7",

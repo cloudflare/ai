@@ -65,21 +65,21 @@
 		"type-check": "tsc --noEmit"
 	},
 	"devDependencies": {
-		"@ai-sdk/anthropic": "^3.0.84",
-		"@ai-sdk/google": "^3.0.0",
-		"@ai-sdk/openai": "^3.0.71",
-		"@ai-sdk/provider": "^3.0.10",
+		"@ai-sdk/anthropic": "^4.0.5",
+		"@ai-sdk/google": "^4.0.6",
+		"@ai-sdk/openai": "^4.0.5",
+		"@ai-sdk/provider": "^4.0.1",
 		"@cloudflare/gateway-core": "workspace:*",
 		"@cloudflare/workers-types": "^4.20260628.1",
-		"ai": "^6.0.204",
+		"ai": "^7.0.11",
 		"zod": "^4.4.3"
 	},
 	"peerDependencies": {
-		"@ai-sdk/anthropic": "^3.0.0",
-		"@ai-sdk/google": "^3.0.0",
-		"@ai-sdk/openai": "^3.0.0",
-		"@ai-sdk/provider": "^3.0.0",
-		"ai": "^6.0.0"
+		"@ai-sdk/anthropic": "^4.0.0",
+		"@ai-sdk/google": "^4.0.0",
+		"@ai-sdk/openai": "^4.0.0",
+		"@ai-sdk/provider": "^4.0.0",
+		"ai": "^7.0.0"
 	},
 	"peerDependenciesMeta": {
 		"@ai-sdk/anthropic": {

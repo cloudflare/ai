@@ -1,4 +1,4 @@
-import type { LanguageModelV3, LanguageModelV3CallOptions } from "@ai-sdk/provider";
+import type { LanguageModelV4, LanguageModelV4CallOptions } from "@ai-sdk/provider";
 import {
 	asText,
 	buildGatewayEntry,
@@ -154,7 +154,7 @@ export interface ProviderPlugin {
 		modelId: string;
 		fetch: typeof globalThis.fetch;
 		baseURL?: string;
-	}): LanguageModelV3;
+	}): LanguageModelV4;
 }
 
 // ---------------------------------------------------------------------------
@@ -376,7 +376,7 @@ export interface GatewayDelegateConfig {
 }
 
 export interface GatewayDelegate {
-	(slug: string, options?: DelegateCallOptions): LanguageModelV3;
+	(slug: string, options?: DelegateCallOptions): LanguageModelV4;
 }
 
 /**
@@ -406,7 +406,7 @@ export function createGatewayDelegate(config: GatewayDelegateConfig): GatewayDel
 	const buildOne = (
 		slug: string,
 		options: DelegateCallOptions,
-	): { model: LanguageModelV3; transport: Transport } => {
+	): { model: LanguageModelV4; transport: Transport } => {
 		const parsed = parseSlug(slug);
 		const info = resolveProvider(slug, parsed);
 
@@ -791,7 +791,7 @@ function makeServerFallbackModel(params: {
 	opts: DelegateCallOptions;
 	selection: Selection;
 	callOptions: DelegateCallOptions;
-}): LanguageModelV3 {
+}): LanguageModelV4 {
 	const { binding, gatewayId, gatewayOptions, legs, opts, selection, callOptions } = params;
 	const first = legs[0]!;
 
@@ -809,7 +809,7 @@ function makeServerFallbackModel(params: {
 
 	const dispatch = async (
 		method: "doGenerate" | "doStream",
-		options: LanguageModelV3CallOptions,
+		options: LanguageModelV4CallOptions,
 	): Promise<unknown> => {
 		// 1) Capture each leg's native request without hitting the network.
 		const entries: GatewayEntry[] = [];
@@ -829,7 +829,7 @@ function makeServerFallbackModel(params: {
 				...(leg.info.baseURL ? { baseURL: leg.info.baseURL } : {}),
 			});
 			try {
-				await (model[method] as (o: LanguageModelV3CallOptions) => Promise<unknown>)(
+				await (model[method] as (o: LanguageModelV4CallOptions) => Promise<unknown>)(
 					options,
 				);
 			} catch (e) {
@@ -880,21 +880,21 @@ function makeServerFallbackModel(params: {
 			fetch: (async () => resp) as typeof globalThis.fetch,
 			...(winner.info.baseURL ? { baseURL: winner.info.baseURL } : {}),
 		});
-		return (winnerModel[method] as (o: LanguageModelV3CallOptions) => Promise<unknown>)(
+		return (winnerModel[method] as (o: LanguageModelV4CallOptions) => Promise<unknown>)(
 			options,
 		);
 	};
 
 	return {
-		specificationVersion: "v3",
+		specificationVersion: "v4",
 		provider: refModel.provider,
 		modelId: refModel.modelId,
 		supportedUrls: refModel.supportedUrls,
 		doGenerate(options) {
-			return dispatch("doGenerate", options) as ReturnType<LanguageModelV3["doGenerate"]>;
+			return dispatch("doGenerate", options) as ReturnType<LanguageModelV4["doGenerate"]>;
 		},
 		doStream(options) {
-			return dispatch("doStream", options) as ReturnType<LanguageModelV3["doStream"]>;
+			return dispatch("doStream", options) as ReturnType<LanguageModelV4["doStream"]>;
 		},
-	} as LanguageModelV3;
+	} as LanguageModelV4;
 }

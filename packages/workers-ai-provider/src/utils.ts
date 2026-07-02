@@ -1,4 +1,4 @@
-import type { LanguageModelV3, LanguageModelV3ToolCall } from "@ai-sdk/provider";
+import type { LanguageModelV4, LanguageModelV4ToolCall } from "@ai-sdk/provider";
 import {
 	getToolNames,
 	isForcedToolChoice,
@@ -332,8 +332,8 @@ export function buildJsonSchemaPayload(
 // ---------------------------------------------------------------------------
 
 export function prepareToolsAndToolChoice(
-	tools: Parameters<LanguageModelV3["doGenerate"]>[0]["tools"],
-	toolChoice: Parameters<LanguageModelV3["doGenerate"]>[0]["toolChoice"],
+	tools: Parameters<LanguageModelV4["doGenerate"]>[0]["tools"],
+	toolChoice: Parameters<LanguageModelV4["doGenerate"]>[0]["toolChoice"],
 ) {
 	if (tools == null) {
 		return { tool_choice: undefined, tools: undefined };
@@ -476,7 +476,7 @@ function mergePartialToolCalls(partialCalls: PartialToolCall[]) {
 	return Object.values(mergedCallsByIndex);
 }
 
-function processToolCall(toolCall: FlatToolCall | OpenAIToolCall): LanguageModelV3ToolCall {
+function processToolCall(toolCall: FlatToolCall | OpenAIToolCall): LanguageModelV4ToolCall {
 	// OpenAI format: has function.name (the key discriminator)
 	const fn =
 		"function" in toolCall && typeof toolCall.function === "object" && toolCall.function
@@ -508,7 +508,7 @@ function processToolCall(toolCall: FlatToolCall | OpenAIToolCall): LanguageModel
 	};
 }
 
-export function processToolCalls(output: Record<string, unknown>): LanguageModelV3ToolCall[] {
+export function processToolCalls(output: Record<string, unknown>): LanguageModelV4ToolCall[] {
 	if (output.tool_calls && Array.isArray(output.tool_calls)) {
 		return output.tool_calls.map((toolCall: FlatToolCall | OpenAIToolCall) =>
 			processToolCall(toolCall),
@@ -540,12 +540,12 @@ export function processPartialToolCalls(partialToolCalls: PartialToolCall[]) {
  *
  * The recovery logic (which JSON shapes count as a leaked call) lives in
  * `@cloudflare/gateway-core`; this wrapper only layers the framework id on each
- * neutral result so the existing `LanguageModelV3ToolCall` shape is preserved.
+ * neutral result so the existing `LanguageModelV4ToolCall` shape is preserved.
  */
 export function parseLeakedToolCalls(
 	text: string,
 	knownToolNames: Set<string>,
-): LanguageModelV3ToolCall[] {
+): LanguageModelV4ToolCall[] {
 	return coreParseLeakedToolCalls(text, knownToolNames).map((call) => ({
 		input: call.input,
 		toolCallId: createAISDKToolCallId(undefined),
@@ -584,7 +584,7 @@ export function salvageToolCallsFromText(
 		tools: Array<{ function: { name?: string } }> | undefined;
 		toolChoice: unknown;
 	},
-): LanguageModelV3ToolCall[] | null {
+): LanguageModelV4ToolCall[] | null {
 	if (!isForcedToolChoice(context.toolChoice)) return null;
 
 	// Never override real tool calls.

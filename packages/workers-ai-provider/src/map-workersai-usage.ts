@@ -1,7 +1,7 @@
-import type { LanguageModelV3Usage } from "@ai-sdk/provider";
+import type { LanguageModelV4Usage } from "@ai-sdk/provider";
 
 /**
- * Map Workers AI usage data to the AI SDK V3 usage format.
+ * Map Workers AI usage data to the AI SDK v4 usage format.
  * Accepts any object that may have a `usage` property with token counts.
  *
  * Workers AI mirrors the OpenAI usage shape, including
@@ -11,7 +11,7 @@ import type { LanguageModelV3Usage } from "@ai-sdk/provider";
  */
 export function mapWorkersAIUsage(
 	output: Record<string, unknown> | AiTextGenerationOutput | AiTextToImageOutput,
-): LanguageModelV3Usage {
+): LanguageModelV4Usage {
 	const usage = (
 		output as {
 			usage?: {
@@ -30,7 +30,7 @@ export function mapWorkersAIUsage(
 	const cachedTokens = usage.prompt_tokens_details?.cached_tokens;
 
 	// Clamp at 0 in case the provider ever reports cached_tokens > prompt_tokens;
-	// the v3 spec expects non-negative counts.
+	// the v4 spec expects non-negative counts.
 	const noCache =
 		cachedTokens !== undefined ? Math.max(0, promptTokens - cachedTokens) : undefined;
 

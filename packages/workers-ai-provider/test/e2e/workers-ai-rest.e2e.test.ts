@@ -16,12 +16,12 @@ import { config } from "dotenv";
 import {
 	generateText,
 	streamText,
-	stepCountIs,
+	isStepCount,
 	Output,
 	generateImage,
 	embedMany,
-	experimental_transcribe as transcribe,
-	experimental_generateSpeech as generateSpeech,
+	transcribe,
+	generateSpeech,
 	rerank,
 } from "ai";
 import { z } from "zod/v4";
@@ -306,7 +306,7 @@ describe.skipIf(skip())("Workers AI REST E2E", () => {
 								}),
 							},
 						},
-						stopWhen: stepCountIs(2),
+						stopWhen: isStepCount(2),
 					});
 
 					// Check if tool was called (step count > 1 means round-trip happened)
@@ -366,7 +366,7 @@ describe.skipIf(skip())("Workers AI REST E2E", () => {
 								}),
 							},
 						},
-						stopWhen: stepCountIs(4),
+						stopWhen: isStepCount(4),
 					});
 
 					const toolCallCount = result.steps.reduce(

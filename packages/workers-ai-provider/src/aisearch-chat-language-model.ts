@@ -1,4 +1,4 @@
-import type { LanguageModelV3, SharedV3Warning } from "@ai-sdk/provider";
+import type { LanguageModelV4, SharedV4Warning } from "@ai-sdk/provider";
 
 import type { AISearchChatSettings } from "./aisearch-chat-settings";
 import { convertToWorkersAIChatMessages } from "./convert-to-workersai-chat-messages";
@@ -13,8 +13,8 @@ type AISearchChatConfig = {
 	gateway?: GatewayOptions;
 };
 
-export class AISearchChatLanguageModel implements LanguageModelV3 {
-	readonly specificationVersion = "v3";
+export class AISearchChatLanguageModel implements LanguageModelV4 {
+	readonly specificationVersion = "v4";
 	readonly defaultObjectGenerationMode = "json";
 
 	readonly supportedUrls: Record<string, RegExp[]> | PromiseLike<Record<string, RegExp[]>> = {};
@@ -43,8 +43,8 @@ export class AISearchChatLanguageModel implements LanguageModelV3 {
 		frequencyPenalty,
 		presencePenalty,
 		responseFormat,
-	}: Parameters<LanguageModelV3["doGenerate"]>[0]): SharedV3Warning[] {
-		const warnings: SharedV3Warning[] = [];
+	}: Parameters<LanguageModelV4["doGenerate"]>[0]): SharedV4Warning[] {
+		const warnings: SharedV4Warning[] = [];
 
 		if (tools != null && tools.length > 0) {
 			console.warn(
@@ -72,14 +72,14 @@ export class AISearchChatLanguageModel implements LanguageModelV3 {
 	 * Build the search query from messages.
 	 * Flattens the conversation into a single string for aiSearch.
 	 */
-	private buildQuery(prompt: Parameters<LanguageModelV3["doGenerate"]>[0]["prompt"]): string {
+	private buildQuery(prompt: Parameters<LanguageModelV4["doGenerate"]>[0]["prompt"]): string {
 		const { messages } = convertToWorkersAIChatMessages(prompt);
 		return messages.map(({ content, role }) => `${role}: ${content}`).join("\n\n");
 	}
 
 	async doGenerate(
-		options: Parameters<LanguageModelV3["doGenerate"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV3["doGenerate"]>>> {
+		options: Parameters<LanguageModelV4["doGenerate"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV4["doGenerate"]>>> {
 		const warnings = this.getWarnings(options);
 		const query = this.buildQuery(options.prompt);
 
@@ -109,8 +109,8 @@ export class AISearchChatLanguageModel implements LanguageModelV3 {
 	}
 
 	async doStream(
-		options: Parameters<LanguageModelV3["doStream"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV3["doStream"]>>> {
+		options: Parameters<LanguageModelV4["doStream"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV4["doStream"]>>> {
 		const warnings = this.getWarnings(options);
 		const query = this.buildQuery(options.prompt);
 

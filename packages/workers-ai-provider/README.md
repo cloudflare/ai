@@ -171,7 +171,7 @@ Images can be provided as `Uint8Array`, base64 strings, or data URLs. Multiple i
 ## Tool calling
 
 ```ts
-import { generateText, stepCountIs } from "ai";
+import { generateText, isStepCount } from "ai";
 import { z } from "zod";
 
 const { text } = await generateText({
@@ -184,7 +184,7 @@ const { text } = await generateText({
 			execute: async ({ city }) => ({ city, temperature: 18, condition: "Cloudy" }),
 		},
 	},
-	stopWhen: stepCountIs(2),
+	stopWhen: isStepCount(2),
 });
 ```
 

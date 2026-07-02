@@ -1,4 +1,4 @@
-import type { RerankingModelV3, SharedV3Warning } from "@ai-sdk/provider";
+import type { RerankingModelV4, SharedV4Warning } from "@ai-sdk/provider";
 import { normalizeBindingError } from "./workersai-error";
 import type { WorkersAIRerankingSettings } from "./workersai-reranking-settings";
 import type { RerankingModels } from "./workersai-models";
@@ -10,7 +10,7 @@ export type WorkersAIRerankingConfig = {
 };
 
 /**
- * Workers AI reranking model implementing the AI SDK's `RerankingModelV3` interface.
+ * Workers AI reranking model implementing the AI SDK's `RerankingModelV4` interface.
  *
  * Supports BGE reranker models (`@cf/baai/bge-reranker-base`, `bge-reranker-v2-m3`).
  *
@@ -18,8 +18,8 @@ export type WorkersAIRerankingConfig = {
  * - Input: `{ query, contexts: [{ text }], top_k? }`
  * - Output: `{ response: [{ id, score }] }`
  */
-export class WorkersAIRerankingModel implements RerankingModelV3 {
-	readonly specificationVersion = "v3";
+export class WorkersAIRerankingModel implements RerankingModelV4 {
+	readonly specificationVersion = "v4";
 
 	get provider(): string {
 		return this.config.provider;
@@ -32,11 +32,11 @@ export class WorkersAIRerankingModel implements RerankingModelV3 {
 	) {}
 
 	async doRerank(
-		options: Parameters<RerankingModelV3["doRerank"]>[0],
-	): Promise<Awaited<ReturnType<RerankingModelV3["doRerank"]>>> {
+		options: Parameters<RerankingModelV4["doRerank"]>[0],
+	): Promise<Awaited<ReturnType<RerankingModelV4["doRerank"]>>> {
 		const { documents, query, topN, abortSignal } = options;
 
-		const warnings: Array<SharedV3Warning> = [];
+		const warnings: Array<SharedV4Warning> = [];
 
 		// Convert AI SDK documents to Workers AI contexts format
 		const contexts = documentsToContexts(documents, warnings);
@@ -100,8 +100,8 @@ export class WorkersAIRerankingModel implements RerankingModelV3 {
  * - `{ type: 'object', values: JSONObject[] }` — JSON objects (stringified for Workers AI)
  */
 function documentsToContexts(
-	documents: Parameters<RerankingModelV3["doRerank"]>[0]["documents"],
-	warnings: Array<SharedV3Warning>,
+	documents: Parameters<RerankingModelV4["doRerank"]>[0]["documents"],
+	warnings: Array<SharedV4Warning>,
 ): Array<{ text: string }> {
 	if (documents.type === "text") {
 		return documents.values.map((text) => ({ text }));

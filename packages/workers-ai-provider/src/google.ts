@@ -1,4 +1,4 @@
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createGoogle } from "@ai-sdk/google";
 import type { ProviderPlugin } from "./gateway-delegate";
 
 /**
@@ -13,7 +13,5 @@ export const google: ProviderPlugin = {
 	create: ({ modelId, fetch, baseURL }) =>
 		// apiKey is a placeholder — the gateway handles auth (unified billing / BYOK)
 		// and the delegate strips the x-goog-api-key header on the gateway path.
-		createGoogleGenerativeAI({ apiKey: "unused", fetch, ...(baseURL ? { baseURL } : {}) })(
-			modelId,
-		),
+		createGoogle({ apiKey: "unused", fetch, ...(baseURL ? { baseURL } : {}) })(modelId),
 };
