@@ -19,13 +19,13 @@
  */
 import {
 	streamText,
-	stepCountIs,
+	isStepCount,
 	tool,
 	embedMany,
 	convertToModelMessages,
 	generateImage,
-	experimental_transcribe as transcribe,
-	experimental_generateSpeech as generateSpeech,
+	transcribe,
+	generateSpeech,
 	rerank,
 } from "ai";
 import { createWorkersAI } from "workers-ai-provider";
@@ -83,7 +83,7 @@ export default {
 						// eslint-disable-next-line @typescript-eslint/no-explicit-any
 						model: workersai(model as any),
 						messages,
-						stopWhen: stepCountIs(10),
+						stopWhen: isStepCount(10),
 						tools: {
 							getWeather: tool({
 								description:
@@ -332,7 +332,7 @@ export default {
 								onDispatch,
 							});
 
-					const result = streamText({ model, messages, stopWhen: stepCountIs(5) });
+					const result = streamText({ model, messages, stopWhen: isStepCount(5) });
 					return result.toUIMessageStreamResponse({ sendReasoning: true });
 				}
 

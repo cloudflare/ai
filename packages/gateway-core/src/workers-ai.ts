@@ -1,7 +1,7 @@
 /**
  * Shared, framework-agnostic Workers AI helpers.
  *
- * These are the pieces that `workers-ai-provider` (native `LanguageModelV3`) and
+ * These are the pieces that `workers-ai-provider` (native `LanguageModelV4`) and
  * `@cloudflare/tanstack-ai` (OpenAI-SDK shim) both need: the SSE byte decoder,
  * message normalization for the binding's stricter schema, response-text
  * extraction across WAI's response shapes, and the gpt-oss forced-tool-call
