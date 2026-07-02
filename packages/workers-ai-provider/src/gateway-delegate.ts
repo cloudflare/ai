@@ -271,13 +271,18 @@ export function selectTransport(
 	// Run-path-only providers (on the run catalog, but not native gateway
 	// providers) have no gateway path at all — reject anything that would need it
 	// here, with a clear message, rather than letting it fail upstream.
-	if (runCatalog && !gatewayAvailable && (opts.transport === "gateway" || gatewayOnly)) {
-		const what = opts.transport === "gateway" ? 'transport:"gateway"' : feature;
+	if (
+		runCatalog &&
+		!gatewayAvailable &&
+		(opts.transport === "gateway" || opts.byok || gatewayOnly)
+	) {
+		const what =
+			opts.transport === "gateway" ? 'transport:"gateway"' : opts.byok ? "byok" : feature;
 		throw new GatewayDelegateError(
 			"config",
 			`${what} is unavailable: this provider is on the unified run catalog but is not a ` +
 				"native gateway provider, so it has no gateway path (no caching, server-side " +
-				'fallback, or transport:"gateway"). Use the default run path, or fallback.mode:"client".',
+				'fallback, BYOK, or transport:"gateway"). Use the default run path, or fallback.mode:"client".',
 		);
 	}
 
@@ -296,6 +301,26 @@ export function selectTransport(
 				"config",
 				"resume:true is unavailable: this provider is not on the resumable run catalog " +
 					"(cf-aig-run-id requires the unified-billing run path).",
+			);
+		}
+		return { transport: "gateway", resumeEnabled: false, warnings };
+	}
+
+	// BYOK forwards the caller's own provider key, which only the gateway path
+	// supports — treat it like an explicit gateway transport (no resume-disabled
+	// warning; the caller opted into a gateway-only mode).
+	if (opts.byok) {
+		if (opts.transport === "run") {
+			throw new GatewayDelegateError(
+				"config",
+				'transport:"run" cannot forward a BYOK key — BYOK is a gateway-path feature. ' +
+					'Drop transport:"run" (or set transport:"gateway").',
+			);
+		}
+		if (resumeExplicitlyTrue) {
+			throw new GatewayDelegateError(
+				"config",
+				"byok cannot provide resume — cf-aig-run-id is only on the unified-billing run path.",
 			);
 		}
 		return { transport: "gateway", resumeEnabled: false, warnings };

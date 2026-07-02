@@ -309,9 +309,21 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 		gateway: GatewayOptions | string | undefined,
 	): GatewayOptions | undefined => (typeof gateway === "string" ? { id: gateway } : gateway);
 
-	const createDynamicRouteModel = (
+	// The bare unified-billing run path (`env.AI.run(model, …)`) shared by two
+	// callers that both hit it WITHOUT the gateway delegate:
+	//   - `dynamic/<route>` AI Gateway dynamic routes, and
+	//   - `"<vendor>/<model>"` catalog slugs when no `providers` are configured
+	//     (the #596 passthrough).
+	// Neither has a transport choice, resume engine, or BYOK forwarding — those
+	// only exist once `providers` are set and the delegate takes over — so this
+	// path defaults the gateway (third-party run models need one), folds
+	// cache/metadata into the gateway options, and rejects delegate-only options
+	// loudly instead of letting `WorkersAIChatLanguageModel` spread them as junk
+	// into `binding.run`'s options arg.
+	const createRunPathModel = (
 		modelId: TextGenerationModels,
 		settings: WorkersAIChatSettings & DelegateCallOptions = {},
+		kind: "dynamic" | "catalog",
 	) => {
 		if (
 			settings.fallback ||
@@ -321,11 +333,16 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 			settings.onResumeExpired ||
 			settings.byok
 		) {
+			const subject =
+				kind === "dynamic"
+					? `"${modelId}" is an AI Gateway dynamic route`
+					: `"${modelId}" routes through the bare unified-billing run path because no \`providers\` are configured`;
 			throw new Error(
-				`"${modelId}" is an AI Gateway dynamic route. Dynamic routes use AI.run with ` +
-					"OpenAI-compatible chat-completions wire format; fallback, gateway transport, " +
-					"resume, BYOK, and resume callbacks must be configured on the dynamic route or " +
-					"gateway instead of per call.",
+				`${subject}. It uses AI.run with OpenAI-compatible chat-completions wire format; ` +
+					"fallback, gateway transport, resume, BYOK, and resume callbacks are gateway-delegate " +
+					"features — configure provider plugins to use them " +
+					"(createWorkersAI({ binding: env.AI, providers: [openai] })), and for dynamic routes " +
+					"set caching/fallback on the route or gateway instead of per call.",
 			);
 		}
 
@@ -367,7 +384,12 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 
 		const plugin = options.providers?.find((p) => p.wireFormat === DYNAMIC_ROUTE_WIRE_FORMAT);
 		if (!plugin) {
-			if (options.providers?.length) {
+			// Dynamic routes with providers configured but no OpenAI plugin can't be
+			// parsed (they always return openai-wire), so guide the user. The
+			// catalog passthrough only reaches here with no providers at all, where
+			// the built-in `WorkersAIChatLanguageModel` parser is the intended
+			// fallback (#596) — so let it through.
+			if (kind === "dynamic" && options.providers?.length) {
 				throw new Error(
 					`"${modelId}" is an AI Gateway dynamic route. Dynamic routes return OpenAI-compatible ` +
 						"chat-completions wire format on the AI.run path, so configure the OpenAI " +
@@ -465,12 +487,27 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 		settings?: WorkersAIChatSettings | DelegateCallOptions,
 	): WorkersAIChatLanguageModel => {
 		if (typeof modelId === "string" && modelId.startsWith("dynamic/")) {
-			return createDynamicRouteModel(
+			return createRunPathModel(
 				modelId,
 				settings as (WorkersAIChatSettings & DelegateCallOptions) | undefined,
+				"dynamic",
 			);
 		}
 		if (isGatewaySlug(modelId)) {
+			// Without provider plugins there's no gateway/BYOK routing to do, and a
+			// bare `"<vendor>/<model>"` id is a valid Workers AI unified-billing run
+			// model — `env.AI.run("deepseek/deepseek-v4-pro")`. Route it through the
+			// same bare run path as dynamic routes (defaults the gateway, folds
+			// cache/metadata, rejects delegate-only options) instead of erroring.
+			// Catalog routing (resume, fallback, caching, BYOK) only kicks in once
+			// `providers` are set. (#596)
+			if (!options.providers?.length) {
+				return createRunPathModel(
+					modelId,
+					settings as (WorkersAIChatSettings & DelegateCallOptions) | undefined,
+					"catalog",
+				);
+			}
 			// The delegate returns a `LanguageModelV4` built by the configured plugin.
 			// It's structurally compatible with the AI SDK consumers this provider is
 			// used with; the cast keeps the public return type unchanged.

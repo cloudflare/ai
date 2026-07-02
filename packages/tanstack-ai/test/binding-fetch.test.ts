@@ -998,3 +998,56 @@ describe("createWorkersAiBindingFetch", () => {
 		]);
 	});
 });
+
+// ---------------------------------------------------------------------------
+// Third-party catalog slug gateway defaulting
+//
+// A `"<vendor>/<model>"` unified-billing model must route through an AI Gateway,
+// so even with no gateway configured the binding shim defaults it to the account
+// `"default"` gateway (parity with workers-ai-provider). `@cf/*` and `dynamic/*`
+// keep the plain binding path (no gateway) when none is configured.
+// ---------------------------------------------------------------------------
+
+describe("createWorkersAiBindingFetch — catalog slug gateway defaulting", () => {
+	/** A raw run-path Response (binding.run returns raw when returnRawResponse is set). */
+	function rawJson(): Response {
+		return new Response(JSON.stringify({ response: "hi" }), {
+			headers: { "content-type": "application/json" },
+		});
+	}
+
+	async function callWith(binding: MockBinding, model: string, gateway?: string) {
+		const fetcher = createWorkersAiBindingFetch(binding, gateway ? { gateway } : undefined);
+		await fetcher("https://api.openai.com/v1/chat/completions", {
+			method: "POST",
+			body: JSON.stringify({ model, messages: [{ role: "user", content: "Hi" }] }),
+		});
+		return binding.run.mock.calls[0]! as [string, Record<string, unknown>, unknown];
+	}
+
+	it("defaults a third-party catalog slug to the account gateway (run path)", async () => {
+		const binding = mockBinding(vi.fn().mockResolvedValue(rawJson()));
+		const [model, , opts] = await callWith(binding, "deepseek/deepseek-v4-pro");
+		expect(model).toBe("deepseek/deepseek-v4-pro");
+		expect(opts).toMatchObject({ gateway: { id: "default" }, returnRawResponse: true });
+	});
+
+	it("keeps `@cf/*` models on the plain binding path (no gateway) when none is configured", async () => {
+		const binding = mockBinding(vi.fn().mockResolvedValue({ response: "hi" }));
+		const [, , opts] = await callWith(binding, "@cf/meta/llama-3.3-70b-instruct-fp8-fast");
+		// Plain binding path passes `undefined` (or no gateway) as the options arg.
+		expect((opts as { gateway?: unknown } | undefined)?.gateway).toBeUndefined();
+	});
+
+	it("does NOT auto-default for `dynamic/*` routes", async () => {
+		const binding = mockBinding(vi.fn().mockResolvedValue({ response: "hi" }));
+		const [, , opts] = await callWith(binding, "dynamic/my-route");
+		expect((opts as { gateway?: unknown } | undefined)?.gateway).toBeUndefined();
+	});
+
+	it("respects an explicitly configured gateway over the catalog default", async () => {
+		const binding = mockBinding(vi.fn().mockResolvedValue(rawJson()));
+		const [, , opts] = await callWith(binding, "deepseek/deepseek-v4-pro", "my-gw");
+		expect(opts).toMatchObject({ gateway: { id: "my-gw" } });
+	});
+});

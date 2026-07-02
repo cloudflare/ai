@@ -1,5 +1,17 @@
 # workers-ai-provider
 
+## 3.3.1
+
+### Patch Changes
+
+- [#599](https://github.com/cloudflare/ai/pull/599) [`c72bb8b`](https://github.com/cloudflare/ai/commit/c72bb8bb325adfdd2ee39e78fda6b8bdb0934782) Thanks [@threepointone](https://github.com/threepointone)! - fix: route native unified-billing catalog slugs (e.g. `deepseek/deepseek-v4-pro`) through the run path
+
+  `workers-ai-provider@3.2.x` began treating any `"<vendor>/<model>"` id as a third-party AI Gateway catalog slug. This regressed models like `deepseek/deepseek-v4-pro` that Cloudflare serves natively on the unified-billing run path (`env.AI.run`): without `providers` the provider threw at construction, and with `providers: [openai]` it routed to the gateway universal `chat/completions` (BYOK) endpoint and returned auth errors.
+
+  `deepseek/*` is now on the unified run catalog (defaults to `env.AI.run`), matching pre-3.2 behavior. Unified-billing eligibility is decided per-model by Cloudflare's catalog, so BYOK-only deepseek models (e.g. `deepseek/deepseek-chat`) still work by opting into the gateway path per call (`transport: "gateway"` / `byok`). The rest of the OpenAI-wire long tail (`mistral`, `perplexity`, `cerebras`, `openrouter`, `fireworks`) is not on Cloudflare's unified run catalog — `env.AI.run` returns model-not-found for those — so they remain BYOK gateway-path providers.
+
+  When no `providers` are configured, a bare `"<vendor>/<model>"` id is now routed through the same hardened run path as `dynamic/*` routes: the gateway defaults to the account's `"default"` gateway (third-party unified billing needs one), `cacheTtl`/`skipCache`/`metadata`/`collectLog` are applied to the gateway options, and delegate-only options (`byok`, `transport: "gateway"`, `fallback`, `resume`, resume callbacks) now throw a clear error instead of being silently dropped.
+
 ## 3.3.0
 
 ### Minor Changes
@@ -8,42 +20,42 @@
   (`fallback: { mode: "server" }`) — multiple vendors in one gateway run, with the
   winner selected via `cf-aig-step`.
 
-    The gateway delegate now reaches header parity with the run path: the gateway
-    path forwards `cacheKey`, `eventId`, `requestTimeoutMs`, and `retries` from the
-    gateway options as `cf-aig-*` headers, and `DelegateCallOptions` gains two new
-    universal-endpoint controls — `byokAlias` (`cf-aig-byok-alias`, select a stored
-    BYOK key by alias) and `zdr` (`cf-aig-zdr`, per-request Zero Data Retention
-    override for Unified Billing, applied on both transports).
+  The gateway delegate now reaches header parity with the run path: the gateway
+  path forwards `cacheKey`, `eventId`, `requestTimeoutMs`, and `retries` from the
+  gateway options as `cf-aig-*` headers, and `DelegateCallOptions` gains two new
+  universal-endpoint controls — `byokAlias` (`cf-aig-byok-alias`, select a stored
+  BYOK key by alias) and `zdr` (`cf-aig-zdr`, per-request Zero Data Retention
+  override for Unified Billing, applied on both transports).
 
-    Internally, the provider registry, `cf-aig-*` header building, resumable-stream
-    engine, and Workers AI SSE helpers are now shared across the Cloudflare AI
-    packages (bundled inline — no new dependency for you to install).
+  Internally, the provider registry, `cf-aig-*` header building, resumable-stream
+  engine, and Workers AI SSE helpers are now shared across the Cloudflare AI
+  packages (bundled inline — no new dependency for you to install).
 
 - [#593](https://github.com/cloudflare/ai/pull/593) [`1c6afd0`](https://github.com/cloudflare/ai/commit/1c6afd06ee2a9089072fd00349a3eca4077d523a) Thanks [@threepointone](https://github.com/threepointone)! - Native Workers AI failures are now surfaced as AI SDK `APICallError`s so the AI
   SDK's built-in retry (`maxRetries`) can engage on transient errors.
 
-    Previously the binding path (`env.AI.run`) threw plain `Error`s and the REST
-    path threw a generic `Error`, so the AI SDK never retried them — most notably
-    the common **"out of capacity"** failure (internal code `3040`, HTTP `429`) and
-    other 5xx blips just failed the call outright.
+  Previously the binding path (`env.AI.run`) threw plain `Error`s and the REST
+  path threw a generic `Error`, so the AI SDK never retried them — most notably
+  the common **"out of capacity"** failure (internal code `3040`, HTTP `429`) and
+  other 5xx blips just failed the call outright.
 
-    - **Binding path**: errors thrown by `env.AI.run` are normalized into an
-      `APICallError` across every Workers AI model — chat, embedding, image, speech,
-      transcription, and reranking. The Workers AI internal error code is parsed from
-      the message (or a numeric `code` property) and mapped to the documented HTTP
-      status (e.g. `3040`/`3036` → `429`, `3007`/`3008` → `408`, `5007` → `400`), and
-      `APICallError` derives `isRetryable` from that status (retryable on
-      408/409/429/5xx). Unrecognized errors get no status and stay non-retryable
-      (prior behavior). `AbortError`/`TimeoutError` cancellations propagate
-      unchanged.
-    - **REST path**: non-OK responses now throw an `APICallError` carrying the real
-      `statusCode`, response headers (so `Retry-After` is honored), and body, instead
-      of a generic `Error`. The error message keeps the same
-      `Workers AI API error (<status> <statusText>): <body>` shape.
+  - **Binding path**: errors thrown by `env.AI.run` are normalized into an
+    `APICallError` across every Workers AI model — chat, embedding, image, speech,
+    transcription, and reranking. The Workers AI internal error code is parsed from
+    the message (or a numeric `code` property) and mapped to the documented HTTP
+    status (e.g. `3040`/`3036` → `429`, `3007`/`3008` → `408`, `5007` → `400`), and
+    `APICallError` derives `isRetryable` from that status (retryable on
+    408/409/429/5xx). Unrecognized errors get no status and stay non-retryable
+    (prior behavior). `AbortError`/`TimeoutError` cancellations propagate
+    unchanged.
+  - **REST path**: non-OK responses now throw an `APICallError` carrying the real
+    `statusCode`, response headers (so `Retry-After` is honored), and body, instead
+    of a generic `Error`. The error message keeps the same
+    `Workers AI API error (<status> <statusText>): <body>` shape.
 
-    This means transient capacity/5xx errors are now automatically retried with
-    exponential backoff by `generateText`/`streamText` (default 2 retries; tune via
-    `maxRetries`). Set `maxRetries: 0` to opt out.
+  This means transient capacity/5xx errors are now automatically retried with
+  exponential backoff by `generateText`/`streamText` (default 2 retries; tune via
+  `maxRetries`). Set `maxRetries: 0` to opt out.
 
 ## 3.2.1
 
@@ -57,117 +69,118 @@
 
 - [#573](https://github.com/cloudflare/ai/pull/573) [`4f19489`](https://github.com/cloudflare/ai/commit/4f19489ee6d6060302cf14ed3621716d755cd936) Thanks [@threepointone](https://github.com/threepointone)! - Add AI Gateway routing for third-party catalog models to `createWorkersAI`, with capability-driven transport selection, the full provider registry, a bring-your-own-provider wrapper, typed errors, and client/server fallback.
 
-    **Experimental.** This is a substantial new surface for the package — well beyond its original job of wrapping Workers AI — and several behaviors rely on undocumented AI Gateway internals (the `cf-aig-run-id` resume buffer, per-provider run-path wire formats). Treat the entire third-party / gateway surface as experimental: the API may change, and provider coverage maturity varies (only the run-catalog providers are live-verified end-to-end). It does not affect the existing stable Workers AI / AI Search APIs.
+  **Experimental.** This is a substantial new surface for the package — well beyond its original job of wrapping Workers AI — and several behaviors rely on undocumented AI Gateway internals (the `cf-aig-run-id` resume buffer, per-provider run-path wire formats). Treat the entire third-party / gateway surface as experimental: the API may change, and provider coverage maturity varies (only the run-catalog providers are live-verified end-to-end). It does not affect the existing stable Workers AI / AI Search APIs.
 
-    `createWorkersAI` is the single public entry point. Pass an optional `providers` array (wire-format plugins from the sub-paths below). When set, a `"<provider>/<model>"` catalog slug passed to the provider (or `.chat`) is routed through AI Gateway automatically, while `@cf/...` ids continue to build Workers AI models. Each slug is resolved against a registry of every AI Gateway provider, and the transport is picked from the requested options: the **run path** (`env.AI.run`) for resumable streaming (`cf-aig-run-id`, the default, on the unified-billing run catalog), or the **gateway path** (`env.AI.gateway(id).run([…])`) for BYOK providers, server-side fallback, and caching. Incompatible option combinations (e.g. `resume: true` with `fallback.mode: "server"`, or `resume`/`transport: "run"` on a BYOK provider) throw a clear `GatewayDelegateError`; resume-disabling combinations warn loudly. This is fully additive: leaving `providers` unset preserves the prior behavior exactly, and passing a catalog slug without it throws a helpful error. The chat factory's settings argument is typed from the model id literal — a `"<provider>/<model>"` slug autocompletes `DelegateCallOptions`, while a `@cf/...` id autocompletes `WorkersAIChatSettings`. `gateway` is optional for catalog routing — when unset, requests use the account's `"default"` AI Gateway; set `gateway` (here or per call) to target a specific one.
+  `createWorkersAI` is the single public entry point. Pass an optional `providers` array (wire-format plugins from the sub-paths below). When set, a `"<provider>/<model>"` catalog slug passed to the provider (or `.chat`) is routed through AI Gateway automatically, while `@cf/...` ids continue to build Workers AI models. Each slug is resolved against a registry of every AI Gateway provider, and the transport is picked from the requested options: the **run path** (`env.AI.run`) for resumable streaming (`cf-aig-run-id`, the default, on the unified-billing run catalog), or the **gateway path** (`env.AI.gateway(id).run([…])`) for BYOK providers, server-side fallback, and caching. Incompatible option combinations (e.g. `resume: true` with `fallback.mode: "server"`, or `resume`/`transport: "run"` on a BYOK provider) throw a clear `GatewayDelegateError`; resume-disabling combinations warn loudly. This is fully additive: leaving `providers` unset preserves the prior behavior exactly, and passing a catalog slug without it throws a helpful error. The chat factory's settings argument is typed from the model id literal — a `"<provider>/<model>"` slug autocompletes `DelegateCallOptions`, while a `@cf/...` id autocompletes `WorkersAIChatSettings`. `gateway` is optional for catalog routing — when unset, requests use the account's `"default"` AI Gateway; set `gateway` (here or per call) to target a specific one.
 
-    New sub-path exports:
+  New sub-path exports:
 
-    - `workers-ai-provider/openai`, `workers-ai-provider/anthropic`, `workers-ai-provider/google` — provider plugins keyed by **wire format**. One `openai` plugin serves the OpenAI-compatible long tail (`deepseek`, `xai`/`grok`, `groq`, `mistral`, `perplexity`, `cerebras`, `openrouter`, `fireworks`) plus the unified-catalog chat providers `alibaba` (Qwen) and `minimax`. `@ai-sdk/openai`, `@ai-sdk/anthropic`, and `@ai-sdk/google` are **optional** peer dependencies; install only the ones whose wire formats you use. The `openai` plugin is required for the run path (see below). Providers whose gateway-path URL isn't reproducible from the shared builder (cohere, baseten, parallel, azure-openai, google-vertex) and provider-native/non-chat providers are bring-your-own-provider only.
-    - `workers-ai-provider/gateway` — `createGatewayFetch` / `createGatewayProvider` wrap any `@ai-sdk/*` provider so its traffic flows through AI Gateway (provider id detected from the request URL, or set explicitly). Use it for provider-native or non-chat providers the slug routing can't auto-wire (bedrock, replicate, audio/image), or for full control of the underlying provider.
+  - `workers-ai-provider/openai`, `workers-ai-provider/anthropic`, `workers-ai-provider/google` — provider plugins keyed by **wire format**. One `openai` plugin serves the OpenAI-compatible long tail (`deepseek`, `xai`/`grok`, `groq`, `mistral`, `perplexity`, `cerebras`, `openrouter`, `fireworks`) plus the unified-catalog chat providers `alibaba` (Qwen) and `minimax`. `@ai-sdk/openai`, `@ai-sdk/anthropic`, and `@ai-sdk/google` are **optional** peer dependencies; install only the ones whose wire formats you use. The `openai` plugin is required for the run path (see below). Providers whose gateway-path URL isn't reproducible from the shared builder (cohere, baseten, parallel, azure-openai, google-vertex) and provider-native/non-chat providers are bring-your-own-provider only.
+  - `workers-ai-provider/gateway` — `createGatewayFetch` / `createGatewayProvider` wrap any `@ai-sdk/*` provider so its traffic flows through AI Gateway (provider id detected from the request URL, or set explicitly). Use it for provider-native or non-chat providers the slug routing can't auto-wire (bedrock, replicate, audio/image), or for full control of the underlying provider.
 
-    The transport types, error classes (`WorkersAIGatewayError`, `WorkersAIFallbackError`, `GatewayDelegateError`), the registry helpers, `DelegateCallOptions`, and `createResumableStream` are re-exported from the package root.
+  The transport types, error classes (`WorkersAIGatewayError`, `WorkersAIFallbackError`, `GatewayDelegateError`), the registry helpers, `DelegateCallOptions`, and `createResumableStream` are re-exported from the package root.
 
-    Features:
+  Features:
 
-    - **Provider registry** (`GATEWAY_PROVIDERS`, `findProviderBySlug`, `detectProviderByUrl`) maps slugs to gateway provider ids, wire formats, billing model, and run-catalog membership. Covers every provider in the AI Gateway directory (OpenAI, Anthropic, Google AI Studio/Vertex, xAI, Groq, DeepSeek, Mistral, Perplexity, Cerebras, OpenRouter, Cohere, Baseten, Parallel, Azure OpenAI, Amazon Bedrock, HuggingFace, Replicate, Fal, Ideogram, Cartesia, Deepgram, ElevenLabs — plus Fireworks), with URL host patterns so `createGatewayFetch` auto-detects each from the wrapped provider's request URL. Also includes the unified-catalog chat providers `alibaba` (Qwen) and `minimax` on the resumable run catalog (verified live: OpenAI-wire, `cf-aig-run-id` on streams); these are run-path only (`gatewayPath: false` — not native gateway providers), so caching, server-side fallback, and `transport: "gateway"` are rejected with a clear `GatewayDelegateError` instead of failing upstream.
-    - **Metadata & logging** — `metadata` (custom log attributes for spend attribution) and `collectLog` are first-class call options on both transports. On the run path they fold into the typed gateway options; on the gateway path they become `cf-aig-metadata` / `cf-aig-collect-log` headers (bigint metadata values are coerced to strings). Call-level `metadata` merges over (and wins against) any `metadata` set via `gateway: { metadata }`.
-    - **BYOK** — set `byok: true` (+ supply the key via `extraHeaders`) to forward the upstream provider key on the gateway path; otherwise provider auth headers are stripped so unified billing / the gateway's stored key applies.
-    - **Client-side fallback** (`fallback.mode: "client"`) keeps resume per leg — a failed pre-stream dispatch falls through to the next model; if all fail, a `WorkersAIFallbackError` carries the per-attempt tree. **Server-side fallback** (`fallback.mode: "server"`) routes same-vendor fallbacks through the gateway path.
-    - **Typed errors** — `WorkersAIGatewayError` (with a coarse `code`, a `recoverable` hint, and the parsed CF/provider envelope) and `WorkersAIFallbackError` (attempt tree). Helpers `classifyStatus` / `extractErrorMessage` are exported.
-    - **Abort + gateway options** are passed through on both transports.
+  - **Provider registry** (`GATEWAY_PROVIDERS`, `findProviderBySlug`, `detectProviderByUrl`) maps slugs to gateway provider ids, wire formats, billing model, and run-catalog membership. Covers every provider in the AI Gateway directory (OpenAI, Anthropic, Google AI Studio/Vertex, xAI, Groq, DeepSeek, Mistral, Perplexity, Cerebras, OpenRouter, Cohere, Baseten, Parallel, Azure OpenAI, Amazon Bedrock, HuggingFace, Replicate, Fal, Ideogram, Cartesia, Deepgram, ElevenLabs — plus Fireworks), with URL host patterns so `createGatewayFetch` auto-detects each from the wrapped provider's request URL. Also includes the unified-catalog chat providers `alibaba` (Qwen) and `minimax` on the resumable run catalog (verified live: OpenAI-wire, `cf-aig-run-id` on streams); these are run-path only (`gatewayPath: false` — not native gateway providers), so caching, server-side fallback, and `transport: "gateway"` are rejected with a clear `GatewayDelegateError` instead of failing upstream.
+  - **Metadata & logging** — `metadata` (custom log attributes for spend attribution) and `collectLog` are first-class call options on both transports. On the run path they fold into the typed gateway options; on the gateway path they become `cf-aig-metadata` / `cf-aig-collect-log` headers (bigint metadata values are coerced to strings). Call-level `metadata` merges over (and wins against) any `metadata` set via `gateway: { metadata }`.
+  - **BYOK** — set `byok: true` (+ supply the key via `extraHeaders`) to forward the upstream provider key on the gateway path; otherwise provider auth headers are stripped so unified billing / the gateway's stored key applies.
+  - **Client-side fallback** (`fallback.mode: "client"`) keeps resume per leg — a failed pre-stream dispatch falls through to the next model; if all fail, a `WorkersAIFallbackError` carries the per-attempt tree. **Server-side fallback** (`fallback.mode: "server"`) routes same-vendor fallbacks through the gateway path.
+  - **Typed errors** — `WorkersAIGatewayError` (with a coarse `code`, a `recoverable` hint, and the parsed CF/provider envelope) and `WorkersAIFallbackError` (attempt tree). Helpers `classifyStatus` / `extractErrorMessage` are exported.
+  - **Abort + gateway options** are passed through on both transports.
 
-    On the run path, the response stream is wrapped so a transient mid-stream drop reconnects through the gateway resume endpoint (`resume?from=N`) transparently — the `@ai-sdk` parser never sees the break. `from` is an SSE event index, so the wrapper emits only complete events and realigns on the boundary after a drop (no duplicated or truncated bytes). When the gateway buffer expires (404, ~5.5 min TTL), an `onResumeExpired` policy controls whether the stream errors (`"error"`, the default) or ends with partial output (`"accept-partial"`).
+  On the run path, the response stream is wrapped so a transient mid-stream drop reconnects through the gateway resume endpoint (`resume?from=N`) transparently — the `@ai-sdk` parser never sees the break. `from` is an SSE event index, so the wrapper emits only complete events and realigns on the boundary after a drop (no duplicated or truncated bytes). When the gateway buffer expires (404, ~5.5 min TTL), an `onResumeExpired` policy controls whether the stream errors (`"error"`, the default) or ends with partial output (`"accept-partial"`).
 
-    For cross-invocation recovery (e.g. a new Durable Object invocation after eviction), `createResumableStream` is exported and accepts no `initial` body plus a `fromEvent` offset — it re-attaches by resuming directly from that event index. An `onProgress(eventOffset)` callback (also surfaced on the delegate as a call option) reports the live SSE event offset so callers can persist `{ runId, eventOffset }` and re-attach later.
+  For cross-invocation recovery (e.g. a new Durable Object invocation after eviction), `createResumableStream` is exported and accepts no `initial` body plus a `fromEvent` offset — it re-attaches by resuming directly from that event index. An `onProgress(eventOffset)` callback (also surfaced on the delegate as a call option) reports the live SSE event offset so callers can persist `{ runId, eventOffset }` and re-attach later.
 
-    **Run-path wire format (per-provider):** on the resumable run path (`env.AI.run`), Cloudflare's unified catalog normalizes most providers to OpenAI chat-completions wire (so `google/…` is parsed with the `openai` plugin on the run path, even though the gateway path uses the native `google` plugin), but passes **Anthropic through natively** (`content[].text`, native tool shape) — so `anthropic/…` is parsed with the `anthropic` plugin on both paths. The registry records this as `runWireFormat` (defaults to `"openai"`). Include `openai` for the openai-wire run-path providers (openai, google, xai/grok, groq) and `anthropic` to use `anthropic/…`; the delegate throws a clear `GatewayDelegateError` naming the exact plugin a transport needs if it's missing.
+  **Run-path wire format (per-provider):** on the resumable run path (`env.AI.run`), Cloudflare's unified catalog normalizes most providers to OpenAI chat-completions wire (so `google/…` is parsed with the `openai` plugin on the run path, even though the gateway path uses the native `google` plugin), but passes **Anthropic through natively** (`content[].text`, native tool shape) — so `anthropic/…` is parsed with the `anthropic` plugin on both paths. The registry records this as `runWireFormat` (defaults to `"openai"`). Include `openai` for the openai-wire run-path providers (openai, google, xai/grok, groq) and `anthropic` to use `anthropic/…`; the delegate throws a clear `GatewayDelegateError` naming the exact plugin a transport needs if it's missing.
 
 ### Patch Changes
 
 - [#563](https://github.com/cloudflare/ai/pull/563) [`231c19b`](https://github.com/cloudflare/ai/commit/231c19b733c1332aa63bd29d71a178a46f68ffc7) Thanks [@slegarraga](https://github.com/slegarraga)! - Validate `file` parts in chat messages before sending them to Workers AI.
 
-    Previously every `file` part in a user message was unconditionally wrapped as
-    an `image_url`, regardless of its `mediaType`. Non-image files (e.g.
-    `application/pdf`, `audio/*`, `video/*`, `application/octet-stream`) were
-    forwarded as if they were valid vision inputs, and a missing `mediaType`
-    silently defaulted to `image/png`, producing a corrupt data URL.
+  Previously every `file` part in a user message was unconditionally wrapped as
+  an `image_url`, regardless of its `mediaType`. Non-image files (e.g.
+  `application/pdf`, `audio/*`, `video/*`, `application/octet-stream`) were
+  forwarded as if they were valid vision inputs, and a missing `mediaType`
+  silently defaulted to `image/png`, producing a corrupt data URL.
 
-    Now `convertToWorkersAIChatMessages`:
+  Now `convertToWorkersAIChatMessages`:
 
-    - throws an `UnsupportedFunctionalityError` when a `file` part has a
-      non-`image/*` `mediaType`, or no `mediaType` at all, instead of forwarding
-      broken multimodal content;
-    - matches the `image/` prefix case-insensitively (per RFC 2045), so media
-      types such as `IMAGE/JPEG` are accepted while the caller's original casing
-      is preserved in the emitted data URL;
-    - preserves the provided image `mediaType` instead of defaulting missing
-      media types to `image/png`.
+  - throws an `UnsupportedFunctionalityError` when a `file` part has a
+    non-`image/*` `mediaType`, or no `mediaType` at all, instead of forwarding
+    broken multimodal content;
+  - matches the `image/` prefix case-insensitively (per RFC 2045), so media
+    types such as `IMAGE/JPEG` are accepted while the caller's original casing
+    is preserved in the emitted data URL;
+  - preserves the provided image `mediaType` instead of defaulting missing
+    media types to `image/png`.
 
-    This is a behavior change: inputs that previously "succeeded" with broken or
-    defaulted media types now throw a clear, catchable error. Type-correct callers
-    (the AI SDK always sets `mediaType` on file parts) are unaffected for valid
-    image inputs.
+  This is a behavior change: inputs that previously "succeeded" with broken or
+  defaulted media types now throw a clear, catchable error. Type-correct callers
+  (the AI SDK always sets `mediaType` on file parts) are unaffected for valid
+  image inputs.
 
 - [#575](https://github.com/cloudflare/ai/pull/575) [`65e0735`](https://github.com/cloudflare/ai/commit/65e0735fc2788666376d7cecf2c198f814e2eb54) Thanks [@threepointone](https://github.com/threepointone)! - Map the AI SDK's forced single-tool choice to the documented named-function form.
 
-    Previously `toolChoice: { type: "tool", toolName }` was downgraded to
-    `tool_choice: "required"` (with the tool list filtered to the single function).
-    Workers AI treats `"required"` as advisory: on long contexts and reasoning
-    models (e.g. `@cf/google/gemma-4-26b-a4b-it`, `@cf/qwen/qwq-32b`,
-    `@cf/qwen/qwen3-30b-a3b-fp8`) the model would "fail open" and answer in prose
-    instead of calling the requested tool.
+  Previously `toolChoice: { type: "tool", toolName }` was downgraded to
+  `tool_choice: "required"` (with the tool list filtered to the single function).
+  Workers AI treats `"required"` as advisory: on long contexts and reasoning
+  models (e.g. `@cf/google/gemma-4-26b-a4b-it`, `@cf/qwen/qwq-32b`,
+  `@cf/qwen/qwen3-30b-a3b-fp8`) the model would "fail open" and answer in prose
+  instead of calling the requested tool.
 
-    Now the provider sends the OpenAI-style named-function form
-    `tool_choice: { type: "function", function: { name } }`, which Workers AI
-    enforces server-side, and keeps the full tool list (matching OpenAI semantics
-    and preserving tool-result context fidelity).
+  Now the provider sends the OpenAI-style named-function form
+  `tool_choice: { type: "function", function: { name } }`, which Workers AI
+  enforces server-side, and keeps the full tool list (matching OpenAI semantics
+  and preserving tool-result context fidelity).
 
-    Note: forcing a tool on a reasoning model with insufficient `max_tokens` is
-    validated server-side and now surfaces as a clear error (Workers AI `8006`)
-    rather than silently producing no tool call.
+  Note: forcing a tool on a reasoning model with insufficient `max_tokens` is
+  validated server-side and now surfaces as a clear error (Workers AI `8006`)
+  rather than silently producing no tool call.
 
-    Additionally, recover forced tool calls that gpt-oss models leak as text.
-    When a tool is forced, gpt-oss (harmony format) sometimes emits the tool call
-    as raw JSON in `message.content` with an empty `tool_calls` array and
-    `finish_reason: "stop"`. The provider now detects this — only when a tool was
-    forced and the leaked JSON's `name` matches a requested tool — and
-    reinterprets it as a structured tool call (with `finishReason: "tool-calls"`
-    and a warning), across both `generateText` and `streamText`. Ambiguous leaks
-    (harmony channel/role names, hallucinated names) are left untouched to avoid
-    fabricating bogus calls.
+  Additionally, recover forced tool calls that gpt-oss models leak as text.
+  When a tool is forced, gpt-oss (harmony format) sometimes emits the tool call
+  as raw JSON in `message.content` with an empty `tool_calls` array and
+  `finish_reason: "stop"`. The provider now detects this — only when a tool was
+  forced and the leaked JSON's `name` matches a requested tool — and
+  reinterprets it as a structured tool call (with `finishReason: "tool-calls"`
+  and a warning), across both `generateText` and `streamText`. Ambiguous leaks
+  (harmony channel/role names, hallucinated names) are left untouched to avoid
+  fabricating bogus calls.
 
 - [#570](https://github.com/cloudflare/ai/pull/570) [`104c4a7`](https://github.com/cloudflare/ai/commit/104c4a70f057c75b9c70e0b3c1a0bc87fd10dbd3) Thanks [@threepointone](https://github.com/threepointone)! - Refresh Workers AI model references from the deprecated `@cf/moonshotai/kimi-k2.5` to the current `@cf/moonshotai/kimi-k2.7-code` in the README and inline source documentation.
 
 - [#576](https://github.com/cloudflare/ai/pull/576) [`a360e7a`](https://github.com/cloudflare/ai/commit/a360e7aff44c0a27ea7a9a9378722fa39837574f) Thanks [@threepointone](https://github.com/threepointone)! - Keep structured-output `name`/`description` instead of dropping them on native Workers AI models.
 
-                    `Output.object({ schema, name, description })` and `generateObject({ schema,
+                      `Output.object({ schema, name, description })` and `generateObject({ schema,
 
-              schemaName, schemaDescription })`pass a`name`/`description`alongside the JSON
+                schemaName, schemaDescription })`pass a`name`/`description`alongside the JSON
 
-    schema. On the native`@cf/...`path the provider previously forwarded only the
-    bare schema as`response_format.json_schema` and silently discarded both.
+      schema. On the native`@cf/...`path the provider previously forwarded only the
+      bare schema as`response_format.json_schema` and silently discarded both.
 
-                    Native Workers AI expects `json_schema` to be a **bare** JSON Schema, not
-                    OpenAI's `{ name, schema, strict }` envelope, so we can't just wrap it (that
-                    would break native models). Instead the `name` is folded into the schema's
-                    standard `title` keyword and the `description` into its `description` keyword —
-                    the payload stays a valid bare schema while the guidance reaches the model.
-                    Existing schema-level `title`/`description` are never overwritten and the input
-                    schema is not mutated.
+                      Native Workers AI expects `json_schema` to be a **bare** JSON Schema, not
+                      OpenAI's `{ name, schema, strict }` envelope, so we can't just wrap it (that
+                      would break native models). Instead the `name` is folded into the schema's
+                      standard `title` keyword and the `description` into its `description` keyword —
+                      the payload stays a valid bare schema while the guidance reaches the model.
+                      Existing schema-level `title`/`description` are never overwritten and the input
+                      schema is not mutated.
 
-                    Note on issue [#559](https://github.com/cloudflare/ai/issues/559): the reported failure was OpenAI partner models (e.g.
-                    `openai/gpt-5.4-mini`) rejecting requests with `Missing required parameter:
+                      Note on issue [#559](https://github.com/cloudflare/ai/issues/559): the reported failure was OpenAI partner models (e.g.
+                      `openai/gpt-5.4-mini`) rejecting requests with `Missing required parameter:
 
-              'response_format.json_schema.name'`. Partner-model slugs are no longer handled
+                'response_format.json_schema.name'`. Partner-model slugs are no longer handled
 
-    by this code path at all — they route through the AI Gateway delegate and the
-    real `@ai-sdk/\*`providers, which build the required`json_schema.name`envelope
-    themselves (configure them via`createWorkersAI({ binding, providers: [openai]
-})`). This change covers the remaining native-model gap where that guidance was
-    being dropped.
+      by this code path at all — they route through the AI Gateway delegate and the
+      real `@ai-sdk/\*`providers, which build the required`json_schema.name`envelope
+      themselves (configure them via`createWorkersAI({ binding, providers: [openai]
 
-                    See https://github.com/cloudflare/ai/issues/559.
+  })`). This change covers the remaining native-model gap where that guidance was
+  being dropped.
+
+                      See https://github.com/cloudflare/ai/issues/559.
 
 ## 3.1.14
 
@@ -181,9 +194,9 @@
 
 - [#510](https://github.com/cloudflare/ai/pull/510) [`dfd2cb4`](https://github.com/cloudflare/ai/commit/dfd2cb4e6e10e2ec3dc149bbc344b34a63734d07) Thanks [@Specy](https://github.com/Specy)! - Map `inputTokens.cacheRead` and `inputTokens.noCache` from Workers AI's `usage.prompt_tokens_details.cached_tokens` instead of always reporting them as `undefined`. This makes prompt-cache hits visible to consumers that compute pricing or telemetry from `LanguageModelV3Usage` (`generateText`/`streamText` `result.usage`).
 
-    `cached_tokens` is treated as `cacheRead`; `cacheWrite` remains `undefined` because the OpenAI-style usage shape Workers AI returns does not distinguish cache reads from writes.
+  `cached_tokens` is treated as `cacheRead`; `cacheWrite` remains `undefined` because the OpenAI-style usage shape Workers AI returns does not distinguish cache reads from writes.
 
-    Closes [#509](https://github.com/cloudflare/ai/issues/509).
+  Closes [#509](https://github.com/cloudflare/ai/issues/509).
 
 ## 3.1.12
 
@@ -191,28 +204,28 @@
 
 - [#504](https://github.com/cloudflare/ai/pull/504) [`e9b2a9a`](https://github.com/cloudflare/ai/commit/e9b2a9a4e4e63a8c045c1ac9e5d07fec3d4f2535) Thanks [@threepointone](https://github.com/threepointone)! - Forward `reasoning_effort` and `chat_template_kwargs` onto `binding.run(model, inputs)`'s `inputs` object instead of silently dropping them into the options arg / REST query string. This fixes reasoning models (GLM-4.7-flash, Kimi K2.5/K2.6, GPT-OSS, QwQ) burning the entire output token budget on chain-of-thought with no visible content.
 
-    Both settings-level and per-call usage are supported:
+  Both settings-level and per-call usage are supported:
 
-    ```ts
-    // Settings-level
-    const model = workersai("@cf/zai-org/glm-4.7-flash", {
-    	reasoning_effort: "low",
-    	chat_template_kwargs: { enable_thinking: false },
-    });
+  ```ts
+  // Settings-level
+  const model = workersai("@cf/zai-org/glm-4.7-flash", {
+    reasoning_effort: "low",
+    chat_template_kwargs: { enable_thinking: false },
+  });
 
-    // Per-call (overrides settings)
-    await generateText({
-    	model,
-    	prompt,
-    	providerOptions: {
-    		"workers-ai": { reasoning_effort: "low" },
-    	},
-    });
-    ```
+  // Per-call (overrides settings)
+  await generateText({
+    model,
+    prompt,
+    providerOptions: {
+      "workers-ai": { reasoning_effort: "low" },
+    },
+  });
+  ```
 
-    `reasoning_effort: null` is preserved as-is (explicit "disable reasoning" signal). The two fields are also typed directly on `WorkersAIChatSettings`.
+  `reasoning_effort: null` is preserved as-is (explicit "disable reasoning" signal). The two fields are also typed directly on `WorkersAIChatSettings`.
 
-    Closes [#501](https://github.com/cloudflare/ai/issues/501).
+  Closes [#501](https://github.com/cloudflare/ai/issues/501).
 
 ## 3.1.11
 
@@ -246,11 +259,11 @@
 
 - [#457](https://github.com/cloudflare/ai/pull/457) [`cc94a06`](https://github.com/cloudflare/ai/commit/cc94a06ca85603e473f41cc12ed83f53cbe9e136) Thanks [@threepointone](https://github.com/threepointone)! - Fix request cancellation by propagating `abortSignal` to outbound network calls.
 
-    **ai-gateway-provider**: Pass `abortSignal` to the `fetch` call (API path) and to `binding.run()` (binding path) so that cancelled requests are properly aborted.
+  **ai-gateway-provider**: Pass `abortSignal` to the `fetch` call (API path) and to `binding.run()` (binding path) so that cancelled requests are properly aborted.
 
-    **workers-ai-provider**: Pass `abortSignal` to `binding.run()` for chat, embedding, and image models, matching the existing behavior in transcription, speech, and reranking models.
+  **workers-ai-provider**: Pass `abortSignal` to `binding.run()` for chat, embedding, and image models, matching the existing behavior in transcription, speech, and reranking models.
 
-    **@cloudflare/tanstack-ai**: Pass `signal` through to `binding.run()` in both `createGatewayFetch` (AI Gateway binding path) and `createWorkersAiBindingFetch` (Workers AI binding path).
+  **@cloudflare/tanstack-ai**: Pass `signal` through to `binding.run()` in both `createGatewayFetch` (AI Gateway binding path) and `createWorkersAiBindingFetch` (Workers AI binding path).
 
 ## 3.1.6
 
@@ -258,25 +271,25 @@
 
 - [#454](https://github.com/cloudflare/ai/pull/454) [`29087ad`](https://github.com/cloudflare/ai/commit/29087ad9ea9cb5398d03e0dfff13c24aa3759c61) Thanks [@mchenco](https://github.com/mchenco)! - Fix three tool calling bugs that caused multi-turn agentic loops to fail
 
-    **1. Tool result output not unwrapped**
+  **1. Tool result output not unwrapped**
 
-    `convert-to-workersai-chat-messages.ts` was calling `JSON.stringify(toolResponse.output)` on the entire `LanguageModelV3ToolResultOutput` wrapper object (`{ type: 'text', value: '...' }`), sending the wrapper as the tool message content instead of just the value. Models received garbled tool results and stopped after the first tool call instead of continuing.
+  `convert-to-workersai-chat-messages.ts` was calling `JSON.stringify(toolResponse.output)` on the entire `LanguageModelV3ToolResultOutput` wrapper object (`{ type: 'text', value: '...' }`), sending the wrapper as the tool message content instead of just the value. Models received garbled tool results and stopped after the first tool call instead of continuing.
 
-    Fix: extract `output.value` and serialize only that.
+  Fix: extract `output.value` and serialize only that.
 
-    **2. `toolChoice: "required"` mapped to `"any"` instead of `"required"`**
+  **2. `toolChoice: "required"` mapped to `"any"` instead of `"required"`**
 
-    `utils.ts` mapped `toolChoice: "required"` to `tool_choice: "any"`. All vLLM-backed models (`@cf/moonshotai/kimi-k2.5`, `@cf/meta/llama-4-scout-17b-16e-instruct`, `@cf/zai-org/glm-4.7-flash`) return `8001: Invalid input` for `tool_choice: "any"`. The same incorrect mapping applied to `toolChoice: { type: "tool" }`.
+  `utils.ts` mapped `toolChoice: "required"` to `tool_choice: "any"`. All vLLM-backed models (`@cf/moonshotai/kimi-k2.5`, `@cf/meta/llama-4-scout-17b-16e-instruct`, `@cf/zai-org/glm-4.7-flash`) return `8001: Invalid input` for `tool_choice: "any"`. The same incorrect mapping applied to `toolChoice: { type: "tool" }`.
 
-    Fix: map both to `"required"`.
+  Fix: map both to `"required"`.
 
-    **3. `description: false` in tool definitions**
+  **3. `description: false` in tool definitions**
 
-    `utils.ts` used `&&` short-circuit for tool description and parameters, which evaluates to `false` (not `undefined`) when `tool.type !== "function"`. Sending `description: false` to the binding causes `8001: Invalid input`.
+  `utils.ts` used `&&` short-circuit for tool description and parameters, which evaluates to `false` (not `undefined`) when `tool.type !== "function"`. Sending `description: false` to the binding causes `8001: Invalid input`.
 
-    Fix: use ternary to produce `undefined` when not applicable.
+  Fix: use ternary to produce `undefined` when not applicable.
 
-    Tested against `@cf/moonshotai/kimi-k2.5`, `@cf/meta/llama-4-scout-17b-16e-instruct`, and `@cf/zai-org/glm-4.7-flash` via the Workers AI binding.
+  Tested against `@cf/moonshotai/kimi-k2.5`, `@cf/meta/llama-4-scout-17b-16e-instruct`, and `@cf/zai-org/glm-4.7-flash` via the Workers AI binding.
 
 ## 3.1.5
 
@@ -284,18 +297,18 @@
 
 - [#451](https://github.com/cloudflare/ai/pull/451) [`2a62e23`](https://github.com/cloudflare/ai/commit/2a62e23c7159df5ba69348f15da7a44eef73e83d) Thanks [@mchenco](https://github.com/mchenco)! - Fix reasoning content being concatenated into assistant message content in multi-turn conversations
 
-    Previously, reasoning parts in assistant messages were concatenated into the `content` string when building message history. This caused models like `kimi-k2.5` and `deepseek-r1` to receive their own internal reasoning as if it were spoken text, corrupting the conversation history and resulting in empty text responses or leaked special tokens on subsequent turns.
+  Previously, reasoning parts in assistant messages were concatenated into the `content` string when building message history. This caused models like `kimi-k2.5` and `deepseek-r1` to receive their own internal reasoning as if it were spoken text, corrupting the conversation history and resulting in empty text responses or leaked special tokens on subsequent turns.
 
-    Reasoning parts are now sent as the `reasoning` field on the assistant message object, which is the field name vLLM expects on input for reasoning models (kimi-k2.5, glm-4.7-flash).
+  Reasoning parts are now sent as the `reasoning` field on the assistant message object, which is the field name vLLM expects on input for reasoning models (kimi-k2.5, glm-4.7-flash).
 
 ## 3.1.4
 
 ### Patch Changes
 
 - [#448](https://github.com/cloudflare/ai/pull/448) [`054ccb8`](https://github.com/cloudflare/ai/commit/054ccb834ea3eb7a07d2b011e1ff1b8344f348fb) Thanks [@threepointone](https://github.com/threepointone)! - Fix image inputs for vision-capable chat models
-    - Handle all `LanguageModelV3DataContent` variants (Uint8Array, base64 string, data URL) instead of only Uint8Array
-    - Send images as OpenAI-compatible `image_url` content parts inline in messages, enabling vision for models like Llama 4 Scout and Kimi K2.5
-    - Works with both the binding and REST API paths
+  - Handle all `LanguageModelV3DataContent` variants (Uint8Array, base64 string, data URL) instead of only Uint8Array
+  - Send images as OpenAI-compatible `image_url` content parts inline in messages, enabling vision for models like Llama 4 Scout and Kimi K2.5
+  - Works with both the binding and REST API paths
 
 ## 3.1.3
 
@@ -320,10 +333,10 @@
 ### Patch Changes
 
 - [#396](https://github.com/cloudflare/ai/pull/396) [`2fb3ca8`](https://github.com/cloudflare/ai/commit/2fb3ca80542c8335fea83cac314fa52da772f38f) Thanks [@threepointone](https://github.com/threepointone)! - - Rewrite README with updated model recommendations (GPT-OSS 120B, EmbeddingGemma 300M, Aura-2 EN)
-    - Stream tool calls incrementally using tool-input-start/delta/end events instead of buffering until stream end
-    - Fix REST streaming for models that don't support it on /ai/run/ (GPT-OSS, Kimi) by retrying without streaming
-    - Add Aura-2 EN/ES to SpeechModels type
-    - Log malformed SSE events with console.warn instead of silently swallowing
+  - Stream tool calls incrementally using tool-input-start/delta/end events instead of buffering until stream end
+  - Fix REST streaming for models that don't support it on /ai/run/ (GPT-OSS, Kimi) by retrying without streaming
+  - Add Aura-2 EN/ES to SpeechModels type
+  - Log malformed SSE events with console.warn instead of silently swallowing
 
 ## 3.1.0
 
@@ -331,46 +344,52 @@
 
 - [#389](https://github.com/cloudflare/ai/pull/389) [`8538cd5`](https://github.com/cloudflare/ai/commit/8538cd53ce2e1be28cca95217725dfd4642fd7da) Thanks [@vaibhavshn](https://github.com/vaibhavshn)! - Add transcription, text-to-speech, and reranking support to the Workers AI provider.
 
-    ### New capabilities
-    - **Transcription** (`provider.transcription(model)`) — implements `TranscriptionModelV3`. Supports Whisper models (`@cf/openai/whisper`, `whisper-tiny-en`, `whisper-large-v3-turbo`) and Deepgram Nova-3 (`@cf/deepgram/nova-3`). Handles model-specific input formats: number arrays for basic Whisper, base64 for v3-turbo via REST, and `{ body, contentType }` for Nova-3 via binding or raw binary upload for Nova-3 via REST.
+  ### New capabilities
 
-    - **Speech / TTS** (`provider.speech(model)`) — implements `SpeechModelV3`. Supports Workers AI TTS models including Deepgram Aura-1 (`@cf/deepgram/aura-1`). Accepts `text`, `voice`, and `speed` options. Returns audio as `Uint8Array`. Uses `returnRawResponse` to handle binary audio from the REST path without JSON parsing.
+  - **Transcription** (`provider.transcription(model)`) — implements `TranscriptionModelV3`. Supports Whisper models (`@cf/openai/whisper`, `whisper-tiny-en`, `whisper-large-v3-turbo`) and Deepgram Nova-3 (`@cf/deepgram/nova-3`). Handles model-specific input formats: number arrays for basic Whisper, base64 for v3-turbo via REST, and `{ body, contentType }` for Nova-3 via binding or raw binary upload for Nova-3 via REST.
 
-    - **Reranking** (`provider.reranking(model)`) — implements `RerankingModelV3`. Supports BGE reranker models (`@cf/baai/bge-reranker-base`, `bge-reranker-v2-m3`). Converts AI SDK's document format to Workers AI's `{ query, contexts, top_k }` input. Handles both text and JSON object documents.
+  - **Speech / TTS** (`provider.speech(model)`) — implements `SpeechModelV3`. Supports Workers AI TTS models including Deepgram Aura-1 (`@cf/deepgram/aura-1`). Accepts `text`, `voice`, and `speed` options. Returns audio as `Uint8Array`. Uses `returnRawResponse` to handle binary audio from the REST path without JSON parsing.
 
-    ### Bug fixes
-    - **AbortSignal passthrough** — `createRun` REST shim now passes the abort signal to `fetch`, enabling request cancellation and timeout handling. Previously the signal was silently dropped.
-    - **Nova-3 REST support** — Added `createRunBinary` utility for models that require raw binary upload instead of JSON (used by Nova-3 transcription via REST).
+  - **Reranking** (`provider.reranking(model)`) — implements `RerankingModelV3`. Supports BGE reranker models (`@cf/baai/bge-reranker-base`, `bge-reranker-v2-m3`). Converts AI SDK's document format to Workers AI's `{ query, contexts, top_k }` input. Handles both text and JSON object documents.
 
-    ### Usage
+  ### Bug fixes
 
-    ```typescript
-    import { createWorkersAI } from "workers-ai-provider";
-    import { experimental_transcribe, experimental_generateSpeech, rerank } from "ai";
+  - **AbortSignal passthrough** — `createRun` REST shim now passes the abort signal to `fetch`, enabling request cancellation and timeout handling. Previously the signal was silently dropped.
+  - **Nova-3 REST support** — Added `createRunBinary` utility for models that require raw binary upload instead of JSON (used by Nova-3 transcription via REST).
 
-    const workersai = createWorkersAI({ binding: env.AI });
+  ### Usage
 
-    // Transcription
-    const transcript = await experimental_transcribe({
-    	model: workersai.transcription("@cf/openai/whisper-large-v3-turbo"),
-    	audio: audioData,
-    	mediaType: "audio/wav",
-    });
+  ```typescript
+  import { createWorkersAI } from "workers-ai-provider";
+  import {
+    experimental_transcribe,
+    experimental_generateSpeech,
+    rerank,
+  } from "ai";
 
-    // Speech
-    const speech = await experimental_generateSpeech({
-    	model: workersai.speech("@cf/deepgram/aura-1"),
-    	text: "Hello world",
-    	voice: "asteria",
-    });
+  const workersai = createWorkersAI({ binding: env.AI });
 
-    // Reranking
-    const ranked = await rerank({
-    	model: workersai.reranking("@cf/baai/bge-reranker-base"),
-    	query: "What is machine learning?",
-    	documents: ["ML is a branch of AI.", "The weather is sunny."],
-    });
-    ```
+  // Transcription
+  const transcript = await experimental_transcribe({
+    model: workersai.transcription("@cf/openai/whisper-large-v3-turbo"),
+    audio: audioData,
+    mediaType: "audio/wav",
+  });
+
+  // Speech
+  const speech = await experimental_generateSpeech({
+    model: workersai.speech("@cf/deepgram/aura-1"),
+    text: "Hello world",
+    voice: "asteria",
+  });
+
+  // Reranking
+  const ranked = await rerank({
+    model: workersai.reranking("@cf/baai/bge-reranker-base"),
+    query: "What is machine learning?",
+    documents: ["ML is a branch of AI.", "The weather is sunny."],
+  });
+  ```
 
 ## 3.0.5
 
@@ -378,60 +397,60 @@
 
 - [#393](https://github.com/cloudflare/ai/pull/393) [`91b32e0`](https://github.com/cloudflare/ai/commit/91b32e0b0ef543fd198ddf387b9521ac3bd9650a) Thanks [@threepointone](https://github.com/threepointone)! - Comprehensive cleanup of the workers-ai-provider package.
 
-    **Bug fixes:**
+  **Bug fixes:**
 
-    - Fixed phantom dependency on `fetch-event-stream` that caused runtime crashes when installed outside the monorepo. Replaced with a built-in SSE parser.
-    - Fixed streaming buffering: responses now stream token-by-token instead of arriving all at once. The root cause was twofold — an eager `ReadableStream` `start()` pattern that buffered all chunks, and a heuristic that silently fell back to non-streaming `doGenerate` whenever tools were defined. Both are fixed. Streaming now uses a proper `TransformStream` pipeline with backpressure.
-    - Fixed `reasoning-delta` ID mismatch in simulated streaming — was using `generateId()` instead of the `reasoningId` from the preceding `reasoning-start` event, causing the AI SDK to drop reasoning content.
-    - Fixed REST API client (`createRun`) silently swallowing HTTP errors. Non-200 responses now throw with status code and response body.
-    - Fixed `response_format` being sent as `undefined` on every non-JSON request. Now only included when actually set.
-    - Fixed `json_schema` field evaluating to `false` (a boolean) instead of `undefined` when schema was missing.
+  - Fixed phantom dependency on `fetch-event-stream` that caused runtime crashes when installed outside the monorepo. Replaced with a built-in SSE parser.
+  - Fixed streaming buffering: responses now stream token-by-token instead of arriving all at once. The root cause was twofold — an eager `ReadableStream` `start()` pattern that buffered all chunks, and a heuristic that silently fell back to non-streaming `doGenerate` whenever tools were defined. Both are fixed. Streaming now uses a proper `TransformStream` pipeline with backpressure.
+  - Fixed `reasoning-delta` ID mismatch in simulated streaming — was using `generateId()` instead of the `reasoningId` from the preceding `reasoning-start` event, causing the AI SDK to drop reasoning content.
+  - Fixed REST API client (`createRun`) silently swallowing HTTP errors. Non-200 responses now throw with status code and response body.
+  - Fixed `response_format` being sent as `undefined` on every non-JSON request. Now only included when actually set.
+  - Fixed `json_schema` field evaluating to `false` (a boolean) instead of `undefined` when schema was missing.
 
-    **Workers AI quirk workarounds:**
+  **Workers AI quirk workarounds:**
 
-    - Added `sanitizeToolCallId()` — strips non-alphanumeric characters and pads/truncates to 9 chars, fixing tool call round-trips through the binding which rejects its own generated IDs.
-    - Added `normalizeMessagesForBinding()` — converts `content: null` to `""` and sanitizes tool call IDs before every binding call. Only applied on the binding path (REST preserves original IDs).
-    - Added null-finalization chunk filtering for streaming tool calls.
-    - Added numeric value coercion in native-format streams (Workers AI sometimes returns numbers instead of strings for the `response` field).
-    - Improved image model to handle all output types from `binding.run()`: `ReadableStream`, `Uint8Array`, `ArrayBuffer`, `Response`, and `{ image: base64 }` objects.
-    - Graceful degradation: if `binding.run()` returns a non-streaming response despite `stream: true`, it wraps the complete response as a simulated stream instead of throwing.
+  - Added `sanitizeToolCallId()` — strips non-alphanumeric characters and pads/truncates to 9 chars, fixing tool call round-trips through the binding which rejects its own generated IDs.
+  - Added `normalizeMessagesForBinding()` — converts `content: null` to `""` and sanitizes tool call IDs before every binding call. Only applied on the binding path (REST preserves original IDs).
+  - Added null-finalization chunk filtering for streaming tool calls.
+  - Added numeric value coercion in native-format streams (Workers AI sometimes returns numbers instead of strings for the `response` field).
+  - Improved image model to handle all output types from `binding.run()`: `ReadableStream`, `Uint8Array`, `ArrayBuffer`, `Response`, and `{ image: base64 }` objects.
+  - Graceful degradation: if `binding.run()` returns a non-streaming response despite `stream: true`, it wraps the complete response as a simulated stream instead of throwing.
 
-    **Premature stream termination detection:**
+  **Premature stream termination detection:**
 
-    - Streams that end without a `[DONE]` sentinel now report `finishReason: "error"` with `raw: "stream-truncated"` instead of silently reporting `"stop"`.
-    - Stream read errors are caught and emit `finishReason: "error"` with `raw: "stream-error"`.
+  - Streams that end without a `[DONE]` sentinel now report `finishReason: "error"` with `raw: "stream-truncated"` instead of silently reporting `"stop"`.
+  - Stream read errors are caught and emit `finishReason: "error"` with `raw: "stream-error"`.
 
-    **AI Search (formerly AutoRAG):**
+  **AI Search (formerly AutoRAG):**
 
-    - Added `createAISearch` and `AISearchChatLanguageModel` as the canonical exports, reflecting the rename from AutoRAG to AI Search.
-    - `createAutoRAG` still works but emits a one-time deprecation warning pointing to `createAISearch`.
-    - `createAutoRAG` preserves `"autorag.chat"` as the provider name for backward compatibility.
-    - AI Search now warns when tools or JSON response format are provided (unsupported by the `aiSearch` API).
-    - Simplified AI Search internals — removed dead tool/response-format processing code.
+  - Added `createAISearch` and `AISearchChatLanguageModel` as the canonical exports, reflecting the rename from AutoRAG to AI Search.
+  - `createAutoRAG` still works but emits a one-time deprecation warning pointing to `createAISearch`.
+  - `createAutoRAG` preserves `"autorag.chat"` as the provider name for backward compatibility.
+  - AI Search now warns when tools or JSON response format are provided (unsupported by the `aiSearch` API).
+  - Simplified AI Search internals — removed dead tool/response-format processing code.
 
-    **Code quality:**
+  **Code quality:**
 
-    - Removed dead code: `workersai-error.ts` (never imported), `workersai-image-config.ts` (inlined).
-    - Consistent file naming: renamed `workers-ai-embedding-model.ts` to `workersai-embedding-model.ts`.
-    - Replaced `StringLike` catch-all index signatures with `[key: string]: unknown` on settings types.
-    - Replaced `any` types with proper interfaces (`FlatToolCall`, `OpenAIToolCall`, `PartialToolCall`).
-    - Tightened `processToolCall` format detection to check `function.name` instead of just the presence of a `function` property.
-    - Removed `@ai-sdk/provider-utils` and `zod` peer dependencies (no longer used in source).
-    - Added `imageModel` to the `WorkersAI` interface type for consistency.
+  - Removed dead code: `workersai-error.ts` (never imported), `workersai-image-config.ts` (inlined).
+  - Consistent file naming: renamed `workers-ai-embedding-model.ts` to `workersai-embedding-model.ts`.
+  - Replaced `StringLike` catch-all index signatures with `[key: string]: unknown` on settings types.
+  - Replaced `any` types with proper interfaces (`FlatToolCall`, `OpenAIToolCall`, `PartialToolCall`).
+  - Tightened `processToolCall` format detection to check `function.name` instead of just the presence of a `function` property.
+  - Removed `@ai-sdk/provider-utils` and `zod` peer dependencies (no longer used in source).
+  - Added `imageModel` to the `WorkersAI` interface type for consistency.
 
-    **Tests:**
+  **Tests:**
 
-    - 149 unit tests across 10 test files (up from 82).
-    - New test coverage: `sanitizeToolCallId`, `normalizeMessagesForBinding`, `prepareToolsAndToolChoice`, `processText`, `mapWorkersAIUsage`, image model output types, streaming error scenarios (malformed SSE, premature termination, empty stream), backpressure verification, graceful degradation (non-streaming fallback with text/tools/reasoning), REST API error handling (401/404/500), AI Search warnings, embedding `TooManyEmbeddingValuesForCallError`, message conversion with images and reasoning.
-    - Integration tests for REST API and binding across 12 models and 7 categories (chat, streaming, multi-turn, tool calling, tool round-trip, structured output, image generation, embeddings).
-    - All tests use the AI SDK's public APIs (`generateText`, `streamText`, `generateImage`, `embedMany`) instead of internal `.doGenerate()`/`.doStream()` methods.
+  - 149 unit tests across 10 test files (up from 82).
+  - New test coverage: `sanitizeToolCallId`, `normalizeMessagesForBinding`, `prepareToolsAndToolChoice`, `processText`, `mapWorkersAIUsage`, image model output types, streaming error scenarios (malformed SSE, premature termination, empty stream), backpressure verification, graceful degradation (non-streaming fallback with text/tools/reasoning), REST API error handling (401/404/500), AI Search warnings, embedding `TooManyEmbeddingValuesForCallError`, message conversion with images and reasoning.
+  - Integration tests for REST API and binding across 12 models and 7 categories (chat, streaming, multi-turn, tool calling, tool round-trip, structured output, image generation, embeddings).
+  - All tests use the AI SDK's public APIs (`generateText`, `streamText`, `generateImage`, `embedMany`) instead of internal `.doGenerate()`/`.doStream()` methods.
 
-    **README:**
+  **README:**
 
-    - Rewritten from scratch with concise examples, model recommendations, configuration guide, and known limitations section.
-    - Updated to use current AI SDK v6 APIs (`generateText` + `Output.object` instead of deprecated `generateObject`, `generateImage` instead of `experimental_generateImage`, `stopWhen: stepCountIs(2)` instead of `maxSteps`).
-    - Added sections for tool calling, structured output, embeddings, image generation, and AI Search.
-    - Uses `wrangler.jsonc` format for configuration examples.
+  - Rewritten from scratch with concise examples, model recommendations, configuration guide, and known limitations section.
+  - Updated to use current AI SDK v6 APIs (`generateText` + `Output.object` instead of deprecated `generateObject`, `generateImage` instead of `experimental_generateImage`, `stopWhen: stepCountIs(2)` instead of `maxSteps`).
+  - Added sections for tool calling, structured output, embeddings, image generation, and AI Search.
+  - Uses `wrangler.jsonc` format for configuration examples.
 
 ## 3.0.4
 
@@ -439,14 +458,14 @@
 
 - [#390](https://github.com/cloudflare/ai/pull/390) [`41b92a3`](https://github.com/cloudflare/ai/commit/41b92a34ce4d9dffba8bb42b4933bbc06e4b1aaa) Thanks [@mchenco](https://github.com/mchenco)! - fix(workers-ai-provider): extract actual finish reason in streaming instead of hardcoded "stop"
 
-    Previously, the streaming implementation always returned `finishReason: "stop"` regardless of the actual completion reason. This caused:
+  Previously, the streaming implementation always returned `finishReason: "stop"` regardless of the actual completion reason. This caused:
 
-    - Tool calling scenarios to incorrectly report "stop" instead of "tool-calls"
-    - Multi-turn tool conversations to fail because the AI SDK couldn't detect when tools were requested
-    - Length limit scenarios to show "stop" instead of "length"
-    - Error scenarios to show "stop" instead of "error"
+  - Tool calling scenarios to incorrectly report "stop" instead of "tool-calls"
+  - Multi-turn tool conversations to fail because the AI SDK couldn't detect when tools were requested
+  - Length limit scenarios to show "stop" instead of "length"
+  - Error scenarios to show "stop" instead of "error"
 
-    The fix extracts the actual `finish_reason` from streaming chunks and uses the existing `mapWorkersAIFinishReason()` function to properly map it to the AI SDK's finish reason format. This enables proper multi-turn tool calling and accurate completion status reporting.
+  The fix extracts the actual `finish_reason` from streaming chunks and uses the existing `mapWorkersAIFinishReason()` function to properly map it to the AI SDK's finish reason format. This enables proper multi-turn tool calling and accurate completion status reporting.
 
 ## 3.0.3
 
@@ -490,7 +509,7 @@
 
 - [#256](https://github.com/cloudflare/ai/pull/256) [`a538901`](https://github.com/cloudflare/ai/commit/a5389013b9a512707fb1de1501a1547fce20c014) Thanks [@jahands](https://github.com/jahands)! - feat: Migrate to AI SDK v5
 
-    This updates workers-ai-provider and ai-gateway-provider to use the AI SDK v5. Please refer to the official migration guide to migrate your code https://ai-sdk.dev/docs/migration-guides/migration-guide-5-0
+  This updates workers-ai-provider and ai-gateway-provider to use the AI SDK v5. Please refer to the official migration guide to migrate your code https://ai-sdk.dev/docs/migration-guides/migration-guide-5-0
 
 ### Patch Changes
 

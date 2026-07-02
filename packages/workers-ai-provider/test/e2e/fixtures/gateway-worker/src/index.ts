@@ -89,6 +89,50 @@ export default {
 
 		try {
 			switch (url.pathname) {
+				// --- Run-path capability probe (issue #596) ---
+				// Drives a slug through the PURE run path (`env.AI.run`, unified
+				// billing, NO BYOK key, no delegate) to empirically determine which
+				// `<provider>/<model>` slugs Cloudflare's unified catalog serves via
+				// `/run`. Reports status + the `cf-aig-*` log headers (provider, path,
+				// wholesale/unified-billing) so we can classify `runCatalog` from real
+				// calls rather than a conservative guess.
+				case "/probe/run": {
+					const slug = body.slug ?? "openai/gpt-4.1-mini";
+					const ai = env.AI as unknown as {
+						run(m: string, i: unknown, o: unknown): Promise<Response>;
+					};
+					const started = Date.now();
+					try {
+						const resp = await ai.run(
+							slug,
+							{ messages: [{ role: "user", content: prompt }], max_tokens: 8 },
+							{ gateway: { id: gateway }, returnRawResponse: true },
+						);
+						const text = await resp.text();
+						const headers: Record<string, string> = {};
+						for (const [k, v] of resp.headers) {
+							if (k.startsWith("cf-aig")) headers[k] = v;
+						}
+						return json({
+							slug,
+							ok: resp.ok,
+							status: resp.status,
+							ms: Date.now() - started,
+							headers,
+							bodySnippet: text.slice(0, 400),
+						});
+					} catch (e) {
+						return json({
+							slug,
+							ok: false,
+							status: 0,
+							ms: Date.now() - started,
+							error: e instanceof Error ? e.message : String(e),
+							name: (e as Error)?.name,
+						});
+					}
+				}
+
 				// --- Run path: unified-billing, resumable (cf-aig-run-id) ---
 				case "/run/chat": {
 					let dispatch: DispatchInfo | undefined;

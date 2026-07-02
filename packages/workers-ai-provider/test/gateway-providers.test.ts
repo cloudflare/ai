@@ -33,14 +33,37 @@ describe("gateway provider registry", () => {
 		expect(findProviderBySlug("openai")?.runWireFormat).toBeUndefined();
 	});
 
-	it("maps the OpenAI-compatible long tail to the openai wire format (BYOK)", () => {
-		for (const slug of ["deepseek", "mistral", "perplexity", "openrouter", "cerebras"]) {
+	it("maps the whole OpenAI-compatible long tail to the openai wire format + a baseURL", () => {
+		for (const slug of [
+			"deepseek",
+			"mistral",
+			"perplexity",
+			"openrouter",
+			"cerebras",
+			"fireworks",
+		]) {
 			const info = findProviderBySlug(slug);
-			expect(info?.wireFormat).toBe("openai");
-			expect(info?.runCatalog).toBe(false);
-			expect(info?.billing).toBe("byok");
-			// shared openai plugin ⇒ must carry a baseURL so the URL host-strips right
-			expect(info?.baseURL).toBeTruthy();
+			expect(info?.wireFormat, slug).toBe("openai");
+			// shared openai plugin ⇒ must carry a baseURL so the gateway-path URL
+			// host-strips right
+			expect(info?.baseURL, slug).toBeTruthy();
+		}
+	});
+
+	it("classifies the long tail by real run-catalog membership (deepseek unified, rest BYOK)", () => {
+		// deepseek/* is the one long-tail provider Cloudflare serves on the unified
+		// run path (#596; env.AI.run 200 for deepseek-v4-pro) — defaults to run.
+		const deepseek = findProviderBySlug("deepseek");
+		expect(deepseek?.runCatalog).toBe(true);
+		expect(deepseek?.billing).toBe("unified");
+
+		// The rest are NOT on the unified run catalog — env.AI.run returns
+		// 7003 model-not-found (mistral/cerebras/openrouter/fireworks) or 2021
+		// use-BYOK (perplexity). They route through the BYOK gateway path.
+		for (const slug of ["mistral", "perplexity", "cerebras", "openrouter", "fireworks"]) {
+			const info = findProviderBySlug(slug);
+			expect(info?.runCatalog, slug).toBe(false);
+			expect(info?.billing, slug).toBe("byok");
 		}
 	});
 
@@ -177,15 +200,19 @@ describe("gateway provider registry", () => {
 		);
 	});
 
-	it("only flags run-catalog providers as the documented unified-billing set", () => {
+	it("lists exactly the providers Cloudflare serves on the unified run catalog", () => {
 		const catalog = GATEWAY_PROVIDERS.filter((p) => p.runCatalog)
 			.map((p) => p.resolverKey)
 			.sort();
-		// openai/anthropic/google/xai/groq are the original directory set; alibaba +
-		// minimax are unified-catalog chat providers verified live on the run path.
+		// The headline directory set (openai/anthropic/google/xai/groq), the
+		// run-only unified chat providers alibaba + minimax, and deepseek — the one
+		// OpenAI-wire long-tail provider actually on the unified `env.AI.run` catalog
+		// (#596). The rest of the long tail (mistral/perplexity/cerebras/openrouter/
+		// fireworks) is BYOK gateway-path only, verified by the e2e run-path probe.
 		expect(catalog).toEqual([
 			"alibaba",
 			"anthropic",
+			"deepseek",
 			"google",
 			"groq",
 			"minimax",

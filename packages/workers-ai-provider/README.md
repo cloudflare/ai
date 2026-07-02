@@ -373,7 +373,7 @@ const result = streamText({
 // result.response.headers["cf-aig-run-id"] is set — resume from there.
 ```
 
-The settings argument is **typed from the model id**: pass a `"<provider>/<model>"` catalog slug and the second argument autocompletes the per-call gateway options (`resume`, `fallback`, `cacheTtl`, `byok`, `metadata`, …, i.e. `DelegateCallOptions`); pass a `@cf/...` id and it autocompletes the usual `WorkersAIChatSettings`. `providers` is optional and **additive**: leave it unset and `createWorkersAI` behaves exactly as before; passing a catalog slug without it throws a helpful error pointing you here.
+The settings argument is **typed from the model id**: pass a `"<provider>/<model>"` catalog slug and the second argument autocompletes the per-call gateway options (`resume`, `fallback`, `cacheTtl`, `byok`, `metadata`, …, i.e. `DelegateCallOptions`); pass a `@cf/...` id and it autocompletes the usual `WorkersAIChatSettings`. `providers` is optional and **additive**: leave it unset and `createWorkersAI` behaves exactly as before — `@cf/...` ids work as always, and a `"<provider>/<model>"` catalog slug still routes through the unified-billing run path (defaulting to your account's `"default"` gateway, with the built-in OpenAI-compatible parser). Configure `providers` to unlock higher-fidelity parsing plus the per-call delegate options (BYOK, caching, fallback, resume); requesting one of those without `providers` throws a helpful error pointing you here.
 
 `gateway` is optional for catalog routing — when unset, requests use your account's `"default"` AI Gateway. Set `gateway: { id: "…" }` (here or per call) to use a specific gateway.
 
@@ -385,7 +385,7 @@ One plugin per **wire format** serves every provider of that format. The `openai
 
 The registry covers every provider in the [AI Gateway provider directory](https://developers.cloudflare.com/ai-gateway/usage/providers/) — OpenAI, Anthropic, Google AI Studio, Google Vertex AI, xAI/Grok, Groq, DeepSeek, Mistral, Perplexity, Cerebras, OpenRouter, Cohere, Baseten, Parallel, Azure OpenAI, Amazon Bedrock, HuggingFace, Replicate, Fal, Ideogram, Cartesia, Deepgram, ElevenLabs (plus Fireworks) — so `createGatewayFetch` can auto-detect them from the request URL.
 
-**Coverage maturity varies** (the whole feature is experimental). Only the unified-billing run-catalog providers — OpenAI, Anthropic, Google, xAI/Grok, Groq, Alibaba/Qwen, MiniMax — are exercised end-to-end against a live gateway. The remaining registry entries (BYOK gateway-path providers like DeepSeek/Mistral/Perplexity/Cerebras/OpenRouter/Fireworks, and bring-your-own-provider-only ones like Cohere/Baseten/Parallel/Azure OpenAI/Bedrock/HuggingFace/Replicate/Fal/Ideogram/Cartesia/Deepgram/ElevenLabs) are registry-level wiring (gateway id, host pattern, endpoint transform) that is **not yet live-verified** — the routing is in place, but a provider's exact request shape may need adjustment. Please file issues for any that misbehave.
+**Coverage maturity varies** (the whole feature is experimental). Only the unified-billing run-catalog providers — OpenAI, Anthropic, Google, xAI/Grok, Groq, DeepSeek, Alibaba/Qwen, MiniMax — are exercised end-to-end against a live gateway. The remaining registry entries (BYOK gateway-path providers like Mistral/Perplexity/Cerebras/OpenRouter/Fireworks, and bring-your-own-provider-only ones like Cohere/Baseten/Parallel/Azure OpenAI/Bedrock/HuggingFace/Replicate/Fal/Ideogram/Cartesia/Deepgram/ElevenLabs) are registry-level wiring (gateway id, host pattern, endpoint transform) that is **not yet live-verified** — the routing is in place, but a provider's exact request shape may need adjustment. Please file issues for any that misbehave.
 
 > **Run-path wire format is per-provider — not always OpenAI.** On the resumable run path (`env.AI.run`), Cloudflare's unified catalog **normalizes most providers to OpenAI chat-completions** (so `google/…` is parsed with the `openai` plugin on the run path, even though the gateway path uses the native `google` plugin), but **passes Anthropic through natively** — so `anthropic/…` uses the `anthropic` plugin on both paths. In practice: include `openai` for the openai-wire run-path providers (openai, google, xai/grok, groq), and `anthropic` to use `anthropic/…`. The native `google` plugin is only needed if you force google onto the **gateway path**. If a plugin a transport needs is missing, the delegate throws a `GatewayDelegateError` naming it.
 
@@ -398,13 +398,13 @@ The transport is chosen automatically from the options you pass:
 | **run** (default) | `env.AI.run(...)`            | ✅                                       | ❌      | ❌              | Unified billing   |
 | **gateway**       | `env.AI.gateway(id).run([])` | ❌                                       | ✅      | ✅              | BYOK / stored key |
 
-Run-catalog providers (OpenAI, Anthropic, Google, xAI, Groq, plus the unified-catalog chat providers Alibaba/Qwen and MiniMax) default to the resumable **run path**. BYOK-only providers (deepseek, mistral, perplexity, …) always use the **gateway path**. Asking for an impossible combination (e.g. `resume: true` with `fallback.mode: "server"`) throws a `GatewayDelegateError`.
+Run-catalog providers (OpenAI, Anthropic, Google, xAI, Groq, DeepSeek, plus the unified-catalog chat providers Alibaba/Qwen and MiniMax) default to the resumable **run path**. BYOK-only providers (mistral, perplexity, cerebras, …) always use the **gateway path**. Asking for an impossible combination (e.g. `resume: true` with `fallback.mode: "server"`) throws a `GatewayDelegateError`.
 
 > Alibaba and MiniMax are **run-path only** — they're on the unified catalog but not the native gateway directory, so there's no gateway path. Requesting `transport: "gateway"`, caching, or server-side fallback on them throws a clear `GatewayDelegateError` at build time (rather than failing upstream); use the default run path or `fallback.mode: "client"`.
 
 ### BYOK (bring your own key)
 
-On the gateway path, set `byok: true` and supply the upstream key via `extraHeaders`:
+Set `byok: true` to forward your own upstream key via `extraHeaders`. BYOK is a gateway-path feature, so it forces the gateway path even for a run-catalog provider like DeepSeek (resume isn't available on that leg):
 
 ```ts
 streamText({

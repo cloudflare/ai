@@ -332,4 +332,96 @@ describe.skipIf(!RUN)("AI Gateway delegate E2E", () => {
 			})();
 		});
 	});
+
+	// --- Run-path catalog membership (issue #596) ---
+	// The pure run path (`env.AI.run`, no BYOK key) cleanly distinguishes what
+	// Cloudflare serves on the unified run catalog from what it does not:
+	//   • unified, recognized ⇒ 200 (with credits) / 402 "insufficient balance"
+	//   • recognized, BYOK-only ⇒ 402 err 2021 "not available via unified billing"
+	//   • off-catalog ⇒ 404 err 7003 "model not found"
+	// This membership drives the `runCatalog`/`billing` flags in the provider
+	// registry, so we probe it live. Guards the #596 regression (deepseek/* — a
+	// real unified-billing run model — was misclassified as an off-catalog BYOK
+	// slug and forced onto the gateway universal endpoint) AND the follow-up
+	// correction (the rest of the OpenAI-wire long tail is genuinely off-catalog:
+	// mistral/cerebras/… return 7003, so they must stay `runCatalog:false`). See
+	// the `/probe/run` endpoint in the fixture worker.
+	describe("run-path catalog membership (#596)", () => {
+		/** err 7003 / "model not found" ⇒ the run router does not know this slug. */
+		function isModelNotFound(status: number, body: string): boolean {
+			return (
+				status === 404 ||
+				/"code"\s*:\s*7003|model not found|no such model|model_not_found/i.test(body)
+			);
+		}
+
+		// On the unified run catalog (recognized by the run router — NOT 7003).
+		// deepseek-v4-pro is the exact model from #596; deepseek-chat is a
+		// recognized-but-BYOK deepseek id (402 err 2021, still not a 7003); openai
+		// is a headline control.
+		const ON_CATALOG = [
+			"deepseek/deepseek-v4-pro",
+			"deepseek/deepseek-chat",
+			"openai/gpt-4.1-mini",
+		];
+		for (const slug of ON_CATALOG) {
+			it(`${slug} is recognized on the run path (not model-not-found)`, (ctx) => {
+				if (!ready) return ctx.skip("server not ready");
+				return (async () => {
+					const data = await post("/probe/run", { slug });
+					if (data.status === 0) {
+						return ctx.skip(`probe threw: ${String(data.error).slice(0, 80)}`);
+					}
+					const body = String(data.bodySnippet ?? "");
+					expect(
+						isModelNotFound(data.status as number, body),
+						`expected ${slug} to be a known run-catalog model, got ` +
+							`[${data.status}] ${body.slice(0, 140)}`,
+					).toBe(false);
+				})();
+			});
+		}
+
+		// OFF the unified run catalog: the OpenAI-wire long tail we reclassified back
+		// to `runCatalog:false` (BYOK gateway path only). Canonical model ids return
+		// 7003 model-not-found on the run path — which is precisely why they must not
+		// default to `env.AI.run`. If Cloudflare later adds any to unified billing,
+		// this flips to a failure that prompts a registry reclassification.
+		const OFF_CATALOG = [
+			"mistral/mistral-large-latest",
+			"cerebras/llama-3.3-70b",
+			"fireworks/llama-v3p1-8b-instruct",
+		];
+		for (const slug of OFF_CATALOG) {
+			it(`${slug} is NOT on the run catalog (model-not-found)`, (ctx) => {
+				if (!ready) return ctx.skip("server not ready");
+				return (async () => {
+					const data = await post("/probe/run", { slug });
+					if (data.status === 0) {
+						return ctx.skip(`probe threw: ${String(data.error).slice(0, 80)}`);
+					}
+					const body = String(data.bodySnippet ?? "");
+					expect(
+						isModelNotFound(data.status as number, body),
+						`expected ${slug} to be off the run catalog (7003), got ` +
+							`[${data.status}] ${body.slice(0, 140)}`,
+					).toBe(true);
+				})();
+			});
+		}
+
+		it("an unknown model id IS model-not-found (probe sanity)", (ctx) => {
+			if (!ready) return ctx.skip("server not ready");
+			return (async () => {
+				const data = await post("/probe/run", {
+					slug: "deepseek/definitely-not-a-real-model-xyz",
+				});
+				if (data.status === 0) {
+					return ctx.skip(`probe threw: ${String(data.error).slice(0, 80)}`);
+				}
+				const body = String(data.bodySnippet ?? "");
+				expect(isModelNotFound(data.status as number, body)).toBe(true);
+			})();
+		});
+	});
 });

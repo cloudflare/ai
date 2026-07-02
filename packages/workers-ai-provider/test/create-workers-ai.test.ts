@@ -357,22 +357,28 @@ describe("createWorkersAI implicit gateway routing", () => {
 			workersai("dynamic/gemma-4-fallback", {
 				fallback: { mode: "client", models: ["openai/gpt-5-mini"] },
 			}),
-		).toThrow(/must be configured on the dynamic route/);
+		).toThrow(/gateway-delegate features/);
 		expect(() => workersai("dynamic/gemma-4-fallback", { transport: "gateway" })).toThrow(
-			/must be configured on the dynamic route/,
+			/gateway-delegate features/,
 		);
 		expect(() => workersai("dynamic/gemma-4-fallback", { resume: true })).toThrow(
-			/must be configured on the dynamic route/,
+			/gateway-delegate features/,
+		);
+		// The dynamic-route message still names the dynamic route specifically.
+		expect(() => workersai("dynamic/gemma-4-fallback", { resume: true })).toThrow(
+			/is an AI Gateway dynamic route/,
 		);
 	});
 
-	it("throws a helpful error for a catalog slug when providers are NOT configured", () => {
+	it("builds a plain Workers AI run model for a catalog slug when providers are NOT configured (#596)", () => {
 		const { binding } = makeBinding();
 		const workersai = createWorkersAI({ binding, gateway: { id: "default" } });
-		expect(() => workersai("openai/gpt-5-mini")).toThrow(
-			/third-party AI Gateway catalog model/,
-		);
-		expect(() => workersai("openai/gpt-5-mini")).toThrow(/workers-ai-provider\/openai/);
+		// Without provider plugins there's no gateway/BYOK routing to do, so a bare
+		// "<vendor>/<model>" id is treated as a Workers AI unified-billing run model
+		// (env.AI.run) — matching pre-3.2 behavior — rather than throwing.
+		const model = workersai("openai/gpt-5-mini");
+		expect(model.modelId).toBe("openai/gpt-5-mini");
+		expect(model.provider).toBe("workersai.chat");
 	});
 
 	it("treats `@cf/` ids as Workers AI even without providers (no routing)", () => {
@@ -438,5 +444,152 @@ describe("createWorkersAI implicit gateway routing", () => {
 		workersai.chat("openai/gpt-5-mini", { resume: false });
 
 		expect(true).toBe(true);
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Regression: deepseek/deepseek-v4-pro unified-billing run path (#596)
+//
+// `deepseek/deepseek-v4-pro` is a unified-billing model on the `env.AI.run`
+// catalog (verified live: 200). It *looks* like a `<provider>/<model>` catalog
+// slug, so 3.2.x routed it to the BYOK gateway universal endpoint (401). It must
+// default to the unified run path instead. (deepseek-chat, by contrast, is a
+// recognized-but-BYOK deepseek model — 402 "use BYOK" — reachable via `byok`.)
+// ---------------------------------------------------------------------------
+
+describe("createWorkersAI — deepseek/deepseek-v4-pro run path (#596)", () => {
+	it("without providers: builds a plain Workers AI run model (env.AI.run)", () => {
+		const { binding } = makeBinding();
+		const workersai = createWorkersAI({ binding, gateway: { id: "default" } });
+		const model = workersai("deepseek/deepseek-v4-pro");
+		// Passed straight through to env.AI.run — full slug preserved, no prefix strip.
+		expect(model.modelId).toBe("deepseek/deepseek-v4-pro");
+		expect(model.provider).toBe("workersai.chat");
+	});
+
+	it("with providers: dispatches through the unified run path, not the BYOK gateway", async () => {
+		const run = vi.fn(
+			async () =>
+				new Response(
+					JSON.stringify({
+						id: "chatcmpl-ds",
+						object: "chat.completion",
+						created: 0,
+						model: "deepseek-v4-pro",
+						choices: [
+							{
+								index: 0,
+								message: { role: "assistant", content: "Hello from deepseek" },
+								finish_reason: "stop",
+							},
+						],
+						usage: { prompt_tokens: 3, completion_tokens: 3, total_tokens: 6 },
+					}),
+					{ headers: { "content-type": "application/json", "cf-aig-log-id": "log-ds" } },
+				),
+		);
+		const gatewayRun = vi.fn(async () => new Response("unused"));
+		const binding = {
+			run,
+			gateway: vi.fn(() => ({ run: gatewayRun })),
+		} as unknown as Parameters<typeof createWorkersAI>[0] extends { binding: infer B }
+			? B
+			: never;
+
+		const workersai = createWorkersAI({
+			binding,
+			gateway: { id: "default" },
+			providers: [openaiWirePlugin],
+		});
+
+		let dispatch: { transport?: string } | undefined;
+		const result = await generateText({
+			model: workersai("deepseek/deepseek-v4-pro", {
+				onDispatch: (info) => {
+					dispatch = info;
+				},
+			}),
+			prompt: "Say hello.",
+		});
+
+		expect(result.text).toBe("Hello from deepseek");
+		// Unified-billing run path: the FULL slug goes to env.AI.run …
+		expect(run).toHaveBeenCalledTimes(1);
+		expect(run.mock.calls[0][0]).toBe("deepseek/deepseek-v4-pro");
+		// … and NOT the BYOK gateway universal (chat/completions) endpoint.
+		expect(gatewayRun).not.toHaveBeenCalled();
+		expect(dispatch?.transport).toBe("run");
+	});
+
+	it("without providers: defaults the run to the account gateway for a catalog slug", async () => {
+		// A bare "<vendor>/<model>" run model needs a gateway (third-party unified
+		// billing routes through one). Even with no `gateway` configured, the run
+		// path must default to "default" — otherwise env.AI.run gets no gateway and
+		// unified billing never engages.
+		const run = vi.fn(async () => ({ response: "hi from deepseek" }));
+		const binding = { run } as unknown as Parameters<typeof createWorkersAI>[0] extends {
+			binding: infer B;
+		}
+			? B
+			: never;
+		const workersai = createWorkersAI({ binding });
+
+		await generateText({
+			model: workersai("deepseek/deepseek-v4-pro"),
+			prompt: "hi",
+		});
+
+		expect(run).toHaveBeenCalledTimes(1);
+		expect(run.mock.calls[0][0]).toBe("deepseek/deepseek-v4-pro");
+		expect(run.mock.calls[0][2]).toMatchObject({ gateway: { id: "default" } });
+	});
+
+	it("without providers: rejects delegate-only options instead of silently dropping them", () => {
+		const { binding } = makeBinding();
+		const workersai = createWorkersAI({ binding, gateway: { id: "default" } });
+		// byok/transport/fallback/resume can't be honored on the bare run path — a
+		// silent drop would send a BYOK request out on unified billing. Throw.
+		expect(() => workersai("deepseek/deepseek-chat", { byok: true })).toThrow(
+			/gateway-delegate features/,
+		);
+		expect(() => workersai("deepseek/deepseek-v4-pro", { transport: "gateway" })).toThrow(
+			/no `providers` are configured/,
+		);
+		expect(() =>
+			workersai("deepseek/deepseek-v4-pro", {
+				fallback: { mode: "client", models: ["openai/gpt-4.1-mini"] },
+			}),
+		).toThrow(/gateway-delegate features/);
+	});
+
+	it("still allows explicit BYOK via the gateway path", () => {
+		const { binding, gwCalls } = (() => {
+			const gwCalls: unknown[] = [];
+			const b = {
+				run: vi.fn(async () => new Response("ok")),
+				gateway: vi.fn(() => ({
+					run: vi.fn(async (entries: unknown) => {
+						gwCalls.push(entries);
+						return new Response("ok");
+					}),
+				})),
+			} as unknown as Parameters<typeof createWorkersAI>[0] extends { binding: infer B }
+				? B
+				: never;
+			return { binding: b, gwCalls };
+		})();
+
+		const workersai = createWorkersAI({
+			binding,
+			gateway: { id: "default" },
+			providers: [openaiWirePlugin],
+		});
+		// byok opts into the gateway path even though deepseek defaults to run.
+		const model = workersai("deepseek/deepseek-chat", {
+			byok: true,
+			extraHeaders: { authorization: "Bearer real-key" },
+		});
+		expect(model.modelId).toBe("deepseek-chat");
+		void gwCalls;
 	});
 });

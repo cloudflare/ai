@@ -16,10 +16,21 @@
  *
  * Slugs mirror the AI Gateway provider directory
  * (developers.cloudflare.com/ai-gateway/usage/providers/); endpoint transforms
- * mirror `ai-gateway-provider`'s provider table. `runCatalog` / `billing` flags
- * follow the documented unified-billing list (OpenAI, Anthropic, Google AI
- * Studio, Google Vertex, xAI/Grok, Groq) and are otherwise conservative — the
- * e2e suite confirms them live, since resume is undocumented upstream.
+ * mirror `ai-gateway-provider`'s provider table.
+ *
+ * `runCatalog` marks providers whose models Cloudflare actually serves on the
+ * unified-billing `env.AI.run` path (resumable, `cf-aig-run-id`). Membership is
+ * NOT "any OpenAI-wire provider" — it's empirically what the run router accepts:
+ * the headline unified providers (OpenAI, Anthropic, Google AI Studio, xAI, Groq),
+ * the DashScope/MiniMax run-only providers, and `deepseek/*` (issue #596). Within
+ * a run-catalog provider, unified-billing eligibility is still decided per-MODEL
+ * (e.g. `deepseek/deepseek-v4-pro` is unified while `deepseek/deepseek-chat`
+ * returns a clear "use BYOK" signal). Everything else — the OpenAI-wire long tail
+ * (mistral, perplexity, cerebras, openrouter, fireworks), the provider-native
+ * `wireFormat`-less providers, and Vertex — is `runCatalog:false` and reached via
+ * the BYOK gateway path. `env.AI.run` distinguishes the two cleanly: `7003
+ * model-not-found` for off-catalog slugs vs `2021 use-BYOK` for a recognized
+ * BYOK-only model. All of this is guarded live by the e2e run-path membership probe.
  */
 
 /** Response wire format the slug delegate can parse with a built-in `@ai-sdk/*` provider. */
@@ -242,18 +253,39 @@ export const GATEWAY_PROVIDERS: GatewayProviderInfo[] = [
 		transformEndpoint: hostStrip(VERTEX_HOST),
 	},
 
-	// ---- OpenAI-compatible long tail (gateway path, BYOK) ----
+	// ---- DeepSeek: OpenAI-wire long-tail provider that IS on the unified run catalog ----
+	// `deepseek/*` is served on the unified-billing run path (`env.AI.run`), unlike
+	// the rest of the OpenAI-wire long tail below (which the run router does not
+	// recognize). Eligibility is per-MODEL: `deepseek/deepseek-v4-pro` bills unified
+	// (#596), while `deepseek/deepseek-chat` returns "not available via unified
+	// billing; use BYOK" — a clear signal the caller answers with `byok`. So the run
+	// path is the correct DEFAULT (matches pre-3.2, unblocks #596); BYOK stays
+	// reachable per call via `transport:"gateway"` / `byok`, and
+	// `baseURL`/`transformEndpoint` keep that forced gateway path working.
+	// Verified live: v4-pro ⇒ 200, deepseek-chat ⇒ 402 use-BYOK (e2e probe).
 	{
 		resolverKey: "deepseek",
 		gatewayProviderId: "deepseek",
 		wireFormat: "openai",
 		baseURL: "https://api.deepseek.com",
-		runCatalog: false,
-		billing: "byok",
+		runCatalog: true,
+		billing: "unified",
 		authHeaders: ["authorization"],
 		hostPattern: DEEPSEEK_HOST,
 		transformEndpoint: hostStrip(DEEPSEEK_HOST),
 	},
+
+	// ---- OpenAI-compatible long tail: BYOK gateway path only ----
+	// These are OpenAI-wire providers reachable through the native gateway
+	// directory, but NOT on Cloudflare's unified-billing run catalog: `env.AI.run`
+	// returns `7003 model-not-found` for their canonical model ids (mistral,
+	// cerebras, openrouter, fireworks), and perplexity is recognized-but-BYOK
+	// (`2021 "use BYOK"`). None can be run unified, so they route through the BYOK
+	// gateway path (`env.AI.gateway().run`, no resume) — supply your provider key
+	// via `extraHeaders` + `byok`. `baseURL`/`transformEndpoint` shape that path.
+	// (Empirically classified by the e2e run-path membership probe; if Cloudflare
+	// adds any of these to unified billing, flip `runCatalog`/`billing` and the
+	// probe will confirm.)
 	{
 		resolverKey: "mistral",
 		gatewayProviderId: "mistral",
@@ -299,8 +331,6 @@ export const GATEWAY_PROVIDERS: GatewayProviderInfo[] = [
 		transformEndpoint: hostStrip(OPENROUTER_HOST),
 	},
 	{
-		// Fireworks is OpenAI-compatible. Present on ai-gateway-provider (#409) but
-		// not the current provider directory — treat as BYOK long-tail.
 		resolverKey: "fireworks",
 		gatewayProviderId: "fireworks",
 		wireFormat: "openai",

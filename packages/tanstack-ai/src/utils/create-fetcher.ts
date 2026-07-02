@@ -470,17 +470,35 @@ function buildBindingInputs(body: Record<string, unknown>): Record<string, unkno
 }
 
 /**
+ * True when a model id is a `"<vendor>/<model>"` third-party AI Gateway catalog
+ * slug (e.g. `deepseek/deepseek-v4-pro`) rather than a `@cf/*` Workers AI model
+ * or a `dynamic/*` route. These are billed through unified billing and MUST run
+ * through an AI Gateway, so `env.AI.run` needs a gateway for them.
+ */
+function isCatalogSlug(model: unknown): model is string {
+	return (
+		typeof model === "string" &&
+		!model.startsWith("@") &&
+		!model.startsWith("dynamic/") &&
+		model.includes("/")
+	);
+}
+
+/**
  * Creates a fetch function that intercepts OpenAI SDK requests and translates them
  * to Workers AI binding calls (env.AI.run). This allows the WorkersAiTextAdapter
  * to use the OpenAI SDK against a plain Workers AI binding.
  *
  * Two transports:
  *   - **Plain binding** (default): `binding.run(model, inputs)` — no run-id, not
- *     resumable.
- *   - **Run path** (when `options.gateway` is set): `binding.run(model, inputs,
- *     { gateway, returnRawResponse })` — surfaces `cf-aig-run-id`, so the stream
- *     can be wrapped with the resume engine. Works for `@cf/*` models and
- *     `"<provider>/<model>"` catalog slugs alike.
+ *     resumable. Used for `@cf/*` models with no gateway configured.
+ *   - **Run path** (when `options.gateway` is set, OR the model is a third-party
+ *     `"<provider>/<model>"` catalog slug): `binding.run(model, inputs,
+ *     { gateway, returnRawResponse })`. Third-party unified-billing models must
+ *     route through a gateway, so a catalog slug with no configured gateway
+ *     falls back to the account `"default"` gateway. Resume (`cf-aig-run-id`
+ *     wrapping) only engages when a gateway was explicitly configured — the
+ *     catalog auto-default is a routing concern, not a resume opt-in.
  *
  * NOTE: The `input` URL parameter is intentionally ignored. The model name and all
  * request parameters are extracted from the JSON body, matching Workers AI's
@@ -506,6 +524,14 @@ export function createWorkersAiBindingFetch(
 		const stream = body.stream as boolean | undefined;
 		const inputs = buildBindingInputs(body);
 
+		// A third-party catalog slug needs a gateway even when none was configured
+		// (unified billing routes through one) — default it to the account gateway.
+		// An explicitly configured gateway always wins and is the only case that
+		// opts into resume.
+		const explicitGateway = options?.gateway;
+		const effectiveGateway = explicitGateway ?? (isCatalogSlug(model) ? "default" : undefined);
+		const resumeEnabled = !!explicitGateway && options?.resume !== false;
+
 		// Context for the gpt-oss forced-tool-call salvage on the non-streaming
 		// (graceful-degradation) paths. See cloudflare/ai#560.
 		const salvageContext: SalvageContext = {
@@ -522,13 +548,13 @@ export function createWorkersAiBindingFetch(
 				},
 			});
 
-		// --- Run path (gateway set): resumable, surfaces cf-aig-run-id ---
-		if (options?.gateway) {
+		// --- Run path (gateway set or catalog slug): surfaces cf-aig-run-id ---
+		if (effectiveGateway) {
 			const runOptions: Record<string, unknown> = {
-				gateway: { id: options.gateway },
+				gateway: { id: effectiveGateway },
 				returnRawResponse: true,
 			};
-			if (options.extraHeaders) runOptions.extraHeaders = options.extraHeaders;
+			if (options?.extraHeaders) runOptions.extraHeaders = options.extraHeaders;
 			if (signal) runOptions.signal = signal;
 
 			let raw: Response;
@@ -551,19 +577,19 @@ export function createWorkersAiBindingFetch(
 
 			if (isStreamResponse) {
 				let byteStream = raw.body as ReadableStream<Uint8Array>;
-				if (options.resume !== false && runId) {
+				if (resumeEnabled && runId) {
 					// Wrap the RAW run-path bytes with the resume engine BEFORE the
 					// SSE transform, so the engine's event-offset bookkeeping (it
 					// counts `\n\n` on the raw stream) stays correct.
 					byteStream = createResumableStream({
 						binding: binding as unknown as Ai,
-						gateway: options.gateway,
+						gateway: effectiveGateway,
 						runId,
 						initial: byteStream,
-						onResumeExpired: options.onResumeExpired,
+						onResumeExpired: options?.onResumeExpired,
 						signal,
 					});
-				} else if (options.resume && !runId) {
+				} else if (options?.resume && !runId) {
 					if (!warnedNoRunId) {
 						warnedNoRunId = true;
 						console.warn(

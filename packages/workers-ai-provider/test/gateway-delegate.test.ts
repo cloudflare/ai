@@ -121,6 +121,30 @@ describe("selectTransport", () => {
 	it("throws when resume:true is requested for a non-run-catalog provider", () => {
 		expect(() => selectTransport({}, true, false)).toThrow(/resume:true is unavailable/);
 	});
+
+	// byok forwards the caller's own key — a gateway-path-only feature
+	it("routes byok through the gateway path with resume disabled", () => {
+		const s = selectTransport({ byok: true }, false);
+		expect(s.transport).toBe("gateway");
+		expect(s.resumeEnabled).toBe(false);
+		expect(s.warnings).toHaveLength(0);
+	});
+
+	it('throws when byok is combined with transport:"run"', () => {
+		expect(() => selectTransport({ byok: true, transport: "run" }, false)).toThrow(
+			/cannot forward a BYOK key/,
+		);
+	});
+
+	it("throws when byok is combined with resume:true", () => {
+		expect(() => selectTransport({ byok: true }, true)).toThrow(/byok cannot provide resume/);
+	});
+
+	it("throws when byok targets a run-path-only provider (no gateway path)", () => {
+		expect(() => selectTransport({ byok: true }, false, true, false)).toThrow(
+			/byok is unavailable/,
+		);
+	});
 });
 
 // ---------------------------------------------------------------------------
@@ -440,7 +464,8 @@ describe("createGatewayDelegate", () => {
 		const { binding, gwCalls } = makeBinding();
 		const { plugin, getFetch } = capturePlugin("openai");
 		const wai = createGatewayDelegate({ binding, gateway: "gw-1", providers: [plugin] });
-		// deepseek is BYOK (gateway path only)
+		// `byok` forces the gateway path (forwarding the caller's key), even for a
+		// run-catalog provider like deepseek that otherwise defaults to the run path.
 		wai("deepseek/deepseek-chat", {
 			byok: true,
 			extraHeaders: { authorization: "Bearer real" },
