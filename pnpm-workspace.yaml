@@ -60,4 +60,4 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/perplexity@4.0.4'
   - '@ai-sdk/xai@4.0.4'
 patchedDependencies:
-  "@ai-sdk/google-vertex": patches/@ai-sdk__google-vertex.patch
+  '@ai-sdk/google-vertex@^5': patches/@ai-sdk__google-vertex.patch

@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  '@ai-sdk/google-vertex': 5015d8c7ff40e99b6b6d204430f0750dda43beda4beda4e6817b38cd2b057184
+  '@ai-sdk/google-vertex@^5': 7af1853481d7b74666d27cebbed5fce392545d6167e30bd53188c8c439aa77d0
 
 importers:
 
@@ -1671,7 +1671,7 @@ importers:
         version: 4.0.6(zod@4.4.3)
       '@ai-sdk/google-vertex':
         specifier: ^5.0.8
-        version: 5.0.8(patch_hash=5015d8c7ff40e99b6b6d204430f0750dda43beda4beda4e6817b38cd2b057184)(zod@4.4.3)
+        version: 5.0.8(patch_hash=7af1853481d7b74666d27cebbed5fce392545d6167e30bd53188c8c439aa77d0)(zod@4.4.3)
       '@ai-sdk/groq':
         specifier: ^4.0.3
         version: 4.0.3(zod@4.4.3)
@@ -6696,7 +6696,7 @@ snapshots:
       '@vercel/oidc': 3.2.0
       zod: 4.4.3
 
-  '@ai-sdk/google-vertex@5.0.8(patch_hash=5015d8c7ff40e99b6b6d204430f0750dda43beda4beda4e6817b38cd2b057184)(zod@4.4.3)':
+  '@ai-sdk/google-vertex@5.0.8(patch_hash=7af1853481d7b74666d27cebbed5fce392545d6167e30bd53188c8c439aa77d0)(zod@4.4.3)':
     dependencies:
       '@ai-sdk/anthropic': 4.0.5(zod@4.4.3)
       '@ai-sdk/google': 4.0.6(zod@4.4.3)
