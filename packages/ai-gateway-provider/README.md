@@ -78,6 +78,21 @@ const { text } = await generateText({
 });
 ```
 
+If you're routing a model that supports structured outputs through
+`createUnified()`, enable them explicitly:
+
+```typescript
+const unified = createUnified({
+	apiKey: "{UPSTREAM_PROVIDER_API_KEY}",
+	supportsStructuredOutputs: true,
+});
+```
+
+`createUnified()` wraps `@ai-sdk/openai-compatible`, so structured outputs stay
+opt-in. Without `supportsStructuredOutputs: true`, schema output can be downgraded
+to plain JSON mode instead of sending the full JSON schema to the upstream
+provider.
+
 ## Automatic Fallback Example
 
 ```typescript
