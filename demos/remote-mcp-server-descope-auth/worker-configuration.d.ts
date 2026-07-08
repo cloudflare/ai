@@ -3,8 +3,8 @@
 declare namespace Cloudflare {
 	interface Env {
 		OAUTH_KV: KVNamespace;
-		DESCOPE_PROJECT_ID: string;
-		DESCOPE_MANAGEMENT_KEY: string;
+		DESCOPE_CLIENT_ID: string;
+		DESCOPE_CLIENT_SECRET: string;
 		COOKIE_ENCRYPTION_KEY: string;
 		MCP_OBJECT: DurableObjectNamespace<import("./src/index").MyMCP>;
 		OAUTH_PROVIDER: import("@cloudflare/workers-oauth-provider").OAuthHelpers;

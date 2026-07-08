@@ -7,13 +7,14 @@
 	"name": "remote-mcp-server-bearer-auth",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-03-10",
+	"compatibility_flags": ["nodejs_compat"],
 	/**
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
 	 *
 	 * Commands to set secrets:
-	 * npx wrangler secret put DESCOPE_PROJECT_ID
-	 * npx wrangler secret put DESCOPE_MANAGEMENT_KEY
+	 * npx wrangler secret put DESCOPE_CLIENT_ID
+	 * npx wrangler secret put DESCOPE_CLIENT_SECRET
 	 * npx wrangler secret put COOKIE_ENCRYPTION_KEY
 	 */
 	"migrations": [

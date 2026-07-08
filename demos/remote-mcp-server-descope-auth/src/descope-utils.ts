@@ -1,50 +1,56 @@
 /**
- * Constructs an authorization URL for Descope OAuth.
+ * Constructs an authorization URL for Descope OAuth (Inbound App).
  *
  * @param {Object} options
- * @param {string} options.project_id - The Descope project ID.
+ * @param {string} options.client_id - The Descope Inbound App Client ID.
  * @param {string} options.redirect_uri - The redirect URI of the application.
  * @param {string} [options.state] - The state parameter.
  *
  * @returns {string} The authorization URL.
  */
 export function getDescopeAuthorizeUrl({
-	project_id,
+	client_id,
 	redirect_uri,
 	state,
+	scope = "openid profile email",
 }: {
-	project_id: string;
+	client_id: string;
 	redirect_uri: string;
 	state?: string;
+	scope?: string;
 }) {
 	const upstream = new URL("https://api.descope.com/oauth2/v1/apps/authorize");
-	upstream.searchParams.set("client_id", project_id);
+	upstream.searchParams.set("client_id", client_id);
 	upstream.searchParams.set("redirect_uri", redirect_uri);
 	upstream.searchParams.set("response_type", "code");
+	// The `openid` scope is required for the /apps/userinfo endpoint to accept the
+	// resulting access token; `profile`/`email` add the name/email claims.
+	// These scopes must be pre-defined on the Inbound App in the Descope Console.
+	upstream.searchParams.set("scope", scope);
 	if (state) upstream.searchParams.set("state", state);
 	return upstream.href;
 }
 
 /**
- * Fetches an authorization token from Descope.
+ * Fetches an authorization token from Descope (Inbound App token exchange).
  *
  * @param {Object} options
- * @param {string} options.project_id - The Descope project ID.
- * @param {string} options.management_key - The Descope management key.
+ * @param {string} options.client_id - The Descope Inbound App Client ID.
+ * @param {string} options.client_secret - The Descope Inbound App Client Secret.
  * @param {string} options.code - The authorization code.
  * @param {string} options.redirect_uri - The redirect URI of the application.
  *
  * @returns {Promise<[string, null] | [null, Response]>} A promise that resolves to an array containing the access token or an error response.
  */
 export async function fetchDescopeAuthToken({
-	project_id,
-	management_key,
+	client_id,
+	client_secret,
 	code,
 	redirect_uri,
 }: {
 	code: string | undefined;
-	project_id: string;
-	management_key: string;
+	client_id: string;
+	client_secret: string;
 	redirect_uri: string;
 }): Promise<[string, null] | [null, Response]> {
 	if (!code) {
@@ -52,14 +58,15 @@ export async function fetchDescopeAuthToken({
 	}
 
 	const resp = await fetch("https://api.descope.com/oauth2/v1/apps/token", {
-		body: JSON.stringify({
+		body: new URLSearchParams({
+			client_id,
+			client_secret,
 			code,
 			grant_type: "authorization_code",
 			redirect_uri,
 		}),
 		headers: {
-			Authorization: `Bearer ${project_id}:${management_key}`,
-			"Content-Type": "application/json",
+			"Content-Type": "application/x-www-form-urlencoded",
 		},
 		method: "POST",
 	});
