@@ -1,5 +1,17 @@
 # workers-ai-provider
 
+## 4.0.0
+
+### Major Changes
+
+- [#601](https://github.com/cloudflare/ai/pull/601) [`7a6f8dd`](https://github.com/cloudflare/ai/commit/7a6f8ddac6c38483da023201303b53d10c266860) Thanks [@OskarLebuda](https://github.com/OskarLebuda)! - Add support for AI SDK 7
+
+  Bumps peer dependencies to require `ai@^7` and `@ai-sdk/provider@^4`. This is a breaking change for users on AI SDK 6, who should stay on the previous major version of these packages.
+
+### Patch Changes
+
+- [#602](https://github.com/cloudflare/ai/pull/602) [`2e64811`](https://github.com/cloudflare/ai/commit/2e648116daa6a2e979508157f31274956ffbac26) Thanks [@aninibread](https://github.com/aninibread)! - Docs: point AI Search users to the new dedicated `ai-search-provider` package for Cloudflare's new `ai_search` and `ai_search_namespaces` Workers bindings. `createAISearch` and `createAutoRAG` in this package continue to wrap the legacy `AutoRAG` binding, unchanged.
+
 ## 3.3.1
 
 ### Patch Changes

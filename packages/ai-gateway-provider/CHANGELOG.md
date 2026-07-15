@@ -1,5 +1,13 @@
 # ai-gateway-provider
 
+## 4.0.0
+
+### Major Changes
+
+- [#601](https://github.com/cloudflare/ai/pull/601) [`7a6f8dd`](https://github.com/cloudflare/ai/commit/7a6f8ddac6c38483da023201303b53d10c266860) Thanks [@OskarLebuda](https://github.com/OskarLebuda)! - Add support for AI SDK 7
+
+  Bumps peer dependencies to require `ai@^7` and `@ai-sdk/provider@^4`. This is a breaking change for users on AI SDK 6, who should stay on the previous major version of these packages.
+
 ## 3.2.0
 
 ### Minor Changes
@@ -8,24 +16,24 @@
   building are now shared with the `workers-ai-provider` AI Gateway delegate
   (bundled inline — no new dependency), so the two stay in lockstep.
 
-    - `AiGatewayOptions` gains two universal-endpoint controls: `byokAlias`
-      (`cf-aig-byok-alias`, select a stored BYOK key by alias) and `zdr`
-      (`cf-aig-zdr`, per-request Zero Data Retention override for Unified Billing).
-    - Cache controls now emit the current `cf-aig-cache-ttl` / `cf-aig-skip-cache`
-      header names instead of the upstream-deprecated `cf-cache-ttl` / `cf-skip-cache`.
-    - New opt-in **resumable streaming** on the binding/run path (**coming soon** —
-      not generally available yet while the AI Gateway resume backend rolls out;
-      treat as experimental): pass `resume`
-      (`{ binding: env.AI, gateway, onResumeExpired?, maxReconnects? }`) and a
-      streaming run that surfaces a `cf-aig-run-id` will transparently reconnect on a
-      transient mid-stream drop, reusing the same resumable-stream engine as the
-      `workers-ai-provider` delegate. No-op on the REST/API-key path and on
-      non-streaming calls.
-    - The misspelled `retries` option type is renamed `AiGatewayReties` →
-      `AiGatewayRetries`; the old name stays exported as a deprecated alias, so this
-      is non-breaking.
+  - `AiGatewayOptions` gains two universal-endpoint controls: `byokAlias`
+    (`cf-aig-byok-alias`, select a stored BYOK key by alias) and `zdr`
+    (`cf-aig-zdr`, per-request Zero Data Retention override for Unified Billing).
+  - Cache controls now emit the current `cf-aig-cache-ttl` / `cf-aig-skip-cache`
+    header names instead of the upstream-deprecated `cf-cache-ttl` / `cf-skip-cache`.
+  - New opt-in **resumable streaming** on the binding/run path (**coming soon** —
+    not generally available yet while the AI Gateway resume backend rolls out;
+    treat as experimental): pass `resume`
+    (`{ binding: env.AI, gateway, onResumeExpired?, maxReconnects? }`) and a
+    streaming run that surfaces a `cf-aig-run-id` will transparently reconnect on a
+    transient mid-stream drop, reusing the same resumable-stream engine as the
+    `workers-ai-provider` delegate. No-op on the REST/API-key path and on
+    non-streaming calls.
+  - The misspelled `retries` option type is renamed `AiGatewayReties` →
+    `AiGatewayRetries`; the old name stays exported as a deprecated alias, so this
+    is non-breaking.
 
-    Existing behavior is otherwise unchanged.
+  Existing behavior is otherwise unchanged.
 
 ## 3.1.3
 
@@ -41,11 +49,11 @@
 
 - [#457](https://github.com/cloudflare/ai/pull/457) [`cc94a06`](https://github.com/cloudflare/ai/commit/cc94a06ca85603e473f41cc12ed83f53cbe9e136) Thanks [@threepointone](https://github.com/threepointone)! - Fix request cancellation by propagating `abortSignal` to outbound network calls.
 
-    **ai-gateway-provider**: Pass `abortSignal` to the `fetch` call (API path) and to `binding.run()` (binding path) so that cancelled requests are properly aborted.
+  **ai-gateway-provider**: Pass `abortSignal` to the `fetch` call (API path) and to `binding.run()` (binding path) so that cancelled requests are properly aborted.
 
-    **workers-ai-provider**: Pass `abortSignal` to `binding.run()` for chat, embedding, and image models, matching the existing behavior in transcription, speech, and reranking models.
+  **workers-ai-provider**: Pass `abortSignal` to `binding.run()` for chat, embedding, and image models, matching the existing behavior in transcription, speech, and reranking models.
 
-    **@cloudflare/tanstack-ai**: Pass `signal` through to `binding.run()` in both `createGatewayFetch` (AI Gateway binding path) and `createWorkersAiBindingFetch` (Workers AI binding path).
+  **@cloudflare/tanstack-ai**: Pass `signal` through to `binding.run()` in both `createGatewayFetch` (AI Gateway binding path) and `createWorkersAiBindingFetch` (Workers AI binding path).
 
 ## 3.1.1
 
@@ -143,7 +151,7 @@
 
 - [#256](https://github.com/cloudflare/ai/pull/256) [`a538901`](https://github.com/cloudflare/ai/commit/a5389013b9a512707fb1de1501a1547fce20c014) Thanks [@jahands](https://github.com/jahands)! - feat: Migrate to AI SDK v5
 
-    This updates workers-ai-provider and ai-gateway-provider to use the AI SDK v5. Please refer to the official migration guide to migrate your code https://ai-sdk.dev/docs/migration-guides/migration-guide-5-0
+  This updates workers-ai-provider and ai-gateway-provider to use the AI SDK v5. Please refer to the official migration guide to migrate your code https://ai-sdk.dev/docs/migration-guides/migration-guide-5-0
 
 ### Patch Changes
 
