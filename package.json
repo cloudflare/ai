@@ -1,0 +1,29 @@
+{
+  "name": "repro-ai-gateway-concurrency-620",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "vite dev",
+    "build": "vite build",
+    "repro:node": "node repro.mjs",
+    "deploy": "vite build && wrangler deploy --temporary"
+  },
+  "dependencies": {
+    "agents": "0.17.1",
+    "ai": "6.0.208",
+    "ai-gateway-provider": "3.2.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.40.2",
+    "@cloudflare/workers-types": "^4.20260612.1",
+    "@types/node": "^25.9.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "wrangler": "4.105.0"
+  }
+}

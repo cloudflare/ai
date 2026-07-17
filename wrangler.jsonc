@@ -1,0 +1,14 @@
+{
+  "name": "repro-ai-gateway-concurrency-620",
+  "main": "src/server.ts",
+  "compatibility_date": "2026-07-17",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/agents/*"]
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "REPRO_AGENT", "class_name": "ReproAgent" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ReproAgent"] }]
+}
