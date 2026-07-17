@@ -8,12 +8,12 @@ import { createWorkersAI, createAISearch } from "../../../../../src/index";
 import {
 	generateText,
 	streamText,
-	stepCountIs,
+	isStepCount,
 	Output,
 	embedMany,
 	generateImage,
-	experimental_transcribe as transcribe,
-	experimental_generateSpeech as generateSpeech,
+	transcribe,
+	generateSpeech,
 	rerank,
 } from "ai";
 import { z } from "zod/v4";
@@ -143,7 +143,7 @@ export default {
 								}),
 							},
 						},
-						stopWhen: stepCountIs(2),
+						stopWhen: isStepCount(2),
 					});
 
 					return jsonResponse({
@@ -177,7 +177,7 @@ export default {
 								}),
 							},
 						},
-						stopWhen: stepCountIs(4),
+						stopWhen: isStepCount(4),
 					});
 
 					const toolCallCount = result.steps.reduce(

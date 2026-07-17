@@ -1,0 +1,59 @@
+{
+	"name": "ai-search-provider",
+	"version": "0.0.0",
+	"description": "AI Search Provider for the AI SDK",
+	"keywords": [
+		"ai",
+		"ai-sdk",
+		"cloudflare",
+		"provider",
+		"rag",
+		"search",
+		"workers"
+	],
+	"bugs": {
+		"url": "https://github.com/cloudflare/ai/issues"
+	},
+	"license": "MIT",
+	"author": "Cloudflare Inc.",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/cloudflare/ai.git"
+	},
+	"files": [
+		"dist",
+		"src",
+		"README.md",
+		"package.json"
+	],
+	"type": "module",
+	"main": "dist/index.mjs",
+	"types": "dist/index.d.mts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.mts",
+			"import": "./dist/index.mjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"scripts": {
+		"build": "rm -rf dist && tsdown --config tsdown.config.ts",
+		"format": "oxfmt --write .",
+		"test:ci": "vitest --watch=false",
+		"test:e2e": "vitest --config vitest.e2e.config.ts --watch=false",
+		"test": "vitest",
+		"type-check": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@ai-sdk/provider": "^3.0.10",
+		"@cloudflare/workers-types": "^4.20260628.1",
+		"ai": "^6.0.204",
+		"tsdown": "^0.22.3",
+		"typescript": "6.0.3",
+		"vitest": "~4.1.9"
+	},
+	"peerDependencies": {
+		"@ai-sdk/provider": "^3.0.0",
+		"ai": "^6.0.0"
+	}
+}

@@ -1,4 +1,4 @@
-import type { LanguageModelV3FinishReason } from "@ai-sdk/provider";
+import type { LanguageModelV4FinishReason } from "@ai-sdk/provider";
 import { describe, expect, it } from "vitest";
 import { mapWorkersAIFinishReason } from "../src/map-workersai-finish-reason";
 
@@ -63,7 +63,7 @@ describe("mapWorkersAIFinishReason", () => {
 	});
 
 	describe("return type validation", () => {
-		it("should return a valid LanguageModelV3FinishReason type", () => {
+		it("should return a valid LanguageModelV4FinishReason type", () => {
 			const validUnifiedReasons = ["stop", "length", "tool-calls", "error", "other"];
 
 			// Test that all our mapped unified values are valid
@@ -80,7 +80,7 @@ describe("mapWorkersAIFinishReason", () => {
 
 	describe("comprehensive mapping test", () => {
 		it("should handle all expected inputs correctly", () => {
-			const testCases: Array<[string | null | undefined, LanguageModelV3FinishReason]> = [
+			const testCases: Array<[string | null | undefined, LanguageModelV4FinishReason]> = [
 				["stop", { unified: "stop", raw: "stop" }],
 				["length", { unified: "length", raw: "length" }],
 				["model_length", { unified: "length", raw: "model_length" }],

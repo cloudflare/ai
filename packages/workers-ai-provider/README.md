@@ -171,7 +171,7 @@ Images can be provided as `Uint8Array`, base64 strings, or data URLs. Multiple i
 ## Tool calling
 
 ```ts
-import { generateText, stepCountIs } from "ai";
+import { generateText, isStepCount } from "ai";
 import { z } from "zod";
 
 const { text } = await generateText({
@@ -184,7 +184,7 @@ const { text } = await generateText({
 			execute: async ({ city }) => ({ city, temperature: 18, condition: "Cloudy" }),
 		},
 	},
-	stopWhen: stepCountIs(2),
+	stopWhen: isStepCount(2),
 });
 ```
 
@@ -309,6 +309,8 @@ const { results } = await rerank({
 ## AI Search
 
 [AI Search](https://developers.cloudflare.com/ai-search/) is Cloudflare's managed RAG service. Connect your data and query it with natural language.
+
+> For Cloudflare's new `ai_search_namespaces` Workers binding — upload files to AI Search for indexing, then search or chat over them — use the dedicated [`ai-search-provider`](../ai-search-provider/README.md) package. The `createAISearch` shown here wraps the legacy `AutoRAG` binding.
 
 ```jsonc
 // wrangler.jsonc

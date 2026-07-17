@@ -508,7 +508,7 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 					"catalog",
 				);
 			}
-			// The delegate returns a `LanguageModelV3` built by the configured plugin.
+			// The delegate returns a `LanguageModelV4` built by the configured plugin.
 			// It's structurally compatible with the AI SDK consumers this provider is
 			// used with; the cast keeps the public return type unchanged.
 			return getDelegate(modelId)(

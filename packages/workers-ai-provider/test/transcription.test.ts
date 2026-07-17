@@ -1,5 +1,5 @@
 import { APICallError } from "@ai-sdk/provider";
-import { experimental_transcribe as transcribe } from "ai";
+import { transcribe } from "ai";
 import { describe, expect, it } from "vitest";
 import { createWorkersAI } from "../src/index";
 

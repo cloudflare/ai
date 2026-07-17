@@ -1,7 +1,7 @@
 import type {
-	EmbeddingModelV3,
-	EmbeddingModelV3CallOptions,
-	EmbeddingModelV3Result,
+	EmbeddingModelV4,
+	EmbeddingModelV4CallOptions,
+	EmbeddingModelV4Result,
 } from "@ai-sdk/provider";
 import { TooManyEmbeddingValuesForCallError } from "@ai-sdk/provider";
 import { normalizeBindingError } from "./workersai-error";
@@ -24,8 +24,8 @@ export type WorkersAIEmbeddingSettings = {
 	[key: string]: unknown;
 };
 
-export class WorkersAIEmbeddingModel implements EmbeddingModelV3 {
-	readonly specificationVersion = "v3";
+export class WorkersAIEmbeddingModel implements EmbeddingModelV4 {
+	readonly specificationVersion = "v4";
 	readonly modelId: EmbeddingModels;
 	private readonly config: WorkersAIEmbeddingConfig;
 	private readonly settings: WorkersAIEmbeddingSettings;
@@ -56,7 +56,7 @@ export class WorkersAIEmbeddingModel implements EmbeddingModelV3 {
 	async doEmbed({
 		values,
 		abortSignal,
-	}: EmbeddingModelV3CallOptions): Promise<EmbeddingModelV3Result> {
+	}: EmbeddingModelV4CallOptions): Promise<EmbeddingModelV4Result> {
 		if (values.length > this.maxEmbeddingsPerCall) {
 			throw new TooManyEmbeddingValuesForCallError({
 				maxEmbeddingsPerCall: this.maxEmbeddingsPerCall,

@@ -1,4 +1,4 @@
-import type { ImageModelV3, SharedV3Warning } from "@ai-sdk/provider";
+import type { ImageModelV4, SharedV4Warning } from "@ai-sdk/provider";
 import { normalizeBindingError } from "./workersai-error";
 import type { WorkersAIImageSettings } from "./workersai-image-settings";
 import type { ImageGenerationModels } from "./workersai-models";
@@ -9,8 +9,8 @@ export type WorkersAIImageConfig = {
 	gateway?: GatewayOptions;
 };
 
-export class WorkersAIImageModel implements ImageModelV3 {
-	readonly specificationVersion = "v3";
+export class WorkersAIImageModel implements ImageModelV4 {
+	readonly specificationVersion = "v4";
 
 	get maxImagesPerCall(): number {
 		return this.settings.maxImagesPerCall ?? 1;
@@ -33,12 +33,12 @@ export class WorkersAIImageModel implements ImageModelV3 {
 		aspectRatio,
 		seed,
 		abortSignal,
-	}: Parameters<ImageModelV3["doGenerate"]>[0]): Promise<
-		Awaited<ReturnType<ImageModelV3["doGenerate"]>>
+	}: Parameters<ImageModelV4["doGenerate"]>[0]): Promise<
+		Awaited<ReturnType<ImageModelV4["doGenerate"]>>
 	> {
 		const { width, height } = getDimensionsFromSizeString(size);
 
-		const warnings: Array<SharedV3Warning> = [];
+		const warnings: Array<SharedV4Warning> = [];
 
 		if (aspectRatio != null) {
 			warnings.push({

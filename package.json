@@ -9,7 +9,7 @@
 		"postinstall": "nx run-many --target=build --projects='packages/*'"
 	},
 	"devDependencies": {
-		"@ai-sdk/openai": "^3.0.71",
+		"@ai-sdk/openai": "^4.0.5",
 		"@changesets/changelog-github": "^0.7.0",
 		"@changesets/cli": "^2.31.0",
 		"@cloudflare/workers-oauth-provider": "^0.8.1",
@@ -17,7 +17,7 @@
 		"@types/node": "^26.0.1",
 		"@types/wait-on": "^5.3.4",
 		"agents": "^0.17.1",
-		"ai": "^6.0.204",
+		"ai": "^7.0.11",
 		"dotenv": "^17.4.2",
 		"get-port": "^7.2.0",
 		"hono": "^4.12.27",

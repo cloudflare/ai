@@ -11,8 +11,9 @@ import type { ProviderPlugin } from "./gateway-delegate";
  *
  * Requires `@ai-sdk/openai` (an optional peer dependency — install it yourself).
  *
- * Uses `.chat()` (Chat Completions) deliberately: AI SDK v6's bare `openai()`
- * defaults to the Responses API, which the AI Gateway run catalog does not serve.
+ * Uses `.chat()` (Chat Completions) deliberately: the bare `openai()` call
+ * (AI SDK v6+) defaults to the Responses API, which the AI Gateway run catalog
+ * does not serve.
  */
 export const openai: ProviderPlugin = {
 	wireFormat: "openai",

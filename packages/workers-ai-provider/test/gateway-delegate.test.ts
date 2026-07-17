@@ -1,4 +1,4 @@
-import type { LanguageModelV3 } from "@ai-sdk/provider";
+import type { LanguageModelV4 } from "@ai-sdk/provider";
 import { describe, expect, it, vi } from "vitest";
 import {
 	createGatewayDelegate,
@@ -162,7 +162,7 @@ function capturePlugin(wireFormat: "openai" | "anthropic" | "google"): {
 			wireFormat,
 			create: ({ modelId, fetch }) => {
 				captured = fetch;
-				return { specificationVersion: "v3", modelId } as unknown as LanguageModelV3;
+				return { specificationVersion: "v4", modelId } as unknown as LanguageModelV4;
 			},
 		},
 		getFetch: () => {
@@ -196,13 +196,13 @@ function fallbackPlugin(
 				return `${modelId}:${await resp.text()}`;
 			};
 			return {
-				specificationVersion: "v3",
+				specificationVersion: "v4",
 				provider: wireFormat,
 				modelId,
 				supportedUrls: {},
 				doGenerate: async () => ({ content: [{ type: "text", text: await call() }] }),
 				doStream: async () => ({ stream: new ReadableStream(), text: await call() }),
-			} as unknown as LanguageModelV3;
+			} as unknown as LanguageModelV4;
 		},
 	};
 }

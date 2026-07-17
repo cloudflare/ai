@@ -1,0 +1,8 @@
+{
+	"name": "ai-search-provider-e2e",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-03-27",
+	// Point this at a namespace that contains your AI Search instance.
+	// A `default` namespace exists for every account.
+	"ai_search_namespaces": [{ "binding": "AI_SEARCH", "namespace": "default" }]
+}

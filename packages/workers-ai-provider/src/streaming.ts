@@ -1,7 +1,7 @@
 import type {
-	LanguageModelV3FinishReason,
-	LanguageModelV3StreamPart,
-	LanguageModelV3Usage,
+	LanguageModelV4FinishReason,
+	LanguageModelV4StreamPart,
+	LanguageModelV4Usage,
 } from "@ai-sdk/provider";
 import { SSEDecoder } from "@cloudflare/gateway-core";
 import { generateId } from "ai";
@@ -15,16 +15,16 @@ import {
 } from "./utils";
 
 /**
- * Prepend a stream-start event to an existing LanguageModelV3 stream.
+ * Prepend a stream-start event to an existing LanguageModelV4 stream.
  * Uses pipeThrough for proper backpressure and error propagation.
  */
 export function prependStreamStart(
-	source: ReadableStream<LanguageModelV3StreamPart>,
-	warnings: LanguageModelV3StreamPart extends { type: "stream-start" } ? never : unknown,
-): ReadableStream<LanguageModelV3StreamPart> {
+	source: ReadableStream<LanguageModelV4StreamPart>,
+	warnings: LanguageModelV4StreamPart extends { type: "stream-start" } ? never : unknown,
+): ReadableStream<LanguageModelV4StreamPart> {
 	let sentStart = false;
 	return source.pipeThrough(
-		new TransformStream<LanguageModelV3StreamPart, LanguageModelV3StreamPart>({
+		new TransformStream<LanguageModelV4StreamPart, LanguageModelV4StreamPart>({
 			transform(chunk, controller) {
 				if (!sentStart) {
 					sentStart = true;
@@ -59,7 +59,7 @@ function isNullFinalizationChunk(tc: Record<string, unknown>): boolean {
 }
 
 /**
- * Maps a Workers AI SSE stream into AI SDK V3 LanguageModelV3StreamPart events.
+ * Maps a Workers AI SSE stream into AI SDK LanguageModelV4StreamPart events.
  *
  * Uses a TransformStream pipeline for proper backpressure — chunks are emitted
  * one at a time as the downstream consumer pulls, not buffered eagerly.
@@ -74,7 +74,7 @@ export function getMappedStream(
 		tools: Array<{ function: { name?: string } }> | undefined;
 		toolChoice: unknown;
 	},
-): ReadableStream<LanguageModelV3StreamPart> {
+): ReadableStream<LanguageModelV4StreamPart> {
 	const rawStream =
 		response instanceof ReadableStream
 			? response
@@ -97,7 +97,7 @@ export function getMappedStream(
 	let anyToolCallStarted = false;
 
 	// State shared across the transform
-	let usage: LanguageModelV3Usage = {
+	let usage: LanguageModelV4Usage = {
 		outputTokens: { total: 0, text: undefined, reasoning: undefined },
 		inputTokens: {
 			total: 0,
@@ -109,7 +109,7 @@ export function getMappedStream(
 	};
 	let textId: string | null = null;
 	let reasoningId: string | null = null;
-	let finishReason: LanguageModelV3FinishReason | null = null;
+	let finishReason: LanguageModelV4FinishReason | null = null;
 	let receivedDone = false;
 	let receivedAnyData = false;
 
@@ -125,9 +125,9 @@ export function getMappedStream(
 	// Step 1: Decode bytes into SSE lines
 	const sseStream = rawStream.pipeThrough(new SSEDecoder());
 
-	// Step 2: Transform SSE events into LanguageModelV3StreamPart
+	// Step 2: Transform SSE events into LanguageModelV4StreamPart
 	return sseStream.pipeThrough(
-		new TransformStream<string, LanguageModelV3StreamPart>({
+		new TransformStream<string, LanguageModelV4StreamPart>({
 			transform(data, controller) {
 				if (!data || data === "[DONE]") {
 					if (data === "[DONE]") receivedDone = true;
@@ -315,12 +315,12 @@ export function getMappedStream(
 
 				// Detect premature termination
 				const effectiveFinishReason = salvagedToolCalls
-					? ({ unified: "tool-calls", raw: "stop" } as LanguageModelV3FinishReason)
+					? ({ unified: "tool-calls", raw: "stop" } as LanguageModelV4FinishReason)
 					: !receivedDone && receivedAnyData && !finishReason
 						? ({
 								unified: "error",
 								raw: "stream-truncated",
-							} as LanguageModelV3FinishReason)
+							} as LanguageModelV4FinishReason)
 						: (finishReason ?? { unified: "stop", raw: "stop" });
 
 				controller.enqueue({
@@ -337,7 +337,7 @@ export function getMappedStream(
 	 */
 	function closeToolCall(
 		index: number,
-		controller: TransformStreamDefaultController<LanguageModelV3StreamPart>,
+		controller: TransformStreamDefaultController<LanguageModelV4StreamPart>,
 	) {
 		const tc = activeToolCalls.get(index);
 		if (!tc || closedToolCalls.has(index)) return;
@@ -367,7 +367,7 @@ export function getMappedStream(
 	 */
 	function emitToolCallDeltas(
 		toolCalls: Record<string, unknown>[],
-		controller: TransformStreamDefaultController<LanguageModelV3StreamPart>,
+		controller: TransformStreamDefaultController<LanguageModelV4StreamPart>,
 	) {
 		for (const tc of toolCalls) {
 			if (isNullFinalizationChunk(tc)) {

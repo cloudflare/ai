@@ -1,12 +1,12 @@
-import type { LanguageModelV3, LanguageModelV3StreamResult } from "@ai-sdk/provider";
+import type { LanguageModelV4, LanguageModelV4StreamResult } from "@ai-sdk/provider";
 import { describe, expect, it, vi } from "vitest";
 import { createClientFallbackModel, type FallbackLeg } from "../src/client-fallback";
 import { WorkersAIFallbackError, WorkersAIGatewayError } from "../src/errors";
 
-function stubModel(modelId: string, behavior: { ok: true } | { throw: unknown }): LanguageModelV3 {
-	const result = { stream: new ReadableStream() } as unknown as LanguageModelV3StreamResult;
+function stubModel(modelId: string, behavior: { ok: true } | { throw: unknown }): LanguageModelV4 {
+	const result = { stream: new ReadableStream() } as unknown as LanguageModelV4StreamResult;
 	return {
-		specificationVersion: "v3",
+		specificationVersion: "v4",
 		provider: "stub",
 		modelId,
 		supportedUrls: {},
@@ -21,7 +21,7 @@ function stubModel(modelId: string, behavior: { ok: true } | { throw: unknown })
 	};
 }
 
-function leg(slug: string, model: LanguageModelV3): FallbackLeg {
+function leg(slug: string, model: LanguageModelV4): FallbackLeg {
 	return { slug, model, transport: "run" };
 }
 

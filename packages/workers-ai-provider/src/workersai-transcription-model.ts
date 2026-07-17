@@ -1,4 +1,4 @@
-import type { TranscriptionModelV3, SharedV3Warning } from "@ai-sdk/provider";
+import type { TranscriptionModelV4, SharedV4Warning } from "@ai-sdk/provider";
 import type { WorkersAITranscriptionSettings } from "./workersai-transcription-settings";
 import type { TranscriptionModels } from "./workersai-models";
 import { createRunBinary, type CreateRunConfig } from "./utils";
@@ -21,14 +21,14 @@ export type WorkersAITranscriptionConfig = {
 };
 
 /**
- * Workers AI transcription model implementing the AI SDK's `TranscriptionModelV3` interface.
+ * Workers AI transcription model implementing the AI SDK's `TranscriptionModelV4` interface.
  *
  * Supports:
  * - Whisper models (`@cf/openai/whisper`, `whisper-tiny-en`, `whisper-large-v3-turbo`)
  * - Deepgram Nova-3 (`@cf/deepgram/nova-3`) — uses a different input/output format
  */
-export class WorkersAITranscriptionModel implements TranscriptionModelV3 {
-	readonly specificationVersion = "v3";
+export class WorkersAITranscriptionModel implements TranscriptionModelV4 {
+	readonly specificationVersion = "v4";
 
 	get provider(): string {
 		return this.config.provider;
@@ -41,11 +41,11 @@ export class WorkersAITranscriptionModel implements TranscriptionModelV3 {
 	) {}
 
 	async doGenerate(
-		options: Parameters<TranscriptionModelV3["doGenerate"]>[0],
-	): Promise<Awaited<ReturnType<TranscriptionModelV3["doGenerate"]>>> {
+		options: Parameters<TranscriptionModelV4["doGenerate"]>[0],
+	): Promise<Awaited<ReturnType<TranscriptionModelV4["doGenerate"]>>> {
 		const { audio, mediaType, abortSignal } = options;
 
-		const warnings: Array<SharedV3Warning> = [];
+		const warnings: Array<SharedV4Warning> = [];
 
 		// The AI SDK always converts audio to Uint8Array via
 		// convertDataContentToUint8Array before calling doGenerate.
@@ -114,8 +114,8 @@ export class WorkersAITranscriptionModel implements TranscriptionModelV3 {
 
 	private normalizeWhisperResponse(
 		raw: Record<string, unknown>,
-		warnings: Array<SharedV3Warning>,
-	): Awaited<ReturnType<TranscriptionModelV3["doGenerate"]>> {
+		warnings: Array<SharedV4Warning>,
+	): Awaited<ReturnType<TranscriptionModelV4["doGenerate"]>> {
 		const text = (raw.text as string) ?? "";
 
 		// Build segments from Whisper's various formats
@@ -199,8 +199,8 @@ export class WorkersAITranscriptionModel implements TranscriptionModelV3 {
 
 	private normalizeNova3Response(
 		raw: Record<string, unknown>,
-		warnings: Array<SharedV3Warning>,
-	): Awaited<ReturnType<TranscriptionModelV3["doGenerate"]>> {
+		warnings: Array<SharedV4Warning>,
+	): Awaited<ReturnType<TranscriptionModelV4["doGenerate"]>> {
 		// Nova-3 format: { results: { channels: [{ alternatives: [{ transcript, words }] }] } }
 		const results = raw.results as Record<string, unknown> | undefined;
 		const channels = results?.channels as

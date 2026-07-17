@@ -1,4 +1,4 @@
-import type { LanguageModelV3 } from "@ai-sdk/provider";
+import type { LanguageModelV4 } from "@ai-sdk/provider";
 import { generateText } from "ai";
 import { describe, expect, it, vi } from "vitest";
 import { createWorkersAI } from "../src/index";
@@ -25,10 +25,10 @@ const openaiPlugin: ProviderPlugin = {
 	wireFormat: "openai",
 	create: ({ modelId }) =>
 		({
-			specificationVersion: "v3",
+			specificationVersion: "v4",
 			modelId,
 			provider: "test.openai",
-		}) as unknown as LanguageModelV3,
+		}) as unknown as LanguageModelV4,
 };
 
 // ---------------------------------------------------------------------------

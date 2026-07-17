@@ -1,4 +1,4 @@
-import type { LanguageModelV3, SharedV3Warning, LanguageModelV3StreamPart } from "@ai-sdk/provider";
+import type { LanguageModelV4, SharedV4Warning, LanguageModelV4StreamPart } from "@ai-sdk/provider";
 import { generateId } from "ai";
 import { convertToWorkersAIChatMessages } from "./convert-to-workersai-chat-messages";
 import { mapWorkersAIFinishReason } from "./map-workersai-finish-reason";
@@ -24,8 +24,33 @@ type WorkersAIChatConfig = {
 	isBinding: boolean;
 };
 
-export class WorkersAIChatLanguageModel implements LanguageModelV3 {
-	readonly specificationVersion = "v3";
+/**
+ * Map the unified `reasoning` call option (spec v4) to Workers AI's
+ * `reasoning_effort`. Workers AI accepts "low" | "medium" | "high" | null
+ * (null disables reasoning), so `minimal` and `xhigh` are clamped to the
+ * nearest supported effort. `provider-default` (and absence) returns
+ * undefined so the settings-level `reasoning_effort` still applies.
+ */
+function mapUnifiedReasoningEffort(
+	reasoning: Parameters<LanguageModelV4["doGenerate"]>[0]["reasoning"],
+): "low" | "medium" | "high" | null | undefined {
+	switch (reasoning) {
+		case undefined:
+		case "provider-default":
+			return undefined;
+		case "none":
+			return null;
+		case "minimal":
+			return "low";
+		case "xhigh":
+			return "high";
+		default:
+			return reasoning;
+	}
+}
+
+export class WorkersAIChatLanguageModel implements LanguageModelV4 {
+	readonly specificationVersion = "v4";
 	readonly defaultObjectGenerationMode = "json";
 
 	readonly supportedUrls: Record<string, RegExp[]> | PromiseLike<Record<string, RegExp[]>> = {};
@@ -59,10 +84,11 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 		frequencyPenalty,
 		presencePenalty,
 		seed,
-	}: Parameters<LanguageModelV3["doGenerate"]>[0]) {
+		reasoning,
+	}: Parameters<LanguageModelV4["doGenerate"]>[0]) {
 		const type = responseFormat?.type ?? "text";
 
-		const warnings: SharedV3Warning[] = [];
+		const warnings: SharedV4Warning[] = [];
 
 		if (frequencyPenalty != null) {
 			warnings.push({ feature: "frequencyPenalty", type: "unsupported" });
@@ -70,6 +96,16 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 
 		if (presencePenalty != null) {
 			warnings.push({ feature: "presencePenalty", type: "unsupported" });
+		}
+
+		if (reasoning === "minimal" || reasoning === "xhigh") {
+			warnings.push({
+				type: "compatibility",
+				feature: "reasoning",
+				details:
+					`Workers AI supports reasoning_effort "low" | "medium" | "high"; ` +
+					`"${reasoning}" was mapped to "${reasoning === "minimal" ? "low" : "high"}".`,
+			});
 		}
 
 		const baseArgs = {
@@ -145,11 +181,20 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 	 *
 	 * `reasoning_effort: null` is a valid value ("disable reasoning"), so we
 	 * check `!== undefined` rather than truthiness.
+	 *
+	 * The unified `reasoning` call option (spec v4) is mapped onto
+	 * `reasoning_effort` between the two: an explicit per-call
+	 * `providerOptions["workers-ai"].reasoning_effort` wins, then the unified
+	 * option, then settings.
 	 */
 	private buildRunInputs(
 		args: ReturnType<typeof this.getArgs>["args"],
 		messages: ReturnType<typeof convertToWorkersAIChatMessages>["messages"],
-		options?: { stream?: boolean; providerOptions?: Record<string, unknown> },
+		options?: {
+			stream?: boolean;
+			providerOptions?: Record<string, unknown>;
+			reasoning?: Parameters<LanguageModelV4["doGenerate"]>[0]["reasoning"];
+		},
 	) {
 		// The AI SDK types this as `Record<string, JSONObject>` but we defensively
 		// accept anything and only treat it as a lookup if it's a plain object.
@@ -159,10 +204,13 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 			rawPerCall !== null && typeof rawPerCall === "object" && !Array.isArray(rawPerCall)
 				? (rawPerCall as Record<string, unknown>)
 				: {};
+		const unifiedReasoningEffort = mapUnifiedReasoningEffort(options?.reasoning);
 		const reasoningEffort =
 			"reasoning_effort" in perCall
 				? perCall.reasoning_effort
-				: this.settings.reasoning_effort;
+				: unifiedReasoningEffort !== undefined
+					? unifiedReasoningEffort
+					: this.settings.reasoning_effort;
 		const chatTemplateKwargs =
 			"chat_template_kwargs" in perCall
 				? perCall.chat_template_kwargs
@@ -229,7 +277,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 	private extractContent(
 		outputRecord: Record<string, unknown>,
 		args: ReturnType<typeof this.getArgs>["args"],
-		warnings: SharedV3Warning[],
+		warnings: SharedV4Warning[],
 	) {
 		const choices = outputRecord.choices as
 			| Array<{ message?: { reasoning_content?: string; reasoning?: string } }>
@@ -268,13 +316,14 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 	}
 
 	async doGenerate(
-		options: Parameters<LanguageModelV3["doGenerate"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV3["doGenerate"]>>> {
+		options: Parameters<LanguageModelV4["doGenerate"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV4["doGenerate"]>>> {
 		const { args, warnings } = this.getArgs(options);
 		const { messages } = convertToWorkersAIChatMessages(options.prompt);
 
 		const inputs = this.buildRunInputs(args, messages, {
 			providerOptions: options.providerOptions,
+			reasoning: options.reasoning,
 		});
 		const runOptions = this.getRunOptions();
 
@@ -325,14 +374,15 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 	}
 
 	async doStream(
-		options: Parameters<LanguageModelV3["doStream"]>[0],
-	): Promise<Awaited<ReturnType<LanguageModelV3["doStream"]>>> {
+		options: Parameters<LanguageModelV4["doStream"]>[0],
+	): Promise<Awaited<ReturnType<LanguageModelV4["doStream"]>>> {
 		const { args, warnings } = this.getArgs(options);
 		const { messages } = convertToWorkersAIChatMessages(options.prompt);
 
 		const inputs = this.buildRunInputs(args, messages, {
 			stream: true,
 			providerOptions: options.providerOptions,
+			reasoning: options.reasoning,
 		});
 		const runOptions = this.getRunOptions();
 
@@ -381,11 +431,11 @@ export class WorkersAIChatLanguageModel implements LanguageModelV3 {
 		let reasoningId: string | null = null;
 
 		return {
-			stream: new ReadableStream<LanguageModelV3StreamPart>({
+			stream: new ReadableStream<LanguageModelV4StreamPart>({
 				start(controller) {
 					controller.enqueue({
 						type: "stream-start",
-						warnings: warnings as SharedV3Warning[],
+						warnings: warnings as SharedV4Warning[],
 					});
 
 					if (reasoningContent) {

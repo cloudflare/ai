@@ -184,7 +184,7 @@ describe("AI Search - provider API", () => {
 		});
 
 		const model = aisearch();
-		expect(model.specificationVersion).toBe("v3");
+		expect(model.specificationVersion).toBe("v4");
 		expect(model.provider).toBe("aisearch.chat");
 	});
 
@@ -194,7 +194,7 @@ describe("AI Search - provider API", () => {
 		});
 
 		const model = aisearch.chat();
-		expect(model.specificationVersion).toBe("v3");
+		expect(model.specificationVersion).toBe("v4");
 		expect(model.provider).toBe("aisearch.chat");
 	});
 

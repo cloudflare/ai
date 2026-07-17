@@ -1,6 +1,6 @@
 import {
-	experimental_generateSpeech as generateSpeech,
-	experimental_transcribe as transcribe,
+	generateSpeech,
+	transcribe,
 	generateImage,
 	rerank,
 } from "ai";
