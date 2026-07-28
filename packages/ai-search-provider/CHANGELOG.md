@@ -1,5 +1,11 @@
 # ai-search-provider
 
+## 0.1.1
+
+### Patch Changes
+
+- [#622](https://github.com/cloudflare/ai/pull/622) [`acc61d2`](https://github.com/cloudflare/ai/commit/acc61d25303f3c0426754fb570fd489124c26b23) Thanks [@petebacondarwin](https://github.com/petebacondarwin)! - Bump to test release scripts
+
 ## 0.1.0
 
 ### Minor Changes
