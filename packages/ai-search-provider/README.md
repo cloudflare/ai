@@ -45,6 +45,7 @@ const { text } = await generateText({
 	maxOutputTokens: 200,
 	topP: 0.9,
 });
+```
 
 ## API
 
