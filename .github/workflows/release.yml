@@ -35,6 +35,7 @@ jobs:
               run: |
                   pnpm nx build workers-ai-provider
                   pnpm nx build ai-gateway-provider
+                  pnpm nx build ai-search-provider
                   pnpm nx build @cloudflare/tanstack-ai
 
             - id: changesets
