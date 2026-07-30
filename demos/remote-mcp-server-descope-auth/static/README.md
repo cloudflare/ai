@@ -6,27 +6,39 @@ Let's get a Remote MCP server up-and-running on Cloudflare Workers with Descope 
 
 Before you begin, ensure you have:
 
-- A [Descope](https://www.descope.com/) account and project
+- A [Descope](https://www.descope.com/) account
+- A Descope **Inbound App client** (created in **Agentic Identity Hub → Clients**)
 - Node.js version `18.x` or higher
 - A Cloudflare account (for deployment)
 
 ## Develop locally
 
-1. Get your credentials from the Descope Console:
-    - [Project ID](https://app.descope.com/settings/project)
-    - [Management Key](https://app.descope.com/settings/company/managementkeys)
+1. Create an Inbound App client in the Descope Console:
+    - Go to **Agentic Identity Hub → Clients** and create a new client.
+    - Set the redirect / callback URL to `http://localhost:8787/callback`.
+    - From the client's **Connection Information**, copy the **Client ID** and **Client Secret**.
+    - Under **User information scopes**, define the scopes the server requests (mapped to a user attribute):
+        - `email` → **Email** attribute
+        - `profile` → **Display Name** attribute
+    - (`openid` is built-in and is required for `getUserInfo` to work. Scopes requested at `/authorize` must be pre-defined on the Inbound App.)
 
-2. Create a `.dev.vars` file in your project root (this file is gitignored):
+2. Create a KV namespace for OAuth state storage:
+
+```bash
+npx wrangler kv namespace create OAUTH_KV
+# Copy the ID and update wrangler.jsonc
+```
+
+3. Create a `.dev.vars` file in your project root (this file is gitignored):
 
 ```bash
 # .dev.vars
-DESCOPE_PROJECT_ID="your_project_id"
-DESCOPE_MANAGEMENT_KEY="your_management_key"
-# For local development
-SERVER_URL="http://localhost:8787"
+DESCOPE_CLIENT_ID="your_inbound_app_client_id"
+DESCOPE_CLIENT_SECRET="your_inbound_app_client_secret"
+COOKIE_ENCRYPTION_KEY="your_cookie_encryption_key"   # openssl rand -hex 32
 ```
 
-3. Clone and set up the repository:
+4. Clone and set up the repository:
 
 ```bash
 # clone the repository
@@ -47,32 +59,29 @@ You should be able to open [`http://localhost:8787/`](http://localhost:8787/) in
 To explore your new MCP api, you can use the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector).
 
 1. Start it with `npx @modelcontextprotocol/inspector`
-2. [Within the inspector](http://localhost:5173), switch the Transport Type to `SSE` and enter `http://localhost:8787/sse` as the URL of the MCP server to connect to.
-3. Add a bearer token and click "Connect"
-4. Click "List Tools"
-5. Run the "getToken" tool, which should return the Authorization header that you set in the inspector
+2. [Within the inspector](http://localhost:5173), set the Transport Type to `Streamable HTTP` and enter `http://localhost:8787/mcp` as the URL of the MCP server to connect to.
+3. Click "Connect" (or run the **Quick OAuth Flow** from the Authentication panel). The inspector registers itself via Dynamic Client Registration, then redirects you to Descope to log in — no manual bearer token needed.
+4. After you authenticate, click "List Tools".
+5. Run the "getUserInfo" tool to see your authenticated Descope profile, or "getToken" to see the Descope access token the server received.
 
-<div align="center">
-  <img src="img/mcp-inspector-sse-config.png" alt="MCP Inspector with the above config" width="600"/>
-</div>
+> **Note:** The `SSE` transport is deprecated. This server exposes the modern **Streamable HTTP** transport at `/mcp`.
 
 ## Deploy to Cloudflare
 
-1. Set up your secrets in Cloudflare:
+1. Create a KV namespace for production:
 
 ```bash
-# Set Descope credentials as secrets
-wrangler secret put DESCOPE_MANAGEMENT_KEY
+npx wrangler kv namespace create OAUTH_KV
+# Copy the returned ID into the production kv_namespaces binding in wrangler.jsonc
 ```
 
-2. Set your Descope `project_id` and your hosted worker's `server_url` to the `wrangler.jsonc` file:
+2. Set up your secrets in Cloudflare:
 
 ```bash
-# wrangler.jsonc
-"vars": {
- "DESCOPE_PROJECT_ID": "your_project_id",
- "SERVER_URL": "https://your_worker_slug.your_account_name.workers.dev"
-}
+# Set Descope Inbound App credentials as secrets
+npx wrangler secret put DESCOPE_CLIENT_ID
+npx wrangler secret put DESCOPE_CLIENT_SECRET
+npx wrangler secret put COOKIE_ENCRYPTION_KEY
 ```
 
 3. Deploy the worker:
@@ -80,6 +89,8 @@ wrangler secret put DESCOPE_MANAGEMENT_KEY
 ```bash
 npm run deploy
 ```
+
+After deploying, add your production callback URL (`https://<worker>.workers.dev/callback`) to the Inbound App client's redirect URLs in **Agentic Identity Hub → Clients**.
 
 ## Call your newly deployed remote MCP server from a remote MCP client
 
@@ -89,9 +100,9 @@ Just like you did above in "Develop locally", run the MCP inspector:
 npx @modelcontextprotocol/inspector@latest
 ```
 
-Then enter the `workers.dev` URL (ex: `worker-name.account-name.workers.dev/sse`) of your Worker in the inspector as the URL of the MCP server to connect to, and click "Connect".
+Then, using the `Streamable HTTP` transport, enter the `workers.dev` URL (ex: `https://worker-name.account-name.workers.dev/mcp`) of your Worker in the inspector as the URL of the MCP server to connect to, and click "Connect".
 
-You've now connected to your MCP server from a remote MCP client. You can pass in a bearer token like mentioned above.
+You've now connected to your MCP server from a remote MCP client. Authentication runs through the Descope OAuth flow.
 
 ## Features
 

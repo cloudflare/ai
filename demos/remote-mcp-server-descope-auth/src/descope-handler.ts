@@ -113,7 +113,7 @@ async function redirectToDescope(
 		headers: {
 			...headers,
 			location: getDescopeAuthorizeUrl({
-				project_id: env.DESCOPE_PROJECT_ID,
+				client_id: env.DESCOPE_CLIENT_ID,
 				redirect_uri: new URL("/callback", request.url).href,
 				state: stateToken,
 			}),
@@ -162,9 +162,9 @@ app.get("/callback", async (c) => {
 
 	// Exchange the code for an access token
 	const [accessToken, errResponse] = await fetchDescopeAuthToken({
+		client_id: c.env.DESCOPE_CLIENT_ID,
+		client_secret: c.env.DESCOPE_CLIENT_SECRET,
 		code: c.req.query("code"),
-		management_key: c.env.DESCOPE_MANAGEMENT_KEY,
-		project_id: c.env.DESCOPE_PROJECT_ID,
 		redirect_uri: new URL("/callback", c.req.url).href,
 	});
 	if (errResponse) return errResponse;
