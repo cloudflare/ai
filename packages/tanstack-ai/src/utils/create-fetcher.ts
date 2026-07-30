@@ -283,6 +283,9 @@ export function createGatewayFetch(
 			}
 			delete query.model;
 			delete query.instructions;
+			if (Array.isArray(query.tools) && query.tools.length === 0) {
+				delete query.tools;
+			}
 		}
 
 		if (config.apiKey) {
@@ -448,7 +451,9 @@ function buildBindingInputs(body: Record<string, unknown>): Record<string, unkno
 	if (body.messages) {
 		inputs.messages = normalizeMessagesForBinding(body.messages as Record<string, unknown>[]);
 	}
-	if (body.tools) inputs.tools = body.tools;
+	if (body.tools && (!Array.isArray(body.tools) || body.tools.length > 0)) {
+		inputs.tools = body.tools;
+	}
 	if (typeof body.temperature === "number") inputs.temperature = body.temperature;
 	if (typeof body.max_tokens === "number") inputs.max_tokens = body.max_tokens;
 	if (body.response_format) inputs.response_format = body.response_format;

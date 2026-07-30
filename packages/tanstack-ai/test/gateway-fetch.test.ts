@@ -136,6 +136,18 @@ describe("createGatewayFetch", () => {
 			const request = mockBinding.run.mock.calls[0]![0];
 			expect(request.query).toEqual({ _raw: "not-json-content" });
 		});
+
+		it("should preserve empty tools for non-Workers AI providers", async () => {
+			const fetcher = createGatewayFetch("openai", bindingConfig);
+
+			await fetcher("https://api.openai.com/v1/chat/completions", {
+				method: "POST",
+				body: JSON.stringify({ model: "gpt-4o", messages: [], tools: [] }),
+			});
+
+			const request = mockBinding.run.mock.calls[0]![0];
+			expect(request.query.tools).toEqual([]);
+		});
 	});
 
 	describe("credentials config", () => {
@@ -357,6 +369,47 @@ describe("createGatewayFetch", () => {
 			const request = mockBinding.run.mock.calls[0]![0];
 			expect(request.query.instructions).toBeUndefined();
 			expect(request.query.messages).toEqual([]);
+		});
+
+		it("should omit empty tools from query", async () => {
+			const config: AiGatewayAdapterConfig = {
+				binding: mockBinding,
+				apiKey: "test-key",
+			};
+			const fetcher = createGatewayFetch("workers-ai", config);
+
+			await fetcher("https://api.openai.com/v1/chat/completions", {
+				method: "POST",
+				body: JSON.stringify({
+					model: "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+					messages: [],
+					tools: [],
+				}),
+			});
+
+			const request = mockBinding.run.mock.calls[0]![0];
+			expect(request.query).not.toHaveProperty("tools");
+		});
+
+		it("should preserve non-empty tools in query", async () => {
+			const config: AiGatewayAdapterConfig = {
+				binding: mockBinding,
+				apiKey: "test-key",
+			};
+			const fetcher = createGatewayFetch("workers-ai", config);
+			const tools = [{ type: "function", function: { name: "add", parameters: {} } }];
+
+			await fetcher("https://api.openai.com/v1/chat/completions", {
+				method: "POST",
+				body: JSON.stringify({
+					model: "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+					messages: [],
+					tools,
+				}),
+			});
+
+			const request = mockBinding.run.mock.calls[0]![0];
+			expect(request.query.tools).toEqual(tools);
 		});
 
 		it("should not double-prefix run/ when URL path already contains it", async () => {

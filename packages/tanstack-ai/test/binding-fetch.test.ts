@@ -347,6 +347,24 @@ describe("createWorkersAiBindingFetch", () => {
 		]);
 	});
 
+	it("should omit empty tools from binding inputs", async () => {
+		const binding = mockBinding(vi.fn().mockResolvedValue({ response: "ok" }));
+
+		const fetcher = createWorkersAiBindingFetch(binding);
+
+		await fetcher("https://api.openai.com/v1/chat/completions", {
+			method: "POST",
+			body: JSON.stringify({
+				model: "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+				messages: [],
+				tools: [],
+			}),
+		});
+
+		const [, inputs] = binding.run.mock.calls[0]!;
+		expect(inputs).not.toHaveProperty("tools");
+	});
+
 	it("should normalize null content to empty string in messages", async () => {
 		const binding = mockBinding(vi.fn().mockResolvedValue({ response: "ok" }));
 		const fetcher = createWorkersAiBindingFetch(binding);
