@@ -17,6 +17,7 @@
  *   OPENAI_API_KEY=<provider key forwarded through the gateway>
  *   CLOUDFLARE_AI_GATEWAY_ID=<gateway id>   # or GATEWAY_ID / CLOUDFLARE_GATEWAY_NAME_UNAUTH; defaults to "default"
  *   CLOUDFLARE_AI_GATEWAY_TOKEN=<token>     # or CLOUDFLARE_GATEWAY_AUTH_TOKEN — only if the gateway has auth enabled
+ *   CLOUDFLARE_AI_GATEWAY_DYNAMIC_ROUTE=<route name> # optional: enables the unified dynamic-route regression test (should resolve to Workers AI)
  *
  * Run with: pnpm test:e2e
  */
@@ -24,6 +25,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject, generateText, jsonSchema, streamText, tool } from "ai";
 import { afterAll, describe, expect, it } from "vitest";
 import { createAiGateway } from "../../src";
+import { createUnified } from "../../src/providers/unified";
 
 // Locally typed so the suite needs neither @types/node nor an ESM module target
 // (the package type-checks under `module: commonjs`).
@@ -49,12 +51,17 @@ const GATEWAY_ID =
 	"default";
 const CF_AIG_TOKEN =
 	process.env.CLOUDFLARE_AI_GATEWAY_TOKEN || process.env.CLOUDFLARE_GATEWAY_AUTH_TOKEN || "";
+const DYNAMIC_ROUTE = process.env.CLOUDFLARE_AI_GATEWAY_DYNAMIC_ROUTE?.trim();
 
 const MODEL = process.env.OPENAI_E2E_MODEL || "gpt-4o-mini";
 
 /** The floor: without an account id + a forwardable provider key, nothing runs. */
 function noCreds() {
 	return !ACCOUNT_ID || !OPENAI_API_KEY;
+}
+
+function noDynamicRoute() {
+	return !ACCOUNT_ID || !DYNAMIC_ROUTE;
 }
 
 function isUnavailable(err: string): boolean {
@@ -79,6 +86,16 @@ function makeGateway() {
 	return { aigateway, openai };
 }
 
+function makeUnifiedGateway() {
+	const aigateway = createAiGateway({
+		accountId: ACCOUNT_ID!,
+		gateway: GATEWAY_ID,
+		apiKey: CF_AIG_TOKEN,
+	});
+	const unified = createUnified();
+	return { aigateway, unified };
+}
+
 describe.skipIf(noCreds())("ai-gateway-provider E2E (live gateway, REST path)", () => {
 	afterAll(() => {
 		// nothing to tear down — kept for symmetry with the other e2e suites
@@ -99,6 +116,32 @@ describe.skipIf(noCreds())("ai-gateway-provider E2E (live gateway, REST path)", 
 			if (isUnavailable(msg)) return ctx.skip(`model unavailable: ${msg.slice(0, 80)}`);
 			throw e;
 		}
+	});
+
+	describe.skipIf(noDynamicRoute())("ai-gateway-provider E2E (unified dynamic route)", () => {
+		afterAll(() => {
+			// nothing to tear down — kept for symmetry with the other e2e suites
+		});
+
+		it("dynamic route — generateText returns exactly OK", async (ctx) => {
+			const { aigateway, unified } = makeUnifiedGateway();
+			try {
+				const { text } = await generateText({
+					model: aigateway(unified(DYNAMIC_ROUTE!)),
+					prompt: "Reply with exactly: OK",
+					maxOutputTokens: 64,
+					maxRetries: 0,
+				});
+				expect(typeof text).toBe("string");
+				expect(text.trim()).toBe("OK");
+			} catch (e) {
+				const msg = e instanceof Error ? e.message : String(e);
+				if (isUnavailable(msg)) {
+					return ctx.skip(`dynamic route unavailable: ${msg.slice(0, 80)}`);
+				}
+				throw e;
+			}
+		});
 	});
 
 	it("streaming — streamText surfaces accumulated text", async (ctx) => {
