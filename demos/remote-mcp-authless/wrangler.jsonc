@@ -6,22 +6,8 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "remote-mcp-server-authless",
 	"main": "src/index.ts",
-	"compatibility_date": "2025-03-10",
+	"compatibility_date": "2026-07-02",
 	"compatibility_flags": ["nodejs_compat"],
-	"migrations": [
-		{
-			"new_sqlite_classes": ["MyMCP"],
-			"tag": "v1",
-		},
-	],
-	"durable_objects": {
-		"bindings": [
-			{
-				"class_name": "MyMCP",
-				"name": "MCP_OBJECT",
-			},
-		],
-	},
 	"observability": {
 		"enabled": true,
 	},
