@@ -1,0 +1,7 @@
+COOKIE_ENCRYPTION_KEY=<your cookie cookie encryption key>
+
+CLERK_SECRET_KEY=<your key>
+CLERK_FRONTEND_API=<your api url>
+
+CLERK_CLIENT_ID=<your client id>
+CLERK_CLIENT_SECRET=<your client secret>
