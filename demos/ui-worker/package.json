@@ -41,7 +41,7 @@
 		"@vitejs/plugin-react": "^6.0.3",
 		"oxfmt": "^0.56.0",
 		"oxlint": "^1.71.0",
-		"postcss": "^8.5.16",
+		"postcss": "^8.5.18",
 		"postcss-preset-mantine": "^1.18.0",
 		"postcss-simple-vars": "^7.0.1",
 		"typescript": "6.0.3",
