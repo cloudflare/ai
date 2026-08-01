@@ -221,7 +221,16 @@ export function getMappedStream(
 						});
 					}
 
-					const textDelta = delta.content as string | undefined;
+					// Workers AI's OpenAI-compatible streaming emits BOTH the native
+					// top-level `response` field and `choices[0].delta.content` in the same
+					// chunk, with identical content. Emitting a text-delta for each doubles
+					// the output (e.g. "Hello" -> "HelloHello"). Treat them as mutually
+					// exclusive: only use `choices[].delta.content` when the native
+					// `response` field was absent for this chunk.
+					const textDelta =
+						nativeResponse != null && nativeResponse !== ""
+							? undefined
+							: (delta.content as string | undefined);
 					if (textDelta && textDelta.length > 0) {
 						if (bufferContentForSalvage) {
 							contentBuffer += textDelta;
