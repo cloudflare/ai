@@ -49,6 +49,32 @@ describe("createWorkersAiBindingFetch", () => {
 		expect(json.choices[0]!.finish_reason).toBe("stop");
 	});
 
+	it("should preserve OpenAI-shaped non-streaming binding responses", async () => {
+		const openAiResponse = {
+			id: "chatcmpl-openai-shaped",
+			object: "chat.completion",
+			choices: [
+				{
+					index: 0,
+					message: { role: "assistant", content: '{"id":"A1"}' },
+					finish_reason: "stop",
+				},
+			],
+		};
+		const binding = mockBinding(vi.fn().mockResolvedValue(openAiResponse));
+
+		const fetcher = createWorkersAiBindingFetch(binding);
+		const response = await fetcher("https://api.openai.com/v1/chat/completions", {
+			method: "POST",
+			body: JSON.stringify({
+				model: "@cf/meta/llama-4-scout-17b-16e-instruct",
+				messages: [{ role: "user", content: "Return an id" }],
+			}),
+		});
+
+		expect(await response.json()).toEqual(openAiResponse);
+	});
+
 	it("should stringify object responses in non-streaming mode", async () => {
 		const binding = mockBinding(
 			vi.fn().mockResolvedValue({ response: { key: "value", nested: { a: 1 } } }),

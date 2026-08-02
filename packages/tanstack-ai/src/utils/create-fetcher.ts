@@ -363,6 +363,16 @@ function wrapWorkersAiResultAsOpenAI(
 	model: string,
 	salvageContext?: SalvageContext,
 ): Response {
+	if (
+		typeof result === "object" &&
+		result !== null &&
+		Array.isArray((result as Record<string, unknown>).choices)
+	) {
+		return new Response(JSON.stringify(result), {
+			headers: { "Content-Type": "application/json" },
+		});
+	}
+
 	const responseObj =
 		typeof result === "object" && result !== null
 			? (result as Record<string, unknown>)
