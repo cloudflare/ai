@@ -134,16 +134,29 @@ function bedrockTransform(url: string): string {
 	return `bedrock-runtime/${region}/${rest}`;
 }
 
-// Azure's URL carries the resource + deployment, so it needs a bespoke transform
-// (mirrors ai-gateway-provider). Only used for bring-your-own-provider detection.
+// Azure OpenAI supports both deployment-based URLs
+// (`/openai/deployments/{deployment}/...`) and the v1 surface
+// (`/openai/v1/...`). AI Gateway expects the former as
+// `{resource}/{deployment}/{rest}`. On the v1 surface only the Responses API is
+// routable: Azure exposes a non-deployment `/openai/responses` route, so the
+// gateway endpoint is `{resource}/openai/responses...`. Other v1 paths (chat,
+// embeddings) have no such non-deployment route and stay unmatched rather than
+// being routed to an endpoint that 404s at Azure.
+// Only used for bring-your-own-provider detection.
 const AZURE_HOST =
-	/^https:\/\/(?<resource>[^.]+)\.openai\.azure\.com\/openai\/deployments\/(?<deployment>[^/]+)\/(?<rest>.*)$/;
+	/^https:\/\/(?<resource>[^.]+)\.openai\.azure\.com\/openai\/(?:(?:deployments\/(?<deployment>[^/]+)\/(?<rest>.*))|(?:v1\/(?<v1rest>responses.*)))$/;
 function azureTransform(url: string): string {
 	const m = url.match(AZURE_HOST);
 	if (!m?.groups) return url;
-	const { resource, deployment, rest } = m.groups;
-	if (!resource || !deployment || !rest) return url;
-	return `${resource}/${deployment}/${rest}`;
+	const { resource, deployment, rest, v1rest } = m.groups;
+	if (!resource) return url;
+	if (deployment && rest) {
+		return `${resource}/${deployment}/${rest}`;
+	}
+	if (v1rest) {
+		return `${resource}/openai/${v1rest}`;
+	}
+	return url;
 }
 
 /**
