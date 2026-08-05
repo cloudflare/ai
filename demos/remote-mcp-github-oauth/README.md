@@ -59,7 +59,7 @@ Test the remote server using [Inspector](https://modelcontextprotocol.io/docs/to
 npx @modelcontextprotocol/inspector@latest
 ```
 
-Enter `https://mcp-github-oauth.<your-subdomain>.workers.dev/sse` and hit connect. Once you go through the authentication flow, you'll see the Tools working:
+Enter `https://mcp-github-oauth.<your-subdomain>.workers.dev/mcp` and hit connect. Once you go through the authentication flow, you'll see the Tools working:
 
 <img width="640" alt="image" src="https://github.com/user-attachments/assets/7973f392-0a9d-4712-b679-6dd23f824287" />
 
@@ -89,7 +89,7 @@ Replace the content with the following configuration. Once you restart Claude De
       "command": "npx",
       "args": [
         "mcp-remote",
-        "https://mcp-github-oauth.<your-subdomain>.workers.dev/sse"
+        "https://mcp-github-oauth.<your-subdomain>.workers.dev/mcp"
       ]
     }
   }
@@ -110,6 +110,7 @@ If you'd like to iterate and test your MCP server, you can do so in local develo
 ```
 GITHUB_CLIENT_ID=your_development_github_client_id
 GITHUB_CLIENT_SECRET=your_development_github_client_secret
+COOKIE_ENCRYPTION_KEY=your_random_32_byte_hex_value
 ```
 
 #### Develop & Test
@@ -117,7 +118,7 @@ GITHUB_CLIENT_SECRET=your_development_github_client_secret
 Run the server locally to make it available at `http://localhost:8788`
 `wrangler dev`
 
-To test the local server, enter `http://localhost:8788/sse` into Inspector and hit connect. Once you follow the prompts, you'll be able to "List Tools".
+To test the local server, enter `http://localhost:8788/mcp` into Inspector and hit connect. Once you follow the prompts, you'll be able to "List Tools".
 
 #### Using Claude and other MCP Clients
 
@@ -125,9 +126,9 @@ When using Claude to connect to your remote MCP server, you may see some error m
 
 #### Using Cursor and other MCP Clients
 
-To connect Cursor with your MCP server, choose `Type`: "Command" and in the `Command` field, combine the command and args fields into one (e.g. `npx mcp-remote https://<your-worker-name>.<your-subdomain>.workers.dev/sse`).
+To connect Cursor with your MCP server, choose `Type`: "Command" and in the `Command` field, combine the command and args fields into one (e.g. `npx mcp-remote https://<your-worker-name>.<your-subdomain>.workers.dev/mcp`).
 
-Note that while Cursor supports HTTP+SSE servers, it doesn't support authentication, so you still need to use `mcp-remote` (and to use a STDIO server, not an HTTP one).
+If your MCP client cannot complete OAuth for a remote server directly, use `mcp-remote` as a local STDIO adapter.
 
 You can connect your MCP server to other MCP clients like Windsurf by opening the client's configuration file, adding the same JSON that was used for the Claude setup, and restarting the MCP client.
 
@@ -141,20 +142,18 @@ The OAuth Provider library serves as a complete OAuth 2.1 server implementation 
 - Managing the connection to GitHub's OAuth services
 - Securely storing tokens and authentication state in KV storage
 
-#### Durable MCP
+#### Stateless MCP
 
-Durable MCP extends the base MCP functionality with Cloudflare's Durable Objects, providing:
+The MCP SDK v2 server uses a stateless Streamable HTTP handler, providing:
 
-- Persistent state management for your MCP server
-- Secure storage of authentication context between requests
-- Access to authenticated user information via `this.props`
+- A fresh MCP server instance for each request
+- Access to authenticated user information via `getMcpAuthContext()`
 - Support for conditional tool availability based on user identity
 
 #### MCP Remote
 
-The MCP Remote library enables your server to expose tools that can be invoked by MCP clients like the Inspector. It:
+For clients that do not support remote MCP servers or OAuth directly, `mcp-remote` runs as a local STDIO adapter. It:
 
-- Defines the protocol for communication between clients and your server
-- Provides a structured way to define tools
-- Handles serialization and deserialization of requests and responses
-- Maintains the Server-Sent Events (SSE) connection between clients and your server
+- Bridges local STDIO clients to the remote Streamable HTTP endpoint
+- Opens the browser-based OAuth flow
+- Forwards MCP requests and responses between the client and server

@@ -1,36 +1,39 @@
+import { env } from "cloudflare:workers";
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { McpAgent } from "agents/mcp";
+import { McpServer } from "@modelcontextprotocol/server";
+import { createMcpHandler, getMcpAuthContext } from "agents/mcp/server";
 import { z } from "zod";
 import { handleAccessRequest } from "./access-handler";
 import type { Props } from "./workers-oauth-utils";
 
 const ALLOWED_EMAILS = new Set(["<INSERT EMAIL>"]);
 
-export class MyMCP extends McpAgent<Env, Record<string, never>, Props> {
-	server = new McpServer({
+function createServer() {
+	const server = new McpServer({
 		name: "Access OAuth Proxy Demo",
 		version: "1.0.0",
 	});
+	const props = getMcpAuthContext()?.props as Props | undefined;
 
-	async init() {
-		// Hello, world!
-		this.server.tool(
-			"add",
-			"Add two numbers the way only MCP can",
-			{ a: z.number(), b: z.number() },
-			async ({ a, b }) => ({
-				content: [{ text: String(a + b), type: "text" }],
-			}),
-		);
+	server.registerTool(
+		"add",
+		{
+			description: "Add two numbers the way only MCP can",
+			inputSchema: z.object({ a: z.number(), b: z.number() }),
+		},
+		async ({ a, b }) => ({
+			content: [{ text: String(a + b), type: "text" }],
+		}),
+	);
 
-		// Dynamically add tools based on the user's login. In this case, I want to limit
-		// access to my Image Generation tool to just me
-		if (ALLOWED_EMAILS.has(this.props!.email)) {
-			this.server.tool(
-				"generateImage",
-				"Generate an image using the `flux-1-schnell` model. Works best with 8 steps.",
-				{
+	// Dynamically add tools based on the authenticated user's email.
+	if (props && ALLOWED_EMAILS.has(props.email)) {
+		server.registerTool(
+			"generateImage",
+			{
+				description:
+					"Generate an image using the `flux-1-schnell` model. Works best with 8 steps.",
+				inputSchema: z.object({
 					prompt: z
 						.string()
 						.describe("A text description of the image you want to generate."),
@@ -42,24 +45,34 @@ export class MyMCP extends McpAgent<Env, Record<string, never>, Props> {
 						.describe(
 							"The number of diffusion steps; higher values can improve quality but take longer. Must be between 4 and 8, inclusive.",
 						),
-				},
-				async ({ prompt, steps }) => {
-					const response = await this.env.AI.run("@cf/black-forest-labs/flux-1-schnell", {
-						prompt,
-						steps,
-					});
+				}),
+			},
+			async ({ prompt, steps }) => {
+				const response = await env.AI.run("@cf/black-forest-labs/flux-1-schnell", {
+					prompt,
+					steps,
+				});
 
-					return {
-						content: [{ data: response.image!, mimeType: "image/jpeg", type: "image" }],
-					};
-				},
-			);
-		}
+				return {
+					content: [{ data: response.image!, mimeType: "image/jpeg", type: "image" }],
+				};
+			},
+		);
 	}
+
+	return server;
 }
 
+const mcpHandler = createMcpHandler(createServer);
+const apiHandler = {
+	fetch(request: Request, bindings: Env, ctx: ExecutionContext) {
+		return mcpHandler(request, bindings, ctx);
+	},
+} satisfies ExportedHandler<Env>;
+
 export default new OAuthProvider({
-	apiHandler: MyMCP.serve("/mcp"),
+	allowPlainPKCE: false,
+	apiHandler,
 	apiRoute: "/mcp",
 	authorizeEndpoint: "/authorize",
 	clientRegistrationEndpoint: "/register",
