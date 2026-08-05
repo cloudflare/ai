@@ -826,11 +826,14 @@ importers:
   demos/remote-mcp-cf-access:
     dependencies:
       '@cloudflare/workers-oauth-provider':
-        specifier: ^0.8.1
-        version: 0.8.1
+        specifier: ^0.8.3
+        version: 0.8.3
+      '@modelcontextprotocol/server':
+        specifier: 2.0.0
+        version: 2.0.0
       agents:
-        specifier: ^0.17.1
-        version: 0.17.1(@ai-sdk/react@3.0.206(react@19.2.7)(zod@4.4.3))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260628.1)(@tanstack/ai@0.38.0(@opentelemetry/api@1.9.0))(ai@6.0.204(zod@4.4.3))(just-bash@3.0.1)(react@19.2.7)(rolldown@1.1.3)(vite@8.1.0(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(sugarss@5.0.0(postcss@8.5.16))(tsx@4.22.4)(yaml@2.9.0))(zod@4.4.3)
+        specifier: ^0.20.1
+        version: 0.20.1(@ai-sdk/react@4.0.12(react@19.2.7)(zod@4.4.3))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260628.1)(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(zod@4.4.3))(@modelcontextprotocol/server@2.0.0)(@tanstack/ai@0.38.0(@opentelemetry/api@1.9.0))(ai@7.0.11(zod@4.4.3))(just-bash@3.0.1)(react@19.2.7)(rolldown@1.1.3)(vite@8.1.0(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(sugarss@5.0.0(postcss@8.5.16))(tsx@4.22.4)(yaml@2.9.0))(zod@4.4.3)
       just-pick:
         specifier: ^4.2.0
         version: 4.2.0
@@ -876,11 +879,14 @@ importers:
   demos/remote-mcp-github-oauth:
     dependencies:
       '@cloudflare/workers-oauth-provider':
-        specifier: ^0.8.1
-        version: 0.8.1
+        specifier: ^0.8.3
+        version: 0.8.3
+      '@modelcontextprotocol/server':
+        specifier: 2.0.0
+        version: 2.0.0
       agents:
-        specifier: ^0.17.1
-        version: 0.17.1(@ai-sdk/react@3.0.206(react@19.2.7)(zod@4.4.3))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260628.1)(@tanstack/ai@0.38.0(@opentelemetry/api@1.9.0))(ai@6.0.204(zod@4.4.3))(just-bash@3.0.1)(react@19.2.7)(rolldown@1.1.3)(vite@8.1.0(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(sugarss@5.0.0(postcss@8.5.16))(tsx@4.22.4)(yaml@2.9.0))(zod@4.4.3)
+        specifier: ^0.20.1
+        version: 0.20.1(@ai-sdk/react@4.0.12(react@19.2.7)(zod@4.4.3))(@babel/core@7.29.0)(@babel/runtime@7.27.0)(@cloudflare/workers-types@4.20260628.1)(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(zod@4.4.3))(@modelcontextprotocol/server@2.0.0)(@tanstack/ai@0.38.0(@opentelemetry/api@1.9.0))(ai@7.0.11(zod@4.4.3))(just-bash@3.0.1)(react@19.2.7)(rolldown@1.1.3)(vite@8.1.0(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(sugarss@5.0.0(postcss@8.5.16))(tsx@4.22.4)(yaml@2.9.0))(zod@4.4.3)
       hono:
         specifier: ^4.12.27
         version: 4.12.27
@@ -2301,6 +2307,9 @@ packages:
 
   '@cloudflare/workers-oauth-provider@0.8.1':
     resolution: {integrity: sha512-zB4In0X1O5Vhc+Eb1s3ZP8wiqxLt2Hg1cqkLjZE2qQW1LNc4cOs1YEqYqtIKqG91yEBgpFIMBNYiafHk3OWj4Q==}
+
+  '@cloudflare/workers-oauth-provider@0.8.3':
+    resolution: {integrity: sha512-5dIeQlJTDKAQvy3GcrtWBhPvTb9lHeRp/m8MoostTkcrbrGImH8zKSdJhogQ5YSTFUCg+b7FBg38b7KCM/x3VQ==}
 
   '@cloudflare/workers-types@4.20260628.1':
     resolution: {integrity: sha512-fMy5zBnNl/PxGqDzSOQb1TdqyR1sRT1Z7T4F8/cqtxpZ1w8VkejWi0qUH7GZE0I2gJyapdP0oW4pNZfxUbekmw==}
@@ -7368,6 +7377,8 @@ snapshots:
     optional: true
 
   '@cloudflare/workers-oauth-provider@0.8.1': {}
+
+  '@cloudflare/workers-oauth-provider@0.8.3': {}
 
   '@cloudflare/workers-types@4.20260628.1': {}
 

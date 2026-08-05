@@ -17,20 +17,6 @@
 	 * npx wrangler secret put GITHUB_CLIENT_SECRET
 	 * npx wrangler secret put COOKIE_ENCRYPTION_KEY
 	 */
-  "migrations": [
-    {
-      "new_sqlite_classes": ["MyMCP"],
-      "tag": "v1"
-    }
-  ],
-  "durable_objects": {
-    "bindings": [
-      {
-        "class_name": "MyMCP",
-        "name": "MCP_OBJECT"
-      }
-    ]
-  },
   "kv_namespaces": [
     {
       "binding": "OAUTH_KV",
@@ -45,5 +31,12 @@
   },
   "dev": {
     "port": 8788
+  },
+  "secrets": {
+    "required": [
+      "GITHUB_CLIENT_ID",
+      "GITHUB_CLIENT_SECRET",
+      "COOKIE_ENCRYPTION_KEY"
+    ]
   }
 }
