@@ -57,7 +57,7 @@ You now have a remote MCP server deployed!
 
 This MCP server uses Access for authentication. All authenticated Access users can access basic tools like "add".
 
-The "generateImage" tool is restricted to specific Access users listed in the `ALLOWED_USERNAMES` configuration:
+The "generateImage" tool is restricted to specific Access users listed in the `ALLOWED_EMAILS` configuration:
 
 ```typescript
 // Add user emails for image generation access
@@ -119,7 +119,7 @@ When using Claude to connect to your remote MCP server, you may see some error m
 
 To connect Cursor with your MCP server, choose `Type`: "Command" and in the `Command` field, combine the command and args fields into one (e.g. `npx mcp-remote https://<your-worker-name>.<your-subdomain>.workers.dev/mcp`).
 
-Note that while Cursor supports HTTP+SSE servers, it doesn't support authentication, so you still need to use `mcp-remote` (and to use a STDIO server, not an HTTP one).
+If your MCP client cannot complete OAuth for a remote server directly, use `mcp-remote` as a local STDIO adapter.
 
 You can connect your MCP server to other MCP clients like Windsurf by opening the client's configuration file, adding the same JSON that was used for the Claude setup, and restarting the MCP client.
 
@@ -133,20 +133,18 @@ The OAuth Provider library serves as a complete OAuth 2.1 server implementation 
 - Managing the connection to Access's OAuth services
 - Securely storing tokens and authentication state in KV storage
 
-#### Durable MCP
+#### Stateless MCP
 
-Durable MCP extends the base MCP functionality with Cloudflare's Durable Objects, providing:
+The MCP SDK v2 server uses a stateless Streamable HTTP handler, providing:
 
-- Persistent state management for your MCP server
-- Secure storage of authentication context between requests
-- Access to authenticated user information via `this.props`
+- A fresh MCP server instance for each request
+- Access to authenticated user information via `getMcpAuthContext()`
 - Support for conditional tool availability based on user identity
 
 #### MCP Remote
 
-The MCP Remote library enables your server to expose tools that can be invoked by MCP clients like the Inspector. It:
+For clients that do not support remote MCP servers or OAuth directly, `mcp-remote` runs as a local STDIO adapter. It:
 
-- Defines the protocol for communication between clients and your server
-- Provides a structured way to define tools
-- Handles serialization and deserialization of requests and responses
-- Maintains the Server-Sent Events (SSE) connection between clients and your server
+- Bridges local STDIO clients to the remote Streamable HTTP endpoint
+- Opens the browser-based OAuth flow
+- Forwards MCP requests and responses between the client and server
