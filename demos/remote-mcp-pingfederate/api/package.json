@@ -1,0 +1,20 @@
+{
+  "name": "todo-api-ping-federate",
+  "description": "Protected resource server for the remote MCP demo",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf dist .wrangler node_modules tsconfig.tsbuildinfo worker-configuration.d.ts || true",
+    "build": "wrangler types && tsc --build",
+    "dev": "wrangler dev",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "dependencies": {
+    "hono": "^4.10.6",
+    "jose": "^6.1.2"
+  },
+  "devDependencies": {
+    "wrangler": "^4.47.0",
+    "typescript": "^5.9.3"
+  }
+}
