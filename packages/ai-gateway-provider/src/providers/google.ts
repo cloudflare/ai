@@ -4,3 +4,5 @@ import { authWrapper } from "../auth";
 export const createGoogleGenerativeAI = (
 	...args: Parameters<typeof createGoogleGenerativeAIOriginal>
 ) => authWrapper(createGoogleGenerativeAIOriginal)(...args);
+
+export const createGoogle = createGoogleGenerativeAI;
