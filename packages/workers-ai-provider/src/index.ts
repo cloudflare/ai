@@ -421,6 +421,17 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 					): Promise<Response>;
 				}
 			).run(modelId, body, runOptions);
+			if (!(response instanceof Response)) {
+				// The binding can resolve with undefined/JSON on some upstream failures
+				// instead of rejecting; surface a real error so retry logic and error
+				// reporting see the failure rather than a masking TypeError on
+				// `response.headers` below.
+				throw new Error(
+					`Workers AI binding run() for ${modelId} returned ${
+						response === null ? "null" : typeof response
+					} instead of a Response`,
+				);
+			}
 			settings.onDispatch?.({
 				transport: "run",
 				resumeEnabled: false,

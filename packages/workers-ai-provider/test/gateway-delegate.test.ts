@@ -401,6 +401,26 @@ describe("createGatewayDelegate", () => {
 		).toThrow(GatewayDelegateError);
 	});
 
+	// --- run-path robustness ---
+
+	it("throws a descriptive error when binding.run resolves without a Response", async () => {
+		// On some upstream failures the binding resolves undefined instead of
+		// rejecting; the run path must surface a real error rather than crash
+		// with `TypeError: Cannot read properties of undefined (reading 'get')`
+		// on `resp.headers`.
+		const binding = {
+			run: vi.fn(async () => undefined),
+			gateway: vi.fn(),
+		} as unknown as Ai;
+		const { plugin, getFetch } = capturePlugin("openai");
+		const wai = createGatewayDelegate({ binding, gateway: "gw-1", providers: [plugin] });
+		wai("openai/gpt-5");
+
+		await expect(
+			getFetch()("https://api.openai.com/v1/chat/completions", REQ),
+		).rejects.toThrow(/returned undefined instead of a Response/);
+	});
+
 	// --- gateway-path entry shaping ---
 
 	it("shapes a gateway entry: maps provider id, strips the endpoint host + auth header", async () => {

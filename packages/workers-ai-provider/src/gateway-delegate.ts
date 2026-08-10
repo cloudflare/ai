@@ -698,6 +698,17 @@ function makeRunFetch(
 			): Promise<Response>;
 		};
 		const resp = await ai.run(slug, body, runOptions);
+		if (!(resp instanceof Response)) {
+			// The binding can resolve with undefined/JSON on some upstream failures
+			// instead of rejecting; surface a real error so retry logic and error
+			// reporting see the failure rather than a masking TypeError on
+			// `resp.headers` below.
+			throw new Error(
+				`Workers AI binding run() for ${slug} returned ${
+					resp === null ? "null" : typeof resp
+				} instead of a Response`,
+			);
+		}
 		fireDispatch(resp, selection, callOptions);
 
 		// Wrap the stream so a transient mid-stream drop reconnects via the gateway
