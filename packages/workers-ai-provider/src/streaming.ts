@@ -74,6 +74,7 @@ export function getMappedStream(
 		tools: Array<{ function: { name?: string } }> | undefined;
 		toolChoice: unknown;
 	},
+	signal?: AbortSignal,
 ): ReadableStream<LanguageModelV4StreamPart> {
 	const rawStream =
 		response instanceof ReadableStream
@@ -83,6 +84,8 @@ export function getMappedStream(
 	if (!rawStream) {
 		throw new Error("No readable stream available for SSE parsing.");
 	}
+
+	const stream = signal ? raceAbort(rawStream, signal) : rawStream;
 
 	// gpt-oss harmony quirk: a forced tool call can be streamed as `content`
 	// text deltas instead of structured tool calls. When a tool was forced,
@@ -123,7 +126,7 @@ export function getMappedStream(
 	let lastActiveToolIndex: number | null = null;
 
 	// Step 1: Decode bytes into SSE lines
-	const sseStream = rawStream.pipeThrough(new SSEDecoder());
+	const sseStream = stream.pipeThrough(new SSEDecoder());
 
 	// Step 2: Transform SSE events into LanguageModelV4StreamPart
 	return sseStream.pipeThrough(
@@ -426,4 +429,45 @@ export function getMappedStream(
 			}
 		}
 	}
+}
+
+/** Make pending reads from binding streams observe the SDK abort signal. */
+function raceAbort(
+	stream: ReadableStream<Uint8Array>,
+	signal: AbortSignal,
+): ReadableStream<Uint8Array> {
+	const reader = stream.getReader();
+	let abortHandler: (() => void) | undefined;
+
+	const abortPromise = new Promise<never>((_, reject) => {
+		abortHandler = () => {
+			reject(signal.reason ?? new DOMException("Aborted", "AbortError"));
+		};
+		if (signal.aborted) abortHandler();
+		else signal.addEventListener("abort", abortHandler, { once: true });
+	});
+	abortPromise.catch(() => {});
+	const cleanup = () => {
+		if (abortHandler) signal.removeEventListener("abort", abortHandler);
+	};
+
+	return new ReadableStream<Uint8Array>({
+		async pull(controller) {
+			try {
+				const result = await Promise.race([reader.read(), abortPromise]);
+				if (result.done) {
+					cleanup();
+					controller.close();
+				} else controller.enqueue(result.value);
+			} catch (error) {
+				cleanup();
+				await reader.cancel(error).catch(() => {});
+				controller.error(error);
+			}
+		},
+		cancel(reason) {
+			cleanup();
+			return reader.cancel(reason);
+		},
+	});
 }

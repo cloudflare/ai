@@ -412,7 +412,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV4 {
 					getMappedStream(response, {
 						tools: args.tools,
 						toolChoice: args.tool_choice,
-					}),
+					}, options.abortSignal),
 					warnings,
 				),
 			};
