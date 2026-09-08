@@ -48,6 +48,22 @@ export function prependStreamStart(
 }
 
 /**
+ * Workers AI's OpenAI-compatible stream occasionally serialises a
+ * numeric-looking token (e.g. the standalone text "6" or "0.005") as a JSON
+ * number instead of a string, and likewise for boolean-looking tokens.
+ * `String()` recovers the digits; a raw `number`/`boolean` otherwise fails
+ * the `typeof value === "string"` shape every downstream consumer (including
+ * the AI SDK's own validators) expects, so chunks like `{"content":6}` get
+ * silently dropped instead of surfacing as text.
+ * See https://github.com/cloudflare/ai/issues/651.
+ */
+function normalizeDeltaText(value: unknown): string | undefined {
+	if (typeof value === "string") return value;
+	if (typeof value === "number" || typeof value === "boolean") return String(value);
+	return undefined;
+}
+
+/**
  * Check if a streaming tool call chunk is a null-finalization sentinel.
  */
 function isNullFinalizationChunk(tc: Record<string, unknown>): boolean {
@@ -203,9 +219,9 @@ export function getMappedStream(
 				if (choices?.[0]?.delta) {
 					const delta = choices[0].delta;
 
-					const reasoningDelta = (delta.reasoning_content ?? delta.reasoning) as
-						| string
-						| undefined;
+					const reasoningDelta = normalizeDeltaText(
+						delta.reasoning_content ?? delta.reasoning,
+					);
 					if (reasoningDelta && reasoningDelta.length > 0) {
 						if (!reasoningId) {
 							reasoningId = generateId();
@@ -221,7 +237,7 @@ export function getMappedStream(
 						});
 					}
 
-					const textDelta = delta.content as string | undefined;
+					const textDelta = normalizeDeltaText(delta.content);
 					if (textDelta && textDelta.length > 0) {
 						if (bufferContentForSalvage) {
 							contentBuffer += textDelta;

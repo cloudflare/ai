@@ -494,6 +494,96 @@ describe("REST API - Streaming Text Tests", () => {
 		expect(reasoning).toEqual("Thinking...");
 		expect(content).toEqual("Hello");
 	});
+
+	it("should not drop text when delta.content arrives as a JSON number instead of a string", async () => {
+		// Workers AI's OpenAI-compatible stream can serialise a standalone
+		// numeric-looking token as a raw JSON number, e.g. `{"content":6}`
+		// instead of `{"content":"6"}`. See #651.
+		server.use(
+			http.post(
+				`https://api.cloudflare.com/client/v4/accounts/${TEST_ACCOUNT_ID}/ai/run/${TEST_MODEL}`,
+				async () => {
+					return new Response(
+						[
+							`data: {"choices":[{"delta":{"content":"The price is $"}}]}\n\n`,
+							`data: {"choices":[{"delta":{"content":0.005}}]}\n\n`,
+							`data: {"choices":[{"delta":{"content":" a minute."},"finish_reason":"stop"}]}\n\n`,
+							"data: [DONE]\n\n",
+						].join(""),
+						{
+							headers: {
+								"Content-Type": "text/event-stream",
+								"Transfer-Encoding": "chunked",
+							},
+							status: 200,
+						},
+					);
+				},
+			),
+		);
+
+		const workersai = createWorkersAI({
+			accountId: TEST_ACCOUNT_ID,
+			apiKey: TEST_API_KEY,
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "What is the price?",
+		});
+
+		let text = "";
+		for await (const chunk of result.textStream) {
+			text += chunk;
+		}
+
+		expect(text).toBe("The price is $0.005 a minute.");
+	});
+
+	it("should not drop reasoning text when reasoning_content arrives as a JSON number", async () => {
+		server.use(
+			http.post(
+				`https://api.cloudflare.com/client/v4/accounts/${TEST_ACCOUNT_ID}/ai/run/${TEST_MODEL}`,
+				async () => {
+					return new Response(
+						[
+							`data: {"choices":[{"delta":{"reasoning_content":"There are "}}]}\n\n`,
+							`data: {"choices":[{"delta":{"reasoning_content":7}}]}\n\n`,
+							`data: {"choices":[{"delta":{"reasoning_content":" items."}}]}\n\n`,
+							`data: {"choices":[{"delta":{"content":"7"},"finish_reason":"stop"}]}\n\n`,
+							"data: [DONE]\n\n",
+						].join(""),
+						{
+							headers: {
+								"Content-Type": "text/event-stream",
+								"Transfer-Encoding": "chunked",
+							},
+							status: 200,
+						},
+					);
+				},
+			),
+		);
+
+		const workersai = createWorkersAI({
+			accountId: TEST_ACCOUNT_ID,
+			apiKey: TEST_API_KEY,
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "How many items?",
+		});
+
+		let reasoning = "";
+		for await (const chunk of result.fullStream) {
+			if (chunk.type === "reasoning-delta") {
+				reasoning += chunk.text;
+			}
+		}
+
+		expect(reasoning).toBe("There are 7 items.");
+	});
 });
 
 describe("Binding - Streaming Text Tests", () => {
