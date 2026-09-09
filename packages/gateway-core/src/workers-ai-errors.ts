@@ -117,3 +117,17 @@ export function isAbortError(error: unknown): boolean {
 export function isRetryableStatus(status: number): boolean {
 	return status === 408 || status === 409 || status === 429 || status >= 500;
 }
+
+/**
+ * Safely extract an explicit boolean `retryable` property from an error, if present.
+ * Returns `true` or `false` when `error.retryable` is a boolean, otherwise `undefined`.
+ */
+export function isExplicitlyRetryable(error: unknown): boolean | undefined {
+	if (error && typeof error === "object" && "retryable" in error) {
+		const retryable = (error as { retryable?: unknown }).retryable;
+		if (typeof retryable === "boolean") {
+			return retryable;
+		}
+	}
+	return undefined;
+}

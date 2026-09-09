@@ -1,4 +1,6 @@
-import type { LanguageModelV4 } from "@ai-sdk/provider";
+import { createOpenAI } from "@ai-sdk/openai";
+import { APICallError, type LanguageModelV4 } from "@ai-sdk/provider";
+import { generateText } from "ai";
 import { describe, expect, it, vi } from "vitest";
 import {
 	createGatewayDelegate,
@@ -7,6 +9,7 @@ import {
 	type ProviderPlugin,
 	selectTransport,
 } from "../src/gateway-delegate";
+import { openai } from "../src/openai";
 
 // ---------------------------------------------------------------------------
 // parseSlug
@@ -686,5 +689,343 @@ describe("createGatewayDelegate", () => {
 		expect(JSON.parse(gwCalls[0].entries[0].headers["cf-aig-metadata"])).toEqual({
 			big: "9007199254740993",
 		});
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Run transport — AI.run binding error normalization into APICallError & AI SDK retries
+// ---------------------------------------------------------------------------
+
+describe("createGatewayDelegate run transport error normalization", () => {
+	const chatResponsePayload = {
+		id: "chatcmpl-1",
+		object: "chat.completion",
+		created: 1677652288,
+		model: "gpt-5",
+		choices: [
+			{
+				index: 0,
+				message: { role: "assistant", content: "Recovered successfully!" },
+				finish_reason: "stop",
+			},
+		],
+		usage: { prompt_tokens: 5, completion_tokens: 5, total_tokens: 10 },
+	};
+
+	const responsesApiPayload = {
+		id: "resp-1",
+		created_at: 1677652288,
+		model: "gpt-5",
+		output: [
+			{
+				type: "message",
+				id: "msg-1",
+				role: "assistant",
+				content: [
+					{ type: "output_text", text: "Responses API recovered!", annotations: [] },
+				],
+			},
+		],
+		usage: { input_tokens: 5, output_tokens: 5, total_tokens: 10 },
+		status: "completed",
+	};
+
+	it("normalizes an explicitly retryable binding error into APICallError with isRetryable: true and cause", async () => {
+		const originalError = Object.assign(new Error("Network connection lost."), {
+			retryable: true,
+		});
+		const binding = {
+			run: vi.fn(async () => {
+				throw originalError;
+			}),
+		} as unknown as Ai;
+
+		const { plugin, getFetch } = capturePlugin("openai");
+		const wai = createGatewayDelegate({ binding, gateway: "gw-1", providers: [plugin] });
+		wai("openai/gpt-5"); // run transport by default
+
+		let capturedErr: unknown;
+		try {
+			await getFetch()("https://api.openai.com/v1/chat/completions", REQ);
+		} catch (err) {
+			capturedErr = err;
+		}
+
+		expect(APICallError.isInstance(capturedErr)).toBe(true);
+		const apiErr = capturedErr as APICallError;
+		expect(apiErr.isRetryable).toBe(true);
+		expect(apiErr.cause).toBe(originalError);
+		expect(apiErr.message).toBe("Network connection lost.");
+		expect(apiErr.url).toBe("workers-ai:binding/run/openai/gpt-5");
+	});
+
+	it("normalizes an unclassified binding error into a non-retryable APICallError", async () => {
+		const originalError = new Error("Something unexpected happened");
+		const binding = {
+			run: vi.fn(async () => {
+				throw originalError;
+			}),
+		} as unknown as Ai;
+
+		const { plugin, getFetch } = capturePlugin("openai");
+		const wai = createGatewayDelegate({ binding, gateway: "gw-1", providers: [plugin] });
+		wai("openai/gpt-5");
+
+		let capturedErr: unknown;
+		try {
+			await getFetch()("https://api.openai.com/v1/chat/completions", REQ);
+		} catch (err) {
+			capturedErr = err;
+		}
+
+		expect(APICallError.isInstance(capturedErr)).toBe(true);
+		const apiErr = capturedErr as APICallError;
+		expect(apiErr.isRetryable).toBe(false);
+		expect(apiErr.cause).toBe(originalError);
+	});
+
+	it("normalizes an explicit retryable: false binding error into a non-retryable APICallError", async () => {
+		const originalError = Object.assign(new Error("Bad request data"), { retryable: false });
+		const binding = {
+			run: vi.fn(async () => {
+				throw originalError;
+			}),
+		} as unknown as Ai;
+
+		const { plugin, getFetch } = capturePlugin("openai");
+		const wai = createGatewayDelegate({ binding, gateway: "gw-1", providers: [plugin] });
+		wai("openai/gpt-5");
+
+		let capturedErr: unknown;
+		try {
+			await getFetch()("https://api.openai.com/v1/chat/completions", REQ);
+		} catch (err) {
+			capturedErr = err;
+		}
+
+		expect(APICallError.isInstance(capturedErr)).toBe(true);
+		const apiErr = capturedErr as APICallError;
+		expect(apiErr.isRetryable).toBe(false);
+		expect(apiErr.cause).toBe(originalError);
+	});
+
+	it("passes AbortError through unchanged without wrapping in APICallError", async () => {
+		const abortError = Object.assign(new Error("The operation was aborted"), {
+			name: "AbortError",
+		});
+		const binding = {
+			run: vi.fn(async () => {
+				throw abortError;
+			}),
+		} as unknown as Ai;
+
+		const { plugin, getFetch } = capturePlugin("openai");
+		const wai = createGatewayDelegate({ binding, gateway: "gw-1", providers: [plugin] });
+		wai("openai/gpt-5");
+
+		let capturedErr: unknown;
+		try {
+			await getFetch()("https://api.openai.com/v1/chat/completions", REQ);
+		} catch (err) {
+			capturedErr = err;
+		}
+
+		expect(capturedErr).toBe(abortError);
+		expect(APICallError.isInstance(capturedErr)).toBe(false);
+	});
+
+	it("auto-retries an explicitly retryable binding error and succeeds with the AI SDK", async () => {
+		let calls = 0;
+		const originalError = Object.assign(new Error("Network connection lost."), {
+			retryable: true,
+		});
+
+		const binding = {
+			run: vi.fn(async () => {
+				calls++;
+				if (calls === 1) {
+					throw originalError;
+				}
+				return new Response(JSON.stringify(chatResponsePayload), {
+					headers: { "content-type": "application/json" },
+				});
+			}),
+		} as unknown as Ai;
+
+		const wai = createGatewayDelegate({
+			binding,
+			gateway: "gw-1",
+			providers: [openai],
+		});
+
+		const result = await generateText({
+			model: wai("openai/gpt-5", { resume: false }),
+			prompt: "Hello",
+			maxRetries: 2,
+		});
+
+		expect(result.text).toBe("Recovered successfully!");
+		expect(calls).toBe(2);
+	});
+
+	it("does not retry an unclassified binding error with the AI SDK (1 call made)", async () => {
+		let calls = 0;
+		const originalError = new Error("Unclassified failure");
+
+		const binding = {
+			run: vi.fn(async () => {
+				calls++;
+				throw originalError;
+			}),
+		} as unknown as Ai;
+
+		const wai = createGatewayDelegate({
+			binding,
+			gateway: "gw-1",
+			providers: [openai],
+		});
+
+		const err = await generateText({
+			model: wai("openai/gpt-5", { resume: false }),
+			prompt: "Hello",
+			maxRetries: 2,
+		}).catch((e) => e);
+
+		expect(calls).toBe(1);
+		expect(APICallError.isInstance(err)).toBe(true);
+		expect((err as APICallError).isRetryable).toBe(false);
+		expect((err as APICallError).cause).toBe(originalError);
+	});
+
+	it("does not retry an explicitly non-retryable binding error with the AI SDK (1 call made)", async () => {
+		let calls = 0;
+		const originalError = Object.assign(new Error("Fatal schema error"), { retryable: false });
+
+		const binding = {
+			run: vi.fn(async () => {
+				calls++;
+				throw originalError;
+			}),
+		} as unknown as Ai;
+
+		const wai = createGatewayDelegate({
+			binding,
+			gateway: "gw-1",
+			providers: [openai],
+		});
+
+		const err = await generateText({
+			model: wai("openai/gpt-5", { resume: false }),
+			prompt: "Hello",
+			maxRetries: 2,
+		}).catch((e) => e);
+
+		expect(calls).toBe(1);
+		expect(APICallError.isInstance(err)).toBe(true);
+		expect((err as APICallError).isRetryable).toBe(false);
+		expect((err as APICallError).cause).toBe(originalError);
+	});
+
+	it("does not retry cancellation with the AI SDK", async () => {
+		let calls = 0;
+		const abortError = Object.assign(new Error("The operation was aborted"), {
+			name: "AbortError",
+		});
+
+		const binding = {
+			run: vi.fn(async () => {
+				calls++;
+				throw abortError;
+			}),
+		} as unknown as Ai;
+
+		const wai = createGatewayDelegate({
+			binding,
+			gateway: "gw-1",
+			providers: [openai],
+		});
+
+		const err = await generateText({
+			model: wai("openai/gpt-5", { resume: false }),
+			prompt: "Hello",
+			maxRetries: 2,
+		}).catch((e) => e);
+
+		expect(calls).toBe(1);
+		expect(err).toBe(abortError);
+	});
+
+	it("respects the AI SDK retry budget (maxRetries: 2 causes exactly 3 total attempts)", async () => {
+		let calls = 0;
+		const originalError = Object.assign(new Error("Persistent network disconnect"), {
+			retryable: true,
+		});
+
+		const binding = {
+			run: vi.fn(async () => {
+				calls++;
+				throw originalError;
+			}),
+		} as unknown as Ai;
+
+		const wai = createGatewayDelegate({
+			binding,
+			gateway: "gw-1",
+			providers: [openai],
+		});
+
+		const err = await generateText({
+			model: wai("openai/gpt-5", { resume: false }),
+			prompt: "Hello",
+			maxRetries: 2,
+		}).catch((e) => e);
+
+		// Initial attempt + 2 retries = 3 total calls
+		expect(calls).toBe(3);
+		expect((err as { reason?: string }).reason).toBe("maxRetriesExceeded");
+		const lastErr = (err as { lastError?: unknown }).lastError;
+		expect(APICallError.isInstance(lastErr)).toBe(true);
+		expect((lastErr as APICallError).isRetryable).toBe(true);
+		expect((lastErr as APICallError).cause).toBe(originalError);
+	}, 15000);
+
+	it("supports custom OpenAI Responses wire plugin with retryable binding error recovery", async () => {
+		let calls = 0;
+		const originalError = Object.assign(new Error("Connection reset by peer"), {
+			retryable: true,
+		});
+
+		const binding = {
+			run: vi.fn(async () => {
+				calls++;
+				if (calls === 1) {
+					throw originalError;
+				}
+				return new Response(JSON.stringify(responsesApiPayload), {
+					headers: { "content-type": "application/json" },
+				});
+			}),
+		} as unknown as Ai;
+
+		const responsesPlugin: ProviderPlugin = {
+			wireFormat: "openai",
+			create: ({ modelId, fetch }) =>
+				createOpenAI({ apiKey: "unused", fetch }).responses(modelId),
+		};
+
+		const wai = createGatewayDelegate({
+			binding,
+			gateway: "gw-1",
+			providers: [responsesPlugin],
+		});
+
+		const result = await generateText({
+			model: wai("openai/gpt-5", { resume: false }),
+			prompt: "Hello from responses plugin",
+			maxRetries: 2,
+		});
+
+		expect(result.text).toBe("Responses API recovered!");
+		expect(calls).toBe(2);
 	});
 });

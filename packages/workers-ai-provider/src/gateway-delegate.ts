@@ -10,6 +10,7 @@ import {
 } from "@cloudflare/gateway-core";
 import { createClientFallbackModel } from "./client-fallback";
 import { findProviderBySlug, type GatewayProviderInfo, type WireFormat } from "./gateway-providers";
+import { normalizeBindingError } from "./workersai-error";
 
 export {
 	createResumableStream,
@@ -697,7 +698,15 @@ function makeRunFetch(
 				options: Record<string, unknown>,
 			): Promise<Response>;
 		};
-		const resp = await ai.run(slug, body, runOptions);
+		let resp: Response;
+		try {
+			resp = await ai.run(slug, body, runOptions);
+		} catch (error) {
+			throw normalizeBindingError(error, {
+				model: slug,
+				requestBodyValues: body,
+			});
+		}
 		fireDispatch(resp, selection, callOptions);
 
 		// Wrap the stream so a transient mid-stream drop reconnects via the gateway

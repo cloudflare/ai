@@ -2,6 +2,7 @@ import { APICallError } from "@ai-sdk/provider";
 import {
 	headersToObject,
 	isAbortError,
+	isExplicitlyRetryable,
 	messageOf,
 	parseWorkersAIErrorCode,
 	WORKERS_AI_ERROR_CODE_TO_STATUS,
@@ -10,7 +11,7 @@ import {
 // Re-exported from `@cloudflare/gateway-core` (single source of truth, shared
 // with `@cloudflare/tanstack-ai`) so existing importers of this module keep
 // working unchanged.
-export { parseWorkersAIErrorCode, WORKERS_AI_ERROR_CODE_TO_STATUS };
+export { isExplicitlyRetryable, parseWorkersAIErrorCode, WORKERS_AI_ERROR_CODE_TO_STATUS };
 
 /**
  * Normalize an error thrown by the Workers AI **binding** (`env.AI.run`) into an
@@ -19,10 +20,11 @@ export { parseWorkersAIErrorCode, WORKERS_AI_ERROR_CODE_TO_STATUS };
  * Cancellations (`AbortError` / `TimeoutError` / `ResponseAborted`, including
  * `DOMException` aborts) and errors that are already an `APICallError` pass
  * through unchanged. Everything else becomes an
- * `APICallError`; when the internal code maps to a known HTTP status, that
- * `statusCode` is attached and `APICallError` derives `isRetryable` from it.
- * Unrecognized errors get no `statusCode`, so they stay non-retryable (the
- * prior behavior).
+ * `APICallError`; when the error carries an explicit `retryable` boolean, that
+ * is forwarded to `APICallError({ isRetryable })`. When the internal code maps
+ * to a known HTTP status, that `statusCode` is attached and `APICallError` derives
+ * `isRetryable` from it. Unrecognized errors without an explicit `retryable`
+ * property get no `statusCode`, so they stay non-retryable (the prior behavior).
  */
 export function normalizeBindingError(
 	error: unknown,
@@ -32,6 +34,7 @@ export function normalizeBindingError(
 		return error;
 	}
 
+	const explicitRetryable = isExplicitlyRetryable(error);
 	const code = parseWorkersAIErrorCode(error);
 	const statusCode = code != null ? WORKERS_AI_ERROR_CODE_TO_STATUS[code] : undefined;
 	const message = messageOf(error);
@@ -43,6 +46,7 @@ export function normalizeBindingError(
 		statusCode,
 		responseBody: message,
 		cause: error,
+		...(explicitRetryable !== undefined ? { isRetryable: explicitRetryable } : {}),
 		...(code != null ? { data: { workersAIErrorCode: code } } : {}),
 	});
 }

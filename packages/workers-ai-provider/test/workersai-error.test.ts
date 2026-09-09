@@ -2,6 +2,7 @@ import { APICallError } from "@ai-sdk/provider";
 import { describe, expect, it } from "vitest";
 import {
 	apiCallErrorFromResponse,
+	isExplicitlyRetryable,
 	normalizeBindingError,
 	parseWorkersAIErrorCode,
 	WORKERS_AI_ERROR_CODE_TO_STATUS,
@@ -45,8 +46,81 @@ describe("parseWorkersAIErrorCode", () => {
 	});
 });
 
+describe("isExplicitlyRetryable", () => {
+	it("returns true when retryable is explicitly true", () => {
+		expect(isExplicitlyRetryable({ retryable: true })).toBe(true);
+		expect(
+			isExplicitlyRetryable(
+				Object.assign(new Error("Network connection lost."), { retryable: true }),
+			),
+		).toBe(true);
+	});
+
+	it("returns false when retryable is explicitly false", () => {
+		expect(isExplicitlyRetryable({ retryable: false })).toBe(false);
+		expect(
+			isExplicitlyRetryable(Object.assign(new Error("Bad request"), { retryable: false })),
+		).toBe(false);
+	});
+
+	it("returns undefined when retryable property is missing or non-boolean", () => {
+		expect(isExplicitlyRetryable(new Error("standard error"))).toBeUndefined();
+		expect(isExplicitlyRetryable({})).toBeUndefined();
+		expect(isExplicitlyRetryable(null)).toBeUndefined();
+		expect(isExplicitlyRetryable(undefined)).toBeUndefined();
+		expect(isExplicitlyRetryable("retryable")).toBeUndefined();
+		expect(isExplicitlyRetryable({ retryable: "true" })).toBeUndefined();
+		expect(isExplicitlyRetryable({ retryable: 1 })).toBeUndefined();
+		expect(isExplicitlyRetryable({ retryable: null })).toBeUndefined();
+	});
+});
+
 describe("normalizeBindingError", () => {
 	const ctx = { model: "@cf/meta/llama-3.3-70b-instruct-fp8-fast", requestBodyValues: {} };
+
+	it("normalizes an explicitly retryable error into a retryable APICallError and preserves cause", () => {
+		const original = Object.assign(new Error("Network connection lost."), { retryable: true });
+		const err = normalizeBindingError(original, ctx) as APICallError;
+
+		expect(APICallError.isInstance(err)).toBe(true);
+		expect(err.isRetryable).toBe(true);
+		expect(err.cause).toBe(original);
+		expect(err.message).toBe("Network connection lost.");
+		expect(err.url).toBe("workers-ai:binding/run/@cf/meta/llama-3.3-70b-instruct-fp8-fast");
+	});
+
+	it("normalizes an explicitly non-retryable error into a non-retryable APICallError", () => {
+		const original = Object.assign(new Error("Invalid request"), { retryable: false });
+		const err = normalizeBindingError(original, ctx) as APICallError;
+
+		expect(APICallError.isInstance(err)).toBe(true);
+		expect(err.isRetryable).toBe(false);
+		expect(err.cause).toBe(original);
+		expect(err.message).toBe("Invalid request");
+	});
+
+	it("honors explicit retryable: false even when error code would otherwise map to a retryable status", () => {
+		const original = Object.assign(
+			new Error("3040: Capacity temporarily exceeded, please try again."),
+			{ retryable: false },
+		);
+		const err = normalizeBindingError(original, ctx) as APICallError;
+
+		expect(APICallError.isInstance(err)).toBe(true);
+		expect(err.statusCode).toBe(429);
+		expect(err.isRetryable).toBe(false);
+		expect(err.cause).toBe(original);
+	});
+
+	it("honors explicit retryable: true even when error code would otherwise map to a non-retryable status", () => {
+		const original = Object.assign(new Error("5007: No such model"), { retryable: true });
+		const err = normalizeBindingError(original, ctx) as APICallError;
+
+		expect(APICallError.isInstance(err)).toBe(true);
+		expect(err.statusCode).toBe(400);
+		expect(err.isRetryable).toBe(true);
+		expect(err.cause).toBe(original);
+	});
 
 	it("maps an out-of-capacity (3040) binding error to a retryable 429 APICallError", () => {
 		const err = normalizeBindingError(
