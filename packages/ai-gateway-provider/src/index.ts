@@ -46,6 +46,29 @@ type InternalLanguageModelV4 = LanguageModelV4 & {
 	config?: { fetch?: FetchFunction | undefined };
 };
 
+/**
+ * Return a per-request view of `model` whose `config.fetch` is isolated.
+ * Mutating the shared `model.config.fetch` races under concurrent calls and
+ * can cross-wire gateway responses (#620).
+ */
+function modelWithFetch(
+	model: InternalLanguageModelV4,
+	fetchFn: FetchFunction,
+): InternalLanguageModelV4 {
+	return new Proxy(model, {
+		get(target, prop, receiver) {
+			if (prop === "config") {
+				return { ...target.config, fetch: fetchFn };
+			}
+			const value = Reflect.get(target, prop, receiver);
+			if (typeof value === "function") {
+				return value.bind(receiver);
+			}
+			return value;
+		},
+	});
+}
+
 export class AiGatewayChatLanguageModel implements LanguageModelV4 {
 	readonly specificationVersion = "v4";
 	readonly defaultObjectGenerationMode = "json";
@@ -94,17 +117,17 @@ export class AiGatewayChatLanguageModel implements LanguageModelV4 {
 				);
 			}
 
-			model.config.fetch = (url, request) => {
+			const captureModel = modelWithFetch(model, (url, request) => {
 				requests.push({
 					modelProvider: model.provider,
 					request: request as Request,
 					url: url as string,
 				});
 				throw new AiGatewayInternalFetchError("Stopping provider execution...");
-			};
+			});
 
 			try {
-				await model[modelMethod](options);
+				await captureModel[modelMethod](options);
 			} catch (e) {
 				if (!(e instanceof AiGatewayInternalFetchError)) {
 					throw e;
@@ -236,12 +259,12 @@ export class AiGatewayChatLanguageModel implements LanguageModelV4 {
 			}
 		}
 
-		this.models[step].config = {
-			...this.models[step].config,
-			fetch: (_url, _req) => resp as unknown as Promise<Response>,
-		};
+		const responseModel = modelWithFetch(
+			this.models[step],
+			(_url, _req) => resp as unknown as Promise<Response>,
+		);
 
-		return this.models[step][modelMethod](options) as Promise<Awaited<ReturnType<T>>>;
+		return responseModel[modelMethod](options) as Promise<Awaited<ReturnType<T>>>;
 	}
 
 	async doStream(
