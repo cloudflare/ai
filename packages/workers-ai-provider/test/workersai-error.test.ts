@@ -60,6 +60,18 @@ describe("normalizeBindingError", () => {
 		expect(api.data).toEqual({ workersAIErrorCode: 3040 });
 	});
 
+	it("maps an inference RPM limit (3021) binding error to a retryable 429 APICallError", () => {
+		const err = normalizeBindingError(
+			new Error("3021: rate limiting: inference request per min rate reached"),
+			ctx,
+		);
+		expect(APICallError.isInstance(err)).toBe(true);
+		const api = err as APICallError;
+		expect(api.statusCode).toBe(429);
+		expect(api.isRetryable).toBe(true);
+		expect(api.data).toEqual({ workersAIErrorCode: 3021 });
+	});
+
 	it("maps a client error (5007) to a non-retryable 400 APICallError", () => {
 		const err = normalizeBindingError(new Error("5007: No such model"), ctx) as APICallError;
 		expect(APICallError.isInstance(err)).toBe(true);
@@ -139,6 +151,7 @@ describe("WORKERS_AI_ERROR_CODE_TO_STATUS", () => {
 	it("maps the documented transient codes to retryable statuses", () => {
 		expect(WORKERS_AI_ERROR_CODE_TO_STATUS[3040]).toBe(429);
 		expect(WORKERS_AI_ERROR_CODE_TO_STATUS[3036]).toBe(429);
+		expect(WORKERS_AI_ERROR_CODE_TO_STATUS[3021]).toBe(429);
 		expect(WORKERS_AI_ERROR_CODE_TO_STATUS[3007]).toBe(408);
 	});
 });
