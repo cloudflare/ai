@@ -50,6 +50,7 @@ export {
 } from "./workers-ai";
 export {
 	isAbortError,
+	isExplicitlyRetryable,
 	isRetryableStatus,
 	messageOf,
 	parseWorkersAIErrorCode,
