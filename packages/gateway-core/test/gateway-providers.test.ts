@@ -22,6 +22,16 @@ describe("findProviderBySlug", () => {
 		expect(findProviderBySlug("azure")?.resolverKey).toBe("azure-openai");
 	});
 
+	it("resolves the Moonshot AI unified catalog slug", () => {
+		expect(findProviderBySlug("moonshotai")).toMatchObject({
+			gatewayProviderId: "moonshotai",
+			wireFormat: "openai",
+			runCatalog: true,
+			gatewayPath: false,
+			billing: "unified",
+		});
+	});
+
 	it("maps google ⇒ google-ai-studio gateway id, anthropic native run wire", () => {
 		expect(findProviderBySlug("google")?.gatewayProviderId).toBe("google-ai-studio");
 		const anthropic = findProviderBySlug("anthropic");

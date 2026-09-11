@@ -205,7 +205,7 @@ describe("gateway provider registry", () => {
 			.map((p) => p.resolverKey)
 			.sort();
 		// The headline directory set (openai/anthropic/google/xai/groq), the
-		// run-only unified chat providers alibaba + minimax, and deepseek — the one
+		// run-only unified chat providers alibaba + minimax + moonshotai, and deepseek — the one
 		// OpenAI-wire long-tail provider actually on the unified `env.AI.run` catalog
 		// (#596). The rest of the long tail (mistral/perplexity/cerebras/openrouter/
 		// fireworks) is BYOK gateway-path only, verified by the e2e run-path probe.
@@ -216,13 +216,14 @@ describe("gateway provider registry", () => {
 			"google",
 			"groq",
 			"minimax",
+			"moonshotai",
 			"openai",
 			"xai",
 		]);
 	});
 
-	it("adds alibaba + minimax as run-only openai-wire chat providers", () => {
-		for (const slug of ["alibaba", "minimax"]) {
+	it("adds run-only openai-wire chat providers", () => {
+		for (const slug of ["alibaba", "minimax", "moonshotai"]) {
 			const info = findProviderBySlug(slug);
 			expect(info, slug).toMatchObject({
 				runCatalog: true,

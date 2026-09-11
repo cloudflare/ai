@@ -342,7 +342,7 @@ describe("createGatewayDelegate", () => {
 		);
 	});
 
-	it("builds alibaba + minimax on the run path with the openai plugin", () => {
+	it("builds unified run-only providers with the openai plugin", () => {
 		const { binding } = makeBinding();
 		const wai = createGatewayDelegate({
 			binding,
@@ -353,6 +353,7 @@ describe("createGatewayDelegate", () => {
 		// so a single openai plugin is enough.
 		expect(wai("alibaba/qwen3-max").modelId).toBe("qwen3-max");
 		expect(wai("minimax/m3").modelId).toBe("m3");
+		expect(wai("moonshotai/kimi-k3").modelId).toBe("kimi-k3");
 	});
 
 	it("rejects gateway-path use of a run-only provider with a clear error", () => {
@@ -362,10 +363,13 @@ describe("createGatewayDelegate", () => {
 			gateway: "default",
 			providers: [capturePlugin("openai").plugin],
 		});
-		// alibaba/minimax have no gateway path — caching, server fallback, and
+		// run-only providers have no gateway path — caching, server fallback, and
 		// transport:"gateway" must fail fast at build time, not upstream.
 		expect(() => wai("alibaba/qwen3-max", { transport: "gateway" })).toThrow(/no gateway path/);
 		expect(() => wai("alibaba/qwen3-max", { cacheTtl: 60 })).toThrow(/no gateway path/);
+		expect(() => wai("moonshotai/kimi-k3", { transport: "gateway" })).toThrow(
+			/no gateway path/,
+		);
 		expect(() =>
 			wai("minimax/m3", { fallback: { mode: "server", models: ["minimax/m2.7"] } }),
 		).toThrow(/no gateway path/);

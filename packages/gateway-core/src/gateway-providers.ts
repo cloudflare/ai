@@ -241,6 +241,17 @@ export const GATEWAY_PROVIDERS: GatewayProviderInfo[] = [
 		authHeaders: ["authorization"],
 	},
 	{
+		// Moonshot AI / Kimi is served by the unified billing run catalog using
+		// the OpenAI-compatible response format. It has no native gateway path.
+		resolverKey: "moonshotai",
+		gatewayProviderId: "moonshotai",
+		wireFormat: "openai",
+		runCatalog: true,
+		gatewayPath: false,
+		billing: "unified",
+		authHeaders: ["authorization"],
+	},
+	{
 		resolverKey: "google-vertex",
 		gatewayProviderId: "google-vertex-ai",
 		// Vertex's URL carries project/location/publisher segments that the
