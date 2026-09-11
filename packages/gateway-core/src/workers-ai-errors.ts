@@ -37,6 +37,7 @@ export const WORKERS_AI_ERROR_CODE_TO_STATUS: Record<number, number> = {
 	3008: 408, // Aborted
 	3036: 429, // Account limited (daily free allocation used up)
 	3040: 429, // Out of capacity (no data center to forward to)
+	3021: 429, // Inference request per-minute rate limit reached
 };
 
 /** Read a human-readable message from any thrown value (Error, DOMException, plain object, string). */
