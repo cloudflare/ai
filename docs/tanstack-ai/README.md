@@ -166,6 +166,19 @@ const adapter = createOpenAiChat("gpt-5", {
 });
 ```
 
+`byokAlias` (`cf-aig-byok-alias`) is credentials / REST only — including
+Gemini (`createGeminiChat` via `httpOptions.headers`). The AI binding does
+not select a non-`default` stored key for third-party models:
+
+```ts
+const adapter = createOpenAiChat("gpt-5", {
+	accountId: env.CF_ACCOUNT_ID,
+	gatewayId: "my-gateway",
+	cfApiKey: env.CF_AIG_TOKEN,
+	byokAlias: "development",
+});
+```
+
 See the [package README](../../packages/tanstack-ai/README.md) for the full list
 of provider factories (chat / summarize / image / transcription / TTS / video)
 and the four Workers AI configuration modes.

@@ -304,6 +304,18 @@ describe("Gemini gateway adapters", () => {
 		expect(config.httpOptions.headers["cf-aig-metadata"]).toBe(JSON.stringify({ env: "test" }));
 	});
 
+	it("createGeminiChat passes byokAlias via httpOptions.headers", async () => {
+		const { createGeminiChat } = await import("../src/adapters/gemini");
+		const configWithAlias: GeminiGatewayConfig = {
+			...geminiConfig,
+			byokAlias: "development",
+		};
+		createGeminiChat("gemini-2.5-flash" as any, configWithAlias);
+
+		const [config] = mockGeminiTextCtor.mock.calls[0]!;
+		expect(config.httpOptions.headers["cf-aig-byok-alias"]).toBe("development");
+	});
+
 	it("createGeminiImage with credentials config", async () => {
 		const { createGeminiImage } = await import("../src/adapters/gemini");
 		createGeminiImage("imagen-4.0-generate-001" as any, geminiConfig);
@@ -542,6 +554,31 @@ describe("OpenRouter gateway adapters", () => {
 		const [config] = mockOpenRouterTextCtor.mock.calls[0]!;
 		expect(config.apiKey).toBe("unused");
 	});
+
+	it("createOpenRouterChat forwards byokAlias through the HTTPClient fetcher", async () => {
+		const originalFetch = globalThis.fetch;
+		const mockFetch = vi.fn(async (..._args: unknown[]) => new Response("ok"));
+		globalThis.fetch = mockFetch as any;
+
+		try {
+			const { createOpenRouterChat } = await import("../src/adapters/openrouter");
+			createOpenRouterChat("openai/gpt-4o", {
+				...credentialsConfig,
+				byokAlias: "development",
+			});
+
+			const [config] = mockOpenRouterTextCtor.mock.calls[0]!;
+			await config.httpClient.fetcher("https://openrouter.ai/api/v1/chat/completions", {
+				method: "POST",
+				body: JSON.stringify({ model: "openai/gpt-4o", messages: [] }),
+			});
+
+			const [, init] = mockFetch.mock.calls[0]!;
+			expect((init as any).headers["cf-aig-byok-alias"]).toBe("development");
+		} finally {
+			globalThis.fetch = originalFetch;
+		}
+	});
 });
 
 describe("gateway fetch integration", () => {
@@ -564,6 +601,37 @@ describe("gateway fetch integration", () => {
 			expect(mockFetch).toHaveBeenCalledOnce();
 			const [url] = mockFetch.mock.calls[0]!;
 			expect(url).toBe("https://gateway.ai.cloudflare.com/v1/test-account/test-gateway");
+		} finally {
+			globalThis.fetch = originalFetch;
+		}
+	});
+
+	it("createOpenAiChat and createAnthropicChat forward byokAlias on REST", async () => {
+		const originalFetch = globalThis.fetch;
+		const mockFetch = vi.fn(async (..._args: unknown[]) => new Response("ok"));
+		globalThis.fetch = mockFetch as any;
+
+		try {
+			const { createOpenAiChat } = await import("../src/adapters/openai");
+			const { createAnthropicChat } = await import("../src/adapters/anthropic");
+			const withAlias = { ...credentialsConfig, byokAlias: "development" };
+
+			createOpenAiChat("gpt-4o" as any, withAlias);
+			await mockOpenAITextCtor.mock.calls[0]![0].fetch(
+				"https://api.openai.com/v1/chat/completions",
+				{ body: JSON.stringify({ model: "gpt-4o", messages: [] }) },
+			);
+
+			createAnthropicChat("claude-sonnet-4-5" as any, withAlias);
+			await mockAnthropicTextCtor.mock.calls[0]![0].fetch(
+				"https://api.anthropic.com/v1/messages",
+				{ body: JSON.stringify({ model: "claude-sonnet-4-5", messages: [] }) },
+			);
+
+			expect(mockFetch).toHaveBeenCalledTimes(2);
+			for (const [, init] of mockFetch.mock.calls) {
+				expect((init as any).headers["cf-aig-byok-alias"]).toBe("development");
+			}
 		} finally {
 			globalThis.fetch = originalFetch;
 		}
@@ -598,6 +666,7 @@ describe("gateway fetch integration", () => {
 				cacheTtl: 300,
 				customCacheKey: "my-key",
 				metadata: { env: "test" },
+				byokAlias: "development",
 			});
 
 			const [config] = mockGrokTextCtor.mock.calls[0]!;
@@ -612,6 +681,8 @@ describe("gateway fetch integration", () => {
 			expect(body.headers["cf-aig-cache-ttl"]).toBe("300");
 			expect(body.headers["cf-aig-cache-key"]).toBe("my-key");
 			expect(body.headers["cf-aig-metadata"]).toBe(JSON.stringify({ env: "test" }));
+			expect(body.headers["cf-aig-byok-alias"]).toBe("development");
+			expect((init as any).headers["cf-aig-byok-alias"]).toBe("development");
 		} finally {
 			globalThis.fetch = originalFetch;
 		}
