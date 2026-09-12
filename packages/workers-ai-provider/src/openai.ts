@@ -11,9 +11,9 @@ import type { ProviderPlugin } from "./gateway-delegate";
  *
  * Requires `@ai-sdk/openai` (an optional peer dependency — install it yourself).
  *
- * Uses `.chat()` (Chat Completions) deliberately: the bare `openai()` call
- * (AI SDK v6+) defaults to the Responses API, which the AI Gateway run catalog
- * does not serve.
+ * Uses `.chat()` (Chat Completions) for the catalog's chat-completions models.
+ * The gpt-5.6 class only accepts the Responses API, so those models use
+ * `.responses()` instead.
  */
 export const openai: ProviderPlugin = {
 	wireFormat: "openai",
@@ -22,5 +22,7 @@ export const openai: ProviderPlugin = {
 		// and the delegate strips the Authorization header on the gateway path.
 		// baseURL (set by the registry for non-OpenAI openai-wire providers) makes
 		// the generated URL host-strip to the right gateway-native endpoint.
-		createOpenAI({ apiKey: "unused", fetch, ...(baseURL ? { baseURL } : {}) }).chat(modelId),
+		createOpenAI({ apiKey: "unused", fetch, ...(baseURL ? { baseURL } : {}) })[
+			/^gpt-5\.6(?:-|$)/.test(modelId) ? "responses" : "chat"
+		](modelId),
 };
