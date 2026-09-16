@@ -1,0 +1,39 @@
+/**
+ * Wrangler Configuration
+ * Details: https://developers.cloudflare.com/workers/wrangler/configuration
+ *
+ * 1. Environment Variables
+ *      - Docs: https://developers.cloudflare.com/workers/configuration/secrets
+ *      - For local development, use the '.dev.vars' file
+ *      - For remote deployment, run this command: 'wrangler secret put <SECRET>'
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "remote-mcp-ping-federate",
+	"main": "dist/index.js",
+	"compatibility_date": "2025-03-10",
+	"compatibility_flags": ["nodejs_compat"],
+	"migrations": [
+		{
+			"new_sqlite_classes": [
+				"TodoMcpServer"
+			],
+			"tag": "v1"
+		}
+	],
+	"durable_objects": {
+		"bindings": [
+			{
+				"class_name": "TodoMcpServer",
+				"name": "MCP_OBJECT"
+			}
+		]
+	},
+	"ai": {
+		"binding": "AI",
+    "remote": true
+	},
+	"observability": {
+		"enabled": true
+	}
+}
