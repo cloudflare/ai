@@ -57,6 +57,52 @@ describe("REST API - Streaming Text Tests", () => {
 		expect(accumulatedText).toBe("Hello chunk1Hello chunk2");
 	});
 
+	it("should not duplicate text when a chunk carries BOTH `response` and `choices[].delta.content`", async () => {
+		// Workers AI's OpenAI-compatible streaming emits both the native `response`
+		// field and `choices[0].delta.content` in the same chunk, with identical
+		// content. The mapper must treat them as mutually exclusive, otherwise every
+		// token is emitted twice ("Hello world" -> "HelloHello world world").
+		server.use(
+			http.post(
+				`https://api.cloudflare.com/client/v4/accounts/${TEST_ACCOUNT_ID}/ai/run/${TEST_MODEL}`,
+				async () => {
+					return new Response(
+						[
+							`data: {"response":"Hello ","choices":[{"delta":{"content":"Hello "},"finish_reason":null}]}\n\n`,
+							`data: {"response":"world","choices":[{"delta":{"content":"world"},"finish_reason":null}]}\n\n`,
+							`data: {"response":"","choices":[{"delta":{},"finish_reason":"stop"}]}\n\n`,
+							"data: [DONE]\n\n",
+						].join(""),
+						{
+							headers: {
+								"Content-Type": "text/event-stream",
+								"Transfer-Encoding": "chunked",
+							},
+							status: 200,
+						},
+					);
+				},
+			),
+		);
+
+		const workersai = createWorkersAI({
+			accountId: TEST_ACCOUNT_ID,
+			apiKey: TEST_API_KEY,
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Say hello world",
+		});
+
+		let accumulatedText = "";
+		for await (const chunk of result.textStream) {
+			accumulatedText += chunk;
+		}
+
+		expect(accumulatedText).toBe("Hello world");
+	});
+
 	it("should handle chunk without 'response' field gracefully", async () => {
 		server.use(
 			http.post(
