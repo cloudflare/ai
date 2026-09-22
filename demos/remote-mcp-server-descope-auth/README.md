@@ -80,7 +80,6 @@ To explore your new MCP api, you can use the [MCP Inspector](https://modelcontex
   <img src="img/mcp-inspector-mcp-config.png" alt="MCP Inspector with the above config" width="600"/>
 </div>
 
-
 ## Deploy to Cloudflare
 
 1. Create a KV namespace for production:
@@ -120,11 +119,16 @@ Then, using the `Streamable HTTP` transport, enter the `workers.dev` URL (ex: `h
 
 You've now connected to your MCP server from a remote MCP client. Authentication runs through the Descope OAuth flow — no manual bearer token needed.
 
+## Architecture
+
+This server uses the **stateless MCP handler** from the [MCP SDK v2](https://developers.cloudflare.com/agents/model-context-protocol/guides/migrate-to-mcp-sdk-v2/) (protocol revision `2026-07-28`). Instead of the old stateful `McpAgent` Durable Object, requests are served by [`createMcpHandler`](https://developers.cloudflare.com/agents/model-context-protocol/mcp-handler-api/) from `agents/mcp/server` — so there is no Durable Object binding or migration to configure.
+
 
 ## Features
 
 The MCP server implementation includes:
 
+- ⚡ Stateless MCP SDK v2 handler (no Durable Object required)
 - 🔐 OAuth 2.0/2.1 Authorization Server Metadata (RFC 8414)
 - 🔑 Dynamic Client Registration (RFC 7591)
 - 🔒 PKCE Support

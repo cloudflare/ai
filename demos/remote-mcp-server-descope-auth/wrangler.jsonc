@@ -4,10 +4,10 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "remote-mcp-server-bearer-auth",
+	"name": "remote-mcp-server-descope-auth",
 	"main": "src/index.ts",
-	"compatibility_date": "2025-03-10",
-	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_date": "2026-07-02",
+	"compatibility_flags": ["nodejs_compat","global_fetch_strictly_public"],
 	/**
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
@@ -17,20 +17,6 @@
 	 * npx wrangler secret put DESCOPE_CLIENT_SECRET
 	 * npx wrangler secret put COOKIE_ENCRYPTION_KEY
 	 */
-	"migrations": [
-		{
-			"new_sqlite_classes": ["MyMCP"],
-			"tag": "v1",
-		},
-	],
-	"durable_objects": {
-		"bindings": [
-			{
-				"class_name": "MyMCP",
-				"name": "MCP_OBJECT",
-			},
-		],
-	},
 	"kv_namespaces": [
 		{
 			"binding": "OAUTH_KV",
