@@ -10,8 +10,9 @@
 		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@cloudflare/workers-oauth-provider": "^0.8.1",
-		"agents": "^0.17.1",
+		"@cloudflare/workers-oauth-provider": "^0.8.3",
+		"@modelcontextprotocol/server": "2.0.0",
+		"agents": "^0.20.1",
 		"hono": "^4.12.27",
 		"just-pick": "^4.2.0",
 		"octokit": "^5.0.5",
