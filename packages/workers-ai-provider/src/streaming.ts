@@ -157,6 +157,28 @@ export function getMappedStream(
 				const choiceFinishReason = choices?.[0]?.finish_reason;
 				const directFinishReason = chunk.finish_reason as string | undefined;
 
+				// Workers AI's /ai/run format mirrors streamed content into the native
+				// top-level fields *and* the OpenAI-compatible `choices[0].delta` in the
+				// same chunk — `response` alongside `delta.content`, and `tool_calls`
+				// alongside `delta.tool_calls` — carrying identical payloads in both. The
+				// pairs are aliases, not alternatives, so the native blocks below defer
+				// whenever the OpenAI copy is present for that chunk. Emitting both
+				// doubles everything streamed: "Hello world" arrives as
+				// "HelloHello world world", and tool arguments accumulate as
+				// `{"location": "{"location": "LondonLondon"}"}`, which then fails to
+				// parse and is rejected before the tool runs.
+				//
+				// Either copy alone still works: a model that emits only the native
+				// fields, or only the OpenAI ones, is unaffected by these guards.
+				const openAIDelta = choices?.[0]?.delta;
+				const openAIText =
+					typeof openAIDelta?.content === "string" && openAIDelta.content !== ""
+						? openAIDelta.content
+						: undefined;
+				const openAIToolCalls = Array.isArray(openAIDelta?.tool_calls)
+					? (openAIDelta.tool_calls as Record<string, unknown>[])
+					: undefined;
+
 				if (choiceFinishReason != null) {
 					finishReason = mapWorkersAIFinishReason(choiceFinishReason);
 				} else if (directFinishReason != null) {
@@ -165,7 +187,7 @@ export function getMappedStream(
 
 				// --- Native format: top-level `response` field ---
 				const nativeResponse = chunk.response;
-				if (nativeResponse != null && nativeResponse !== "") {
+				if (openAIText === undefined && nativeResponse != null && nativeResponse !== "") {
 					const responseText = String(nativeResponse);
 					if (responseText.length > 0) {
 						if (bufferContentForSalvage) {
@@ -190,7 +212,12 @@ export function getMappedStream(
 				}
 
 				// --- Native format: top-level `tool_calls` ---
-				if (Array.isArray(chunk.tool_calls)) {
+				// Deferred to the OpenAI copy when both are present (see above). For tool
+				// calls the OpenAI copy is also the richer record: it carries `id`,
+				// `index` and `type`, where the native mirror carries only `arguments`, so
+				// preferring the native one would synthesise a call id and collapse
+				// parallel calls onto index 0.
+				if (openAIToolCalls === undefined && Array.isArray(chunk.tool_calls)) {
 					// Close active reasoning block before tool calls start
 					if (reasoningId) {
 						controller.enqueue({ type: "reasoning-end", id: reasoningId });

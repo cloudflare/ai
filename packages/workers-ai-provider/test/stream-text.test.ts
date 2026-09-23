@@ -381,6 +381,381 @@ describe("REST API - Streaming Text Tests", () => {
 		expect(await result.finishReason).toBe("tool-calls");
 	});
 
+	it("should not duplicate streamed text when a chunk carries BOTH `response` and `choices[].delta.content`", async () => {
+		// Workers AI's /ai/run format mirrors each token into the native top-level
+		// `response` field and `choices[0].delta.content` in the same chunk, with the same
+		// string in both (observed with @cf/meta/llama-3.3-70b-instruct-fp8-fast).
+		// Emitting a text-delta for each doubles everything streamed.
+		server.use(
+			http.post(
+				`https://api.cloudflare.com/client/v4/accounts/${TEST_ACCOUNT_ID}/ai/run/${TEST_MODEL}`,
+				async () => {
+					return new Response(
+						[
+							`data: {"response":"Hello","choices":[{"delta":{"content":"Hello","role":"assistant"},"finish_reason":null}]}\n\n`,
+							`data: {"response":" world","choices":[{"delta":{"content":" world"},"finish_reason":null}]}\n\n`,
+							`data: {"response":"!","choices":[{"delta":{"content":"!"},"finish_reason":"stop"}]}\n\n`,
+							"data: [DONE]\n\n",
+						].join(""),
+						{
+							headers: {
+								"Content-Type": "text/event-stream",
+								"Transfer-Encoding": "chunked",
+							},
+						},
+					);
+				},
+			),
+		);
+
+		const workersai = createWorkersAI({
+			accountId: TEST_ACCOUNT_ID,
+			apiKey: TEST_API_KEY,
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Say hello",
+		});
+
+		let accumulatedText = "";
+		const deltas: string[] = [];
+		for await (const chunk of result.textStream) {
+			accumulatedText += chunk;
+			deltas.push(chunk);
+		}
+
+		expect(accumulatedText).toBe("Hello world!");
+		// One delta per chunk, not two: a doubled stream would arrive as
+		// ["Hello", "Hello", " world", " world", "!", "!"].
+		expect(deltas).toEqual(["Hello", " world", "!"]);
+		expect(await result.finishReason).toBe("stop");
+	});
+
+	it("should emit native `response` text when the chunk carries an empty `delta.content`", async () => {
+		// The role-priming chunk carries `content: ""` alongside real native text. An
+		// empty string is not a token, so the native copy must still be emitted —
+		// treating the key's mere presence as the OpenAI copy would drop the text.
+		server.use(
+			http.post(
+				`https://api.cloudflare.com/client/v4/accounts/${TEST_ACCOUNT_ID}/ai/run/${TEST_MODEL}`,
+				async () => {
+					return new Response(
+						[
+							`data: {"response":"Hello","choices":[{"delta":{"content":"","role":"assistant"},"finish_reason":null}]}\n\n`,
+							"data: [DONE]\n\n",
+						].join(""),
+						{
+							headers: {
+								"Content-Type": "text/event-stream",
+								"Transfer-Encoding": "chunked",
+							},
+						},
+					);
+				},
+			),
+		);
+
+		const workersai = createWorkersAI({
+			accountId: TEST_ACCOUNT_ID,
+			apiKey: TEST_API_KEY,
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Say hello",
+		});
+
+		let accumulatedText = "";
+		for await (const chunk of result.textStream) accumulatedText += chunk;
+
+		expect(accumulatedText).toBe("Hello");
+	});
+
+	it("should emit OpenAI `delta.content` text when the chunk carries no native copy", async () => {
+		// The mirror is not guaranteed: a chunk with only `choices[].delta.content` has to
+		// keep working, so the guard must key on the OpenAI copy being present rather than
+		// on the native field being absent.
+		server.use(
+			http.post(
+				`https://api.cloudflare.com/client/v4/accounts/${TEST_ACCOUNT_ID}/ai/run/${TEST_MODEL}`,
+				async () => {
+					return new Response(
+						[
+							`data: {"choices":[{"delta":{"content":"Only"},"finish_reason":null}]}\n\n`,
+							`data: {"choices":[{"delta":{"content":" OpenAI"},"finish_reason":"stop"}]}\n\n`,
+							"data: [DONE]\n\n",
+						].join(""),
+						{
+							headers: {
+								"Content-Type": "text/event-stream",
+								"Transfer-Encoding": "chunked",
+							},
+						},
+					);
+				},
+			),
+		);
+
+		const workersai = createWorkersAI({
+			accountId: TEST_ACCOUNT_ID,
+			apiKey: TEST_API_KEY,
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Say hello",
+		});
+
+		let accumulatedText = "";
+		for await (const chunk of result.textStream) accumulatedText += chunk;
+
+		expect(accumulatedText).toBe("Only OpenAI");
+	});
+
+	it("should not duplicate text or tool calls when a chunk carries BOTH formats for both", async () => {
+		// The realistic shape: a turn that streams a sentence and then calls a tool, with
+		// every chunk mirroring both fields. Both guards have to hold at once.
+		server.use(
+			http.post(
+				`https://api.cloudflare.com/client/v4/accounts/${TEST_ACCOUNT_ID}/ai/run/${TEST_MODEL}`,
+				async () => {
+					return new Response(
+						[
+							`data: {"response":"Checking","choices":[{"delta":{"content":"Checking","role":"assistant"},"finish_reason":null}]}\n\n`,
+							`data: {"tool_calls":[{"name":"get_weather"}],"choices":[{"delta":{"tool_calls":[{"id":"call-1","type":"function","index":0,"function":{"name":"get_weather","arguments":"{\\"location\\": \\"London\\"}"}}]},"finish_reason":null}]}\n\n`,
+							`data: {"choices":[{"delta":{},"finish_reason":"tool_calls"}]}\n\n`,
+							"data: [DONE]\n\n",
+						].join(""),
+						{
+							headers: {
+								"Content-Type": "text/event-stream",
+								"Transfer-Encoding": "chunked",
+							},
+						},
+					);
+				},
+			),
+		);
+
+		const workersai = createWorkersAI({
+			accountId: TEST_ACCOUNT_ID,
+			apiKey: TEST_API_KEY,
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "What is the weather in London?",
+			tools: {
+				get_weather: {
+					description: "Get the weather in a location",
+					execute: async ({ location }) => ({ location }),
+					inputSchema: z.object({
+						location: z.string().describe("The location to get the weather for"),
+					}),
+				},
+			},
+		});
+
+		let accumulatedText = "";
+		const toolCalls: any = [];
+		for await (const chunk of result.fullStream) {
+			if (chunk.type === "text-delta") accumulatedText += (chunk as { text: string }).text;
+			if (chunk.type === "tool-call") toolCalls.push(chunk);
+		}
+
+		expect(accumulatedText).toBe("Checking");
+		expect(toolCalls).toHaveLength(1);
+		expect(toolCalls[0].input).toEqual({ location: "London" });
+		expect(toWorkersAIToolCallId(toolCalls[0].toolCallId)).toBe("call-1");
+	});
+	it("should not duplicate tool call arguments when a chunk carries BOTH native and OpenAI `tool_calls`", async () => {
+		// Workers AI's /ai/run format mirrors each tool call into the native top-level
+		// `tool_calls` and `choices[0].delta.tool_calls` in the same chunk, carrying the
+		// same fragment in both (observed with @cf/meta/llama-3.3-70b-instruct-fp8-fast).
+		// Emitting both appends every fragment twice, so the accumulated arguments become
+		// `{"location": "{"location": "LondonLondon"}"}` and fail to parse — the AI SDK
+		// then rejects the call with AI_InvalidToolInputError before the tool runs, which
+		// surfaces as an assistant message with no text rather than as an error.
+		server.use(
+			http.post(
+				`https://api.cloudflare.com/client/v4/accounts/${TEST_ACCOUNT_ID}/ai/run/${TEST_MODEL}`,
+				async () => {
+					return new Response(
+						[
+							`data: {"tool_calls":[{"name":"get_weather"}],"choices":[{"delta":{"tool_calls":[{"id":"chatcmpl-tool-abc","type":"function","index":0,"function":{"name":"get_weather"}}]},"finish_reason":null}]}\n\n`,
+							`data: {"tool_calls":[{"arguments":"{\\"location\\": \\""}],"choices":[{"delta":{"tool_calls":[{"index":0,"function":{"arguments":"{\\"location\\": \\""}}]},"finish_reason":null}]}\n\n`,
+							`data: {"tool_calls":[{"arguments":"London\\"}"}],"choices":[{"delta":{"tool_calls":[{"index":0,"function":{"arguments":"London\\"}"}}]},"finish_reason":null}]}\n\n`,
+							`data: {"choices":[{"delta":{},"finish_reason":"tool_calls"}]}\n\n`,
+							"data: [DONE]\n\n",
+						].join(""),
+						{
+							headers: {
+								"Content-Type": "text/event-stream",
+								"Transfer-Encoding": "chunked",
+							},
+						},
+					);
+				},
+			),
+		);
+
+		const workersai = createWorkersAI({
+			accountId: TEST_ACCOUNT_ID,
+			apiKey: TEST_API_KEY,
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Get the weather information for London",
+			tools: {
+				get_weather: {
+					description: "Get the weather in a location",
+					execute: async ({ location }) => ({
+						location,
+						weather: location === "London" ? "Raining" : "Sunny",
+					}),
+					inputSchema: z.object({
+						location: z.string().describe("The location to get the weather for"),
+					}),
+				},
+			},
+		});
+
+		const toolCalls: any = [];
+		const inputDeltas: string[] = [];
+		const errors: any = [];
+		for await (const chunk of result.fullStream) {
+			if (chunk.type === "tool-call") toolCalls.push(chunk);
+			if (chunk.type === "tool-input-delta") inputDeltas.push(chunk.delta);
+			if (chunk.type === "tool-input-error" || chunk.type === "tool-error") {
+				errors.push(chunk);
+			}
+		}
+
+		// Each fragment is emitted once, so the arguments parse and reach the tool.
+		expect(inputDeltas.join("")).toBe('{"location": "London"}');
+		expect(errors).toHaveLength(0);
+		expect(toolCalls).toHaveLength(1);
+		expect(toolCalls[0].toolName).toBe("get_weather");
+		expect(toolCalls[0].input).toEqual({ location: "London" });
+		// The OpenAI copy is the one that survives, so tool-call identity is preserved:
+		// the native mirror carries no id.
+		expect(toWorkersAIToolCallId(toolCalls[0].toolCallId)).toBe("chatcmpl-tool-abc");
+		expect(await result.finishReason).toBe("tool-calls");
+	});
+
+	it("should keep parallel tool calls distinct when chunks carry BOTH formats", async () => {
+		// The native mirror carries no `index`, so preferring it would collapse parallel
+		// calls onto index 0 and interleave their arguments into one unparseable string.
+		server.use(
+			http.post(
+				`https://api.cloudflare.com/client/v4/accounts/${TEST_ACCOUNT_ID}/ai/run/${TEST_MODEL}`,
+				async () => {
+					return new Response(
+						[
+							`data: {"tool_calls":[{"name":"get_weather"}],"choices":[{"delta":{"tool_calls":[{"id":"call-london","type":"function","index":0,"function":{"name":"get_weather","arguments":"{\\"location\\": \\"London\\"}"}}]},"finish_reason":null}]}\n\n`,
+							`data: {"tool_calls":[{"name":"get_weather"}],"choices":[{"delta":{"tool_calls":[{"id":"call-paris","type":"function","index":1,"function":{"name":"get_weather","arguments":"{\\"location\\": \\"Paris\\"}"}}]},"finish_reason":null}]}\n\n`,
+							`data: {"choices":[{"delta":{},"finish_reason":"tool_calls"}]}\n\n`,
+							"data: [DONE]\n\n",
+						].join(""),
+						{
+							headers: {
+								"Content-Type": "text/event-stream",
+								"Transfer-Encoding": "chunked",
+							},
+						},
+					);
+				},
+			),
+		);
+
+		const workersai = createWorkersAI({
+			accountId: TEST_ACCOUNT_ID,
+			apiKey: TEST_API_KEY,
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Get the weather for London and Paris",
+			tools: {
+				get_weather: {
+					description: "Get the weather in a location",
+					execute: async ({ location }) => ({ location }),
+					inputSchema: z.object({
+						location: z.string().describe("The location to get the weather for"),
+					}),
+				},
+			},
+		});
+
+		const toolCalls: any = [];
+		for await (const chunk of result.fullStream) {
+			if (chunk.type === "tool-call") toolCalls.push(chunk);
+		}
+
+		expect(toolCalls).toHaveLength(2);
+		expect(toolCalls.map((call: any) => call.input)).toEqual([
+			{ location: "London" },
+			{ location: "Paris" },
+		]);
+		expect(toolCalls.map((call: any) => toWorkersAIToolCallId(call.toolCallId))).toEqual([
+			"call-london",
+			"call-paris",
+		]);
+	});
+
+	it("should still emit native `tool_calls` when the chunk carries no OpenAI copy", async () => {
+		// The guard must not suppress the native format when it is the only copy: a chunk
+		// with `tool_calls` and no `choices[].delta.tool_calls` still has to work.
+		server.use(
+			http.post(
+				`https://api.cloudflare.com/client/v4/accounts/${TEST_ACCOUNT_ID}/ai/run/${TEST_MODEL}`,
+				async () => {
+					return new Response(
+						[
+							`data: {"tool_calls":[{"id":"native-only","name":"get_weather","arguments":{"location":"London"}}]}\n\n`,
+							"data: [DONE]\n\n",
+						].join(""),
+						{
+							headers: {
+								"Content-Type": "text/event-stream",
+								"Transfer-Encoding": "chunked",
+							},
+						},
+					);
+				},
+			),
+		);
+
+		const workersai = createWorkersAI({
+			accountId: TEST_ACCOUNT_ID,
+			apiKey: TEST_API_KEY,
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Get the weather information for London",
+			tools: {
+				get_weather: {
+					description: "Get the weather in a location",
+					execute: async ({ location }) => ({ location }),
+					inputSchema: z.object({
+						location: z.string().describe("The location to get the weather for"),
+					}),
+				},
+			},
+		});
+
+		const toolCalls: any = [];
+		for await (const chunk of result.fullStream) {
+			if (chunk.type === "tool-call") toolCalls.push(chunk);
+		}
+
+		expect(toolCalls).toHaveLength(1);
+		expect(toolCalls[0].toolName).toBe("get_weather");
+		expect(toolCalls[0].input).toEqual({ location: "London" });
+	});
 	it("should handle content and reasoning_content fields if present", async () => {
 		server.use(
 			http.post(
