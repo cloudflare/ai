@@ -1,0 +1,10 @@
+.vscode/
+**/node_modules
+**/dist
+**/build
+**/lib
+**/coverage
+**/*.tsbuildinfo
+.wrangler
+worker-configuration.d.ts
+.dev.vars
