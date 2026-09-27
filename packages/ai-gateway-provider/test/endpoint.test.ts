@@ -53,6 +53,11 @@ const testCases = [
 		url: "https://myresource.openai.azure.com/openai/deployments/mydeployment/chat/completions?api-version=2024-02-15-preview",
 	},
 	{
+		expected: "myresource/openai/responses?api-version=2024-02-15-preview",
+		name: "azure-openai",
+		url: "https://myresource.openai.azure.com/openai/v1/responses?api-version=2024-02-15-preview",
+	},
+	{
 		expected: "v1/chat/completions",
 		name: "openrouter",
 		url: "https://openrouter.ai/api/v1/chat/completions",
@@ -73,6 +78,15 @@ describe("ProvidersConfigs endpoint parsing", () => {
 			expect(result).toBe(testCase.expected);
 		});
 	}
+
+	// Azure's v1 surface is only routable for the Responses API (the sole path
+	// with a non-deployment Azure route); other v1 paths must stay unmatched
+	// rather than route to an endpoint that 404s at Azure.
+	it("does not match Azure v1 paths other than responses", () => {
+		const url =
+			"https://myresource.openai.azure.com/openai/v1/chat/completions?api-version=2024-02-15-preview";
+		expect(providers.find((p) => p.regex.test(url))).toBeUndefined();
+	});
 });
 
 describe("Provider auth header selection", () => {

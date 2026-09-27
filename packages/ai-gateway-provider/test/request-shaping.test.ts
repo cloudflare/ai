@@ -3,6 +3,7 @@ import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { CF_TEMP_TOKEN } from "../src/auth";
+import { createAzure } from "../src/providers/azure";
 import { createOpenAI } from "../src/providers/openai";
 import { createAiGateway } from "../src";
 
@@ -112,6 +113,46 @@ describe("REST request shaping", () => {
 		expect(captured.headers["cf-aig-cache-ttl"]).toBe("120");
 		expect(captured.headers["cf-aig-byok-alias"]).toBe("alias-1");
 		expect(captured.headers["cf-aig-zdr"]).toBe("true");
+	});
+
+	it("routes Azure responses API v1 URLs through the azure-openai provider entry", async () => {
+		server.use(
+			http.post(GATEWAY_URL, async ({ request }) => {
+				captured.headers = Object.fromEntries(request.headers);
+				captured.body = await request.json();
+				return HttpResponse.json(openAiResponse());
+			}),
+		);
+
+		const aigateway = createAiGateway({
+			accountId: TEST_ACCOUNT_ID,
+			apiKey: TEST_API_KEY,
+			gateway: TEST_GATEWAY,
+		});
+		const azure = createAzure({
+			resourceName: "myresource",
+			apiKey: "azure-api-key",
+			apiVersion: "2024-02-15-preview",
+			useDeploymentBasedUrls: false,
+		});
+
+		await generateText({
+			model: aigateway(azure.responses("gpt-5.1")),
+			prompt: "hi",
+			maxRetries: 0,
+		});
+
+		const body = captured.body as Array<{
+			provider: string;
+			endpoint: string;
+			query: { model?: string };
+		}>;
+		expect(body).toHaveLength(1);
+		expect(body[0]?.provider).toBe("azure-openai");
+		expect(body[0]?.endpoint).toBe(
+			"myresource/openai/responses?api-version=2024-02-15-preview",
+		);
+		expect(body[0]?.query.model).toBe("gpt-5.1");
 	});
 });
 
