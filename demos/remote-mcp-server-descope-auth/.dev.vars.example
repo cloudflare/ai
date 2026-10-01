@@ -1,3 +1,11 @@
-DESCOPE_CLIENT_ID="your_inbound_app_client_id"
-DESCOPE_CLIENT_SECRET="your_inbound_app_client_secret"
+DESCOPE_CLIENT_ID="your_mcp_server_client_id"
+DESCOPE_CLIENT_SECRET="your_mcp_server_client_secret"
+DESCOPE_PROJECT_ID="your_descope_project_id"
+DESCOPE_MCP_SERVER_ID="your_descope_mcp_server_id"
+# Descope API host. Defaults to production; override to https://api.descope.org (or your
+# region/environment's host) only if this project lives in a non-production Descope environment.
+DESCOPE_BASE_URL="https://api.descope.com"
+DESCOPE_SCOPES="openid profile email"
+DESCOPE_ENABLE_PKCE="false"
+DESCOPE_RESOURCE="http://localhost:8787/mcp"
 COOKIE_ENCRYPTION_KEY="your_cookie_encryption_key_generate_with_openssl_rand_hex_32"

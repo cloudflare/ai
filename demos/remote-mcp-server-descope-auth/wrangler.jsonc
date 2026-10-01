@@ -15,6 +15,9 @@
 	 * Commands to set secrets:
 	 * npx wrangler secret put DESCOPE_CLIENT_ID
 	 * npx wrangler secret put DESCOPE_CLIENT_SECRET
+	 * npx wrangler secret put DESCOPE_PROJECT_ID
+	 * npx wrangler secret put DESCOPE_MCP_SERVER_ID
+	 * npx wrangler secret put DESCOPE_BASE_URL (optional, defaults to https://api.descope.com)
 	 * npx wrangler secret put COOKIE_ENCRYPTION_KEY
 	 */
 	"kv_namespaces": [
