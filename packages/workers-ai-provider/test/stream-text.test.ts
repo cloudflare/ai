@@ -320,7 +320,9 @@ describe("REST API - Streaming Text Tests", () => {
 
 		expect(toolCalls).toHaveLength(0);
 		expect(accumulatedText).toBe('{"name":"analysis","location":"x"}');
-		expect(await result.finishReason).toBe("stop");
+		// The provider reports the upstream "stop"; the AI SDK (>= 7.0.103) then
+		// flags the missing forced tool call as a ToolChoiceViolationError.
+		expect(await result.rawFinishReason).toBe("stop");
 	});
 
 	it("should handle streamed tool calls (OpenAI format) with tools present", async () => {

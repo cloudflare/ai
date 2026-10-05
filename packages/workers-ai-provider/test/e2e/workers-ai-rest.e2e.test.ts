@@ -23,6 +23,7 @@ import {
 	transcribe,
 	generateSpeech,
 	rerank,
+	experimental_evaluate as evaluate,
 } from "ai";
 import { z } from "zod/v4";
 import { createWorkersAI } from "../../src/index";
@@ -935,6 +936,46 @@ describe.skipIf(skip())("Workers AI REST E2E", () => {
 			// The ML-related documents (index 0 and 2) should score higher
 			console.log(
 				`  [rerank] BGE Reranker Base OK — ${result.ranking.length} results, top: index ${result.ranking[0].originalIndex} (${result.ranking[0].score.toFixed(3)})`,
+			);
+		});
+	});
+
+	// ------------------------------------------------------------------
+	// Evaluation
+	// ------------------------------------------------------------------
+	describe("evaluation", () => {
+		it("Clef — should evaluate boolean, choice, and score questions via REST", async () => {
+			const provider = makeProvider();
+
+			const result = await evaluate({
+				model: provider.evaluation("@cf/cloudflare/clef"),
+				state: "Checkout has been failing for every customer for the last hour.",
+				questions: {
+					urgent: { type: "boolean", instructions: "Is this support request urgent?" },
+					team: {
+						type: "choice",
+						instructions: "Which team should handle this request?",
+						criteria: {
+							billing: "Payments, invoices, and refunds",
+							technical: "Outages, errors, and configuration",
+							sales: "Plans and upgrades",
+						},
+					},
+					severity: {
+						type: "score",
+						instructions: "How severe is the customer impact?",
+						criteria: ["No impact", "Minor", "Major", "Critical"],
+					},
+				},
+			});
+
+			expect(result.answers.urgent.probability).toBeGreaterThanOrEqual(0);
+			expect(result.answers.urgent.probability).toBeLessThanOrEqual(1);
+			expect(["billing", "technical", "sales"]).toContain(result.answers.team.choice);
+			expect(result.answers.severity.score).toBeGreaterThanOrEqual(0);
+			expect(result.answers.severity.score).toBeLessThanOrEqual(3);
+			console.log(
+				`  [evaluate] Clef OK — urgent: ${result.answers.urgent.probability}, team: ${result.answers.team.choice}, severity: ${result.answers.severity.score}`,
 			);
 		});
 	});

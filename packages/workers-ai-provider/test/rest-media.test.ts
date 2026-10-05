@@ -1,4 +1,5 @@
 import {
+	experimental_evaluate as evaluate,
 	generateSpeech,
 	transcribe,
 	generateImage,
@@ -11,7 +12,7 @@ import { createWorkersAI } from "../src/index";
 
 /**
  * REST-path coverage for the non-text Workers AI models (image / speech /
- * transcription / reranking). The offline suites for these only exercised the
+ * transcription / reranking / evaluation). The offline suites for these only exercised the
  * binding path; the REST path was previously e2e-only (creds-gated, not in CI).
  *
  * The credentials shim hits `…/accounts/<id>/ai/run/<model>` and unwraps the
@@ -173,5 +174,39 @@ describe("REST API - Reranking", () => {
 		expect(result.ranking[0]!.originalIndex).toBe(2);
 		expect(result.ranking[0]!.score).toBe(0.95);
 		expect(captured).toMatchObject({ query: "What is machine learning?" });
+	});
+});
+
+describe("REST API - Evaluation", () => {
+	it("maps Clef answers from the { result } envelope", async () => {
+		const model = "@cf/cloudflare/clef";
+		let captured: Record<string, unknown> | null = null;
+
+		server.use(
+			http.post(runUrl(model), async ({ request }) => {
+				captured = (await request.json()) as Record<string, unknown>;
+				return HttpResponse.json({
+					result: {
+						model: "clef",
+						answers: { urgent: { type: "noul", noul: 0.97 } },
+						usage: { input_tokens: 30, output_tokens: 0 },
+					},
+				});
+			}),
+		);
+
+		const result = await evaluate({
+			model: workersai().evaluation(model),
+			state: "Checkout is down.",
+			questions: { urgent: { type: "boolean", instructions: "Is this urgent?" } },
+		});
+
+		expect(result.answers.urgent).toEqual({ type: "boolean", probability: 0.97 });
+		expect(result.usage.inputTokens).toBe(30);
+		expect(captured).toEqual({
+			model: "clef",
+			state: "Checkout is down.",
+			questions: { urgent: { type: "noul", instructions: "Is this urgent?" } },
+		});
 	});
 });

@@ -68,10 +68,10 @@
 		"@ai-sdk/anthropic": "^4.0.5",
 		"@ai-sdk/google": "^4.0.6",
 		"@ai-sdk/openai": "^4.0.5",
-		"@ai-sdk/provider": "^4.0.1",
+		"@ai-sdk/provider": "^4.0.16",
 		"@cloudflare/gateway-core": "workspace:*",
 		"@cloudflare/workers-types": "^4.20260628.1",
-		"ai": "^7.0.11",
+		"ai": "^7.0.103",
 		"zod": "^4.4.3"
 	},
 	"peerDependencies": {

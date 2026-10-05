@@ -15,6 +15,8 @@ import { WorkersAISpeechModel } from "./workersai-speech-model";
 import type { WorkersAISpeechSettings } from "./workersai-speech-settings";
 import { WorkersAIRerankingModel } from "./workersai-reranking-model";
 import type { WorkersAIRerankingSettings } from "./workersai-reranking-settings";
+import { WorkersAIEvaluationModel } from "./workersai-evaluation-model";
+import type { WorkersAIEvaluationSettings } from "./workersai-evaluation-settings";
 import type {
 	EmbeddingModels,
 	ImageGenerationModels,
@@ -23,6 +25,7 @@ import type {
 	TranscriptionModels,
 	SpeechModels,
 	RerankingModels,
+	EvaluationModels,
 } from "./workersai-models";
 
 // Re-export deprecated AutoRAG aliases
@@ -40,6 +43,12 @@ export { WorkersAISpeechModel } from "./workersai-speech-model";
 export type { WorkersAISpeechSettings } from "./workersai-speech-settings";
 export { WorkersAIRerankingModel } from "./workersai-reranking-model";
 export type { WorkersAIRerankingSettings } from "./workersai-reranking-settings";
+export {
+	WorkersAIEvaluationModel,
+	type WorkersAIEvaluationImage,
+	type WorkersAIEvaluationProviderOptions,
+} from "./workersai-evaluation-model";
+export type { WorkersAIEvaluationSettings } from "./workersai-evaluation-settings";
 
 // ---------------------------------------------------------------------------
 // AI Gateway delegate (route catalog models through AI Gateway)
@@ -272,6 +281,20 @@ export interface WorkersAI {
 		modelId: RerankingModels,
 		settings?: WorkersAIRerankingSettings,
 	): WorkersAIRerankingModel;
+
+	/**
+	 * Creates a model for evaluation (`experimental_evaluate`).
+	 *
+	 * @experimental The AI SDK evaluation interface is experimental.
+	 **/
+	evaluation(
+		modelId: EvaluationModels,
+		settings?: WorkersAIEvaluationSettings,
+	): WorkersAIEvaluationModel;
+	evaluationModel(
+		modelId: EvaluationModels,
+		settings?: WorkersAIEvaluationSettings,
+	): WorkersAIEvaluationModel;
 }
 
 /**
@@ -570,6 +593,16 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 			provider: "workersai.reranking",
 		});
 
+	const createEvaluationModel = (
+		modelId: EvaluationModels,
+		settings: WorkersAIEvaluationSettings = {},
+	) =>
+		new WorkersAIEvaluationModel(modelId, settings, {
+			binding,
+			gateway: options.gateway,
+			provider: "workersai.evaluation",
+		});
+
 	const provider = (
 		modelId: TextGenerationModels,
 		settings?: WorkersAIChatSettings | DelegateCallOptions,
@@ -592,6 +625,8 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 	provider.speechModel = createSpeechModel;
 	provider.reranking = createRerankingModel;
 	provider.rerankingModel = createRerankingModel;
+	provider.evaluation = createEvaluationModel;
+	provider.evaluationModel = createEvaluationModel;
 
 	return provider;
 }

@@ -65,4 +65,11 @@ export type RerankingModels =
 	| "@cf/baai/bge-reranker-v2-m3"
 	| (string & {});
 
+/**
+ * Workers AI models that support evaluation (`experimental_evaluate`).
+ *
+ * Accepts any string at runtime, but provides autocomplete for known models.
+ */
+export type EvaluationModels = "@cf/cloudflare/clef" | "@cf/cloudflare/clef-flash" | (string & {});
+
 type value2key<T, V> = { [K in keyof T]: T[K] extends V ? K : never }[keyof T];

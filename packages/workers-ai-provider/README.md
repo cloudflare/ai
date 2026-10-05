@@ -1,6 +1,6 @@
 # workers-ai-provider
 
-[Workers AI](https://developers.cloudflare.com/workers-ai/) provider for the [AI SDK](https://sdk.vercel.ai/). Run Cloudflare's models for chat, embeddings, image generation, transcription, text-to-speech, reranking, and [AI Search](https://developers.cloudflare.com/ai-search/) — all from a single provider. It can also route **third-party** models (OpenAI, Anthropic, Google, …) through [AI Gateway](https://developers.cloudflare.com/ai-gateway/) — see [Third-party models](#third-party-models-via-ai-gateway).
+[Workers AI](https://developers.cloudflare.com/workers-ai/) provider for the [AI SDK](https://sdk.vercel.ai/). Run Cloudflare's models for chat, embeddings, image generation, transcription, text-to-speech, reranking, evaluation, and [AI Search](https://developers.cloudflare.com/ai-search/) — all from a single provider. It can also route **third-party** models (OpenAI, Anthropic, Google, …) through [AI Gateway](https://developers.cloudflare.com/ai-gateway/) — see [Third-party models](#third-party-models-via-ai-gateway).
 
 > 📚 In-depth guides and the AI Gateway **delegate** reference (unified catalog,
 > resumable streaming _(coming soon)_, server-side fallback) live in
@@ -89,6 +89,7 @@ Some good defaults:
 | Transcription  | `@cf/deepgram/nova-3`                  | Fast, high accuracy                 |
 | Text-to-Speech | `@cf/deepgram/aura-2-en`               | Context-aware, natural pacing       |
 | Reranking      | `@cf/baai/bge-reranker-base`           | Fast document reranking             |
+| Evaluation     | `@cf/cloudflare/clef`                  | Typed decisions with probabilities  |
 
 ## Text generation
 
@@ -305,6 +306,56 @@ const { results } = await rerank({
 
 // results is sorted by relevance score
 ```
+
+## Evaluation
+
+Turn a state and a set of typed questions into decisions with [Clef](https://developers.cloudflare.com/ai/models/@cf/cloudflare/clef/), using the AI SDK's experimental `evaluate`. Every question returns a probability for each allowed option — useful for routing, triage, moderation, and LLM-as-a-judge checks.
+
+```ts
+import { experimental_evaluate as evaluate } from "ai";
+
+const { answers } = await evaluate({
+	model: workersai.evaluation("@cf/cloudflare/clef"),
+	state: "Checkout has been failing for every customer for the last hour.",
+	questions: {
+		urgent: {
+			type: "boolean",
+			instructions: "Is this support request urgent?",
+		},
+		team: {
+			type: "choice",
+			instructions: "Which team should handle this request?",
+			criteria: {
+				billing: "Payments, invoices, and refunds",
+				technical: "Outages, errors, and configuration",
+				sales: "Plans and upgrades",
+			},
+		},
+		severity: {
+			type: "score",
+			instructions: "How severe is the customer impact?",
+			criteria: ["No impact", "Minor", "Major", "Critical"],
+		},
+	},
+});
+
+answers.urgent.probability; // P(yes), e.g. 0.97
+answers.team.choice; // "technical" (plus per-option `probabilities`)
+answers.severity.score; // probability-weighted level, 0 = lowest
+```
+
+`state` can be a string or JSON (records, chat logs, application state). Use `@cf/cloudflare/clef-flash` for the faster variant. Pass up to 4 images (base64 data URLs or `{ content_type, base64 }`) with `providerOptions`:
+
+```ts
+await evaluate({
+	model: workersai.evaluation("@cf/cloudflare/clef"),
+	state: "Review the attached receipt.",
+	questions: { legible: { type: "boolean", instructions: "Is the receipt total legible?" } },
+	providerOptions: { "workers-ai": { images: ["data:image/png;base64,..."] } },
+});
+```
+
+Clef's per-answer `confidence` (and the `legend` of score levels) are returned in `providerMetadata["workers-ai"].answers`. Requires `ai` 7.0.103 or later.
 
 ## AI Search
 
@@ -537,6 +588,9 @@ workersai.speech(modelId);
 
 // Reranking — for rerank
 workersai.reranking(modelId);
+
+// Evaluation — for experimental_evaluate
+workersai.evaluation(modelId);
 ```
 
 ### `createAISearch(options)`
