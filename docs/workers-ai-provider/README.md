@@ -30,7 +30,7 @@ const { text } = await generateText({
 ```
 
 Supports chat (tool calling, reasoning), image generation, embeddings,
-transcription, text-to-speech, and reranking. Works with a `binding` or with
+transcription, text-to-speech, reranking, and evaluation. Works with a `binding` or with
 `accountId` + `apiKey` (REST).
 
 ### 2. Bring your own `@ai-sdk` provider — `createGatewayProvider`

@@ -35,6 +35,7 @@ const provider = createWorkersAI({
 | ------------------------------------------------- | ------- | ---- |
 | Chat / generate / stream                          | ✅      | ✅   |
 | Image / embeddings / transcription / TTS / rerank | ✅      | ✅   |
+| Evaluation                                        | ✅      | ✅   |
 | Gateway routing (caching, metadata, BYOK)         | ✅      | ✅   |
 | Server-side fallback                              | ✅      | ✅   |
 | **Resumable streaming** _(coming soon)_           | ✅      | ❌   |
