@@ -486,6 +486,7 @@ export function createGatewayDelegate(config: GatewayDelegateConfig): GatewayDel
 						// Use the canonical run-catalog author (e.g. "grok" → "xai"), not the
 						// raw alias the caller typed, so `env.AI.run` resolves the model.
 						`${info.resolverKey}/${parsed.modelId}`,
+						wire,
 						gatewayOptions,
 						effectiveOptions,
 						selection,
@@ -654,9 +655,32 @@ function buildGatewayControls(
 	};
 }
 
+/**
+ * The unified-billing run path validates an Anthropic Messages body's `system`
+ * as a string, while `@ai-sdk/anthropic` always sends it as an array of text
+ * blocks (valid for Anthropic's own API). Every request with a system prompt
+ * was rejected with `7003: Invalid value at system: … expected string,
+ * received array`. Join text-only blocks into the string the run path
+ * accepts. Block-level `cache_control` can't be expressed as a string; the
+ * run path rejected those requests outright, so dropping it is strictly an
+ * improvement. Bodies with non-text blocks are left alone.
+ */
+export function flattenAnthropicSystem(body: Record<string, unknown>): void {
+	const system = body.system;
+	if (!Array.isArray(system)) return;
+	const isTextBlock = (block: unknown): block is { type: "text"; text: string } =>
+		typeof block === "object" &&
+		block !== null &&
+		(block as { type?: unknown }).type === "text" &&
+		typeof (block as { text?: unknown }).text === "string";
+	if (!system.every(isTextBlock)) return;
+	body.system = system.map((block) => block.text).join("\n\n");
+}
+
 function makeRunFetch(
 	binding: Ai,
 	slug: string,
+	wire: WireFormat,
 	gatewayOptions: GatewayOptions,
 	opts: DelegateCallOptions,
 	selection: Selection,
@@ -666,6 +690,7 @@ function makeRunFetch(
 		const body = JSON.parse(asText(init?.body)) as Record<string, unknown>;
 		// The slug carries the model; drop the redundant body field (both are tolerated).
 		delete body.model;
+		if (wire === "anthropic") flattenAnthropicSystem(body);
 
 		// Fold first-class metadata/collectLog over anything supplied via
 		// `gateway: { ... }`; explicit call options win.
