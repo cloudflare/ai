@@ -133,12 +133,10 @@ async function redirectToDescope(
 	return new Response(null, {
 		headers: {
 			...headers,
-			location: getDescopeAuthorizeUrl({
+			location: await getDescopeAuthorizeUrl({
 				client_id: env.DESCOPE_CLIENT_ID,
 				redirect_uri: new URL("/callback", request.url).href,
-				project_id: env.DESCOPE_PROJECT_ID,
-				mcp_server_id: env.DESCOPE_MCP_SERVER_ID,
-				base_url: env.DESCOPE_BASE_URL,
+				issuer_url: env.DESCOPE_ISSUER_URL,
 				scope: env.DESCOPE_SCOPES,
 				state: stateToken,
 				code_challenge: codeChallenge,
@@ -205,9 +203,7 @@ app.get("/callback", async (c) => {
 		client_secret: c.env.DESCOPE_CLIENT_SECRET,
 		code: c.req.query("code"),
 		redirect_uri: new URL("/callback", c.req.url).href,
-		project_id: c.env.DESCOPE_PROJECT_ID,
-		mcp_server_id: c.env.DESCOPE_MCP_SERVER_ID,
-		base_url: c.env.DESCOPE_BASE_URL,
+		issuer_url: c.env.DESCOPE_ISSUER_URL,
 		code_verifier: codeVerifier,
 		resource: c.env.DESCOPE_RESOURCE,
 	});

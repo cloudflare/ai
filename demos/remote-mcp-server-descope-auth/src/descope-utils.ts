@@ -6,38 +6,33 @@ import { createRemoteJWKSet, jwtVerify } from "jose";
  * @param {Object} options
  * @param {string} options.client_id - The Descope MCP Server Client ID.
  * @param {string} options.redirect_uri - The redirect URI of the application.
- * @param {string} options.project_id - The Descope Project ID.
- * @param {string} options.mcp_server_id - The Descope MCP Server ID.
+ * @param {string} options.issuer_url - The Descope MCP Server's issuer URL (from the Console's
+ *   Connection Information section).
  * @param {string} [options.state] - The state parameter.
  *
- * @returns {string} The authorization URL.
+ * @returns {Promise<string>} The authorization URL.
  */
-export function getDescopeAuthorizeUrl({
+export async function getDescopeAuthorizeUrl({
 	client_id,
 	redirect_uri,
-	project_id,
-	mcp_server_id,
+	issuer_url,
 	state,
 	scope = "openid profile email",
-	base_url = "https://api.descope.com",
 	code_challenge,
 	code_challenge_method,
 	resource,
 }: {
 	client_id: string;
 	redirect_uri: string;
-	project_id: string;
-	mcp_server_id: string;
+	issuer_url: string;
 	state?: string;
 	scope?: string;
-	base_url?: string;
 	code_challenge?: string;
 	code_challenge_method?: string;
 	resource?: string;
-}) {
-	const upstream = new URL(
-		`${base_url}/oauth2/v1/apps/agentic/${project_id}/${mcp_server_id}/authorize`,
-	);
+}): Promise<string> {
+	const discovery = await getDescopeDiscoveryDocument(issuer_url);
+	const upstream = new URL(discovery.authorization_endpoint);
 	upstream.searchParams.set("client_id", client_id);
 	upstream.searchParams.set("redirect_uri", redirect_uri);
 	upstream.searchParams.set("response_type", "code");
@@ -72,6 +67,8 @@ export interface DescopeTokenResult {
 
 interface DescopeDiscoveryDocument {
 	issuer: string;
+	authorization_endpoint: string;
+	token_endpoint: string;
 	jwks_uri: string;
 	[key: string]: any;
 }
@@ -83,31 +80,25 @@ const jwksCache = new Map<string, ReturnType<typeof createRemoteJWKSet>>();
 
 /**
  * Fetches (and caches) the Agentic Identity Hub MCP Server's OIDC discovery document.
- * `jwks_uri` and `issuer` are read from this document rather than hardcoded, since Descope
- * does not document a fixed URL shape for them.
+ * `authorization_endpoint`, `token_endpoint`, `jwks_uri`, and `issuer` are read from this
+ * document rather than hardcoded, since Descope is moving to project-level issuers and does
+ * not document a fixed URL shape for them.
  */
-async function getDescopeDiscoveryDocument(
-	base_url: string,
-	project_id: string,
-	mcp_server_id: string,
-): Promise<DescopeDiscoveryDocument> {
-	const cacheKey = `${base_url}/${project_id}/${mcp_server_id}`;
-	const cached = discoveryCache.get(cacheKey);
+async function getDescopeDiscoveryDocument(issuer_url: string): Promise<DescopeDiscoveryDocument> {
+	const cached = discoveryCache.get(issuer_url);
 	if (cached) return cached;
 
-	const resp = await fetch(
-		`${base_url}/v1/apps/agentic/${project_id}/${mcp_server_id}/.well-known/openid-configuration`,
-	);
+	const resp = await fetch(`${issuer_url}/.well-known/openid-configuration`);
 	// Descope's discovery endpoint has been observed to return a non-2xx status wrapper while
 	// still carrying a valid discovery document in the body, so the body is parsed regardless
 	// of resp.ok and only rejected if it's missing the fields verification depends on.
 	const doc = (await resp.json()) as DescopeDiscoveryDocument;
-	if (!doc.issuer || !doc.jwks_uri) {
+	if (!doc.issuer || !doc.jwks_uri || !doc.token_endpoint || !doc.authorization_endpoint) {
 		throw new Error(
-			`Descope discovery document is missing issuer/jwks_uri (status ${resp.status})`,
+			`Descope discovery document is missing required fields (status ${resp.status})`,
 		);
 	}
-	discoveryCache.set(cacheKey, doc);
+	discoveryCache.set(issuer_url, doc);
 	return doc;
 }
 
@@ -126,19 +117,17 @@ function getJwks(jwks_uri: string) {
  * semantics, an ID token's audience is the OAuth client it was issued to (`client_id`), NOT the
  * resource/MCP-server URL — that resource-audience requirement applies to the access token, and
  * was confirmed empirically to differ: this MCP Server's id_token carries `aud: [client_id,
- * project_id]`, while its access token carries `aud: [client_id, project_id, resource_url]`.
+ * issuer]`, while its access token carries `aud: [client_id, issuer, resource_url]`.
  * `exp`/`nbf` are enforced by `jwtVerify` itself.
  *
  * Throws (does not fall back to unverified claims) if verification fails for any reason.
  */
 async function verifyDescopeIdToken(
 	idToken: string,
-	base_url: string,
-	project_id: string,
-	mcp_server_id: string,
+	issuer_url: string,
 	client_id: string,
 ): Promise<DescopeIdTokenClaims> {
-	const discovery = await getDescopeDiscoveryDocument(base_url, project_id, mcp_server_id);
+	const discovery = await getDescopeDiscoveryDocument(issuer_url);
 	const jwks = getJwks(discovery.jwks_uri);
 
 	const { payload } = await jwtVerify(idToken, jwks, {
@@ -157,8 +146,8 @@ async function verifyDescopeIdToken(
  * @param {string} options.client_secret - The Descope MCP Server Client Secret.
  * @param {string} options.code - The authorization code.
  * @param {string} options.redirect_uri - The redirect URI of the application.
- * @param {string} options.project_id - The Descope Project ID.
- * @param {string} options.mcp_server_id - The Descope MCP Server ID.
+ * @param {string} options.issuer_url - The Descope MCP Server's issuer URL (from the Console's
+ *   Connection Information section).
  *
  * @returns {Promise<[DescopeTokenResult, null] | [null, Response]>} A promise that resolves to the access token plus verified id_token claims, or an error response.
  */
@@ -167,9 +156,7 @@ export async function fetchDescopeAuthToken({
 	client_secret,
 	code,
 	redirect_uri,
-	project_id,
-	mcp_server_id,
-	base_url = "https://api.descope.com",
+	issuer_url,
 	code_verifier,
 	resource,
 }: {
@@ -177,15 +164,15 @@ export async function fetchDescopeAuthToken({
 	client_id: string;
 	client_secret: string;
 	redirect_uri: string;
-	project_id: string;
-	mcp_server_id: string;
-	base_url?: string;
+	issuer_url: string;
 	code_verifier?: string;
 	resource?: string;
 }): Promise<[DescopeTokenResult, null] | [null, Response]> {
 	if (!code) {
 		return [null, new Response("Missing code", { status: 400 })];
 	}
+
+	const discovery = await getDescopeDiscoveryDocument(issuer_url);
 
 	const bodyParams: Record<string, string> = {
 		client_id,
@@ -197,16 +184,13 @@ export async function fetchDescopeAuthToken({
 	if (code_verifier) bodyParams.code_verifier = code_verifier;
 	if (resource) bodyParams.resource = resource;
 
-	const resp = await fetch(
-		`${base_url}/oauth2/v1/apps/agentic/${project_id}/${mcp_server_id}/token`,
-		{
-			body: new URLSearchParams(bodyParams),
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
-			},
-			method: "POST",
+	const resp = await fetch(discovery.token_endpoint, {
+		body: new URLSearchParams(bodyParams),
+		headers: {
+			"Content-Type": "application/x-www-form-urlencoded",
 		},
-	);
+		method: "POST",
+	});
 
 	if (!resp.ok) {
 		const errorText = await resp.text();
@@ -223,13 +207,7 @@ export async function fetchDescopeAuthToken({
 	let idTokenClaims: DescopeIdTokenClaims | null = null;
 	if (body.id_token) {
 		try {
-			idTokenClaims = await verifyDescopeIdToken(
-				body.id_token,
-				base_url,
-				project_id,
-				mcp_server_id,
-				client_id,
-			);
+			idTokenClaims = await verifyDescopeIdToken(body.id_token, issuer_url, client_id);
 		} catch (e) {
 			console.error("id_token verification failed:", e);
 			return [null, new Response("Failed to verify id_token", { status: 401 })];

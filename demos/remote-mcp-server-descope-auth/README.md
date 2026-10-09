@@ -10,7 +10,7 @@ Let's get a Remote MCP server up-and-running on Cloudflare Workers with Descope 
 Before you begin, ensure you have:
 
 - A [Descope](https://www.descope.com/) account
-- A Descope **Agentic Identity Hub MCP Server** resource, and a **Client** bound to it (created in [Agentic Identity Hub → MCP Servers](https://app.descope.com/) — see below)
+- A Descope **Agentic Identity Hub MCP Server** resource, and a **Client** bound to it at creation time (created in [Agentic Identity Hub → MCP Servers](https://app.descope.com/) — see below)
 - Node.js version `18.x` or higher
 - A Cloudflare account (for deployment)
 
@@ -18,11 +18,12 @@ Before you begin, ensure you have:
 
 1. Create an MCP Server resource and a Client in the Descope Console:
     - Go to **Agentic Identity Hub → MCP Servers** and create a new MCP Server. Set its **MCP Server URL** to `http://localhost:8787/mcp` (add your deployed `https://<worker>.workers.dev/mcp` too when you deploy) — this value is included in the `aud` claim on issued access tokens.
-    - Under that MCP Server, create a **Client**. Allow the Authorization Code grant type, and set the redirect / callback URL to `http://localhost:8787/callback` (add your deployed `https://<worker>.workers.dev/callback` too when you deploy).
+    - Clients are a separate, top-level object — not created "under" an MCP Server. Create a **Client** and bind it to the MCP Server Resource you just created at creation time. Allow the Authorization Code grant type, and set the redirect / callback URL to `http://localhost:8787/callback` (add your deployed `https://<worker>.workers.dev/callback` too when you deploy).
 
-      > A Client's MCP Server association is set when the client is created and cannot be changed afterward. If you need to bind an existing client to a different MCP Server, create a new client instead.
+      > A Client's MCP Server binding is set when the client is created and cannot be changed afterward. If you need to bind an existing client to a different MCP Server, create a new client instead.
 
-    - From the client's settings, copy the **Client ID** and **Client Secret** — these are the credentials this server uses to authorize against Descope.
+    - From the MCP Server's **Connection Information** section, copy the **Issuer URL** — this is the single value this server needs to discover the authorize/token/JWKS endpoints.
+    - From the client's settings, copy the **Client ID** and **Client Secret** — these are the credentials this server uses for token exchange.
     - **Define and grant the scopes** the server requests (in the MCP Server's Scopes section, then grant them to your client). This server asks for `openid profile email`, so define and grant:
         - `profile` → mapped to the `name` claim
         - `email` → mapped to the `email` claim
@@ -46,9 +47,7 @@ npx wrangler kv namespace create OAUTH_KV
 # .dev.vars
 DESCOPE_CLIENT_ID="your_client_id"
 DESCOPE_CLIENT_SECRET="your_client_secret"
-DESCOPE_PROJECT_ID="your_descope_project_id"
-DESCOPE_MCP_SERVER_ID="your_descope_mcp_server_id"
-DESCOPE_BASE_URL="https://api.descope.com"
+DESCOPE_ISSUER_URL="https://api.descope.com/v1/apps/agentic/your_descope_project_id/your_descope_mcp_server_id"
 DESCOPE_SCOPES="openid profile email"
 DESCOPE_ENABLE_PKCE="false"
 DESCOPE_RESOURCE="http://localhost:8787/mcp"
@@ -106,9 +105,7 @@ npx wrangler kv namespace create OAUTH_KV
 # Set Descope Agentic Identity Hub credentials as secrets
 npx wrangler secret put DESCOPE_CLIENT_ID
 npx wrangler secret put DESCOPE_CLIENT_SECRET
-npx wrangler secret put DESCOPE_PROJECT_ID
-npx wrangler secret put DESCOPE_MCP_SERVER_ID
-npx wrangler secret put DESCOPE_BASE_URL # optional, defaults to https://api.descope.com
+npx wrangler secret put DESCOPE_ISSUER_URL
 npx wrangler secret put COOKIE_ENCRYPTION_KEY
 ```
 
