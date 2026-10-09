@@ -1,12 +1,7 @@
 import { env } from "cloudflare:workers";
 import type { AuthRequest, OAuthHelpers } from "@cloudflare/workers-oauth-provider";
 import { Hono } from "hono";
-import {
-	fetchDescopeAuthToken,
-	getDescopeAuthorizeUrl,
-	getDescopeUserInfo,
-	type Props,
-} from "./descope-utils";
+import { fetchDescopeAuthToken, getDescopeAuthorizeUrl, type Props } from "./descope-utils";
 import {
 	addApprovedClient,
 	bindStateToSession,
@@ -21,6 +16,22 @@ import {
 
 const app = new Hono<{ Bindings: Env & { OAUTH_PROVIDER: OAuthHelpers } }>();
 
+function base64url(bytes: ArrayBuffer): string {
+	return btoa(String.fromCharCode(...new Uint8Array(bytes)))
+		.replace(/\+/g, "-")
+		.replace(/\//g, "_")
+		.replace(/=+$/, "");
+}
+
+/** Generates a PKCE code_verifier/code_challenge (S256) pair. */
+async function generatePkcePair(): Promise<{ codeVerifier: string; codeChallenge: string }> {
+	const verifierBytes = crypto.getRandomValues(new Uint8Array(32));
+	const codeVerifier = base64url(verifierBytes.buffer);
+	const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(codeVerifier));
+	const codeChallenge = base64url(digest);
+	return { codeVerifier, codeChallenge };
+}
+
 app.get("/authorize", async (c) => {
 	const oauthReqInfo = await c.env.OAUTH_PROVIDER.parseAuthRequest(c.req.raw);
 	const { clientId } = oauthReqInfo;
@@ -33,7 +44,9 @@ app.get("/authorize", async (c) => {
 		// Skip approval dialog but still create secure state and bind to session
 		const { stateToken } = await createOAuthState(oauthReqInfo, c.env.OAUTH_KV);
 		const { setCookie: sessionBindingCookie } = await bindStateToSession(stateToken);
-		return redirectToDescope(c.req.raw, stateToken, { "Set-Cookie": sessionBindingCookie });
+		return redirectToDescope(c.req.raw, stateToken, c.env.OAUTH_KV, {
+			"Set-Cookie": sessionBindingCookie,
+		});
 	}
 
 	// Generate CSRF protection for the approval form
@@ -93,7 +106,7 @@ app.post("/authorize", async (c) => {
 		headers.append("Set-Cookie", approvedClientCookie);
 		headers.append("Set-Cookie", sessionBindingCookie);
 
-		return redirectToDescope(c.req.raw, stateToken, Object.fromEntries(headers));
+		return redirectToDescope(c.req.raw, stateToken, c.env.OAUTH_KV, Object.fromEntries(headers));
 	} catch (error: any) {
 		console.error("POST /authorize error:", error);
 		if (error instanceof OAuthError) {
@@ -107,15 +120,28 @@ app.post("/authorize", async (c) => {
 async function redirectToDescope(
 	request: Request,
 	stateToken: string,
+	kv: KVNamespace,
 	headers: Record<string, string> = {},
 ) {
+	let codeChallenge: string | undefined;
+	if (env.DESCOPE_ENABLE_PKCE === "true") {
+		const { codeVerifier, codeChallenge: challenge } = await generatePkcePair();
+		await kv.put(`oauth:pkce:${stateToken}`, codeVerifier, { expirationTtl: 600 });
+		codeChallenge = challenge;
+	}
+
 	return new Response(null, {
 		headers: {
 			...headers,
-			location: getDescopeAuthorizeUrl({
+			location: await getDescopeAuthorizeUrl({
 				client_id: env.DESCOPE_CLIENT_ID,
 				redirect_uri: new URL("/callback", request.url).href,
+				issuer_url: env.DESCOPE_ISSUER_URL,
+				scope: env.DESCOPE_SCOPES,
 				state: stateToken,
+				code_challenge: codeChallenge,
+				code_challenge_method: codeChallenge ? "S256" : undefined,
+				resource: env.DESCOPE_RESOURCE,
 			}),
 		},
 		status: 302,
@@ -160,18 +186,33 @@ app.get("/callback", async (c) => {
 		return c.text("Invalid OAuth request data", 400);
 	}
 
-	// Exchange the code for an access token
-	const [accessToken, errResponse] = await fetchDescopeAuthToken({
+	// Retrieve the PKCE code_verifier, if one was stashed for this state token
+	const stateFromQuery = c.req.query("state");
+	let codeVerifier: string | undefined;
+	if (stateFromQuery) {
+		const pkceKey = `oauth:pkce:${stateFromQuery}`;
+		codeVerifier = (await c.env.OAUTH_KV.get(pkceKey)) ?? undefined;
+		if (codeVerifier) await c.env.OAUTH_KV.delete(pkceKey);
+	}
+
+	// Exchange the code for an access token. For Agentic Identity Hub MCP Server clients, user
+	// profile claims come back in the token response's `id_token`, not from a separate userinfo
+	// call (that endpoint doesn't resolve applications identified by the agentic issuer format).
+	const [tokenResult, errResponse] = await fetchDescopeAuthToken({
 		client_id: c.env.DESCOPE_CLIENT_ID,
 		client_secret: c.env.DESCOPE_CLIENT_SECRET,
 		code: c.req.query("code"),
 		redirect_uri: new URL("/callback", c.req.url).href,
+		issuer_url: c.env.DESCOPE_ISSUER_URL,
+		code_verifier: codeVerifier,
+		resource: c.env.DESCOPE_RESOURCE,
 	});
 	if (errResponse) return errResponse;
 
-	// Fetch the user info from Descope
-	const userInfo = await getDescopeUserInfo(accessToken);
-	const { sub, name, email } = userInfo;
+	const { accessToken, idTokenClaims } = tokenResult;
+	const sub = idTokenClaims?.sub ?? "";
+	const name = idTokenClaims?.name;
+	const email = idTokenClaims?.email;
 
 	// Return back to the MCP client a new token
 	const { redirectTo } = await c.env.OAUTH_PROVIDER.completeAuthorization({

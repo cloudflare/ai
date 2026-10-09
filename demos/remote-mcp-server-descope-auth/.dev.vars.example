@@ -1,3 +1,9 @@
-DESCOPE_CLIENT_ID="your_inbound_app_client_id"
-DESCOPE_CLIENT_SECRET="your_inbound_app_client_secret"
+DESCOPE_CLIENT_ID="your_mcp_server_client_id"
+DESCOPE_CLIENT_SECRET="your_mcp_server_client_secret"
+# Copy this directly from the Descope Console's Connection Information section for your MCP
+# Server, e.g. https://api.descope.com/v1/apps/agentic/your_project_id/your_mcp_server_id
+DESCOPE_ISSUER_URL="https://api.descope.com/v1/apps/agentic/your_descope_project_id/your_descope_mcp_server_id"
+DESCOPE_SCOPES="openid profile email"
+DESCOPE_ENABLE_PKCE="false"
+DESCOPE_RESOURCE="http://localhost:8787/mcp"
 COOKIE_ENCRYPTION_KEY="your_cookie_encryption_key_generate_with_openssl_rand_hex_32"
