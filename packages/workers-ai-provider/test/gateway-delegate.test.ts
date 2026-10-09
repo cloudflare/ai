@@ -2,6 +2,7 @@ import type { LanguageModelV4 } from "@ai-sdk/provider";
 import { describe, expect, it, vi } from "vitest";
 import {
 	createGatewayDelegate,
+	flattenAnthropicSystem,
 	GatewayDelegateError,
 	parseSlug,
 	type ProviderPlugin,
@@ -441,6 +442,44 @@ describe("createGatewayDelegate", () => {
 		expect((runCalls[0] as { model: string }).model).toBe("xai/grok-3");
 	});
 
+	it("flattens an Anthropic system array to a string on the run path", async () => {
+		const { binding, runCalls } = makeBinding();
+		const { plugin, getFetch } = capturePlugin("anthropic");
+		const wai = createGatewayDelegate({ binding, gateway: "gw-1", providers: [plugin] });
+		wai("anthropic/claude-sonnet-4-5"); // run path (anthropic is run-catalog)
+		await getFetch()("https://api.anthropic.com/v1/messages", {
+			...REQ,
+			body: JSON.stringify({
+				model: "claude-sonnet-4-5",
+				system: [
+					{ type: "text", text: "You are terse." },
+					{
+						type: "text",
+						text: "Reply in English.",
+						cache_control: { type: "ephemeral" },
+					},
+				],
+				messages: [{ role: "user", content: "hi" }],
+			}),
+		});
+		const body = (runCalls[0] as { body: Record<string, unknown> }).body;
+		expect(body.system).toBe("You are terse.\n\nReply in English.");
+		expect(body.messages).toEqual([{ role: "user", content: "hi" }]);
+	});
+
+	it("leaves the Anthropic system array alone on the gateway path", async () => {
+		const { binding, gwCalls } = makeBinding();
+		const { plugin, getFetch } = capturePlugin("anthropic");
+		const wai = createGatewayDelegate({ binding, gateway: "gw-1", providers: [plugin] });
+		wai("anthropic/claude-sonnet-4-5", { transport: "gateway" });
+		const system = [{ type: "text", text: "You are terse." }];
+		await getFetch()("https://api.anthropic.com/v1/messages", {
+			...REQ,
+			body: JSON.stringify({ model: "claude-sonnet-4-5", system, messages: [] }),
+		});
+		expect((gwCalls[0].entries[0].query as { system: unknown }).system).toEqual(system);
+	});
+
 	it("rejects BYOG-only providers with a helpful error", () => {
 		const { binding } = makeBinding();
 		const wai = createGatewayDelegate({
@@ -686,5 +725,37 @@ describe("createGatewayDelegate", () => {
 		expect(JSON.parse(gwCalls[0].entries[0].headers["cf-aig-metadata"])).toEqual({
 			big: "9007199254740993",
 		});
+	});
+});
+
+describe("flattenAnthropicSystem", () => {
+	it("joins text blocks", () => {
+		const body: Record<string, unknown> = {
+			system: [
+				{ type: "text", text: "a" },
+				{ type: "text", text: "b" },
+			],
+		};
+		flattenAnthropicSystem(body);
+		expect(body.system).toBe("a\n\nb");
+	});
+
+	it("leaves a string system alone", () => {
+		const body: Record<string, unknown> = { system: "a" };
+		flattenAnthropicSystem(body);
+		expect(body.system).toBe("a");
+	});
+
+	it("leaves an absent system alone", () => {
+		const body: Record<string, unknown> = { messages: [] };
+		flattenAnthropicSystem(body);
+		expect(body).not.toHaveProperty("system");
+	});
+
+	it("leaves arrays with non-text blocks alone", () => {
+		const system = [{ type: "image", source: {} }];
+		const body: Record<string, unknown> = { system };
+		flattenAnthropicSystem(body);
+		expect(body.system).toBe(system);
 	});
 });
