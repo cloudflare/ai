@@ -25,6 +25,9 @@ export interface FallbackLeg {
  * Fallback triggers on `doGenerate`/`doStream` rejection (the dispatch never
  * produced a stream). Errors that surface *mid-stream* — after content has
  * already been emitted — are not recoverable here and propagate as-is.
+ *
+ * @deprecated Use the `fallback` option of `createAI` from
+ * `agents/models/ai-sdk`: `ai(primary, { fallback: [secondary, "@cf/…"] })`.
  */
 export function createClientFallbackModel(legs: FallbackLeg[]): LanguageModelV4 {
 	if (legs.length === 0) {

@@ -4,6 +4,22 @@
 
 This library provides an AI Gateway Provider for the [Vercel AI SDK](https://sdk.vercel.ai/docs), enabling you to seamlessly integrate multiple AI models from different providers behind a unified interface. It leverages Cloudflare's AI Gateway to manage and optimize your AI model usage.
 
+> [!IMPORTANT]
+> **Inside a Worker, use `createAI` from the Agents SDK.** It routes any AI SDK
+> model through AI Gateway with the `env.AI` binding, with gateway options and
+> fallback:
+>
+> ```ts
+> import { createAI } from "agents/models/ai-sdk";
+>
+> const ai = createAI({ binding: env.AI, id: "my-gateway" });
+> ai(anthropic("claude-opus-4-8"), { fallback: [openai("gpt-5.4")] });
+> ```
+>
+> `createAiGateway({ binding })` is deprecated. REST mode (`accountId` +
+> `gateway` + `apiKey`) is not. `createAI` falls back client-side rather than in
+> one gateway request, and has no `byokAlias` or `zdr` option yet.
+
 ## Features
 
 - **Runtime Agnostic:** Works in all JavaScript runtimes supported by the Vercel AI SDK including Node.js, Edge Runtime, and more.

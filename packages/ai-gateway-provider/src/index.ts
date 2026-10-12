@@ -337,6 +337,28 @@ export type AiGatewayBindingSettings = {
 };
 export type AiGatewaySettings = AiGatewayAPISettings | AiGatewayBindingSettings;
 
+/**
+ * Create an AI Gateway provider over one model or a fallback chain.
+ *
+ * @deprecated Binding mode is superseded by `createAI` from
+ * `agents/models/ai-sdk`. It
+ * takes the `env.AI` binding itself, not `env.AI.gateway(id)`:
+ *
+ * ```ts
+ * import { createAI } from "agents/models/ai-sdk";
+ * const ai = createAI({ binding: env.AI, id: "my-gateway", cacheTtl: 60 });
+ * ai(anthropic("claude-opus-4-8"), { fallback: [openai("gpt-5.4")] }); // was aigateway([anthropic(…), openai(…)])
+ * ```
+ *
+ * Differences: `createAI` falls back client-side (one request per leg) rather
+ * than in a single gateway request, and has no `byokAlias` or `zdr` option
+ * yet. REST mode (`accountId` + `gateway` + `apiKey`) is not deprecated.
+ */
+export function createAiGateway(options: AiGatewayBindingSettings): AiGateway;
+/**
+ * Create an AI Gateway provider over one model or a fallback chain.
+ */
+export function createAiGateway(options: AiGatewaySettings): AiGateway;
 export function createAiGateway(options: AiGatewaySettings): AiGateway {
 	const createChatModel = (models: LanguageModelV4 | LanguageModelV4[]) => {
 		return new AiGatewayChatLanguageModel(Array.isArray(models) ? models : [models], options);

@@ -276,7 +276,27 @@ export interface WorkersAI {
 
 /**
  * Create a Workers AI provider instance.
+ *
+ * @deprecated Binding mode is superseded by `createAI` from
+ * `agents/models/ai-sdk`:
+ *
+ * ```ts
+ * import { createAI } from "agents/models/ai-sdk";
+ * const ai = createAI({ binding: env.AI });
+ * ai("@cf/zai-org/glm-4.7-flash"); // was workersai("@cf/…")
+ * ai(createAnthropic({ apiKey: "cloudflare" })("claude-opus-4-8")); // was "anthropic/…" + providers
+ * ai.embedding("@cf/baai/bge-base-en-v1.5"); // .image/.speech/.transcription/.reranking alike
+ * ```
+ *
+ * Not yet in `createAI`: `dynamic/<route>` ids and run-path stream resume
+ * (`resume`, `onResumeExpired`). Credentials mode (`accountId` + `apiKey`) is
+ * not deprecated.
  */
+export function createWorkersAI(options: WorkersAISettings & { binding: Ai }): WorkersAI;
+/**
+ * Create a Workers AI provider instance.
+ */
+export function createWorkersAI(options: WorkersAISettings): WorkersAI;
 export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 	if (!options.binding && !("accountId" in options && "apiKey" in options)) {
 		throw new Error(

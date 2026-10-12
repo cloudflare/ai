@@ -6,6 +6,25 @@
 > resumable streaming _(coming soon)_, server-side fallback) live in
 > [`docs/workers-ai-provider`](../../docs/workers-ai-provider/README.md).
 
+> [!IMPORTANT]
+> **Inside a Worker, use `createAI` from the Agents SDK.** It covers the binding
+> path of this package (every Workers AI modality, gateway options, fallback, and
+> any vendor's AI SDK model via `ai(model)`):
+>
+> ```ts
+> import { createAI } from "agents/models/ai-sdk";
+>
+> const ai = createAI({ binding: env.AI });
+> ai("@cf/zai-org/glm-4.7-flash");
+> ai(createAnthropic({ apiKey: "cloudflare" })("claude-opus-4-8"));
+> ```
+>
+> `createWorkersAI({ binding })`, the `openai`/`anthropic`/`google` plugins,
+> `workers-ai-provider/gateway` and `createClientFallbackModel` are deprecated.
+> Credentials mode (`accountId` + `apiKey`) and AI Search are not. `createAI`
+> does not yet support `dynamic/<route>` ids, stream resume or BYOK key
+> forwarding, so keep using this package for those.
+
 ## Quick start
 
 ```bash

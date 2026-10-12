@@ -14,6 +14,10 @@ import type { ProviderPlugin } from "./gateway-delegate";
  * Uses `.chat()` (Chat Completions) deliberately: the bare `openai()` call
  * (AI SDK v6+) defaults to the Responses API, which the AI Gateway run catalog
  * does not serve.
+ *
+ * @deprecated Pass the vendor's own model to `createAI` from
+ * `agents/models/ai-sdk` instead of a plugin plus a slug:
+ * `ai(createOpenAI({ apiKey: "cloudflare" }).chat("gpt-5.4"))`.
  */
 export const openai: ProviderPlugin = {
 	wireFormat: "openai",

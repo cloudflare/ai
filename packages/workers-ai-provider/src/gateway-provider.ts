@@ -56,6 +56,12 @@ interface AiGatewayRunner {
  * A `fetch` that dispatches the wrapped provider's request through AI Gateway.
  * Detects the gateway provider id from the request URL (or uses `config.provider`),
  * strips the provider host to the endpoint path, and forwards the body verbatim.
+ *
+ * @deprecated Route the vendor's model with `createAI` from
+ * `agents/models/ai-sdk`: `ai(model)` for language models, `ai.routed(model)`
+ * for embedding, image, speech and transcription models. `createAI` always
+ * strips the vendor key (unified billing or the gateway's stored key), so
+ * keep this for `byok: true` until it supports forwarding.
  */
 export function createGatewayFetch(config: GatewayFetchConfig): typeof globalThis.fetch {
 	if (!config?.binding) {
@@ -130,6 +136,12 @@ export function createGatewayFetch(config: GatewayFetchConfig): typeof globalThi
  * });
  * const model = openai("gpt-5");
  * ```
+ *
+ * @deprecated Route the vendor's model with `createAI` from
+ * `agents/models/ai-sdk`: `ai(model)` for language models, `ai.routed(model)`
+ * for embedding, image, speech and transcription models. `createAI` always
+ * strips the vendor key (unified billing or the gateway's stored key), so
+ * keep this for `byok: true` until it supports forwarding.
  */
 export function createGatewayProvider<T>(
 	factory: (opts: { apiKey?: string; baseURL?: string; fetch: typeof globalThis.fetch }) => T,
