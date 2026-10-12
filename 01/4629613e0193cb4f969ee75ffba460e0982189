@@ -1,0 +1,37 @@
+.changeset/create-ai-from-agents.md
+  s_9052ae3a3bfc59::t_ce86e1ac42371f 1-11
+packages/ai-gateway-provider/README.md
+  s_9052ae3a3bfc59::t_8426ed0195b3c4 7-22
+packages/ai-gateway-provider/src/index.ts
+  s_9052ae3a3bfc59::t_163bc18ec1eb47 340-361
+packages/workers-ai-provider/README.md
+  s_9052ae3a3bfc59::t_ed5b02bd6c5aad 9-27
+packages/workers-ai-provider/src/anthropic.ts
+  s_9052ae3a3bfc59::t_09aad354fe33ce 10-13
+packages/workers-ai-provider/src/client-fallback.ts
+  s_9052ae3a3bfc59::t_f6ffabf6c15fc0 28-30
+packages/workers-ai-provider/src/gateway-provider.ts
+  s_9052ae3a3bfc59::t_0d1c0a9fb3fe5a 59-64,139-144
+packages/workers-ai-provider/src/google.ts
+  s_9052ae3a3bfc59::t_6af2ef9e6c25c9 10-13
+packages/workers-ai-provider/src/index.ts
+  s_9052ae3a3bfc59::t_2cb3e73fb909ed 279-293,295-299
+packages/workers-ai-provider/src/openai.ts
+  s_9052ae3a3bfc59::t_3a7ccde651cab7 17-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "014629613e0193cb4f969ee75ffba460e0982189",
+  "prompts": {},
+  "sessions": {
+    "s_9052ae3a3bfc59": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a12ffa-4429-7344-8f32-b55fe04f5889",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Matt Carey <mcarey@cloudflare.com>"
+    }
+  }
+}
