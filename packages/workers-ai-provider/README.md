@@ -8,22 +8,22 @@
 
 > [!IMPORTANT]
 > **Inside a Worker, use `createAI` from the Agents SDK.** It covers the binding
-> path of this package (every Workers AI modality, gateway options, fallback, and
-> any vendor's AI SDK model via `ai(model)`):
+> path of this package: every Workers AI modality, AI Gateway catalog ids and
+> dynamic routes, any vendor's AI SDK model via `ai(model)`, gateway options,
+> fallback, BYOK and stream resume:
 >
 > ```ts
 > import { createAI } from "agents/models/ai-sdk";
 >
 > const ai = createAI({ binding: env.AI });
 > ai("@cf/zai-org/glm-4.7-flash");
+> ai("anthropic/claude-opus-4.8");
 > ai(createAnthropic({ apiKey: "cloudflare" })("claude-opus-4-8"));
 > ```
 >
 > `createWorkersAI({ binding })`, the `openai`/`anthropic`/`google` plugins,
 > `workers-ai-provider/gateway` and `createClientFallbackModel` are deprecated.
-> Credentials mode (`accountId` + `apiKey`) and AI Search are not. `createAI`
-> does not yet support `dynamic/<route>` ids, stream resume or BYOK key
-> forwarding, so keep using this package for those.
+> Credentials mode (`accountId` + `apiKey`) and AI Search are not.
 
 ## Quick start
 

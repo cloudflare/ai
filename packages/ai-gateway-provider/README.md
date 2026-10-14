@@ -18,7 +18,7 @@ This library provides an AI Gateway Provider for the [Vercel AI SDK](https://sdk
 >
 > `createAiGateway({ binding })` is deprecated. REST mode (`accountId` +
 > `gateway` + `apiKey`) is not. `createAI` falls back client-side rather than in
-> one gateway request, and has no `byokAlias` or `zdr` option yet.
+> one gateway request.
 
 ## Features
 

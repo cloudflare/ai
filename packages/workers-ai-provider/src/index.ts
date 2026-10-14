@@ -284,13 +284,15 @@ export interface WorkersAI {
  * import { createAI } from "agents/models/ai-sdk";
  * const ai = createAI({ binding: env.AI });
  * ai("@cf/zai-org/glm-4.7-flash"); // was workersai("@cf/…")
- * ai(createAnthropic({ apiKey: "cloudflare" })("claude-opus-4-8")); // was "anthropic/…" + providers
+ * ai("anthropic/claude-opus-4.8"); // was "anthropic/…" + providers; the catalog's spelling
+ * ai("dynamic/support"); // dynamic routes, as before
+ * ai(createAnthropic({ apiKey: "cloudflare" })("claude-opus-4-8")); // a vendor's own model
  * ai.embedding("@cf/baai/bge-base-en-v1.5"); // .image/.speech/.transcription/.reranking alike
  * ```
  *
- * Not yet in `createAI`: `dynamic/<route>` ids and run-path stream resume
- * (`resume`, `onResumeExpired`). Credentials mode (`accountId` + `apiKey`) is
- * not deprecated.
+ * Catalog streams resume after a dropped connection, and `vendorKey`,
+ * `byokAlias` and `zdr` cover BYOK. Credentials mode (`accountId` + `apiKey`)
+ * is not deprecated.
  */
 export function createWorkersAI(options: WorkersAISettings & { binding: Ai }): WorkersAI;
 /**

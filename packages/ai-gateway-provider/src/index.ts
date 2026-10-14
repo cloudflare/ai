@@ -350,9 +350,9 @@ export type AiGatewaySettings = AiGatewayAPISettings | AiGatewayBindingSettings;
  * ai(anthropic("claude-opus-4-8"), { fallback: [openai("gpt-5.4")] }); // was aigateway([anthropic(…), openai(…)])
  * ```
  *
- * Differences: `createAI` falls back client-side (one request per leg) rather
- * than in a single gateway request, and has no `byokAlias` or `zdr` option
- * yet. REST mode (`accountId` + `gateway` + `apiKey`) is not deprecated.
+ * One difference: `createAI` falls back client-side (one request per leg)
+ * rather than in a single gateway request. REST mode (`accountId` + `gateway` +
+ * `apiKey`) is not deprecated.
  */
 export function createAiGateway(options: AiGatewayBindingSettings): AiGateway;
 /**
