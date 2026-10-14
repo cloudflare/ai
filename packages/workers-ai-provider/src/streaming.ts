@@ -164,8 +164,9 @@ export function getMappedStream(
 				}
 
 				// --- Native format: top-level `response` field ---
+				const hasChoicesDelta = choices?.[0]?.delta != null;
 				const nativeResponse = chunk.response;
-				if (nativeResponse != null && nativeResponse !== "") {
+				if (!hasChoicesDelta && nativeResponse != null && nativeResponse !== "") {
 					const responseText = String(nativeResponse);
 					if (responseText.length > 0) {
 						if (bufferContentForSalvage) {
@@ -190,7 +191,7 @@ export function getMappedStream(
 				}
 
 				// --- Native format: top-level `tool_calls` ---
-				if (Array.isArray(chunk.tool_calls)) {
+				if (!hasChoicesDelta && Array.isArray(chunk.tool_calls)) {
 					// Close active reasoning block before tool calls start
 					if (reasoningId) {
 						controller.enqueue({ type: "reasoning-end", id: reasoningId });

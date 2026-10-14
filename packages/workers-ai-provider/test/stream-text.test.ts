@@ -1890,6 +1890,34 @@ describe("Streaming Error Handling", () => {
 		expect(text).toBe("");
 	});
 
+	it("should prevent duplicate text emission when SSE chunks include both response and choices[0].delta", async () => {
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () => {
+					return mockStream([
+						{
+							response: "Hello world",
+							choices: [{ delta: { content: "Hello world" } }],
+						},
+						"[DONE]",
+					]);
+				},
+			},
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Test dual-format chunk",
+		});
+
+		let text = "";
+		for await (const chunk of result.textStream) {
+			text += chunk;
+		}
+
+		expect(text).toBe("Hello world");
+	});
+
 	it("should detect premature stream termination (no [DONE])", async () => {
 		const workersai = createWorkersAI({
 			binding: {
