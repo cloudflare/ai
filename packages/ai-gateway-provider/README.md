@@ -1,7 +1,7 @@
 # AI Gateway Provider for Vercel AI SDK
 
 > [!IMPORTANT]
-> The Agents SDK has a new `createAI` function for the AI SDK and Pi AI that unifies `workers-ai-provider` and `ai-gateway-provider`. This package is now feature frozen and marked as deprecated. Existing code keeps working; migrate at your convenience.
+> The Agents SDK has a new `createAI` function for the AI SDK and Pi AI that unifies `workers-ai-provider` and `ai-gateway-provider`. This package is now feature frozen and marked as deprecated. Please migrate at your convenience.
 >
 > ```sh
 > npm i agents
