@@ -1,10 +1,12 @@
 # workers-ai-provider
 
 > [!IMPORTANT]
-> **`workers-ai-provider` is deprecated.** Use `createAI` from the Agents SDK, and [`ai-search-provider`](../ai-search-provider/README.md) for AI Search.
+> The Agents SDK has a new `createAI` function for the AI SDK and Pi AI that unifies `workers-ai-provider` and `ai-gateway-provider`. This package is now feature frozen and marked as deprecated. Existing code keeps working; migrate at your convenience.
+>
+> For AI Search, use [`ai-search-provider`](../ai-search-provider/README.md).
 >
 > ```sh
-> npm install agents ai @ai-sdk/provider
+> npm i agents
 > ```
 >
 > | Before                                                                                            | After                                                                                       |
