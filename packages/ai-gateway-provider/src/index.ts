@@ -141,15 +141,21 @@ export class AiGatewayChatLanguageModel implements LanguageModelV4 {
 				// delete the fake injected CF_TEMP_TOKEN
 
 				const authHeader = providerConfig.headerKey ?? "authorization";
-				const authValue =
-					"get" in req.request.headers
-						? req.request.headers.get(authHeader)
-						: req.request.headers[authHeader];
-				if (authValue?.includes(CF_TEMP_TOKEN)) {
-					if ("delete" in req.request.headers) {
-						req.request.headers.delete(authHeader);
-					} else {
-						delete req.request.headers[authHeader];
+				// Typed as `Headers`, but wrapped SDKs may hand over a plain object.
+				const reqHeaders = req.request.headers as Headers | Record<string, string>;
+				const isHeaders = (h: typeof reqHeaders): h is Headers => "get" in h;
+				if (isHeaders(reqHeaders)) {
+					// `Headers` lookups are already case-insensitive.
+					if (reqHeaders.get(authHeader)?.includes(CF_TEMP_TOKEN)) {
+						reqHeaders.delete(authHeader);
+					}
+				} else {
+					// Plain objects are case-sensitive, and the wrapped SDK may have
+					// written the header as e.g. `Authorization`.
+					const wanted = authHeader.toLowerCase();
+					const key = Object.keys(reqHeaders).find((k) => k.toLowerCase() === wanted);
+					if (key !== undefined && reqHeaders[key]?.includes(CF_TEMP_TOKEN)) {
+						delete reqHeaders[key];
 					}
 				}
 
