@@ -6,6 +6,25 @@
 > resumable streaming _(coming soon)_, server-side fallback) live in
 > [`docs/workers-ai-provider`](../../docs/workers-ai-provider/README.md).
 
+> [!IMPORTANT]
+> **This package is deprecated. Use `createAI` from the Agents SDK**, and
+> [`ai-search-provider`](../ai-search-provider/README.md) for AI Search.
+> `createAI` covers every Workers AI modality, AI Gateway catalog ids and dynamic routes,
+> any vendor's AI SDK model via `ai(model)`, gateway options, fallback and BYOK,
+> with the `env.AI` binding or an account id and API token:
+>
+> ```ts
+> import { createAI } from "agents/models/ai-sdk";
+>
+> const ai = createAI({ binding: env.AI }); // or { accountId, apiToken }
+> ai("@cf/zai-org/glm-4.7-flash");
+> ai("anthropic/claude-opus-4.8");
+> ai(createAnthropic({ apiKey: "cloudflare" })("claude-opus-4-8"));
+> ```
+>
+> For AI Search, `createAISearchNamespace` from `ai-search-provider` takes the
+> `ai_search_namespaces` binding, which replaces `env.AI.autorag()`.
+
 ## Quick start
 
 ```bash
