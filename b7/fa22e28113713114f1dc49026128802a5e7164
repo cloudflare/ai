@@ -1,0 +1,23 @@
+.changeset/create-ai-from-agents.md
+  s_9052ae3a3bfc59::t_b6d44d490f65ef 6
+packages/workers-ai-provider/README.md
+  s_9052ae3a3bfc59::t_8dcac9529c4750 10-12,25-26
+packages/workers-ai-provider/src/index.ts
+  s_9052ae3a3bfc59::t_107adf74d038aa 294-295,620-625,630-635,648-652,698-700
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "b7fa22e28113713114f1dc49026128802a5e7164",
+  "prompts": {},
+  "sessions": {
+    "s_9052ae3a3bfc59": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a12ffa-4429-7344-8f32-b55fe04f5889",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Matt Carey <mcarey@cloudflare.com>"
+    }
+  }
+}
