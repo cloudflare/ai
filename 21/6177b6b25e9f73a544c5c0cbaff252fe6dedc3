@@ -1,0 +1,63 @@
+.changeset/create-ai-from-agents.md
+  s_9052ae3a3bfc59::t_42caaaf1123d5c 6
+packages/ai-gateway-provider/README.md
+  s_9052ae3a3bfc59::t_ce0faa001e1e73 8-10,15,17,20-22
+packages/ai-gateway-provider/src/index.ts
+  s_9052ae3a3bfc59::t_ced356aa774b52 49-52,347-349,353,358
+packages/ai-gateway-provider/src/providers/amazon-bedrock.ts
+  s_9052ae3a3bfc59::t_61cd7cd3ab7438 4-8
+packages/ai-gateway-provider/src/providers/anthropic.ts
+  s_9052ae3a3bfc59::t_510ab54c4d493d 4-8
+packages/ai-gateway-provider/src/providers/azure.ts
+  s_9052ae3a3bfc59::t_6ef963ec37a82a 4-8
+packages/ai-gateway-provider/src/providers/cerebras.ts
+  s_9052ae3a3bfc59::t_a15564fd31ecfd 4-8
+packages/ai-gateway-provider/src/providers/cohere.ts
+  s_9052ae3a3bfc59::t_fba8c7aff1ad51 4-8
+packages/ai-gateway-provider/src/providers/deepgram.ts
+  s_9052ae3a3bfc59::t_d2634c188bfbd0 4-6
+packages/ai-gateway-provider/src/providers/deepseek.ts
+  s_9052ae3a3bfc59::t_a337d66833b224 4-8
+packages/ai-gateway-provider/src/providers/elevenlabs.ts
+  s_9052ae3a3bfc59::t_25d26d4d09d34e 4-8
+packages/ai-gateway-provider/src/providers/fireworks.ts
+  s_9052ae3a3bfc59::t_1c607721b0dfe3 4-6
+packages/ai-gateway-provider/src/providers/google-vertex.ts
+  s_9052ae3a3bfc59::t_963d049f048b2a 4-8
+packages/ai-gateway-provider/src/providers/google.ts
+  s_9052ae3a3bfc59::t_e271109a43767c 4-8
+packages/ai-gateway-provider/src/providers/groq.ts
+  s_9052ae3a3bfc59::t_712e22cc40aff1 4-8
+packages/ai-gateway-provider/src/providers/mistral.ts
+  s_9052ae3a3bfc59::t_6c15d72b29bb63 4-8
+packages/ai-gateway-provider/src/providers/openai.ts
+  s_9052ae3a3bfc59::t_8e78f0f7e22c35 4-8
+packages/ai-gateway-provider/src/providers/openrouter.ts
+  s_9052ae3a3bfc59::t_4ddf685cb793ee 4-8
+packages/ai-gateway-provider/src/providers/perplexity.ts
+  s_9052ae3a3bfc59::t_6811dd8f665e8e 4-8
+packages/ai-gateway-provider/src/providers/unified.ts
+  s_9052ae3a3bfc59::t_e05e97f5d53549 4-7,16-19
+packages/ai-gateway-provider/src/providers/xai.ts
+  s_9052ae3a3bfc59::t_577e5ea785451a 4-8
+packages/workers-ai-provider/README.md
+  s_9052ae3a3bfc59::t_8c3044ae1821d5 10-13,18,24,26
+packages/workers-ai-provider/src/index.ts
+  s_9052ae3a3bfc59::t_33d5ca8f2be45f 280-281,285,293-295
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "216177b6b25e9f73a544c5c0cbaff252fe6dedc3",
+  "prompts": {},
+  "sessions": {
+    "s_9052ae3a3bfc59": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a12ffa-4429-7344-8f32-b55fe04f5889",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Matt Carey <mcarey@cloudflare.com>"
+    }
+  }
+}
