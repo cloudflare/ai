@@ -277,12 +277,12 @@ export interface WorkersAI {
 /**
  * Create a Workers AI provider instance.
  *
- * @deprecated Binding mode is superseded by `createAI` from
- * `agents/models/ai-sdk`:
+ * @deprecated Use `createAI` from `agents/models/ai-sdk`, with the binding or
+ * with an account id and API token (credentials mode's `apiKey`):
  *
  * ```ts
  * import { createAI } from "agents/models/ai-sdk";
- * const ai = createAI({ binding: env.AI });
+ * const ai = createAI({ binding: env.AI }); // or { accountId, apiToken }
  * ai("@cf/zai-org/glm-4.7-flash"); // was workersai("@cf/…")
  * ai("anthropic/claude-opus-4.8"); // was "anthropic/…" + providers; the catalog's spelling
  * ai("dynamic/support"); // dynamic routes, as before
@@ -290,15 +290,10 @@ export interface WorkersAI {
  * ai.embedding("@cf/baai/bge-base-en-v1.5"); // .image/.speech/.transcription/.reranking alike
  * ```
  *
- * Catalog streams resume after a dropped connection, and `vendorKey`,
- * `byokAlias` and `zdr` cover BYOK. Credentials mode (`accountId` + `apiKey`)
- * is not deprecated.
+ * `vendorKey`, `byokAlias` and `zdr` cover BYOK, and through the binding a
+ * catalog stream resumes after a dropped connection. AI Search
+ * (`createAISearch`) is not deprecated.
  */
-export function createWorkersAI(options: WorkersAISettings & { binding: Ai }): WorkersAI;
-/**
- * Create a Workers AI provider instance.
- */
-export function createWorkersAI(options: WorkersAISettings): WorkersAI;
 export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 	if (!options.binding && !("accountId" in options && "apiKey" in options)) {
 		throw new Error(

@@ -7,23 +7,23 @@
 > [`docs/workers-ai-provider`](../../docs/workers-ai-provider/README.md).
 
 > [!IMPORTANT]
-> **Inside a Worker, use `createAI` from the Agents SDK.** It covers the binding
-> path of this package: every Workers AI modality, AI Gateway catalog ids and
-> dynamic routes, any vendor's AI SDK model via `ai(model)`, gateway options,
-> fallback, BYOK and stream resume:
+> **Use `createAI` from the Agents SDK.** It covers this package, except AI
+> Search: every Workers AI modality, AI Gateway catalog ids and dynamic routes,
+> any vendor's AI SDK model via `ai(model)`, gateway options, fallback and BYOK,
+> with the `env.AI` binding or an account id and API token:
 >
 > ```ts
 > import { createAI } from "agents/models/ai-sdk";
 >
-> const ai = createAI({ binding: env.AI });
+> const ai = createAI({ binding: env.AI }); // or { accountId, apiToken }
 > ai("@cf/zai-org/glm-4.7-flash");
 > ai("anthropic/claude-opus-4.8");
 > ai(createAnthropic({ apiKey: "cloudflare" })("claude-opus-4-8"));
 > ```
 >
-> `createWorkersAI({ binding })`, the `openai`/`anthropic`/`google` plugins,
+> `createWorkersAI`, the `openai`/`anthropic`/`google` plugins,
 > `workers-ai-provider/gateway` and `createClientFallbackModel` are deprecated.
-> Credentials mode (`accountId` + `apiKey`) and AI Search are not.
+> AI Search (`createAISearch`) is not.
 
 ## Quick start
 
