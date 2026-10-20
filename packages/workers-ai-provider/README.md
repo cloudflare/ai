@@ -7,8 +7,9 @@
 > [`docs/workers-ai-provider`](../../docs/workers-ai-provider/README.md).
 
 > [!IMPORTANT]
-> **Use `createAI` from the Agents SDK.** It covers this package, except AI
-> Search: every Workers AI modality, AI Gateway catalog ids and dynamic routes,
+> **This package is deprecated. Use `createAI` from the Agents SDK**, and
+> [`ai-search-provider`](../ai-search-provider/README.md) for AI Search.
+> `createAI` covers every Workers AI modality, AI Gateway catalog ids and dynamic routes,
 > any vendor's AI SDK model via `ai(model)`, gateway options, fallback and BYOK,
 > with the `env.AI` binding or an account id and API token:
 >
@@ -21,9 +22,8 @@
 > ai(createAnthropic({ apiKey: "cloudflare" })("claude-opus-4-8"));
 > ```
 >
-> `createWorkersAI`, the `openai`/`anthropic`/`google` plugins,
-> `workers-ai-provider/gateway` and `createClientFallbackModel` are deprecated.
-> AI Search (`createAISearch`) is not.
+> For AI Search, `createAISearchNamespace` from `ai-search-provider` takes the
+> `ai_search_namespaces` binding, which replaces `env.AI.autorag()`.
 
 ## Quick start
 

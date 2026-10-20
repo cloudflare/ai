@@ -291,8 +291,8 @@ export interface WorkersAI {
  * ```
  *
  * `vendorKey`, `byokAlias` and `zdr` cover BYOK, and through the binding a
- * catalog stream resumes after a dropped connection. AI Search
- * (`createAISearch`) is not deprecated.
+ * catalog stream resumes after a dropped connection. For AI Search, use
+ * `ai-search-provider`.
  */
 export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 	if (!options.binding && !("accountId" in options && "apiKey" in options)) {
@@ -617,10 +617,22 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
 // AI Search (formerly AutoRAG)
 // ---------------------------------------------------------------------------
 
+/**
+ * @deprecated Use `createAISearchNamespace` from `ai-search-provider`, over the
+ * `ai_search_namespaces` binding that replaces `env.AI.autorag()`:
+ * `createAISearchNamespace({ binding: env.AI_SEARCH }).get("my-instance").chat()`.
+ * @see https://developers.cloudflare.com/ai-search/api/migration/workers-binding/
+ */
 export type AISearchSettings = {
 	binding: AutoRAG;
 };
 
+/**
+ * @deprecated Use `createAISearchNamespace` from `ai-search-provider`, over the
+ * `ai_search_namespaces` binding that replaces `env.AI.autorag()`:
+ * `createAISearchNamespace({ binding: env.AI_SEARCH }).get("my-instance").chat()`.
+ * @see https://developers.cloudflare.com/ai-search/api/migration/workers-binding/
+ */
 export interface AISearchProvider {
 	(settings?: AISearchChatSettings): AISearchChatLanguageModel;
 	/**
@@ -633,7 +645,11 @@ export interface AISearchProvider {
  * Create an AI Search provider instance.
  *
  * AI Search (formerly AutoRAG) is Cloudflare's managed search service.
- * @see https://developers.cloudflare.com/ai-search/
+ *
+ * @deprecated Use `createAISearchNamespace` from `ai-search-provider`, over the
+ * `ai_search_namespaces` binding that replaces `env.AI.autorag()`:
+ * `createAISearchNamespace({ binding: env.AI_SEARCH }).get("my-instance").chat()`.
+ * @see https://developers.cloudflare.com/ai-search/api/migration/workers-binding/
  */
 export function createAISearch(
 	options: AISearchSettings,
@@ -679,8 +695,9 @@ export type AutoRAGProvider = AISearchProvider;
 let autoRAGWarned = false;
 
 /**
- * @deprecated Use `createAISearch` instead. AutoRAG has been renamed to AI Search.
- * @see https://developers.cloudflare.com/ai-search/
+ * @deprecated Use `createAISearchNamespace` from `ai-search-provider`. AutoRAG
+ * has been renamed to AI Search.
+ * @see https://developers.cloudflare.com/ai-search/api/migration/workers-binding/
  */
 export function createAutoRAG(options: AISearchSettings): AISearchProvider {
 	if (!autoRAGWarned) {

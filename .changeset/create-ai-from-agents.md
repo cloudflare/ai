@@ -3,4 +3,4 @@
 "ai-gateway-provider": patch
 ---
 
-Deprecate what `createAI` from `agents/models/ai-sdk` replaces: all of `ai-gateway-provider`, and all of `workers-ai-provider` except AI Search. Nothing changes at runtime.
+Deprecate both packages. Use `createAI` from `agents/models/ai-sdk`, and `ai-search-provider` for AI Search. Nothing changes at runtime.
