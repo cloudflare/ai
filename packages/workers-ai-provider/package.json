@@ -1,6 +1,6 @@
 {
 	"name": "workers-ai-provider",
-	"version": "4.0.0",
+	"version": "4.0.1",
 	"description": "Workers AI Provider for the vercel AI SDK",
 	"keywords": [
 		"ai",
