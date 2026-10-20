@@ -1,25 +1,25 @@
 # AI Gateway Provider for Vercel AI SDK
 
+> [!IMPORTANT]
+> **`ai-gateway-provider` is deprecated.** Use `createAI` from the Agents SDK.
+>
+> ```sh
+> npm install agents ai @ai-sdk/provider
+> ```
+>
+> | Before                                                             | After                                                                                      |
+> | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+> | `createAiGateway({ binding: env.AI.gateway("g") })`                | `createAI({ binding: env.AI, id: "g" })`                                                   |
+> | `createAiGateway({ accountId, gateway: "g", apiKey })`             | `createAI({ accountId, apiToken, gateway: "g" })`                                          |
+> | `aigateway([a, b])`                                                | `ai(a, { fallback: [b] })`, tried in order on the client                                   |
+> | `createAnthropic()` from `ai-gateway-provider/providers/anthropic` | `createAnthropic({ apiKey: "cloudflare" })` from `@ai-sdk/anthropic`                       |
+> | `unified("<provider>/<model>")`                                    | `ai("<provider>/<model>")`, the [catalog](https://developers.cloudflare.com/ai/models/) id |
+>
+> See [Models](https://developers.cloudflare.com/agents/models/ai-sdk/).
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This library provides an AI Gateway Provider for the [Vercel AI SDK](https://sdk.vercel.ai/docs), enabling you to seamlessly integrate multiple AI models from different providers behind a unified interface. It leverages Cloudflare's AI Gateway to manage and optimize your AI model usage.
-
-> [!IMPORTANT]
-> **This package is deprecated. Use `createAI` from the Agents SDK.** It routes
-> any AI SDK model through AI Gateway, with gateway options and fallback, using
-> the `env.AI` binding or an account id and API token:
->
-> ```ts
-> import { createAI } from "agents/models/ai-sdk";
->
-> const ai = createAI({ accountId, apiToken, gateway: "my-gateway" }); // or { binding: env.AI, id: "my-gateway" }
-> ai(anthropic("claude-opus-4-8"), { fallback: [openai("gpt-5.4")] });
-> ai("anthropic/claude-opus-4.8"); // a catalog id, in place of `unified`
-> ```
->
-> Pass the vendor's own provider (`@ai-sdk/anthropic` and so on) in place of
-> the `ai-gateway-provider/providers/*` wrappers. `createAI` falls back
-> client-side rather than in one gateway request.
 
 ## Features
 

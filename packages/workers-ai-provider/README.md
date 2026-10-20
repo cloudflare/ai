@@ -1,29 +1,29 @@
 # workers-ai-provider
 
+> [!IMPORTANT]
+> **`workers-ai-provider` is deprecated.** Use `createAI` from the Agents SDK, and [`ai-search-provider`](../ai-search-provider/README.md) for AI Search.
+>
+> ```sh
+> npm install agents ai @ai-sdk/provider
+> ```
+>
+> | Before                                                                                            | After                                                                                       |
+> | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+> | `createWorkersAI({ binding: env.AI })`                                                            | `createAI({ binding: env.AI })`                                                             |
+> | `createWorkersAI({ accountId, apiKey })`                                                          | `createAI({ accountId, apiToken })`                                                         |
+> | `workersai("@cf/…")`, `.embedding()`, `.image()`, `.speech()`, `.transcription()`, `.reranking()` | The same calls on `ai`                                                                      |
+> | `workersai("openai/…")` with `providers: [openai]`                                                | `ai("openai/…")`, the [catalog](https://developers.cloudflare.com/ai/models/) id, no plugin |
+> | `createGatewayFetch` / `createGatewayProvider`                                                    | `ai(vendorModel)`, or `ai.routed(vendorModel)` for other modalities                         |
+> | `createClientFallbackModel([{ model: a }, { model: b }])`                                         | `ai(a, { fallback: [b] })`                                                                  |
+> | `createAISearch({ binding: env.AI.autorag("x") })`                                                | `createAISearchNamespace({ binding: env.AI_SEARCH }).get("x").chat()`                       |
+>
+> See [Models](https://developers.cloudflare.com/agents/models/ai-sdk/).
+
 [Workers AI](https://developers.cloudflare.com/workers-ai/) provider for the [AI SDK](https://sdk.vercel.ai/). Run Cloudflare's models for chat, embeddings, image generation, transcription, text-to-speech, reranking, and [AI Search](https://developers.cloudflare.com/ai-search/) — all from a single provider. It can also route **third-party** models (OpenAI, Anthropic, Google, …) through [AI Gateway](https://developers.cloudflare.com/ai-gateway/) — see [Third-party models](#third-party-models-via-ai-gateway).
 
 > 📚 In-depth guides and the AI Gateway **delegate** reference (unified catalog,
 > resumable streaming _(coming soon)_, server-side fallback) live in
 > [`docs/workers-ai-provider`](../../docs/workers-ai-provider/README.md).
-
-> [!IMPORTANT]
-> **This package is deprecated. Use `createAI` from the Agents SDK**, and
-> [`ai-search-provider`](../ai-search-provider/README.md) for AI Search.
-> `createAI` covers every Workers AI modality, AI Gateway catalog ids and dynamic routes,
-> any vendor's AI SDK model via `ai(model)`, gateway options, fallback and BYOK,
-> with the `env.AI` binding or an account id and API token:
->
-> ```ts
-> import { createAI } from "agents/models/ai-sdk";
->
-> const ai = createAI({ binding: env.AI }); // or { accountId, apiToken }
-> ai("@cf/zai-org/glm-4.7-flash");
-> ai("anthropic/claude-opus-4.8");
-> ai(createAnthropic({ apiKey: "cloudflare" })("claude-opus-4-8"));
-> ```
->
-> For AI Search, `createAISearchNamespace` from `ai-search-provider` takes the
-> `ai_search_namespaces` binding, which replaces `env.AI.autorag()`.
 
 ## Quick start
 
