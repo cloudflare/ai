@@ -1,0 +1,21 @@
+packages/ai-gateway-provider/README.md
+  s_9052ae3a3bfc59::t_79149c02c4c6ac 4
+packages/workers-ai-provider/README.md
+  s_9052ae3a3bfc59::t_dd430b59a6938f 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "c9face494927bbbed6ccd6d4d09e8aebb0939f71",
+  "prompts": {},
+  "sessions": {
+    "s_9052ae3a3bfc59": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a12ffa-4429-7344-8f32-b55fe04f5889",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Matt Carey <mcarey@cloudflare.com>"
+    }
+  }
+}
