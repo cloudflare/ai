@@ -4,7 +4,7 @@ This is a Workers server that composes three functions:
 
 - A static website built using React and Vite on top of [Worker Assets](https://developers.cloudflare.com/workers/static-assets/)
 - A REST API built using Hono on top of [Workers KV](https://developers.cloudflare.com/kv/)
-- A [Model Context Protocol](https://modelcontextprotocol.io/introduction) Server built using on top of [Workers Durable Objects](https://developers.cloudflare.com/durable-objects/)
+- A [Model Context Protocol](https://modelcontextprotocol.io/introduction) Server built using with `createMcpHandler` from the [Agents SDK](https://developers.cloudflare.com/agents/)
 
 Member, Tenant, and client identity is managed using [Stytch](https://stytch.com/). Put together, these three features show how to extend a traditional full-stack CRUD application for use by an AI agent.
 
@@ -94,7 +94,7 @@ After completing all the setup steps above the application can be run with the c
 npm run dev
 ```
 
-The application will be available at [`http://localhost:3000`](http://localhost:3000) and the MCP server will be available at `http://localhost:3000/sse`.
+The application will be available at [`http://localhost:3000`](http://localhost:3000) and the MCP server will be available at `http://localhost:3000/mcp`.
 
 Test your MCP server using the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector)
 
@@ -104,8 +104,8 @@ npx @modelcontextprotocol/inspector@latest
 
 Navigate to the URL where the Inspector is running, and input the following values:
 
-- Transport Type: `SSE`
-- URL: `http://localhost:3000/sse`
+- Transport Type: `Streamable HTTP`
+- URL: `http://localhost:3000/mcp`
 
 Click Connect to test the authorization flow and interacting with the Objectives and Key Results via your MCP Server!
 

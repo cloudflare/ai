@@ -25,20 +25,6 @@
    * databases, object storage, AI inference, real-time communication and more.
    * https://developers.cloudflare.com/workers/runtime-apis/bindings/
    */
-  "migrations": [
-    {
-      "tag": "v1",
-      "new_sqlite_classes": ["TodoMCP"]
-    }
-  ],
-  "durable_objects": {
-    "bindings": [
-      {
-        "class_name": "TodoMCP",
-        "name": "MCP_OBJECT"
-      }
-    ]
-  },
   "kv_namespaces": [
     {
       "binding": "TODOS",

@@ -69,7 +69,7 @@ npm run dev
 
 Your MCP server will run on `http://localhost:8787`.
 
-Then visit the Cloudflare Workers AI LLM Playground for testing, enter `http://localhost:8787/sse` in the MCP server URL, and click the `Connect` button.
+Then visit the Cloudflare Workers AI LLM Playground for testing, enter `http://localhost:8787/mcp` in the MCP server URL, and click the `Connect` button.
 
 A login page will appear. After completing the login process, you can interact with the LLM in the Playground and use the tools defined in your MCP server. For example, we ask the LLM "Who am I?":
 
@@ -104,7 +104,7 @@ https://remote-mcp-logto.<your-subdomain>.workers.dev/callback
 To test your deployment, head over to the Workers AI LLM Playground at [https://playground.ai.cloudflare.com/](https://playground.ai.cloudflare.com/). Look for the MCP server connection settings in the bottom left corner and enter your server URL:
 
 ```bash
-https://remote-mcp-logto.<your-subdomain>.workers.dev/sse
+https://remote-mcp-logto.<your-subdomain>.workers.dev/mcp
 ```
 
 When you connect, a Logto authentication window will appear. Once you complete the sign-in process, you'll have access to all available tools.
@@ -122,7 +122,7 @@ Replace the content with the following configuration:
       "command": "npx",
       "args": [
         "mcp-remote",
-        "https://remote-mcp-logto.<your-subdomain>.workers.dev/sse"
+        "https://remote-mcp-logto.<your-subdomain>.workers.dev/mcp"
       ]
     }
   }

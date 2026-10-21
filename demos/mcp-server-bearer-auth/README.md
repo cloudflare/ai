@@ -23,7 +23,7 @@ You should be able to open [`http://localhost:8787/`](http://localhost:8787/) in
 To explore your new MCP api, you can use the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector).
 
 - Start it with `npx @modelcontextprotocol/inspector`
-- [Within the inspector](http://localhost:5173), switch the Transport Type to `SSE` and enter `http://localhost:8787/sse` as the URL of the MCP server to connect to.
+- [Within the inspector](http://localhost:5173), switch the Transport Type to `Streamable HTTP` and enter `http://localhost:8787/mcp` as the URL of the MCP server to connect to.
 - Add a bearer token and click "Connect"
 - Click "List Tools"
 - Run the "getToken" tool, which should return the Authorization header that you set in the inspector
@@ -45,7 +45,7 @@ To explore your new MCP api, you can use the [MCP Inspector](https://modelcontex
 			"command": "npx",
 			"args": [
 				"mcp-remote",
-				"http://localhost:8787/sse",
+				"http://localhost:8787/mcp",
 				"--header",
 				"Authorization: Bearer ${AUTH_TOKEN}"
 			]
@@ -67,7 +67,7 @@ Just like you did above in "Develop locally", run the MCP inspector:
 
 `npx @modelcontextprotocol/inspector@latest`
 
-Then enter the `workers.dev` URL (ex: `worker-name.account-name.workers.dev/sse`) of your Worker in the inspector as the URL of the MCP server to connect to, and click "Connect".
+Then enter the `workers.dev` URL (ex: `worker-name.account-name.workers.dev/mcp`) of your Worker in the inspector as the URL of the MCP server to connect to, and click "Connect".
 
 You've now connected to your MCP server from a remote MCP client. You can pass in a bearer token like mentioned above
 
@@ -77,7 +77,7 @@ Should anything go wrong it can be helpful to restart Claude, or to try connecti
 MCP server on the command line with the following command.
 
 ```bash
-npx mcp-remote http://localhost:8787/sse
+npx mcp-remote http://localhost:8787/mcp
 ```
 
 In some rare cases it may help to clear the files added to `~/.mcp-auth`

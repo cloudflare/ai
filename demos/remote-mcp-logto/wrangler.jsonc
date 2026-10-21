@@ -18,26 +18,12 @@
 	 * npx wrangler secret put LOGTO_APP_SECRET
 	 * npx wrangler secret put COOKIE_ENCRYPTION_KEY
 	 */
-	"migrations": [
-		{
-			"new_sqlite_classes": ["MyMCP"],
-			"tag": "v1",
-		},
-	],
 	"kv_namespaces": [
 		{
 			"binding": "OAUTH_KV",
 			"id": "<Add-KV-ID>",
 		},
 	],
-	"durable_objects": {
-		"bindings": [
-			{
-				"class_name": "MyMCP",
-				"name": "MCP_OBJECT",
-			},
-		],
-	},
 	"observability": {
 		"enabled": true,
 	},

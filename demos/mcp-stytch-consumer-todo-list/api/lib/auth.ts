@@ -48,7 +48,6 @@ export const stytchBearerTokenAuthMiddleware = createMiddleware<{
 
 	try {
 		const verifyResult = await validateStytchJWT(accessToken, c.env);
-		// @ts-expect-error Props go brr
 		c.executionCtx.props = {
 			accessToken,
 			claims: verifyResult.payload,

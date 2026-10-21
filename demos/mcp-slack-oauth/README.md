@@ -74,10 +74,10 @@ Acts as OAuth Client to your real OAuth server (in this case, Slack)
 
 ## Usage
 
-To use this service, connect to the SSE endpoint in your MCP client:
+To use this service, connect to the MCP endpoint in your MCP client:
 
 ```
-https://mcp-slack-oauth.<your-subdomain>.workers.dev/sse
+https://mcp-slack-oauth.<your-subdomain>.workers.dev/mcp
 ```
 
 You'll be prompted to authorize with Slack, and then you can use the available tools to access your Slack data.
@@ -92,7 +92,7 @@ Test the remote server using [Inspector](https://modelcontextprotocol.io/docs/to
 npx @modelcontextprotocol/inspector@latest
 ```
 
-Enter `https://mcp-slack-oauth.<your-subdomain>.workers.dev/sse` and hit connect. Once you go through the authentication flow, you'll see the Tools working.
+Enter `https://mcp-slack-oauth.<your-subdomain>.workers.dev/mcp` and hit connect. Once you go through the authentication flow, you'll see the Tools working.
 
 #### Access the remote MCP server from Claude Desktop
 
@@ -107,7 +107,7 @@ Replace the content with the following configuration. Once you restart Claude De
       "command": "npx",
       "args": [
         "mcp-remote",
-        "https://mcp-slack-oauth.<your-subdomain>.workers.dev/sse"
+        "https://mcp-slack-oauth.<your-subdomain>.workers.dev/mcp"
       ]
     }
   }
@@ -137,15 +137,12 @@ The OAuth Provider library serves as a complete OAuth 2.1 server implementation 
 - Managing the connection to Slack's OAuth services
 - Securely storing tokens and authentication state in KV storage
 
-#### McpAgent
+#### createMcpHandler
 
-McpAgent extends the base MCP functionality with Cloudflare's Agents SDK, providing:
+`createMcpHandler` from `agents/mcp/server` serves an MCP SDK v2 `McpServer` from a Worker. It is stateless: each request builds a fresh server, so there are no sessions or Durable Objects to manage. It provides:
 
-- Persistent state management for your MCP server
-- Secure storage of authentication context between requests
-- Access to authenticated user information via this.props
+- Access to authenticated user information via `getMcpAuthContext()`
 - Support for conditional tool availability based on user identity
-- Integration with Cloudflare's Agent platform for extended AI capabilities
 
 #### MCP Remote
 
@@ -154,4 +151,4 @@ The MCP Remote library enables your server to expose tools that can be invoked b
 - Defines the protocol for communication between clients and your server
 - Provides a structured way to define tools
 - Handles serialization and deserialization of requests and responses
-- Maintains the Server-Sent Events (SSE) connection between clients and your server
+- Serves the Streamable HTTP transport at `/mcp`
