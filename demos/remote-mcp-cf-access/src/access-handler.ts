@@ -161,7 +161,7 @@ export async function handleAccessRequest(
 			metadata: {
 				label: user.name,
 			},
-			// This will be available on this.props inside MyMCP
+			// This will be available through getMcpAuthContext() in MCP handlers.
 			props: {
 				accessToken,
 				email: user.email,
