@@ -1,0 +1,103 @@
+demos/mcp-server-bearer-auth/README.md
+  s_6ca65135f6cb8f::t_4ddc5bbbb55f1e 26,48,70,80
+demos/mcp-server-bearer-auth/package.json
+  s_6ca65135f6cb8f::t_c1325b0d1993a5 16-17
+demos/mcp-server-bearer-auth/src/index.ts
+  s_6ca65135f6cb8f::t_2fd483de1f5659 1-2,15-16,21-24,26-38,47,49,54-62
+demos/mcp-server-bearer-auth/static/README.md
+  s_6ca65135f6cb8f::t_21524067f7af31 26,53,67
+demos/mcp-slack-oauth/README.md
+  s_6ca65135f6cb8f::t_d0136cf7b788ab 77,80,95,110,140,142,144,154
+demos/mcp-slack-oauth/package.json
+  s_6ca65135f6cb8f::t_902847674c95d2 14,16,19-20,25
+demos/mcp-slack-oauth/src/index.ts
+  s_6ca65135f6cb8f::t_58b980827acaa0 2,4,14-15,19,21-25,29-32,37-38,40-49,51-60,62-67,75-110,112,115-118,122,127-138,140,143-144,146-150
+demos/mcp-stytch-b2b-okr-manager/README.md
+  s_6ca65135f6cb8f::t_6790d298095353 7,97,107-108
+demos/mcp-stytch-b2b-okr-manager/api/OKRManagerMCP.ts
+  s_6ca65135f6cb8f::t_16fa6688bd8baa 1-3,10-12,14-22,24,30,43,50-53,55-58,60-62,64-67,71-93,95-97,99-104,108-221
+demos/mcp-stytch-b2b-okr-manager/api/index.ts
+  s_6ca65135f6cb8f::t_58e45610141425 5-6,8,27
+demos/mcp-stytch-b2b-okr-manager/package.json
+  s_6ca65135f6cb8f::t_80b10851110ffe 17,20
+demos/mcp-stytch-consumer-todo-list/README.md
+  s_6ca65135f6cb8f::t_ca7ad44de16a34 7,77
+demos/mcp-stytch-consumer-todo-list/api/TodoMCP.ts
+  s_6ca65135f6cb8f::t_f3b64189160616 1-3,8-23,25-27,29-31,33-36,38-42,45-48,51-67,69-76,78-85,87-94,96
+demos/mcp-stytch-consumer-todo-list/api/index.ts
+  s_6ca65135f6cb8f::t_f161e99c9f7c95 5-6,8,27
+demos/mcp-stytch-consumer-todo-list/package.json
+  s_6ca65135f6cb8f::t_a840ba8b57fcd8 16,19
+demos/remote-mcp-auth0/README.md
+  s_6ca65135f6cb8f::t_f8c804b9314674 25,45
+demos/remote-mcp-auth0/mcp-auth0-oidc/README.md
+  s_6ca65135f6cb8f::t_d2ad6c06684b95 65,97
+demos/remote-mcp-auth0/mcp-auth0-oidc/package.json
+  s_6ca65135f6cb8f::t_19cf369f2b4b86 14-15
+demos/remote-mcp-auth0/mcp-auth0-oidc/src/index.ts
+  s_6ca65135f6cb8f::t_783a692ecde9f7 1,3-4,9-10,14,16-19,21-25,27,30,48-49,51-62,64-70,73-74,82-86
+demos/remote-mcp-authkit/README.md
+  s_6ca65135f6cb8f::t_0a893f7b7b19b8 65,68
+demos/remote-mcp-authkit/package.json
+  s_6ca65135f6cb8f::t_da8d423838598c 18,20
+demos/remote-mcp-authkit/src/index.ts
+  s_6ca65135f6cb8f::t_be7db338b55271 1,3-4,9-10,14,16-26,28-36,48-54,56-66,68-69,72-73,76-80
+demos/remote-mcp-authkit/src/props.ts
+  s_6ca65135f6cb8f::t_83ffc5e8976b07 10
+demos/remote-mcp-authless/package.json
+  s_6ca65135f6cb8f::t_9b997c1e5fced4 15-16
+demos/remote-mcp-cf-access-self-hosted/package.json
+  s_6ca65135f6cb8f::t_d42fa72ed0715b 13-14
+demos/remote-mcp-cf-access-self-hosted/src/index.ts
+  s_6ca65135f6cb8f::t_0f793fbf952860 2-4,15-16,20,22-31,33-39,49-60,62-63,93,95,100-105
+demos/remote-mcp-cf-access/package.json
+  s_6ca65135f6cb8f::t_c3c83b45cee022 14-15
+demos/remote-mcp-github-oauth/package.json
+  s_6ca65135f6cb8f::t_3aca2b6015e790 14-15
+demos/remote-mcp-google-oauth/README.md
+  s_6ca65135f6cb8f::t_6bffa7ef9387fb 115,129,131,133,143,145,147
+demos/remote-mcp-google-oauth/package.json
+  s_6ca65135f6cb8f::t_9e9c0b7c94c130 14-15
+demos/remote-mcp-google-oauth/src/index.ts
+  s_6ca65135f6cb8f::t_2b6a79dc9a56ba 2-3,7-9,15-16,21-24,26-29,32-33,35-39
+demos/remote-mcp-logto/README.md
+  s_6ca65135f6cb8f::t_50ae3cd68d1734 72,107,125
+demos/remote-mcp-logto/package.json
+  s_6ca65135f6cb8f::t_b3eb456aecbf5d 17-18
+demos/remote-mcp-logto/src/index.ts
+  s_6ca65135f6cb8f::t_e59e13ac2e2a59 2-3,7,14-15,19,21-31,33-42,45-46,48-52
+demos/remote-mcp-server-autorag/README.md
+  s_6ca65135f6cb8f::t_c187562770a565 26,49,79,85,92,104
+demos/remote-mcp-server-autorag/package.json
+  s_6ca65135f6cb8f::t_4548ce6716312b 15-16
+demos/remote-mcp-server-autorag/src/index.ts
+  s_6ca65135f6cb8f::t_988c98524bf5ba 1,3-4,8-9,14-27,29-35,38-39,43-47
+demos/remote-mcp-server-autorag/static/README.md
+  s_6ca65135f6cb8f::t_d7010547667cb3 26,49,79,85,92,104
+demos/remote-mcp-server/README.md
+  s_6ca65135f6cb8f::t_05a944c1c7d984 29,52,82,88,95,107
+demos/remote-mcp-server/package.json
+  s_6ca65135f6cb8f::t_b4956a2210a1a5 16-17
+demos/remote-mcp-server/src/index.ts
+  s_6ca65135f6cb8f::t_fe1d8c9a31de18 2-3,7-8,13-16,18-21,24-25,29-33
+demos/remote-mcp-server/static/README.md
+  s_6ca65135f6cb8f::t_b376e7c071d418 26,49,79,85,92,104
+pnpm-lock.yaml
+  s_6ca65135f6cb8f::t_3c3e37d911fd82 100,143,186,229,282,351-353,355-356,385-387,391-393,403-405,419-421,429-430,483-485,493-494,555,598,641,684,725-727,729-730,784-786,791-792,822-823,825-826,850-851,853-854,877-879,881-882,906-907,909-910,939-941,943-944,973-975,977-978,1004-1006,1008-1009,1038-1040,1042-1043,1111,1151,1188,1222,1262,1305,1348,1528,1802,1811,1998-1999,2004-2005,2322,2939-2940,2943-2944,2967-2968,4160-4161,4164,4167-4173,4184-4185,4190-4197,4210-4211,4396-4398,5761-5763,6669-6671,6922,6957,6959,6963,6966,6968,7613,7620,7977,7979,7987,8038,8040,8042,8292,8784,8786,9095,9099-9101,9103,9109,9113,9118,9314-9315,10747-10748,11689,11691,11698,11700
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "e1ff49d21cdc3ae6b0c4a3ee947998e18b0d92fe",
+  "prompts": {},
+  "sessions": {
+    "s_6ca65135f6cb8f": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a15b50-b2f2-7189-bdc9-f33f3f5fadc2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Matt Carey <mcarey@cloudflare.com>"
+    }
+  }
+}
