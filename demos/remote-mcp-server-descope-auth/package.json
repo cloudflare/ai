@@ -8,11 +8,14 @@
 		"format": "oxfmt --write .",
 		"lint:fix": "oxlint --fix",
 		"start": "wrangler dev",
-		"cf-typegen": "wrangler types"
+		"cf-typegen": "wrangler types",
+		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
 		"@cloudflare/workers-oauth-provider": "^0.8.1",
-		"agents": "^0.17.1",
+		"@modelcontextprotocol/sdk": "1.30.0",
+		"@modelcontextprotocol/server": "2.0.0",
+		"agents": "^0.20.1",
 		"hono": "^4.12.27",
 		"zod": "^4.4.3"
 	},
