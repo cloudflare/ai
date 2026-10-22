@@ -78,7 +78,7 @@ app.get("/authorize", authorize);
 app.post("/authorize", confirmConsent);
 app.get("/callback", callback);
 
-export default new OAuthProvider({
+export default new OAuthProvider<Env>({
 	apiHandler: {
 		fetch(request: Request, bindings: Env, ctx: ExecutionContext) {
 			return mcpHandler(request, bindings, ctx);
@@ -90,4 +90,6 @@ export default new OAuthProvider({
 	defaultHandler: app,
 	tokenEndpoint: "/token",
 	tokenExchangeCallback,
+	// The URL MCP clients connect to. Every token is bound to it.
+	resourceMetadata: { resource: env.MCP_RESOURCE },
 });

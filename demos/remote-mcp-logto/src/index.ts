@@ -1,3 +1,4 @@
+import { env } from "cloudflare:workers";
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
 import { McpServer } from "@modelcontextprotocol/server";
 import { createMcpHandler, getMcpAuthContext } from "agents/mcp/server";
@@ -44,7 +45,7 @@ function createServer() {
 
 const mcpHandler = createMcpHandler(createServer);
 
-export default new OAuthProvider({
+export default new OAuthProvider<Env>({
 	apiHandler: {
 		fetch(request: Request, env: Env, ctx: ExecutionContext) {
 			return mcpHandler(request, env, ctx);
@@ -55,4 +56,6 @@ export default new OAuthProvider({
 	clientRegistrationEndpoint: "/register",
 	defaultHandler: LogtoHandler as any,
 	tokenEndpoint: "/token",
+	// The URL MCP clients connect to. Every token is bound to it.
+	resourceMetadata: { resource: env.MCP_RESOURCE },
 });

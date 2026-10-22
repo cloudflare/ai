@@ -70,12 +70,13 @@ const apiHandler = {
 	},
 } satisfies ExportedHandler<Env>;
 
-export default new OAuthProvider({
-	allowPlainPKCE: false,
+export default new OAuthProvider<Env>({
 	apiHandler,
 	apiRoute: "/mcp",
 	authorizeEndpoint: "/authorize",
 	clientRegistrationEndpoint: "/register",
 	defaultHandler: { fetch: handleAccessRequest as any },
 	tokenEndpoint: "/token",
+	// The URL MCP clients connect to. Every token is bound to it.
+	resourceMetadata: { resource: env.MCP_RESOURCE },
 });

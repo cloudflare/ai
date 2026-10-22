@@ -7,6 +7,11 @@
 	"name": "remote-mcp-server-autorag",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-03-10",
+	// The URL MCP clients connect to. Set it to your deployed URL, for example
+	// https://<worker-name>.<your-subdomain>.workers.dev/mcp
+	"vars": {
+		"MCP_RESOURCE": "http://localhost:8787/mcp",
+	},
 	"kv_namespaces": [
 		{
 			"binding": "OAUTH_KV",
