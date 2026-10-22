@@ -1,34 +1,39 @@
+import { env } from "cloudflare:workers";
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { McpAgent } from "agents/mcp";
+import { McpServer } from "@modelcontextprotocol/server";
+import { createMcpHandler, getMcpAuthContext } from "agents/mcp/server";
 import { z } from "zod";
 import { AuthkitHandler } from "./authkit-handler";
 import type { Props } from "./props";
 
-export class MyMCP extends McpAgent<Env, unknown, Props> {
-	server = new McpServer({
+function createServer() {
+	const server = new McpServer({
 		name: "MCP server demo using AuthKit",
 		version: "1.0.0",
 	});
+	const props = getMcpAuthContext()?.props as Props | undefined;
 
-	async init() {
-		// Hello, world!
-		this.server.tool(
-			"add",
-			"Add two numbers the way only MCP can",
-			{ a: z.number(), b: z.number() },
-			async ({ a, b }) => ({
-				content: [{ type: "text", text: String(a + b) }],
-			}),
-		);
+	// Hello, world!
+	server.registerTool(
+		"add",
+		{
+			description: "Add two numbers the way only MCP can",
+			inputSchema: z.object({ a: z.number(), b: z.number() }),
+		},
+		async ({ a, b }) => ({
+			content: [{ type: "text", text: String(a + b) }],
+		}),
+	);
 
-		// Dynamically add tools based on the user's permissions. They must have the
-		// `image_generation` permission to use this tool.
-		if (this.props!.permissions.includes("image_generation")) {
-			this.server.tool(
-				"generateImage",
-				"Generate an image using the `flux-1-schnell` model. Works best with 8 steps.",
-				{
+	// Dynamically add tools based on the user's permissions. They must have the
+	// `image_generation` permission to use this tool.
+	if (props?.permissions.includes("image_generation")) {
+		server.registerTool(
+			"generateImage",
+			{
+				description:
+					"Generate an image using the `flux-1-schnell` model. Works best with 8 steps.",
+				inputSchema: z.object({
 					prompt: z
 						.string()
 						.describe("A text description of the image you want to generate."),
@@ -40,35 +45,39 @@ export class MyMCP extends McpAgent<Env, unknown, Props> {
 						.describe(
 							"The number of diffusion steps; higher values can improve quality but take longer. Must be between 4 and 8, inclusive.",
 						),
-				},
-				async ({ prompt, steps }) => {
-					// TODO: Update the `McpAgent` type to pass its `Env` generic parameter
-					// down to the `DurableObject` type it extends to avoid this cast.
-					const env = this.env as Env;
+				}),
+			},
+			async ({ prompt, steps }) => {
+				const response = await (env as Env).AI.run("@cf/black-forest-labs/flux-1-schnell", {
+					prompt,
+					steps,
+				});
 
-					const response = await env.AI.run("@cf/black-forest-labs/flux-1-schnell", {
-						prompt,
-						steps,
-					});
-
-					return {
-						content: [
-							{
-								type: "image",
-								data: response.image!,
-								mimeType: "image/jpeg",
-							},
-						],
-					};
-				},
-			);
-		}
+				return {
+					content: [
+						{
+							type: "image",
+							data: response.image!,
+							mimeType: "image/jpeg",
+						},
+					],
+				};
+			},
+		);
 	}
+
+	return server;
 }
+
+const mcpHandler = createMcpHandler(createServer);
 
 export default new OAuthProvider({
 	apiRoute: "/mcp",
-	apiHandler: MyMCP.serve("/mcp") as any, // Use 'any' for maximum flexibility
+	apiHandler: {
+		fetch(request: Request, bindings: Env, ctx: ExecutionContext) {
+			return mcpHandler(request, bindings, ctx);
+		},
+	},
 	defaultHandler: AuthkitHandler as any, // Use 'any' for maximum flexibility
 	authorizeEndpoint: "/authorize",
 	tokenEndpoint: "/token",

@@ -62,7 +62,7 @@ To start the MCP server, you can use the following command:
 npm run dev
 ```
 
-With MCP Inspector you can connect to the MCP server, list the available tools and call them. Make sure to set the transport type to `sse` and the URL to `http://localhost:8788/sse`.
+With MCP Inspector you can connect to the MCP server, list the available tools and call them. Make sure to set the transport type to `streamable-http` and the URL to `http://localhost:8788/mcp`.
 
 <img src="../docs/local.jpg" width="750" alt="MCP Inspector">
 
@@ -94,7 +94,7 @@ https://mcp-auth0-oidc.<your-subdomain>.workers.dev/callback
 To test this you can now use the Workers AI LLM Playground. Navigate to [https://playground.ai.cloudflare.com/](https://playground.ai.cloudflare.com/) and connect to your MCP server on the bottom left using the following URL pattern:
 
 ```bash
-https://mcp-auth0-oidc.<your-subdomain>.workers.dev/sse
+https://mcp-auth0-oidc.<your-subdomain>.workers.dev/mcp
 ```
 
 This will open a popup where you can sign in after which you'll be able to use all of the tools.

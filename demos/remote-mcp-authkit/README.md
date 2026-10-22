@@ -62,10 +62,10 @@ Visit the [Cloudflare Workers AI playground](https://playground.ai.cloudflare.co
 
 ```
 # Local
-http://localhost:8788/sse
+http://localhost:8788/mcp
 
 # Deployed
-https://<your-worker-domain>/sse
+https://<your-worker-domain>/mcp
 ```
 
 After clicking **_Connect_**, you'll be redirected to your WorkOS AuthKit

@@ -1,7 +1,7 @@
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpServer } from "@modelcontextprotocol/server";
 import { WebClient } from "@slack/web-api";
-import { McpAgent } from "agents/mcp";
+import { createMcpHandler, getMcpAuthContext } from "agents/mcp/server";
 import { z } from "zod";
 import { type Props, refreshSlackToken, SlackHandler } from "./slack-handler";
 
@@ -11,56 +11,60 @@ import { type Props, refreshSlackToken, SlackHandler } from "./slack-handler";
 // 	// Example: 'U01234567',
 // ]);
 
-export class SlackMCP extends McpAgent<Env, unknown, Props> {
-	server = new McpServer({
+function createServer() {
+	const server = new McpServer({
 		name: "Slack Assistant MCP",
 		version: "1.0.0",
 	});
+	const props = getMcpAuthContext()?.props as Props;
 
-	async init() {
-		// Who am I tool
-		this.server.tool("whoami", "Get information about your Slack user", {}, async () => ({
+	// Who am I tool
+	server.registerTool(
+		"whoami",
+		{ description: "Get information about your Slack user" },
+		async () => ({
 			content: [
 				{
 					text: JSON.stringify({
-						scope: this.props!.scope,
-						teamName: this.props!.teamName,
-						userId: this.props!.userId,
-						userName: this.props!.userName,
+						scope: props.scope,
+						teamName: props.teamName,
+						userId: props.userId,
+						userName: props.userName,
 					}),
 					type: "text",
 				},
 			],
-		}));
+		}),
+	);
 
-		// List channels tool
-		this.server.tool(
-			"listChannels",
-			"Get a list of channels from your Slack workspace",
-			{},
-			async () => {
-				const slack = new WebClient(this.props!.accessToken);
-				const response = await slack.conversations.list({
-					exclude_archived: true,
-					types: "public_channel",
-				});
+	// List channels tool
+	server.registerTool(
+		"listChannels",
+		{ description: "Get a list of channels from your Slack workspace" },
+		async () => {
+			const slack = new WebClient(props.accessToken);
+			const response = await slack.conversations.list({
+				exclude_archived: true,
+				types: "public_channel",
+			});
 
-				return {
-					content: [
-						{
-							text: JSON.stringify(response.channels, null, 2),
-							type: "text",
-						},
-					],
-				};
-			},
-		);
+			return {
+				content: [
+					{
+						text: JSON.stringify(response.channels, null, 2),
+						type: "text",
+					},
+				],
+			};
+		},
+	);
 
-		// Get channel messages tool
-		this.server.tool(
-			"getChannelMessages",
-			"Get recent messages from a specific channel",
-			{
+	// Get channel messages tool
+	server.registerTool(
+		"getChannelMessages",
+		{
+			description: "Get recent messages from a specific channel",
+			inputSchema: z.object({
 				channelId: z.string().describe("The Slack channel ID"),
 				limit: z
 					.number()
@@ -68,71 +72,82 @@ export class SlackMCP extends McpAgent<Env, unknown, Props> {
 					.max(100)
 					.default(10)
 					.describe("Number of messages to retrieve"),
-			},
-			async ({ channelId, limit }) => {
-				const slack = new WebClient(this.props!.accessToken);
-				const response = await slack.conversations.history({
+			}),
+		},
+		async ({ channelId, limit }) => {
+			const slack = new WebClient(props.accessToken);
+			const response = await slack.conversations.history({
+				channel: channelId,
+				limit,
+			});
+
+			return {
+				content: [
+					{
+						text: JSON.stringify(response.messages, null, 2),
+						type: "text",
+					},
+				],
+			};
+		},
+	);
+
+	// This tool will fail because we only requested read permissions
+	server.registerTool(
+		"postMessage",
+		{
+			description:
+				"Attempt to post a message to a channel (will fail due to read-only permissions)",
+			inputSchema: z.object({
+				channelId: z.string().describe("The Slack channel ID"),
+				message: z.string().describe("The message to post"),
+			}),
+		},
+		async ({ channelId, message }) => {
+			const slack = new WebClient(props.accessToken);
+
+			try {
+				const response = await slack.chat.postMessage({
 					channel: channelId,
-					limit,
+					text: message,
 				});
+
+				if (!response.ok) {
+					throw new Error(response.error);
+				}
 
 				return {
 					content: [
 						{
-							text: JSON.stringify(response.messages, null, 2),
+							text: "Message posted successfully! This should not happen with read-only permissions.",
 							type: "text",
 						},
 					],
 				};
-			},
-		);
+			} catch (error) {
+				return {
+					content: [
+						{
+							text: `Failed to post message as expected with read-only permissions: ${(error as Error).message || JSON.stringify(error)}\n\nThis demonstrates that the MCP has properly limited access to read-only operations.`,
+							type: "text",
+						},
+					],
+				};
+			}
+		},
+	);
 
-		// This tool will fail because we only requested read permissions
-		this.server.tool(
-			"postMessage",
-			"Attempt to post a message to a channel (will fail due to read-only permissions)",
-			{
-				channelId: z.string().describe("The Slack channel ID"),
-				message: z.string().describe("The message to post"),
-			},
-			async ({ channelId, message }) => {
-				const slack = new WebClient(this.props!.accessToken);
-
-				try {
-					const response = await slack.chat.postMessage({
-						channel: channelId,
-						text: message,
-					});
-
-					if (!response.ok) {
-						throw new Error(response.error);
-					}
-
-					return {
-						content: [
-							{
-								text: "Message posted successfully! This should not happen with read-only permissions.",
-								type: "text",
-							},
-						],
-					};
-				} catch (error) {
-					return {
-						content: [
-							{
-								text: `Failed to post message as expected with read-only permissions: ${(error as Error).message || JSON.stringify(error)}\n\nThis demonstrates that the MCP has properly limited access to read-only operations.`,
-								type: "text",
-							},
-						],
-					};
-				}
-			},
-		);
-	}
+	return server;
 }
 
+const mcpHandler = createMcpHandler(createServer);
+
 export default new OAuthProvider({
-	apiHandler: SlackMCP.serve("/mcp") as any,
+	apiHandler: {
+		fetch(request: Request, env: Env, ctx: ExecutionContext) {
+			return mcpHandler(request, env, ctx);
+		},
+	},
 	apiRoute: "/mcp",
 	authorizeEndpoint: "/authorize",
 	clientRegistrationEndpoint: "/register",

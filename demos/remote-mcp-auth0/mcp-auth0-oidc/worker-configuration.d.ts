@@ -10,7 +10,6 @@ interface Env {
     AUTH0_CLIENT_SECRET: string
     API_BASE_URL: string
     COOKIE_ENCRYPTION_KEY: string
-    MCP_OBJECT: DurableObjectNamespace<import('./src/index').AuthenticatedMCP>
     AI: Ai
 }
 
@@ -25,7 +24,6 @@ declare namespace Cloudflare {
         AUTH0_CLIENT_SECRET: string
         API_BASE_URL: string
         COOKIE_ENCRYPTION_KEY: string
-        MCP_OBJECT: DurableObjectNamespace<import('./src/index').AuthenticatedMCP>
         AI: Ai
     }
 }

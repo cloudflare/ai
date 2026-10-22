@@ -7,7 +7,6 @@ export interface Props {
 	permissions: string[];
 	organizationId?: string;
 
-	// Props must have an index signature to satsify the `McpAgent`
-	// generic `Props` which extends `Record<string, unknown>`.
+	// OAuthProvider stores props as a plain record.
 	[key: string]: unknown;
 }

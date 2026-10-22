@@ -7,7 +7,6 @@ declare namespace Cloudflare {
 		LOGTO_ENDPOINT: string;
 		LOGTO_APP_ID: string;
 		LOGTO_APP_SECRET: string;
-		MCP_OBJECT: DurableObjectNamespace<import("./src/index").MyMCP>;
 	}
 }
 interface Env extends Cloudflare.Env {}

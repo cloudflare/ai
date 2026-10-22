@@ -112,7 +112,7 @@ When using Claude to connect to your remote MCP server, you may see some error m
 
 To connect Cursor with your MCP server, choose `Type`: "Command" and in the `Command` field, combine the command and args fields into one (e.g. `npx mcp-remote https://<your-worker-name>.<your-subdomain>.workers.dev/mcp`).
 
-Note that while Cursor supports HTTP+SSE servers, it doesn't support authentication, so you still need to use `mcp-remote` (and to use a STDIO server, not an HTTP one).
+If your Cursor version does not support remote servers with authentication, use `mcp-remote` as a STDIO server instead.
 
 You can connect your MCP server to other MCP clients like Windsurf by opening the client's configuration file, adding the same JSON that was used for the Claude setup, and restarting the MCP client.
 
@@ -126,13 +126,11 @@ The OAuth Provider library serves as a complete OAuth 2.1 server implementation 
 - Managing the connection to Google Cloud's OAuth services
 - Securely storing tokens and authentication state in KV storage
 
-#### Durable MCP
+#### createMcpHandler
 
-Durable MCP extends the base MCP functionality with Cloudflare's Durable Objects, providing:
+`createMcpHandler` from `agents/mcp/server` serves an MCP SDK v2 `McpServer` from a Worker. It is stateless: each request builds a fresh server, so there are no sessions or Durable Objects to manage. It provides:
 
-- Persistent state management for your MCP server
-- Secure storage of authentication context between requests
-- Access to authenticated user information via `this.props`
+- Access to authenticated user information via `getMcpAuthContext()`
 - Support for conditional tool availability based on user identity
 
 #### MCP Remote
@@ -142,13 +140,8 @@ The MCP Remote library enables your server to expose tools that can be invoked b
 - Defines the protocol for communication between clients and your server
 - Provides a structured way to define tools
 - Handles serialization and deserialization of requests and responses
-- Supports both Streamable HTTP (recommended) and Server-Sent Events (SSE) protocols for client communication
+- Serves the Streamable HTTP transport at `/mcp`
 
-## Transport Protocol Migration
+## Transport
 
-This example has been updated to support the new **Streamable HTTP** transport protocol, which replaces the deprecated Server-Sent Events (SSE) protocol. The server now exposes both endpoints:
-
-- `/mcp` - **Recommended**: Uses the new Streamable HTTP protocol
-- `/sse` - **Deprecated**: Legacy SSE protocol (maintained for backward compatibility)
-
-All new integrations should use the `/mcp` endpoint. The SSE endpoint will be removed in a future version.
+The server serves the Streamable HTTP transport at `/mcp`. It does not serve the deprecated SSE transport.
