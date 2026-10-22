@@ -1,0 +1,21 @@
+pnpm-lock.yaml
+  s_6ca65135f6cb8f::t_405558359d26db 349-350
+pnpm-workspace.yaml
+  s_6ca65135f6cb8f::t_b654efb12a06df 24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "899512185ddbc0e06c73d963c1c5a2065f4975f2",
+  "prompts": {},
+  "sessions": {
+    "s_6ca65135f6cb8f": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a15b50-b2f2-7189-bdc9-f33f3f5fadc2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Matt Carey <mcarey@cloudflare.com>"
+    }
+  }
+}
