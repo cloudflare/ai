@@ -3,6 +3,7 @@
 // Runtime types generated with workerd@1.20250428.0 2025-03-10 nodejs_compat
 declare namespace Cloudflare {
 	interface Env {
+		MCP_RESOURCE: string;
 		OAUTH_KV: KVNamespace;
 		LOGTO_ENDPOINT: string;
 		LOGTO_APP_ID: string;

@@ -2,6 +2,9 @@
 
 This is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server that supports remote MCP connections, with Github OAuth built-in.
 
+> [!IMPORTANT]
+> Before you deploy, set `MCP_RESOURCE` in `wrangler.jsonc` to the URL MCP clients connect to, for example `https://<worker-name>.<your-subdomain>.workers.dev/mcp`. [Workers OAuth Provider](https://github.com/cloudflare/workers-oauth-provider) binds every token to that URL. The default value works for local development.
+
 You can deploy it to your own Cloudflare account, and after you create your own Github OAuth client app, you'll have a fully functional remote MCP server that you can build off. Users will be able to connect to your MCP server by signing in with their GitHub account.
 
 You can use this as a reference example for how to integrate other OAuth providers with an MCP server deployed to Cloudflare, using the [`workers-oauth-provider` library](https://github.com/cloudflare/workers-oauth-provider).
