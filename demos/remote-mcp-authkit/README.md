@@ -2,6 +2,9 @@
 
 This is an example [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server that allows remote clients to connect and authenticate using [WorkOS](https://workos.com) [AuthKit](https://authkit.com).
 
+> [!IMPORTANT]
+> Before you deploy, set `MCP_RESOURCE` in `wrangler.jsonc` to the URL MCP clients connect to, for example `https://<worker-name>.<your-subdomain>.workers.dev/mcp`. [Workers OAuth Provider](https://github.com/cloudflare/workers-oauth-provider) binds every token to that URL. The default value works for local development.
+
 AuthKit supports user management features including an organization-centric
 authentication model allowing you to control tool access based on user and
 organization permissions.

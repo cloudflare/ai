@@ -7,6 +7,11 @@
 	"name": "remote-mcp-authkit",
 	"main": "src/index.ts",
 	"compatibility_flags": ["nodejs_compat"],
+	// The URL MCP clients connect to. Set it to your deployed URL, for example
+	// https://<worker-name>.<your-subdomain>.workers.dev/mcp
+	"vars": {
+		"MCP_RESOURCE": "http://localhost:8788/mcp",
+	},
 	"compatibility_date": "2024-09-23",
 	"kv_namespaces": [
 		{
