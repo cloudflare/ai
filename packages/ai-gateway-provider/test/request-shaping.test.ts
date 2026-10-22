@@ -144,3 +144,56 @@ describe("Binding request shaping", () => {
 		expect(JSON.stringify(bindingData)).not.toContain(CF_TEMP_TOKEN);
 	});
 });
+
+describe("Temp-token header cleanup", () => {
+	// A minimal wrapped model whose request headers are a plain object, the way
+	// some SDKs hand them over, with a non-lowercase `Authorization` key.
+	function stubModel(headers: Record<string, string>) {
+		const model = {
+			specificationVersion: "v4",
+			provider: "openai",
+			modelId: "gpt-4o-mini",
+			supportedUrls: {},
+			// processModelRequest only checks that the `fetch` key exists.
+			config: { fetch: undefined as ((url: string, init: unknown) => unknown) | undefined },
+			doGenerate: async () => {
+				model.config.fetch?.("https://api.openai.com/v1/responses", {
+					method: "POST",
+					headers,
+					body: new Response(JSON.stringify({ model: "gpt-4o-mini" })).body,
+				});
+			},
+		};
+		return model;
+	}
+
+	async function sentHeaders(headers: Record<string, string>) {
+		let bindingData: Array<{ headers: Record<string, string> }> = [];
+		const aigateway = createAiGateway({
+			binding: {
+				run: async (data) => {
+					bindingData = data as typeof bindingData;
+					return new Response(JSON.stringify(openAiResponse()), {
+						headers: { "content-type": "application/json" },
+					});
+				},
+			},
+		});
+		await aigateway([stubModel(headers) as never]).doGenerate({ prompt: [] });
+		return bindingData[0]?.headers;
+	}
+
+	it("strips a plain-object `Authorization` header that carries the temp token", async () => {
+		const sent = await sentHeaders({
+			Authorization: `Bearer ${CF_TEMP_TOKEN}`,
+			"X-Other": "keep",
+		});
+		expect(JSON.stringify(sent)).not.toContain(CF_TEMP_TOKEN);
+		expect(sent).toMatchObject({ "X-Other": "keep" });
+	});
+
+	it("keeps a plain-object `Authorization` header that holds a real key", async () => {
+		const sent = await sentHeaders({ Authorization: "Bearer sk-real" });
+		expect(sent).toMatchObject({ Authorization: "Bearer sk-real" });
+	});
+});
