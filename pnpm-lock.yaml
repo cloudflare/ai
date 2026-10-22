@@ -346,8 +346,8 @@ importers:
   demos/mcp-server-bearer-auth:
     dependencies:
       '@cloudflare/workers-oauth-provider':
-        specifier: ^0.8.1
-        version: 0.8.1
+        specifier: ^1.2.4
+        version: 1.2.4
       '@modelcontextprotocol/server':
         specifier: 2.3.1
         version: 2.3.1

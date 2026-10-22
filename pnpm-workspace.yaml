@@ -21,6 +21,7 @@ allowBuilds:
   utf-8-validate: true
   workerd: true
 minimumReleaseAgeExclude:
+  - "@cloudflare/workers-oauth-provider@1.2.4"
   - '@ai-sdk/fireworks@2.0.56 || 3.0.4'
   - "@cloudflare/workers-types@4.20260628.1"
   - "@microsoft/api-extractor@7.58.9"
