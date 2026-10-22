@@ -1,0 +1,57 @@
+demos/mcp-server-bearer-auth/package.json
+  s_6ca65135f6cb8f::t_b4cf25dad1a9a3 15
+demos/mcp-slack-oauth/package.json
+  s_6ca65135f6cb8f::t_d9e9d09c2491ae 13
+demos/mcp-slack-oauth/src/index.ts
+  s_6ca65135f6cb8f::t_9b64ef9bfae9ef 1,145,171-190
+demos/remote-mcp-auth0/mcp-auth0-oidc/package.json
+  s_6ca65135f6cb8f::t_b28b0a8a7fbeff 13
+demos/remote-mcp-auth0/mcp-auth0-oidc/src/index.ts
+  s_6ca65135f6cb8f::t_a748be4824630c 2-5,84,96-115
+demos/remote-mcp-authkit/package.json
+  s_6ca65135f6cb8f::t_fc9ad84df7ab23 17
+demos/remote-mcp-authkit/src/index.ts
+  s_6ca65135f6cb8f::t_b1b4548c90c986 2,74,85-104
+demos/remote-mcp-cf-access/package.json
+  s_6ca65135f6cb8f::t_3f4872f8f60695 13
+demos/remote-mcp-cf-access/src/index.ts
+  s_6ca65135f6cb8f::t_560d3833dade00 2,73,80-99
+demos/remote-mcp-github-oauth/package.json
+  s_6ca65135f6cb8f::t_e6749e7e5a9d82 13
+demos/remote-mcp-github-oauth/src/index.ts
+  s_6ca65135f6cb8f::t_89f99b1e262f4e 2,104,111-130
+demos/remote-mcp-google-oauth/package.json
+  s_6ca65135f6cb8f::t_ca8cd5bad4f82f 13
+demos/remote-mcp-google-oauth/src/index.ts
+  s_6ca65135f6cb8f::t_68219cd4ee1d59 1,34,45-64
+demos/remote-mcp-logto/package.json
+  s_6ca65135f6cb8f::t_b8c0ade21b077e 15
+demos/remote-mcp-logto/src/index.ts
+  s_6ca65135f6cb8f::t_17a3540616ad14 1,47,58-77
+demos/remote-mcp-server-autorag/package.json
+  s_6ca65135f6cb8f::t_19c724f09fd76e 14
+demos/remote-mcp-server-autorag/src/index.ts
+  s_6ca65135f6cb8f::t_0edb1417a6a849 2,40,51-70
+demos/remote-mcp-server/package.json
+  s_6ca65135f6cb8f::t_1eb8672b745d54 15
+demos/remote-mcp-server/src/index.ts
+  s_6ca65135f6cb8f::t_4aa0e6ca23312f 1,26,37-56
+pnpm-lock.yaml
+  s_6ca65135f6cb8f::t_a66c92fdda8af7 383-384,723-724,782-783,847-848,903-904,937-938,968-969,1002-1003,1036-1037,2361-2362,7474
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "dfc0dbab6092fd4480973d39d6a9a7609fca927f",
+  "prompts": {},
+  "sessions": {
+    "s_6ca65135f6cb8f": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a15b50-b2f2-7189-bdc9-f33f3f5fadc2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Matt Carey <mcarey@cloudflare.com>"
+    }
+  }
+}

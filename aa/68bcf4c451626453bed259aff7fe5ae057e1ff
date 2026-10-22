@@ -1,0 +1,89 @@
+demos/mcp-slack-oauth/README.md
+  s_6ca65135f6cb8f::t_d50f32cca7b395 5-7
+demos/mcp-slack-oauth/src/index.ts
+  s_6ca65135f6cb8f::t_0a5f4e1edeec7b 1-2,146,172-174
+demos/mcp-slack-oauth/worker-configuration.d.ts
+  s_6ca65135f6cb8f::t_cdf5c61c876549 6,5154
+demos/mcp-slack-oauth/wrangler.jsonc
+  s_6ca65135f6cb8f::t_bcc40098914349 7-8,10
+demos/remote-mcp-auth0/mcp-auth0-oidc/README.md
+  s_6ca65135f6cb8f::t_96412362935184 5-7
+demos/remote-mcp-auth0/mcp-auth0-oidc/src/index.ts
+  s_6ca65135f6cb8f::t_9f90bf7321ef08 2,81,93-95
+demos/remote-mcp-auth0/mcp-auth0-oidc/worker-configuration.d.ts
+  s_6ca65135f6cb8f::t_6730fd4d9f5450 4,19
+demos/remote-mcp-auth0/mcp-auth0-oidc/wrangler.jsonc
+  s_6ca65135f6cb8f::t_f405b76f0237da 11-15
+demos/remote-mcp-authkit/README.md
+  s_6ca65135f6cb8f::t_c945dafd8b1144 5-7
+demos/remote-mcp-authkit/src/index.ts
+  s_6ca65135f6cb8f::t_4369b22ec264ae 2,74,85-87
+demos/remote-mcp-authkit/worker-configuration.d.ts
+  s_6ca65135f6cb8f::t_2224315e982584 3-8,10
+demos/remote-mcp-authkit/wrangler.jsonc
+  s_6ca65135f6cb8f::t_3a3f67c2340219 10-14
+demos/remote-mcp-cf-access/README.md
+  s_6ca65135f6cb8f::t_7915d135678a34 5-7
+demos/remote-mcp-cf-access/src/index.ts
+  s_6ca65135f6cb8f::t_78ee38c3a9e55d 2,73,80-82
+demos/remote-mcp-cf-access/worker-configuration.d.ts
+  s_6ca65135f6cb8f::t_784076aaf874b9 13020
+demos/remote-mcp-cf-access/wrangler.jsonc
+  s_6ca65135f6cb8f::t_ab638ab59435ee 11-15
+demos/remote-mcp-github-oauth/README.md
+  s_6ca65135f6cb8f::t_0e7335611200f6 5-7
+demos/remote-mcp-github-oauth/src/index.ts
+  s_6ca65135f6cb8f::t_cf9575d6a9d354 2,104,111-113
+demos/remote-mcp-github-oauth/worker-configuration.d.ts
+  s_6ca65135f6cb8f::t_4d58ff2accf74f 12984
+demos/remote-mcp-github-oauth/wrangler.jsonc
+  s_6ca65135f6cb8f::t_1b6b8563b35485 11-15
+demos/remote-mcp-google-oauth/README.md
+  s_6ca65135f6cb8f::t_5bae1f4d227b44 5-7
+demos/remote-mcp-google-oauth/src/index.ts
+  s_6ca65135f6cb8f::t_e6d6509a614105 1-2,35,46-48
+demos/remote-mcp-google-oauth/worker-configuration.d.ts
+  s_6ca65135f6cb8f::t_77fe3a5d9207d1 3-8,10
+demos/remote-mcp-google-oauth/wrangler.jsonc
+  s_6ca65135f6cb8f::t_9e375620b0da14 11-15
+demos/remote-mcp-logto/README.md
+  s_6ca65135f6cb8f::t_b983089c54b61a 5-7
+demos/remote-mcp-logto/src/index.ts
+  s_6ca65135f6cb8f::t_e500e5c8820457 1-2,48,59-61
+demos/remote-mcp-logto/worker-configuration.d.ts
+  s_6ca65135f6cb8f::t_247278b8de7f7e 6
+demos/remote-mcp-logto/wrangler.jsonc
+  s_6ca65135f6cb8f::t_cd7a08f58ae576 11-15
+demos/remote-mcp-server-autorag/README.md
+  s_6ca65135f6cb8f::t_60fbadf8aa2e31 5-7
+demos/remote-mcp-server-autorag/src/index.ts
+  s_6ca65135f6cb8f::t_dc3b9fdb9890cf 2,40,51-53
+demos/remote-mcp-server-autorag/worker-configuration.d.ts
+  s_6ca65135f6cb8f::t_ae6196d4e5057b 5
+demos/remote-mcp-server-autorag/wrangler.jsonc
+  s_6ca65135f6cb8f::t_c8e729c4313b9b 10-14
+demos/remote-mcp-server/README.md
+  s_6ca65135f6cb8f::t_9423607f3c3a59 5-7
+demos/remote-mcp-server/src/index.ts
+  s_6ca65135f6cb8f::t_a5c93f9b1fb3e6 1-2,27,38-40
+demos/remote-mcp-server/worker-configuration.d.ts
+  s_6ca65135f6cb8f::t_d7bfbf3ef08da7 5
+demos/remote-mcp-server/wrangler.jsonc
+  s_6ca65135f6cb8f::t_38b9957717312f 11-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "aa68bcf4c451626453bed259aff7fe5ae057e1ff",
+  "prompts": {},
+  "sessions": {
+    "s_6ca65135f6cb8f": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a15b50-b2f2-7189-bdc9-f33f3f5fadc2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Matt Carey <mcarey@cloudflare.com>"
+    }
+  }
+}
