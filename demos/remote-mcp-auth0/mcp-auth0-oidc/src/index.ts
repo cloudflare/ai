@@ -1,5 +1,8 @@
 import { env } from "cloudflare:workers";
-import OAuthProvider, { type OAuthHelpers } from "@cloudflare/workers-oauth-provider";
+import OAuthProvider, {
+	type OAuthHelpers,
+	type OAuthProviderOptions,
+} from "@cloudflare/workers-oauth-provider";
 import { McpServer } from "@modelcontextprotocol/server";
 import { createMcpHandler, getMcpAuthContext } from "agents/mcp/server";
 import { Hono } from "hono";
@@ -78,7 +81,7 @@ app.get("/authorize", authorize);
 app.post("/authorize", confirmConsent);
 app.get("/callback", callback);
 
-export default new OAuthProvider({
+const oauthOptions = {
 	apiHandler: {
 		fetch(request: Request, bindings: Env, ctx: ExecutionContext) {
 			return mcpHandler(request, bindings, ctx);
@@ -90,4 +93,23 @@ export default new OAuthProvider({
 	defaultHandler: app,
 	tokenEndpoint: "/token",
 	tokenExchangeCallback,
-});
+} satisfies Omit<OAuthProviderOptions<Env>, "resourceMetadata">;
+
+// Workers OAuth Provider binds every token to the URL clients connect to, so
+// build one provider per origin: workers.dev, a custom domain, or localhost.
+const providers = new Map<string, OAuthProvider<Env>>();
+
+export default {
+	fetch(request: Request, env: Env, ctx: ExecutionContext) {
+		const { origin } = new URL(request.url);
+		let provider = providers.get(origin);
+		if (!provider) {
+			provider = new OAuthProvider<Env>({
+				...oauthOptions,
+				resourceMetadata: { resource: `${origin}/mcp` },
+			});
+			providers.set(origin, provider);
+		}
+		return provider.fetch(request, env, ctx);
+	},
+} satisfies ExportedHandler<Env>;
