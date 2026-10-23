@@ -1,0 +1,4 @@
+ENTRA_CLIENT_ID=<your client id>
+ENTRA_CLIENT_SECRET=<your client secret>
+ENTRA_TENANT_ID=<your tenant id>
+COOKIE_ENCRYPTION_KEY=any_random_string_here
