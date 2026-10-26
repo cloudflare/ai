@@ -1267,6 +1267,84 @@ describe("WorkersAiTextAdapter modelOptions passthrough", () => {
 		}
 		warnSpy.mockRestore();
 	});
+
+	it("should generate unique toolCallIds in the non-streaming fallback path", async () => {
+		// Workers AI models can emit the same deterministic tool_call id for
+		// every call in a step (issues #526/#527). The streaming path already
+		// replaces provider ids with generated ones; the non-streaming
+		// fallback must do the same or multi-tool-call responses collide.
+		const adapter = new WorkersAiTextAdapter("@cf/openai/gpt-oss-120b" as WorkersAiTextModel, {
+			binding: {
+				run: vi.fn(),
+				gateway: () => ({ run: () => Promise.resolve(new Response("ok")) }),
+			},
+		});
+
+		const createMock = vi
+			.fn()
+			// First call (streaming) throws
+			.mockRejectedValueOnce(new Error("streaming not supported"))
+			// Second call (non-streaming fallback) returns two tool calls
+			// sharing the same deterministic backend id
+			.mockResolvedValueOnce({
+				model: "@cf/openai/gpt-oss-120b",
+				choices: [
+					{
+						message: {
+							role: "assistant",
+							content: null,
+							tool_calls: [
+								{
+									id: "chatcmpl-tool-b93bf5371e6efcfba7a45b8d84fb0d6f",
+									type: "function",
+									function: {
+										name: "get_weather",
+										arguments: '{"city":"Austin"}',
+									},
+								},
+								{
+									id: "chatcmpl-tool-b93bf5371e6efcfba7a45b8d84fb0d6f",
+									type: "function",
+									function: {
+										name: "get_weather",
+										arguments: '{"city":"Dallas"}',
+									},
+								},
+							],
+						},
+						finish_reason: "tool_calls",
+					},
+				],
+				usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
+			});
+
+		(adapter as any).client = {
+			chat: { completions: { create: createMock } },
+		};
+
+		const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+		const chunks = await collectChunks(
+			adapter.chatStream({
+				model: "@cf/openai/gpt-oss-120b" as WorkersAiTextModel,
+				messages: [{ role: "user", content: "Hi" }],
+			} as any),
+		);
+
+		const starts = chunks.filter((c: any) => c.type === "TOOL_CALL_START");
+		const ends = chunks.filter((c: any) => c.type === "TOOL_CALL_END");
+		expect(starts).toHaveLength(2);
+		expect(ends).toHaveLength(2);
+
+		// The duplicate backend id must not be forwarded
+		const startIds = starts.map((c: any) => c.toolCallId);
+		expect(new Set(startIds).size).toBe(2);
+
+		// START and END of the same call must agree on the generated id
+		expect(ends.map((c: any) => c.toolCallId)).toEqual(startIds);
+
+		warnSpy.mockRestore();
+	});
 });
 
 // ---------------------------------------------------------------------------
