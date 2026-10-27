@@ -2,6 +2,7 @@
 // Runtime types generated with workerd@1.20250404.0 2025-03-10
 declare namespace Cloudflare {
 	interface Env {
+		MCP_RESOURCE: string;
 		OAUTH_KV: KVNamespace;
 		AI: Ai;
 		ASSETS: Fetcher;

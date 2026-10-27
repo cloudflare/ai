@@ -2,6 +2,9 @@
 
 This is an implementation of a remote Slack [MCP server](https://modelcontextprotocol.io/introduction) that requires users to login to their Slack account in order to use the tools to read and post messages from their channels.
 
+> [!IMPORTANT]
+> Before you deploy, set `MCP_RESOURCE` in `wrangler.jsonc` to the URL MCP clients connect to, for example `https://<worker-name>.<your-subdomain>.workers.dev/mcp`. [Workers OAuth Provider](https://github.com/cloudflare/workers-oauth-provider) binds every token to that URL. The default value works for local development.
+
 You can deploy it to your own Cloudflare account, once you create a [Slack OAuth](https://api.slack.com/authentication/oauth-v2) app.
 
 You can use this as a reference example for how to integrate other OAuth providers with an MCP server deployed to Cloudflare, using the workers-oauth-provider library.

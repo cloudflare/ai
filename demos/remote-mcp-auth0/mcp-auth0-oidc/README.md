@@ -2,6 +2,9 @@
 
 This is a MCP server which will require the user to first authenticate. The MCP server will then be able to call protected APIs on behalf of the user.
 
+> [!IMPORTANT]
+> Before you deploy, set `MCP_RESOURCE` in `wrangler.jsonc` to the URL MCP clients connect to, for example `https://<worker-name>.<your-subdomain>.workers.dev/mcp`. [Workers OAuth Provider](https://github.com/cloudflare/workers-oauth-provider) binds every token to that URL. The default value works for local development.
+
 ## Configuration
 
 ### Todos API

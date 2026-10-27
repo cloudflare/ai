@@ -4,7 +4,10 @@
   "main": "src/index.ts",
   "compatibility_date": "2025-03-10",
   "compatibility_flags": ["nodejs_compat"],
+  // The URL MCP clients connect to. Set it to your deployed URL, for example
+  // https://<worker-name>.<your-subdomain>.workers.dev/mcp
   "vars": {
+    "MCP_RESOURCE": "http://localhost:8788/mcp",
     // replace this in .dev.vars
     "SLACK_CLIENT_ID": "1234567890",
     "SLACK_CLIENT_SECRET": "1234567890",

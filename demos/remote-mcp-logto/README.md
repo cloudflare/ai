@@ -2,6 +2,9 @@
 
 This is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server that supports remote MCP connections, with [Logto](https://logto.io/) authentication built-in.
 
+> [!IMPORTANT]
+> Before you deploy, set `MCP_RESOURCE` in `wrangler.jsonc` to the URL MCP clients connect to, for example `https://<worker-name>.<your-subdomain>.workers.dev/mcp`. [Workers OAuth Provider](https://github.com/cloudflare/workers-oauth-provider) binds every token to that URL. The default value works for local development.
+
 The MCP server is powered by [Cloudflare Workers](https://developers.cloudflare.com/workers/):
 
 - Acts as OAuth _Server_ to your MCP clients

@@ -2,6 +2,9 @@
 
 Let's get a remote MCP server up-and-running on Cloudflare Workers complete with OAuth login!
 
+> [!IMPORTANT]
+> Before you deploy, set `MCP_RESOURCE` in `wrangler.jsonc` to the URL MCP clients connect to, for example `https://<worker-name>.<your-subdomain>.workers.dev/mcp`. [Workers OAuth Provider](https://github.com/cloudflare/workers-oauth-provider) binds every token to that URL. The default value works for local development.
+
 ## Develop locally
 
 ```bash
