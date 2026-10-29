@@ -1,26 +1,45 @@
 /**
  * For more details on how to configure Wrangler, refer to:
  * https://developers.cloudflare.com/workers/wrangler/configuration/
+ *
+ * Secrets (never in this file): set them with `wrangler secret put <NAME>`
+ *   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, AMAT_ACCESS_TOKEN
  */
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "mcp-google-oauth",
+  // TO CONFIRM: the Worker name. It is the first label of the public URL
+  // https://<name>.<account-subdomain>.workers.dev
+  "name": "amat-mcp-oauth",
   "main": "src/index.ts",
   "compatibility_date": "2025-03-10",
   "compatibility_flags": ["nodejs_compat"],
-  // The URL MCP clients connect to. Set it to your deployed URL, for example
-  // https://<worker-name>.<your-subdomain>.workers.dev/mcp
+  "workers_dev": true,
+  // Version preview URLs would serve the same Worker on other hostnames.
+  "preview_urls": false,
   "vars": {
-    "MCP_RESOURCE": "http://localhost:8788/mcp",
+    // TO CONFIRM: the URL MCP clients connect to, https://<name>.<account-subdomain>.workers.dev/mcp
+    // Every token is bound to it, and the Google callback is derived from it (<origin>/callback).
+    // The placeholder is not a valid URL on purpose: the Worker refuses to start until it is set.
+    // For `wrangler dev`, .dev.vars overrides it with http://localhost:8788/mcp.
+    "MCP_RESOURCE": "https://<name>.<account-subdomain>.workers.dev/mcp",
+    // The Amat MCP endpoint. The relay only accepts https://mcp-amat.nasta-univers.com/mcp
+    // or the same URL with a trailing slash (see src/amat-relay.ts).
+    "AMAT_MCP_URL": "https://mcp-amat.nasta-univers.com/mcp"
   },
   "kv_namespaces": [
     {
       "binding": "OAUTH_KV",
+      // TO SET: the id printed by `wrangler kv namespace create OAUTH_KV`
       "id": "<Add-KV-ID>"
     }
   ],
   "observability": {
-    "enabled": true
+    "enabled": true,
+    "logs": {
+      // Invocation logs record request URLs, including Google's authorization code on
+      // /callback. The Worker's own console logs never contain codes, tokens or secrets.
+      "invocation_logs": false
+    }
   },
   "dev": {
     "port": 8788

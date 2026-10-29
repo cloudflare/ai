@@ -1,223 +1,276 @@
-import type { AuthRequest, OAuthHelpers } from "@cloudflare/workers-oauth-provider";
-import { Hono } from "hono";
-import { fetchUpstreamAuthToken, getUpstreamAuthorizeUrl, type Props } from "./utils";
 import {
-	addApprovedClient,
-	bindStateToSession,
-	createOAuthState,
-	generateCSRFProtection,
-	isClientApproved,
-	OAuthError,
-	renderApprovalDialog,
-	validateCSRFToken,
-	validateOAuthState,
-} from "./workers-oauth-utils";
+	type AuthRequest,
+	AuthorizationError,
+	authorizationErrorRedirect,
+	type OAuthHelpers,
+	type ResumedUpstream,
+} from "@cloudflare/workers-oauth-provider";
+import { Hono } from "hono";
+import { isAllowedEmail, isAllowedRedirectUri, normalizeEmail } from "./access";
+import { renderConsentPage, renderMessagePage } from "./pages";
+import {
+	createPkcePair,
+	exchangeCodeForAccessToken,
+	fetchGoogleUser,
+	getUpstreamAuthorizeUrl,
+	type Props,
+	readBody,
+} from "./utils";
 
-const app = new Hono<{ Bindings: Env & { OAUTH_PROVIDER: OAuthHelpers } }>();
+/**
+ * The authorization flow, built on the OAuth provider's consent and upstream helpers:
+ *
+ *   GET  /authorize  parseAuthRequest() validates the client, redirect URI, PKCE and resource;
+ *                    the redirect URI must also be Claude's. beginConsent() shows the page.
+ *   POST /authorize  approveConsent() recovers the request from storage (never from the form)
+ *                    after checking the browser-bound, single-use handle; beginUpstream()
+ *                    stores it again under a browser-bound, single-use `state` for Google.
+ *   GET  /callback   finishUpstream() recovers it; the code is exchanged with PKCE, and the
+ *                    Google account must be verified and allowlisted before
+ *                    completeAuthorization() issues anything to the MCP client.
+ */
 
-app.get("/authorize", async (c) => {
-	const oauthReqInfo = await c.env.OAUTH_PROVIDER.parseAuthRequest(c.req.raw);
-	const { clientId } = oauthReqInfo;
-	if (!clientId) {
-		return c.text("Invalid request", 400);
-	}
+type Bindings = Env & { OAUTH_PROVIDER: OAuthHelpers };
 
-	// Check if client is already approved
-	if (await isClientApproved(c.req.raw, clientId, c.env.COOKIE_ENCRYPTION_KEY)) {
-		// Skip approval dialog but still create secure state and bind to session
-		const { stateToken } = await createOAuthState(oauthReqInfo, c.env.OAUTH_KV);
-		const { setCookie: sessionBindingCookie } = await bindStateToSession(stateToken);
-		return redirectToGoogle(c.req.raw, c.env, stateToken, {
-			"Set-Cookie": sessionBindingCookie,
-		});
-	}
+// The consent form only carries a handle and a decision.
+const MAX_FORM_BYTES = 4096;
 
-	// Generate CSRF protection for the approval form
-	const { token: csrfToken, setCookie } = generateCSRFProtection();
+const app = new Hono<{ Bindings: Bindings }>();
 
-	return renderApprovalDialog(c.req.raw, {
-		client: await c.env.OAUTH_PROVIDER.lookupClient(clientId),
-		csrfToken,
-		server: {
-			description: "This MCP Server is a demo for Google OAuth.",
-			name: "Google OAuth Demo",
-		},
-		setCookie,
-		state: { oauthReqInfo },
-	});
-});
+function missingConfig(env: Env): string[] {
+	const missing: string[] = [];
+	if (!env.GOOGLE_CLIENT_ID) missing.push("GOOGLE_CLIENT_ID");
+	if (!env.GOOGLE_CLIENT_SECRET) missing.push("GOOGLE_CLIENT_SECRET");
+	return missing;
+}
 
-app.post("/authorize", async (c) => {
-	try {
-		// Read form data once
-		const formData = await c.req.raw.formData();
-
-		// Validate CSRF token
-		validateCSRFToken(formData, c.req.raw);
-
-		// Extract state from form data
-		const encodedState = formData.get("state");
-		if (!encodedState || typeof encodedState !== "string") {
-			return c.text("Missing state in form data", 400);
-		}
-
-		let state: { oauthReqInfo?: AuthRequest };
-		try {
-			state = JSON.parse(atob(encodedState));
-		} catch (_e) {
-			return c.text("Invalid state data", 400);
-		}
-
-		if (!state.oauthReqInfo || !state.oauthReqInfo.clientId) {
-			return c.text("Invalid request", 400);
-		}
-
-		// Add client to approved list
-		const approvedClientCookie = await addApprovedClient(
-			c.req.raw,
-			state.oauthReqInfo.clientId,
-			c.env.COOKIE_ENCRYPTION_KEY,
+app.use("*", async (c, next) => {
+	const missing = missingConfig(c.env);
+	if (missing.length > 0) {
+		console.error("oauth_misconfigured", { missing });
+		return renderMessagePage(
+			500,
+			"Service indisponible",
+			"Le serveur d'autorisation n'est pas configuré. Contactez l'administrateur.",
 		);
-
-		// Create OAuth state and bind it to this user's session
-		const { stateToken } = await createOAuthState(state.oauthReqInfo, c.env.OAUTH_KV);
-		const { setCookie: sessionBindingCookie } = await bindStateToSession(stateToken);
-
-		// Set both cookies: approved client list + session binding
-		const headers = new Headers();
-		headers.append("Set-Cookie", approvedClientCookie);
-		headers.append("Set-Cookie", sessionBindingCookie);
-
-		return redirectToGoogle(c.req.raw, c.env, stateToken, Object.fromEntries(headers));
-	} catch (error: any) {
-		console.error("POST /authorize error:", error);
-		if (error instanceof OAuthError) {
-			return error.toResponse();
-		}
-		// Unexpected non-OAuth error
-		return c.text(`Internal server error: ${error.message}`, 500);
 	}
+	await next();
 });
 
-async function redirectToGoogle(
-	request: Request,
-	env: Env,
-	stateToken: string,
-	headers: Record<string, string> = {},
-) {
-	return new Response(null, {
-		headers: {
-			...headers,
-			location: getUpstreamAuthorizeUrl({
-				clientId: env.GOOGLE_CLIENT_ID,
-				hostedDomain: env.HOSTED_DOMAIN,
-				redirectUri: new URL("/callback", request.url).href,
-				scope: "email profile",
-				state: stateToken,
-				upstreamUrl: "https://accounts.google.com/o/oauth2/v2/auth",
-			}),
-		},
-		status: 302,
-	});
+// Registered with Google as the OAuth redirect URI. Derived from the configured public URL,
+// not from the request, so it always matches the Google Cloud configuration.
+function googleCallbackUrl(env: Env): string {
+	return new URL("/callback", env.MCP_RESOURCE).href;
+}
+
+function clientNotAllowed(headers?: Headers): Response {
+	return renderMessagePage(
+		400,
+		"Client non autorisé",
+		"Seul le connecteur Claude peut se connecter à ce serveur MCP.",
+		{ headers },
+	);
 }
 
 /**
- * OAuth Callback Endpoint
- *
- * This route handles the callback from Google after user authentication.
- * It exchanges the temporary code for an access token, then stores some
- * user metadata & the auth token as part of the 'props' on the token passed
- * down to the client. It ends by redirecting the client back to _its_ callback URL
- *
- * SECURITY: This endpoint validates that the state parameter from Google
- * matches both:
- * 1. A valid state token in KV (proves it was created by our server)
- * 2. The __Host-CONSENTED_STATE cookie (proves THIS browser consented to it)
- *
- * This prevents CSRF attacks where an attacker's state token is injected
- * into a victim's OAuth flow.
+ * Validation failures from the library. A redirect back to the client is used only when the
+ * library validated its redirect URI and it is one of Claude's; everything else is rendered here.
  */
-app.get("/callback", async (c) => {
-	// Validate OAuth state with session binding
-	// This checks both KV storage AND the session cookie
-	let oauthReqInfo: AuthRequest;
-	let clearSessionCookie: string;
+function authorizationFailure(error: unknown): Response {
+	if (!(error instanceof AuthorizationError)) throw error;
+	console.warn("authorize_failed", { code: error.code, description: error.description });
+	if (error.redirectTo && isAllowedRedirectUri(error.redirectUri)) {
+		return new Response(null, {
+			headers: { "Cache-Control": "no-store", Location: error.redirectTo },
+			status: 302,
+		});
+	}
+	return renderMessagePage(
+		400,
+		"Autorisation impossible",
+		`${error.description} — Recommencez la connexion depuis Claude.`,
+	);
+}
+
+async function redirectToGoogle(
+	env: Bindings,
+	authRequest: AuthRequest,
+	headers?: Headers,
+): Promise<Response> {
+	const { verifier, challenge } = await createPkcePair();
+	const upstream = await env.OAUTH_PROVIDER.beginUpstream(authRequest, {
+		data: { codeVerifier: verifier },
+		headers,
+	});
+	upstream.headers.set(
+		"Location",
+		getUpstreamAuthorizeUrl({
+			clientId: env.GOOGLE_CLIENT_ID,
+			codeChallenge: challenge,
+			redirectUri: googleCallbackUrl(env),
+			state: upstream.state,
+		}),
+	);
+	return new Response(null, { headers: upstream.headers, status: 302 });
+}
+
+app.get("/authorize", async (c) => {
+	const oauth = c.env.OAUTH_PROVIDER;
+	let authRequest: AuthRequest;
+	try {
+		authRequest = await oauth.parseAuthRequest(c.req.raw);
+	} catch (error) {
+		return authorizationFailure(error);
+	}
+
+	if (!isAllowedRedirectUri(authRequest.redirectUri)) {
+		console.warn("authorize_rejected", {
+			clientId: authRequest.clientId,
+			reason: "redirect_uri_not_allowed",
+		});
+		return clientNotAllowed();
+	}
+
+	// Consent is asked on every authorization, never remembered: a remembered approval would
+	// let an authorization link forwarded to an allowed user skip straight to Google.
+	const details = await oauth.describeConsent(authRequest);
+	const consent = await oauth.beginConsent(authRequest);
+	return renderConsentPage(details, consent.handle, consent.headers);
+});
+
+app.post("/authorize", async (c) => {
+	const oauth = c.env.OAUTH_PROVIDER;
+	const contentType = (c.req.header("content-type") ?? "").toLowerCase();
+	if (!contentType.startsWith("application/x-www-form-urlencoded")) {
+		return renderMessagePage(400, "Requête invalide", "Le formulaire est invalide.");
+	}
+	const read = await readBody(c.req.raw, MAX_FORM_BYTES);
+	if ("error" in read) {
+		return read.error === "too_large"
+			? renderMessagePage(413, "Requête invalide", "Le formulaire est trop volumineux.")
+			: renderMessagePage(400, "Requête invalide", "Le formulaire est invalide.");
+	}
+	const form = new URLSearchParams(read.text);
+	const handle = form.get("handle");
+	if (typeof handle !== "string" || handle.length === 0) {
+		return renderMessagePage(400, "Requête invalide", "Le formulaire est incomplet.");
+	}
 
 	try {
-		const result = await validateOAuthState(c.req.raw, c.env.OAUTH_KV);
-		oauthReqInfo = result.oauthReqInfo;
-		clearSessionCookie = result.clearCookie;
-	} catch (error: any) {
-		if (error instanceof OAuthError) {
-			return error.toResponse();
+		if (form.get("decision") !== "approve") {
+			const denied = await oauth.denyConsent(c.req.raw, handle);
+			return new Response(null, { headers: denied.headers, status: 302 });
 		}
-		// Unexpected non-OAuth error
-		return c.text("Internal server error", 500);
+		const approved = await oauth.approveConsent(c.req.raw, handle);
+		if (!isAllowedRedirectUri(approved.request.redirectUri)) {
+			return clientNotAllowed(approved.headers);
+		}
+		return await redirectToGoogle(c.env, approved.request, approved.headers);
+	} catch (error) {
+		return authorizationFailure(error);
+	}
+});
+
+app.get("/callback", async (c) => {
+	const oauth = c.env.OAUTH_PROVIDER;
+	let resumed: ResumedUpstream<{ codeVerifier?: unknown }>;
+	try {
+		resumed = await oauth.finishUpstream<{ codeVerifier?: unknown }>(c.req.raw);
+	} catch (error) {
+		return authorizationFailure(error);
+	}
+	const { request: authRequest, data, headers } = resumed;
+	if (!isAllowedRedirectUri(authRequest.redirectUri)) {
+		return clientNotAllowed(headers);
 	}
 
-	if (!oauthReqInfo.clientId) {
-		return c.text("Invalid OAuth request data", 400);
+	const params = new URL(c.req.url).searchParams;
+	if (params.has("error")) {
+		// The user cancelled at Google, or Google refused the sign-in.
+		headers.set(
+			"Location",
+			authorizationErrorRedirect(
+				authRequest,
+				"access_denied",
+				"Google sign-in did not complete",
+			),
+		);
+		return new Response(null, { headers, status: 302 });
 	}
 
-	// Exchange the code for an access token
-	const code = c.req.query("code");
-	if (!code) {
-		return c.text("Missing code", 400);
+	const code = params.get("code");
+	const codeVerifier = data?.codeVerifier;
+	if (!code || typeof codeVerifier !== "string") {
+		return renderMessagePage(400, "Requête invalide", "La réponse de Google est incomplète.", {
+			headers,
+		});
 	}
 
-	const [accessToken, googleErrResponse] = await fetchUpstreamAuthToken({
+	const googleAccessToken = await exchangeCodeForAccessToken({
 		clientId: c.env.GOOGLE_CLIENT_ID,
 		clientSecret: c.env.GOOGLE_CLIENT_SECRET,
 		code,
-		grantType: "authorization_code",
-		redirectUri: new URL("/callback", c.req.url).href,
-		upstreamUrl: "https://accounts.google.com/o/oauth2/token",
+		codeVerifier,
+		redirectUri: googleCallbackUrl(c.env),
 	});
-	if (googleErrResponse) {
-		return googleErrResponse;
+	const user = googleAccessToken ? await fetchGoogleUser(googleAccessToken) : null;
+	if (!user) {
+		return renderMessagePage(
+			502,
+			"Échec de la connexion Google",
+			"Google n'a pas pu confirmer votre identité. Recommencez la connexion depuis Claude.",
+			{ headers },
+		);
 	}
 
-	// Fetch the user info from Google
-	const userResponse = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
-		headers: {
-			Authorization: `Bearer ${accessToken}`,
-		},
-	});
-	if (!userResponse.ok) {
-		return c.text(`Failed to fetch user info: ${await userResponse.text()}`, 500);
-	}
-
-	const { id, name, email } = (await userResponse.json()) as {
-		id: string;
-		name: string;
-		email: string;
-	};
-
-	// Return back to the MCP client a new token
-	const { redirectTo } = await c.env.OAUTH_PROVIDER.completeAuthorization({
-		metadata: {
-			label: name,
-		},
-		props: {
-			accessToken,
+	// The allowlist decision is taken here, before any grant or code exists.
+	const email = normalizeEmail(user.email);
+	if (!user.emailVerified || !isAllowedEmail(email)) {
+		console.warn("login_denied", {
 			email,
-			name,
-		} as Props,
-		request: oauthReqInfo,
-		scope: oauthReqInfo.scope,
-		userId: id,
-	});
-
-	// Clear the session binding cookie (one-time use) by creating response with headers
-	const headers = new Headers({ Location: redirectTo });
-	if (clearSessionCookie) {
-		headers.set("Set-Cookie", clearSessionCookie);
+			reason: !user.emailVerified ? "email_not_verified" : "email_not_allowed",
+		});
+		return renderMessagePage(
+			403,
+			"Accès refusé",
+			`Le compte Google ${email || "utilisé"} n'est pas autorisé à accéder à ce serveur MCP.`,
+			{
+				headers,
+				link: {
+					href: authorizationErrorRedirect(
+						authRequest,
+						"access_denied",
+						"This Google account is not authorized",
+					),
+					label: "Retourner à Claude",
+				},
+			},
+		);
 	}
 
-	return new Response(null, {
-		status: 302,
-		headers,
+	const props: Props = { email, name: user.name, sub: user.sub };
+	const { redirectTo } = await oauth.completeAuthorization({
+		metadata: { label: email },
+		props,
+		request: authRequest,
+		scope: authRequest.scope,
+		userId: user.sub,
 	});
+	console.log("login_granted", { clientId: authRequest.clientId, email });
+	headers.set("Location", redirectTo);
+	return new Response(null, { headers, status: 302 });
+});
+
+app.onError((error) => {
+	console.error("oauth_handler_error", {
+		message: error.message.slice(0, 200),
+		name: error.name,
+	});
+	return renderMessagePage(
+		500,
+		"Erreur interne",
+		"Une erreur inattendue s'est produite. Recommencez la connexion depuis Claude.",
+	);
 });
 
 export { app as GoogleHandler };
