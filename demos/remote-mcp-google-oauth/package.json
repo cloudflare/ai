@@ -2,24 +2,25 @@
 	"name": "remote-mcp-google-oauth",
 	"version": "0.0.1",
 	"private": true,
+	"type": "module",
 	"scripts": {
 		"deploy": "wrangler deploy",
 		"dev": "wrangler dev",
 		"start": "wrangler dev",
 		"cf-typegen": "wrangler types",
-		"type-check": "tsc --noEmit"
+		"test": "vitest",
+		"test:ci": "vitest --watch=false",
+		"type-check": "tsc --noEmit && tsc --noEmit -p test"
 	},
 	"dependencies": {
 		"@cloudflare/workers-oauth-provider": "^1.2.4",
-		"@modelcontextprotocol/server": "2.3.1",
-		"agents": "^0.29.0",
-		"hono": "^4.12.27",
-		"just-pick": "^4.2.0",
-		"zod": "^4.4.3"
+		"hono": "^4.12.27"
 	},
 	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "^0.16.20",
 		"@cloudflare/workers-types": "^4.20260628.1",
 		"typescript": "6.0.3",
+		"vitest": "~4.1.9",
 		"wrangler": "^4.105.0"
 	}
 }

@@ -3,14 +3,15 @@
 declare namespace Cloudflare {
 	interface Env {
 		MCP_RESOURCE: string;
+		AMAT_MCP_URL: string;
 	}
 }
 
 interface Env {
   MCP_RESOURCE: string;
+  AMAT_MCP_URL: string;
   OAUTH_KV: KVNamespace;
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
-  COOKIE_ENCRYPTION_KEY: string;
-  HOSTED_DOMAIN: string;
+  AMAT_ACCESS_TOKEN: string;
 }

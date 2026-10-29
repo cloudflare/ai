@@ -1,48 +1,21 @@
 import { env } from "cloudflare:workers";
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
-import { McpServer } from "@modelcontextprotocol/server";
-import { createMcpHandler } from "agents/mcp/server";
-import { z } from "zod";
+import { createAmatRelay } from "./amat-relay";
 import { GoogleHandler } from "./google-handler";
 
-// Context from the auth process, encrypted and stored in the auth token.
-// Read it inside the server with `getMcpAuthContext()?.props`.
-export type Props = {
-	name: string;
-	email: string;
-	accessToken: string;
-};
+export type { Props } from "./utils";
 
-function createServer() {
-	const server = new McpServer({
-		name: "Google OAuth Proxy Demo",
-		version: "0.0.1",
-	});
-
-	server.registerTool(
-		"add",
-		{ inputSchema: z.object({ a: z.number(), b: z.number() }) },
-		async ({ a, b }) => ({
-			content: [{ text: String(a + b), type: "text" }],
-		}),
-	);
-
-	return server;
-}
-
-const mcpHandler = createMcpHandler(createServer);
-
+// Every request to /mcp (and below) must carry an access token this provider issued for
+// MCP_RESOURCE; anything else gets a 401 challenge before the relay runs. The Google
+// handler serves /authorize and /callback; the provider serves /token, /register and the
+// OAuth metadata documents.
 export default new OAuthProvider<Env>({
-	apiHandler: {
-		fetch(request: Request, env: Env, ctx: ExecutionContext) {
-			return mcpHandler(request, env, ctx);
-		},
-	},
+	apiHandler: createAmatRelay(),
 	apiRoute: "/mcp",
 	authorizeEndpoint: "/authorize",
 	clientRegistrationEndpoint: "/register",
 	defaultHandler: GoogleHandler as any,
 	tokenEndpoint: "/token",
 	// The URL MCP clients connect to. Every token is bound to it.
-	resourceMetadata: { resource: env.MCP_RESOURCE },
+	resourceMetadata: { resource: env.MCP_RESOURCE, resource_name: "Amat Odoo MCP" },
 });
