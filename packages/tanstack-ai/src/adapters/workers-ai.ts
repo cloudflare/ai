@@ -449,9 +449,13 @@ export class WorkersAiTextAdapter<TModel extends WorkersAiTextModel> extends Bas
 						} catch {
 							parsedInput = {};
 						}
+						// Always generate a unique ID per tool call.
+						// The backend may send the same ID for multiple tool calls,
+						// so we cannot trust tc.id to be unique.
+						const toolCallId = generateId("chatcmpl-tool");
 						yield {
 							type: EventType.TOOL_CALL_START,
-							toolCallId: tc.id,
+							toolCallId,
 							toolCallName: fn.name,
 							toolName: fn.name,
 							model: nonStreamResult.model || model || this.model,
@@ -460,7 +464,7 @@ export class WorkersAiTextAdapter<TModel extends WorkersAiTextModel> extends Bas
 						} satisfies StreamChunk;
 						yield {
 							type: EventType.TOOL_CALL_END,
-							toolCallId: tc.id,
+							toolCallId,
 							toolName: fn.name,
 							model: nonStreamResult.model || model || this.model,
 							timestamp,
