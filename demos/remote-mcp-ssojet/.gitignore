@@ -1,0 +1,28 @@
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# dotenv files
+.env
+.env.* 
+.dev.vars
+.wrangler
+# Wrangler output
+dist/
+wrangler.toml.local
+.dev.vars
+
+# VSCode settings
+.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Optional: Ignore KV preview data (if used locally)
+.kv-preview/
