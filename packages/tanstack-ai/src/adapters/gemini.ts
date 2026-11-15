@@ -66,6 +66,9 @@ function buildGeminiGatewayConfig(config: GeminiGatewayConfig) {
 	if (typeof config.metadata === "object") {
 		headers["cf-aig-metadata"] = JSON.stringify(config.metadata);
 	}
+	if (typeof config.byokAlias === "string" && config.byokAlias.length > 0) {
+		headers["cf-aig-byok-alias"] = config.byokAlias;
+	}
 
 	const apiKey = config.apiKey ?? config.cfApiKey;
 

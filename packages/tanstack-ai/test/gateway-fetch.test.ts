@@ -212,6 +212,24 @@ describe("createGatewayFetch", () => {
 			const [, init] = mockFetch.mock.calls[0]!;
 			expect(init.headers["cf-aig-authorization"]).toBeUndefined();
 		});
+
+		it("should set cf-aig-byok-alias on the outer REST request", async () => {
+			const fetcher = createGatewayFetch("openrouter", {
+				...credentialsConfig,
+				byokAlias: "development",
+			});
+
+			await fetcher("https://openrouter.ai/api/v1/chat/completions", {
+				method: "POST",
+				body: JSON.stringify({}),
+			});
+
+			const [, init] = mockFetch.mock.calls[0]!;
+			expect(init.headers["cf-aig-byok-alias"]).toBe("development");
+			const body = JSON.parse(init.body);
+			expect(body.provider).toBe("openrouter");
+			expect(body.headers["cf-aig-byok-alias"]).toBe("development");
+		});
 	});
 
 	describe("cache headers", () => {
@@ -304,6 +322,23 @@ describe("createGatewayFetch", () => {
 			expect(request.headers["cf-aig-cache-ttl"]).toBeUndefined();
 			expect(request.headers["cf-aig-cache-key"]).toBeUndefined();
 			expect(request.headers["cf-aig-metadata"]).toBeUndefined();
+			expect(request.headers["cf-aig-byok-alias"]).toBeUndefined();
+		});
+
+		it("does not set cf-aig-byok-alias on the binding path", async () => {
+			const config: AiGatewayAdapterConfig = {
+				binding: mockBinding,
+				byokAlias: "development",
+			};
+			const fetcher = createGatewayFetch("openai", config);
+
+			await fetcher("https://api.openai.com/v1/chat/completions", {
+				method: "POST",
+				body: JSON.stringify({}),
+			});
+
+			const request = mockBinding.run.mock.calls[0]![0];
+			expect(request.headers["cf-aig-byok-alias"]).toBeUndefined();
 		});
 	});
 

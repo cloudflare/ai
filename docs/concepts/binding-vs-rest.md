@@ -35,7 +35,8 @@ const provider = createWorkersAI({
 | ------------------------------------------------- | ------- | ---- |
 | Chat / generate / stream                          | ✅      | ✅   |
 | Image / embeddings / transcription / TTS / rerank | ✅      | ✅   |
-| Gateway routing (caching, metadata, BYOK)         | ✅      | ✅   |
+| Gateway routing (caching, metadata)               | ✅      | ✅   |
+| BYOK stored-key alias (`cf-aig-byok-alias`)       | ❌      | ✅   |
 | Server-side fallback                              | ✅      | ✅   |
 | **Resumable streaming** _(coming soon)_           | ✅      | ❌   |
 
