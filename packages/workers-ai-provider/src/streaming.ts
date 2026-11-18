@@ -163,9 +163,18 @@ export function getMappedStream(
 					finishReason = mapWorkersAIFinishReason(directFinishReason);
 				}
 
+				// Some models (the Llama family on Workers AI) send a hybrid event: the same piece in
+				// the native fields and in the OpenAI-style `choices[0].delta`. Each piece is read
+				// from one place only: text from `response`, tool calls from the delta (which
+				// carries their index and id).
+				const deltaToolCallsInChunk = choices?.[0]?.delta?.tool_calls;
+				const hasDeltaToolCalls =
+					Array.isArray(deltaToolCallsInChunk) && deltaToolCallsInChunk.length > 0;
+
 				// --- Native format: top-level `response` field ---
 				const nativeResponse = chunk.response;
-				if (nativeResponse != null && nativeResponse !== "") {
+				const hasNativeText = nativeResponse != null && nativeResponse !== "";
+				if (hasNativeText) {
 					const responseText = String(nativeResponse);
 					if (responseText.length > 0) {
 						if (bufferContentForSalvage) {
@@ -190,7 +199,7 @@ export function getMappedStream(
 				}
 
 				// --- Native format: top-level `tool_calls` ---
-				if (Array.isArray(chunk.tool_calls)) {
+				if (Array.isArray(chunk.tool_calls) && !hasDeltaToolCalls) {
 					// Close active reasoning block before tool calls start
 					if (reasoningId) {
 						controller.enqueue({ type: "reasoning-end", id: reasoningId });
@@ -221,7 +230,9 @@ export function getMappedStream(
 						});
 					}
 
-					const textDelta = delta.content as string | undefined;
+					const textDelta = hasNativeText
+						? undefined
+						: (delta.content as string | undefined);
 					if (textDelta && textDelta.length > 0) {
 						if (bufferContentForSalvage) {
 							contentBuffer += textDelta;

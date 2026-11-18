@@ -1363,6 +1363,139 @@ describe("Binding - Streaming Text Tests", () => {
 		expect(reasoning).toEqual("Thinking...");
 		expect(content).toEqual("Hello");
 	});
+	// Workers AI's Llama models (e.g. llama-3.3-70b-instruct-fp8-fast, llama-4-scout-17b-16e-instruct)
+	// stream a hybrid event: the same piece in the native fields and in the OpenAI-style delta.
+	it("should read text once when a chunk carries it in both `response` and `choices[0].delta.content`", async () => {
+		const piece = (text: string) => ({
+			response: text,
+			tool_calls: [],
+			p: "abcdef",
+			choices: [
+				{ index: 0, delta: { role: "assistant", content: text }, finish_reason: null },
+			],
+		});
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () =>
+					mockStream([piece("The capital"), piece(" is Canberra."), "[DONE]"]),
+			},
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "What's the capital of Australia?",
+		});
+
+		let text = "";
+		for await (const chunk of result.textStream) {
+			text += chunk;
+		}
+
+		expect(text).toBe("The capital is Canberra.");
+	});
+
+	it("should read tool-call arguments once when a chunk carries them in both `tool_calls` and `choices[0].delta.tool_calls`", async () => {
+		// The first piece has the name (and, in the delta, the id); every argument piece comes in both places.
+		const piece = (args: string, first = false) => ({
+			response: "",
+			tool_calls: [first ? { name: "get_weather", arguments: args } : { arguments: args }],
+			choices: [
+				{
+					index: 0,
+					delta: {
+						tool_calls: [
+							{
+								index: 0,
+								id: first ? "chatcmpl-tool-abc" : null,
+								...(first ? { type: "function" } : {}),
+								function: {
+									...(first ? { name: "get_weather" } : {}),
+									arguments: args,
+								},
+							},
+						],
+					},
+				},
+			],
+		});
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () =>
+					mockStream([
+						piece('{"location": ', true),
+						piece('"Lon'),
+						piece('don"}'),
+						"[DONE]",
+					]),
+			},
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Get the weather information for London",
+			tools: {
+				get_weather: {
+					description: "Get the weather in a location",
+					inputSchema: z.object({
+						location: z.string().describe("The location to get the weather for"),
+					}),
+				},
+			},
+		});
+
+		const toolCalls: any[] = [];
+		for await (const chunk of result.fullStream) {
+			if (chunk.type === "tool-call") {
+				toolCalls.push(chunk);
+			}
+		}
+
+		expect(toolCalls).toHaveLength(1);
+		expect(toolCalls[0].toolName).toBe("get_weather");
+		expect(toolCalls[0].invalid).toBeFalsy();
+		expect(toolCalls[0].input).toEqual({ location: "London" });
+	});
+
+	it("should still read native `tool_calls` when `choices[0].delta.tool_calls` is empty", async () => {
+		const workersai = createWorkersAI({
+			binding: {
+				run: async () =>
+					mockStream([
+						{
+							response: "",
+							tool_calls: [
+								{ name: "get_weather", arguments: '{"location": "London"}' },
+							],
+							choices: [{ index: 0, delta: { tool_calls: [] } }],
+						},
+						"[DONE]",
+					]),
+			},
+		});
+
+		const result = streamText({
+			model: workersai(TEST_MODEL),
+			prompt: "Get the weather information for London",
+			tools: {
+				get_weather: {
+					description: "Get the weather in a location",
+					inputSchema: z.object({
+						location: z.string().describe("The location to get the weather for"),
+					}),
+				},
+			},
+		});
+
+		const toolCalls: any[] = [];
+		for await (const chunk of result.fullStream) {
+			if (chunk.type === "tool-call") {
+				toolCalls.push(chunk);
+			}
+		}
+
+		expect(toolCalls).toHaveLength(1);
+		expect(toolCalls[0].input).toEqual({ location: "London" });
+	});
 });
 
 describe("REST API - Finish Reason Handling", () => {
