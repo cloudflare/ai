@@ -2,10 +2,10 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { stytchBearerTokenAuthMiddleware } from "./lib/auth";
 import { TodoAPI } from "./TodoAPI.ts";
-import { TodoMCP } from "./TodoMCP.ts";
+import { createMcpHandler } from "agents/mcp/server";
+import { createTodoServer } from "./TodoMCP.ts";
 
-// Export the TodoMCP class so the Worker runtime can find it
-export { TodoMCP };
+const mcpHandler = createMcpHandler(createTodoServer);
 
 export default new Hono<{ Bindings: Env }>()
 	.use(cors())
@@ -24,7 +24,7 @@ export default new Hono<{ Bindings: Env }>()
 
 	// Let the MCP Server have a go at handling the request
 	.use("/mcp/*", stytchBearerTokenAuthMiddleware)
-	.route("/mcp", new Hono().mount("/", TodoMCP.serve("/mcp").fetch))
+	.all("/mcp", (c) => mcpHandler(c.req.raw, c.env, c.executionCtx))
 
 	// Finally - serve static assets from Vite
 	.mount("/", (req, env) => env.ASSETS.fetch(req));

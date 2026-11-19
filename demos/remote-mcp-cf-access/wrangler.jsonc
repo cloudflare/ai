@@ -7,20 +7,11 @@
   "name": "mcp-access-oauth",
   "main": "src/index.ts",
   "compatibility_date": "2026-03-10",
-  "migrations": [
-    {
-      "new_sqlite_classes": ["MyMCP"],
-      "tag": "v1"
-    }
-  ],
   "compatibility_flags": ["nodejs_compat"],
-  "durable_objects": {
-    "bindings": [
-      {
-        "class_name": "MyMCP",
-        "name": "MCP_OBJECT"
-      }
-    ]
+  // The URL MCP clients connect to. Set it to your deployed URL, for example
+  // https://<worker-name>.<your-subdomain>.workers.dev/mcp
+  "vars": {
+    "MCP_RESOURCE": "http://localhost:8788/mcp",
   },
   "kv_namespaces": [
     {

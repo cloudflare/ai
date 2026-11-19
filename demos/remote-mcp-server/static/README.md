@@ -23,7 +23,7 @@ You should be able to open [`http://localhost:8787/`](http://localhost:8787/) in
 To explore your new MCP api, you can use the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector).
 
 - Start it with `npx @modelcontextprotocol/inspector`
-- [Within the inspector](http://localhost:5173), switch the Transport Type to `SSE` and enter `http://localhost:8787/sse` as the URL of the MCP server to connect to, and click "Connect"
+- [Within the inspector](http://localhost:5173), switch the Transport Type to `Streamable HTTP` and enter `http://localhost:8787/mcp` as the URL of the MCP server to connect to, and click "Connect"
 - You will navigate to a (mock) user/password login screen. Input any email and pass to login.
 - You should be redirected back to the MCP Inspector and you can now list and call any defined tools!
 
@@ -46,7 +46,7 @@ Open the file in your text editor and replace it with this configuration:
 	"mcpServers": {
 		"math": {
 			"command": "npx",
-			"args": ["mcp-remote", "http://localhost:8787/sse"]
+			"args": ["mcp-remote", "http://localhost:8787/mcp"]
 		}
 	}
 }
@@ -76,20 +76,20 @@ Just like you did above in "Develop locally", run the MCP inspector:
 
 `npx @modelcontextprotocol/inspector@latest`
 
-Then enter the `workers.dev` URL (ex: `worker-name.account-name.workers.dev/sse`) of your Worker in the inspector as the URL of the MCP server to connect to, and click "Connect".
+Then enter the `workers.dev` URL (ex: `worker-name.account-name.workers.dev/mcp`) of your Worker in the inspector as the URL of the MCP server to connect to, and click "Connect".
 
 You've now connected to your MCP server from a remote MCP client.
 
 ## Connect Claude Desktop to your remote MCP server
 
-Update the Claude configuration file to point to your `workers.dev` URL (ex: `worker-name.account-name.workers.dev/sse`) and restart Claude
+Update the Claude configuration file to point to your `workers.dev` URL (ex: `worker-name.account-name.workers.dev/mcp`) and restart Claude
 
 ```json
 {
 	"mcpServers": {
 		"math": {
 			"command": "npx",
-			"args": ["mcp-remote", "https://worker-name.account-name.workers.dev/sse"]
+			"args": ["mcp-remote", "https://worker-name.account-name.workers.dev/mcp"]
 		}
 	}
 }
@@ -101,7 +101,7 @@ Should anything go wrong it can be helpful to restart Claude, or to try connecti
 MCP server on the command line with the following command.
 
 ```bash
-npx mcp-remote http://localhost:8787/sse
+npx mcp-remote http://localhost:8787/mcp
 ```
 
 In some rare cases it may help to clear the files added to `~/.mcp-auth`

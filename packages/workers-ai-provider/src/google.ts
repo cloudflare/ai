@@ -7,6 +7,10 @@ import type { ProviderPlugin } from "./gateway-delegate";
  * (Google AI Studio) and `"google-vertex/<model>"` slugs.
  *
  * Requires `@ai-sdk/google` (an optional peer dependency — install it yourself).
+ *
+ * @deprecated Pass the vendor's own model to `createAI` from
+ * `agents/models/ai-sdk` instead of a plugin plus a slug:
+ * `ai(createGoogle({ apiKey: "cloudflare" })("gemini-2.5-flash"))`.
  */
 export const google: ProviderPlugin = {
 	wireFormat: "google",

@@ -2,10 +2,10 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { stytchBearerTokenAuthMiddleware } from "./lib/auth";
 import { OKRAPI } from "./OKRAPI.ts";
-import { OKRManagerMCP } from "./OKRManagerMCP.ts";
+import { createMcpHandler } from "agents/mcp/server";
+import { createOKRManagerServer } from "./OKRManagerMCP.ts";
 
-// Export the OKRManagerMCP class so the Worker runtime can find it
-export { OKRManagerMCP };
+const mcpHandler = createMcpHandler(createOKRManagerServer);
 
 export default new Hono<{ Bindings: Env }>()
 	.use(cors())
@@ -24,7 +24,7 @@ export default new Hono<{ Bindings: Env }>()
 
 	// Let the MCP Server have a go at handling the request
 	.use("/mcp/*", stytchBearerTokenAuthMiddleware)
-	.route("/mcp", new Hono().mount("/", OKRManagerMCP.serve("/mcp").fetch))
+	.all("/mcp", (c) => mcpHandler(c.req.raw, c.env, c.executionCtx))
 
 	// Finally - serve static assets from Vite
 	.mount("/", (req, env) => env.ASSETS.fetch(req));

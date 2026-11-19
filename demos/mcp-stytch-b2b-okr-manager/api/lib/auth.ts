@@ -87,7 +87,6 @@ export const stytchBearerTokenAuthMiddleware = createMiddleware<{
 
 	try {
 		const tokenRes = await getClient(c.env).idp.introspectTokenLocal(accessToken);
-		// @ts-expect-error executionCtx is untyped
 		c.executionCtx.props = {
 			accessToken,
 			organizationID: tokenRes.organization.organization_id,

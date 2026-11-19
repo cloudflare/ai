@@ -8,19 +8,10 @@
 	"main": "src/index.ts",
 	"compatibility_date": "2025-03-10",
 	"compatibility_flags": ["nodejs_compat"],
-	"migrations": [
-		{
-			"new_sqlite_classes": ["MyMCP"],
-			"tag": "v1",
-		},
-	],
-	"durable_objects": {
-		"bindings": [
-			{
-				"class_name": "MyMCP",
-				"name": "MCP_OBJECT",
-			},
-		],
+	// The URL MCP clients connect to. Set it to your deployed URL, for example
+	// https://<worker-name>.<your-subdomain>.workers.dev/mcp
+	"vars": {
+		"MCP_RESOURCE": "http://localhost:8787/mcp",
 	},
 	"kv_namespaces": [
 		{

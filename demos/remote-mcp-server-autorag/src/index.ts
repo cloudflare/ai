@@ -1,46 +1,53 @@
+import { env } from "cloudflare:workers";
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { McpAgent } from "agents/mcp";
+import { McpServer } from "@modelcontextprotocol/server";
+import { createMcpHandler } from "agents/mcp/server";
 import { z } from "zod";
 import app from "./app";
 
-export class MyMCP extends McpAgent {
-	server = new McpServer({
+function createServer() {
+	const server = new McpServer({
 		name: "Demo",
 		version: "1.0.0",
 	});
 
-	async init() {
-		this.server.tool(
-			"Query AutoRAG <insert tool description here>",
-			{ query: z.string() },
-			async ({ query }) => {
-				const answer = await this.env.AI.autorag("add-name-of-your-autorag-here").aiSearch({
-					query,
-					model: "@cf/meta/llama-3.3-70b-instruct-sd",
-					rewrite_query: true,
-					max_num_results: 2,
-					ranking_options: {
-						score_threshold: 0.7,
-					},
-					stream: false,
-				});
+	server.registerTool(
+		"Query AutoRAG <insert tool description here>",
+		{ inputSchema: z.object({ query: z.string() }) },
+		async ({ query }) => {
+			const answer = await env.AI.autorag("add-name-of-your-autorag-here").aiSearch({
+				query,
+				model: "@cf/meta/llama-3.3-70b-instruct-sd",
+				rewrite_query: true,
+				max_num_results: 2,
+				ranking_options: {
+					score_threshold: 0.7,
+				},
+				stream: false,
+			} as AutoRagSearchRequest);
 
-				return {
-					content: [{ type: "text", text: answer }],
-				};
-			},
-		);
-	}
+			return {
+				content: [{ type: "text", text: answer.response }],
+			};
+		},
+	);
+
+	return server;
 }
 
-// Export the OAuth handler as the default
-export default new OAuthProvider({
+const mcpHandler = createMcpHandler(createServer);
+
+export default new OAuthProvider<Env>({
 	apiRoute: "/mcp",
-	apiHandler: MyMCP.serve("/mcp"),
-	// @ts-expect-error
+	apiHandler: {
+		fetch(request: Request, bindings: Env, ctx: ExecutionContext) {
+			return mcpHandler(request, bindings, ctx);
+		},
+	},
 	defaultHandler: app,
 	authorizeEndpoint: "/authorize",
 	tokenEndpoint: "/token",
 	clientRegistrationEndpoint: "/register",
+	// The URL MCP clients connect to. Every token is bound to it.
+	resourceMetadata: { resource: env.MCP_RESOURCE },
 });

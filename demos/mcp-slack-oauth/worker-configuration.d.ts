@@ -3,11 +3,11 @@
 // Runtime types generated with workerd@1.20250507.0 2025-03-10 nodejs_compat
 declare namespace Cloudflare {
 	interface Env {
+		MCP_RESOURCE: string;
 		OAUTH_KV: KVNamespace;
 		SLACK_CLIENT_ID: "1234567890";
 		SLACK_CLIENT_SECRET: "1234567890";
         COOKIE_ENCRYPTION_KEY: string;
-		MCP_OBJECT: DurableObjectNamespace<import("./src/index").SlackMCP>;
 	}
 }
 interface Env extends Cloudflare.Env {}
@@ -5151,6 +5151,7 @@ declare namespace Rpc {
 }
 declare namespace Cloudflare {
     interface Env {
+    	MCP_RESOURCE: string;
     }
 }
 declare module 'cloudflare:workers' {

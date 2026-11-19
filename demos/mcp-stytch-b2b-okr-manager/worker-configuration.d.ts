@@ -6,7 +6,6 @@ declare namespace Cloudflare {
 		STYTCH_PROJECT_ID: string;
 		STYTCH_PROJECT_SECRET: string;
 		STYTCH_DOMAIN: string;
-		MCP_OBJECT: DurableObjectNamespace<import("./api/index").OKRManagerMCP>;
 		ASSETS: Fetcher;
 	}
 }

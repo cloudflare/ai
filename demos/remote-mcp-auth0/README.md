@@ -22,7 +22,7 @@ This demo allows an MCP Server to call a protected API on behalf of the authenti
 Navigate to [https://playground.ai.cloudflare.com/](https://playground.ai.cloudflare.com/) and connect to your MCP server on the bottom left using the following URL pattern:
 
 ```bash
-https://mcp-auth0-oidc.<your-subdomain>.workers.dev/sse
+https://mcp-auth0-oidc.<your-subdomain>.workers.dev/mcp
 ```
 
 This will open a popup where you can sign in after which you'll be able to use all of the tools.
@@ -42,7 +42,7 @@ Replace the content with the following configuration:
       "command": "npx",
       "args": [
         "mcp-remote",
-        "https://mcp-auth0-oidc.<your-subdomain>.workers.dev/sse"
+        "https://mcp-auth0-oidc.<your-subdomain>.workers.dev/mcp"
       ]
     }
   }

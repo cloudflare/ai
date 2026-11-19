@@ -7,6 +7,10 @@ import type { ProviderPlugin } from "./gateway-delegate";
  * `"anthropic/<model>"` slugs.
  *
  * Requires `@ai-sdk/anthropic` (an optional peer dependency — install it yourself).
+ *
+ * @deprecated Pass the vendor's own model to `createAI` from
+ * `agents/models/ai-sdk` instead of a plugin plus a slug:
+ * `ai(createAnthropic({ apiKey: "cloudflare" })("claude-opus-4-8"))`.
  */
 export const anthropic: ProviderPlugin = {
 	wireFormat: "anthropic",

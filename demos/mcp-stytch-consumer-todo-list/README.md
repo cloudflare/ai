@@ -4,7 +4,7 @@ This is a Workers server that composes three functions:
 
 - A static website built using React and Vite on top of [Worker Assets](https://developers.cloudflare.com/workers/static-assets/)
 - A REST API built using Hono on top of [Workers KV](https://developers.cloudflare.com/kv/)
-- A [Model Context Protocol](https://modelcontextprotocol.io/introduction) Server built using on top of [Workers Durable Objects](https://developers.cloudflare.com/durable-objects/)
+- A [Model Context Protocol](https://modelcontextprotocol.io/introduction) Server built using with `createMcpHandler` from the [Agents SDK](https://developers.cloudflare.com/agents/)
 
 User and client identity is managed using [Stytch](https://stytch.com/). Put together, these three features show how to extend a traditional full-stack application for use by an AI agent.
 
@@ -74,7 +74,7 @@ After completing all the setup steps above the application can be run with the c
 npm run dev
 ```
 
-The application will be available at [`http://localhost:3000`](http://localhost:3000) and the MCP server will be available at `http://localhost:3000/sse`.
+The application will be available at [`http://localhost:3000`](http://localhost:3000) and the MCP server will be available at `http://localhost:3000/mcp`.
 
 Test your MCP server using the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector)
 

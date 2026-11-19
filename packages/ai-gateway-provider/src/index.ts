@@ -46,6 +46,10 @@ type InternalLanguageModelV4 = LanguageModelV4 & {
 	config?: { fetch?: FetchFunction | undefined };
 };
 
+/**
+ * @deprecated Use `createAI` from `agents/models/ai-sdk`; see
+ * {@link createAiGateway}.
+ */
 export class AiGatewayChatLanguageModel implements LanguageModelV4 {
 	readonly specificationVersion = "v4";
 	readonly defaultObjectGenerationMode = "json";
@@ -337,6 +341,22 @@ export type AiGatewayBindingSettings = {
 };
 export type AiGatewaySettings = AiGatewayAPISettings | AiGatewayBindingSettings;
 
+/**
+ * Create an AI Gateway provider over one model or a fallback chain.
+ *
+ * @deprecated Use `createAI` from `agents/models/ai-sdk`, with the `env.AI`
+ * binding (not `env.AI.gateway(id)`) or, in place of REST mode, an account id
+ * and API token:
+ *
+ * ```ts
+ * import { createAI } from "agents/models/ai-sdk";
+ * const ai = createAI({ accountId, apiToken, gateway: "my-gateway" }); // or { binding: env.AI, id: "my-gateway" }
+ * ai(anthropic("claude-opus-4-8"), { fallback: [openai("gpt-5.4")] }); // was aigateway([anthropic(…), openai(…)])
+ * ```
+ *
+ * One difference: `createAI` falls back client-side (one request per leg)
+ * rather than in a single gateway request.
+ */
 export function createAiGateway(options: AiGatewaySettings): AiGateway {
 	const createChatModel = (models: LanguageModelV4 | LanguageModelV4[]) => {
 		return new AiGatewayChatLanguageModel(Array.isArray(models) ? models : [models], options);

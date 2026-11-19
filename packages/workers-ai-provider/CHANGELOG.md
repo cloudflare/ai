@@ -1,5 +1,11 @@
 # workers-ai-provider
 
+## 4.0.1
+
+### Patch Changes
+
+- [#675](https://github.com/cloudflare/ai/pull/675) [`0146296`](https://github.com/cloudflare/ai/commit/014629613e0193cb4f969ee75ffba460e0982189) Thanks [@mattzcarey](https://github.com/mattzcarey)! - Deprecate both packages. Use `createAI` from `agents/models/ai-sdk`, and `ai-search-provider` for AI Search. Nothing changes at runtime.
+
 ## 4.0.0
 
 ### Major Changes

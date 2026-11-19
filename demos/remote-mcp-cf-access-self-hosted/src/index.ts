@@ -1,6 +1,7 @@
 import { jwtVerify, createRemoteJWKSet } from "jose";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { McpAgent } from "agents/mcp";
+import { env } from "cloudflare:workers";
+import { McpServer } from "@modelcontextprotocol/server";
+import { createMcpHandler, getMcpAuthContext } from "agents/mcp/server";
 import { z } from "zod";
 
 export interface AccessIdentity {
@@ -11,27 +12,31 @@ export interface AccessIdentity {
 
 const ALLOWED_EMAILS = new Set(["<INSERT EMAIL>"]);
 
-export class MyMCP extends McpAgent<Env, Record<string, never>, AccessIdentity> {
-	server = new McpServer({
+function createServer() {
+	const server = new McpServer({
 		name: "Access Self-Hosted MCP Demo",
 		version: "1.0.0",
 	});
+	const identity = getMcpAuthContext()?.props as AccessIdentity | undefined;
 
-	async init() {
-		this.server.tool(
-			"add",
-			"Add two numbers the way only MCP can",
-			{ a: z.number(), b: z.number() },
-			async ({ a, b }) => ({
-				content: [{ text: String(a + b), type: "text" }],
-			}),
-		);
+	server.registerTool(
+		"add",
+		{
+			description: "Add two numbers the way only MCP can",
+			inputSchema: z.object({ a: z.number(), b: z.number() }),
+		},
+		async ({ a, b }) => ({
+			content: [{ text: String(a + b), type: "text" }],
+		}),
+	);
 
-		if (this.props && ALLOWED_EMAILS.has(this.props.email)) {
-			this.server.tool(
-				"generateImage",
-				"Generate an image using the `flux-1-schnell` model. Works best with 8 steps.",
-				{
+	if (identity && ALLOWED_EMAILS.has(identity.email)) {
+		server.registerTool(
+			"generateImage",
+			{
+				description:
+					"Generate an image using the `flux-1-schnell` model. Works best with 8 steps.",
+				inputSchema: z.object({
 					prompt: z
 						.string()
 						.describe("A text description of the image you want to generate."),
@@ -41,19 +46,21 @@ export class MyMCP extends McpAgent<Env, Record<string, never>, AccessIdentity> 
 						.max(8)
 						.default(4)
 						.describe("Number of diffusion steps (4-8)."),
-				},
-				async ({ prompt, steps }) => {
-					const response = await this.env.AI.run("@cf/black-forest-labs/flux-1-schnell", {
-						prompt,
-						steps,
-					});
-					return {
-						content: [{ data: response.image!, mimeType: "image/jpeg", type: "image" }],
-					};
-				},
-			);
-		}
+				}),
+			},
+			async ({ prompt, steps }) => {
+				const response = await env.AI.run("@cf/black-forest-labs/flux-1-schnell", {
+					prompt,
+					steps,
+				});
+				return {
+					content: [{ data: response.image!, mimeType: "image/jpeg", type: "image" }],
+				};
+			},
+		);
 	}
+
+	return server;
 }
 
 /**
@@ -83,12 +90,18 @@ export default {
 			});
 		}
 
+		let identity: AccessIdentity;
 		try {
-			await verifyAccessJwt(token, env);
+			identity = await verifyAccessJwt(token, env);
 		} catch {
 			return new Response("Invalid token", { status: 403 });
 		}
 
-		return MyMCP.serve("/mcp").fetch(request, env, ctx);
+		// Tools read the verified identity through `getMcpAuthContext()`
+		return createMcpHandler(createServer, { authContext: { props: identity } })(
+			request,
+			env,
+			ctx,
+		);
 	},
 } satisfies ExportedHandler<Env>;
