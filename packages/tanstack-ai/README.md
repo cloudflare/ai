@@ -258,7 +258,7 @@ import {
 const openai = createOpenAiChat("gpt-4o", config);
 
 // Anthropic
-const anthropic = createAnthropicChat("claude-sonnet-4-5", config);
+const anthropic = createAnthropicChat("claude-sonnet-4-6", config);
 
 // Gemini (credentials only)
 const gemini = createGeminiChat("gemini-2.0-flash", {

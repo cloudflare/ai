@@ -141,7 +141,7 @@ import { chat } from "@tanstack/ai";
 const openai = createOpenAiChat("gpt-5", { binding: env.AI.gateway("my-gateway") });
 
 // REST credentials (anywhere)
-const anthropic = createAnthropicChat("claude-sonnet-4-5", {
+const anthropic = createAnthropicChat("claude-sonnet-4-6", {
 	accountId: env.CF_ACCOUNT_ID,
 	gatewayId: "my-gateway",
 	cfApiKey: env.CF_AIG_TOKEN, // only if the gateway is authenticated
